@@ -18,7 +18,7 @@
     "@sanity/preview-url-secret": "^2.0.5",
     "@workspace/ui": "workspace:*",
     "lucide-react": "0.456.0",
-    "next": "^15.1.0",
+    "next": "^15.1.2",
     "next-sanity": "^9.8.32",
     "next-themes": "^0.4.3",
     "react": "^19.0.0",
