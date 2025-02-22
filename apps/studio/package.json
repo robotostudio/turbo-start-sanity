@@ -27,8 +27,6 @@
     "lucide-react": "0.475.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-is": "^19.0.0",
-    "react-rx": "^4.1.19",
     "sanity": "^3.75.0",
     "sanity-plugin-asset-source-unsplash": "^3.0.3",
     "sanity-plugin-icon-picker": "^3.3.0",
@@ -45,12 +43,10 @@
     "@types/jsdom": "^21.1.7",
     "@types/node": "^20",
     "@types/react": "^18.0.25",
-    "@types/react-is": "^19.0.0",
     "eslint": "^9.20.1",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.3",
     "eslint-plugin-simple-import-sort": "^12.1.1",
-    "jsdom": "^26.0.0",
-    "p-limit": "^6.2.0"
+    "jsdom": "^26.0.0"
   }
 }
