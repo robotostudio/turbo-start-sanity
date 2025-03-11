@@ -30,7 +30,7 @@
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "18.3.0",
-    "@types/react-dom": "18.3.1",
+    "@types/react-dom": "19.0.4",
     "@workspace/eslint-config": "workspace:^",
     "@workspace/typescript-config": "workspace:*",
     "postcss": "^8",
