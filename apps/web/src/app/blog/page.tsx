@@ -45,8 +45,10 @@ export default async function BlogIndexPage() {
     );
   }
 
-  // Extract featured blog and remaining blogs
-  const [featuredBlog, ...remainingBlogs] = blogs;
+  // Get featured blog from data.featured or first blog in array
+  const featuredBlog = data.featured || blogs[0];
+  // Get remaining blogs, filtering out the featured blog if it exists
+  const remainingBlogs = blogs.filter((blog) => blog._id !== featuredBlog?._id);
 
   return (
     <main className="bg-background">
