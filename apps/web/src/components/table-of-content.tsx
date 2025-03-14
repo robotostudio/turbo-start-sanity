@@ -1,57 +1,111 @@
-import { buttonVariants } from "@workspace/ui/components/button";
-import { cn } from "@workspace/ui/lib/utils";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { type FC, useMemo } from "react";
+import slugify from "slugify";
+
+import { cn } from "@workspace/ui/lib/utils";
+
 import type { PortableTextBlock } from "next-sanity";
 
-import { convertToSlug } from "@/utils";
+export type TableProps = {
+  richText?: PortableTextBlock[] | null;
+};
 
-interface TableOfContentProps<T> {
-  richText?: T | null;
-}
+const headings = {
+  h2: "pl-0",
+  h3: "pl-4",
+  h4: "pl-8",
+  h5: "pl-12",
+  h6: "pl-16",
+};
 
-interface ProcessedHeading {
-  href: string;
-  text: string;
-}
+const extractTextFromBlock = (block: any[]) => {
+  return block?.[0]?.text;
+};
 
-function filterHeadings(
-  richText?: PortableTextBlock[] | null,
-): ProcessedHeading[] {
-  if (!Array.isArray(richText)) return [];
+const styleToNumber = (style: string) => Number(style.replace("h", ""));
 
-  return richText.reduce<ProcessedHeading[]>((headings, block) => {
-    if (block._type !== "block" || !block.style?.startsWith("h")) {
-      return headings;
+const isExistTableOfContent = (richText?: PortableTextBlock[]) => {
+  if (Array.isArray(richText)) {
+    const even = (text: any) => text.style in headings;
+    return richText.filter(even);
+  }
+  return [];
+};
+
+const getHeadingLevels = (exist: any[]) => {
+  const temp: any[] = exist.map((block) => {
+    return {
+      heading: block?.style,
+      href: `#${slugify(extractTextFromBlock(block.children), {
+        lower: true,
+        strict: true,
+      })}`,
+      head: styleToNumber(block?.style),
+      text: extractTextFromBlock(block.children),
+    };
+  });
+
+  const headings: any[] = [];
+  temp.forEach((block, index) => {
+    const children = [];
+
+    if (block.isChild) return;
+
+    let count = index + 1;
+    while (count < temp.length && block["head"] < temp[count].head) {
+      children.push(temp[count]);
+      temp[count]["isChild"] = true;
+      count++;
     }
-    const text = block.children
-      ?.map((child) => child.text)
-      .join("")
-      .trim();
-    if (!text) return headings;
-    const slug = convertToSlug(text);
-    headings.push({ href: `#${slug}`, text });
-    return headings;
-  }, []);
-}
 
-function TableOfContentLink({ heading }: { heading: ProcessedHeading }) {
+    headings.push({
+      ...block,
+      children,
+    });
+  });
+
+  return headings;
+};
+
+const AnchorT: FC<{ heading: any }> = ({ heading }) => {
+  const { href, text, children, isChild, heading: style } = heading ?? {};
+  if (isChild === true && children?.length === 0) return <></>;
+
   return (
-    <Link
-      href={heading.href}
-      className={cn(
-        buttonVariants({ variant: "link" }),
-        "text-sm justify-start truncate",
-      )}
+    <li
+      className={cn("list-inside list-disc my-2", [
+        headings[style as keyof typeof headings],
+      ])}
     >
-      {heading.text}
-    </Link>
+      <Link href={href ?? "#"}>
+        <span className="hover:underline">{text}</span>
+      </Link>
+      {Array.isArray(children) && children.length > 0 && (
+        <ul>
+          {children.map((child, index) => (
+            <AnchorT heading={child} key={`${child.text}-${index}-${style}`} />
+          ))}
+        </ul>
+      )}
+    </li>
   );
-}
+};
 
-export function TableOfContent<T>({ richText }: TableOfContentProps<T>) {
-  const headings = filterHeadings(richText as PortableTextBlock[]);
-  if (!headings.length) return null;
+export const TableOfContent: FC<TableProps> = ({ richText }) => {
+  const { showTableOfContent, headings } = useMemo(() => {
+    const exist = isExistTableOfContent(richText ?? []);
+    if (exist.length) {
+      const headings = getHeadingLevels(exist);
+      return {
+        showTableOfContent: true,
+        headings,
+      };
+    }
+    return { showTableOfContent: !!exist.length };
+  }, [richText]);
+
+  if (!showTableOfContent) return <></>;
 
   return (
     <div className="sticky left-0 top-8 flex flex-col">
@@ -63,17 +117,15 @@ export function TableOfContent<T>({ richText }: TableOfContentProps<T>) {
             aria-hidden="true"
           />
         </summary>
-        <nav className="mt-4 " aria-label="Table of contents">
-          <ul className="flex flex-col space-y-2">
-            {headings.map((heading) => (
-              <TableOfContentLink
-                key={`${heading.href}-${heading.text}-heading`}
-                heading={heading}
-              />
-            ))}
+        <nav className="mt-4" aria-label="Table of contents">
+          <ul className="text-sm">
+            {Array.isArray(headings) &&
+              headings.map((heading, index) => (
+                <AnchorT heading={heading} key={`${heading._key}-${index}`} />
+              ))}
           </ul>
         </nav>
       </details>
     </div>
   );
-}
+};
