@@ -73,8 +73,8 @@ importers:
         specifier: ^9.6.0
         version: 9.6.0
       '@portabletext/block-tools':
-        specifier: ^1.1.13
-        version: 1.1.13(@sanity/types@3.78.1(@types/react@18.3.0)(debug@4.4.0))(@types/react@18.3.0)
+        specifier: ^1.1.14
+        version: 1.1.14(@sanity/types@3.78.1(@types/react@18.3.0)(debug@4.4.0))(@types/react@18.3.0)
       '@sanity/eslint-config-studio':
         specifier: ^5.0.2
         version: 5.0.2(eslint@9.22.0(jiti@1.21.6))(typescript@5.7.3)
@@ -1744,10 +1744,10 @@ packages:
       '@sanity/types': ^3.78.0
       '@types/react': 18 || 19
 
-  '@portabletext/block-tools@1.1.13':
-    resolution: {integrity: sha512-TpcKlOpzKC/DNlyMAfsZjkgekzrcRTmQHmtYt5FlXSC4vmJWEYSZgE4e9VMJG7FMM2j1yNMz4MadUkx6n5/M8A==}
+  '@portabletext/block-tools@1.1.14':
+    resolution: {integrity: sha512-T2xxOZIMmnI98Q2EUoLUYFAR+2n5QIOxrHyNJdC6oNtp/XCys5gSJPQTc51HvNT0NJ5ThwVMU5uH6rTBrGL9gQ==}
     peerDependencies:
-      '@sanity/types': ^3.79.0
+      '@sanity/types': ^3.80.1
       '@types/react': 18 || 19
 
   '@portabletext/editor@1.37.0':
@@ -9007,7 +9007,7 @@ snapshots:
       get-random-values-esm: 1.0.2
       lodash: 4.17.21
 
-  '@portabletext/block-tools@1.1.13(@sanity/types@3.78.1(@types/react@18.3.0)(debug@4.4.0))(@types/react@18.3.0)':
+  '@portabletext/block-tools@1.1.14(@sanity/types@3.78.1(@types/react@18.3.0)(debug@4.4.0))(@types/react@18.3.0)':
     dependencies:
       '@sanity/types': 3.78.1(@types/react@18.3.0)(debug@4.4.0)
       '@types/react': 18.3.0
@@ -14623,7 +14623,7 @@ snapshots:
       '@dnd-kit/sortable': 7.0.2(@dnd-kit/core@6.3.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react@19.0.0)
       '@dnd-kit/utilities': 3.2.2(react@19.0.0)
       '@juggle/resize-observer': 3.4.0
-      '@portabletext/block-tools': 1.1.13(@sanity/types@3.78.1(@types/react@18.3.0)(debug@4.4.0))(@types/react@18.3.0)
+      '@portabletext/block-tools': 1.1.14(@sanity/types@3.78.1(@types/react@18.3.0)(debug@4.4.0))(@types/react@18.3.0)
       '@portabletext/editor': 1.37.0(@sanity/schema@3.78.1(@types/react@18.3.0)(debug@4.4.0))(@sanity/types@3.78.1(@types/react@18.3.0)(debug@4.4.0))(@types/react@18.3.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(rxjs@7.8.2)
       '@portabletext/react': 3.2.1(react@19.0.0)
       '@portabletext/toolkit': 2.0.17
@@ -14777,7 +14777,7 @@ snapshots:
       '@dnd-kit/sortable': 7.0.2(@dnd-kit/core@6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@dnd-kit/utilities': 3.2.2(react@18.3.1)
       '@juggle/resize-observer': 3.4.0
-      '@portabletext/block-tools': 1.1.13(@sanity/types@3.78.1(@types/react@18.3.0)(debug@4.4.0))(@types/react@18.3.0)
+      '@portabletext/block-tools': 1.1.14(@sanity/types@3.78.1(@types/react@18.3.0)(debug@4.4.0))(@types/react@18.3.0)
       '@portabletext/editor': 1.37.0(@sanity/schema@3.78.1(@types/react@18.3.0)(debug@4.4.0))(@sanity/types@3.78.1(@types/react@18.3.0)(debug@4.4.0))(@types/react@18.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.8.2)
       '@portabletext/react': 3.2.1(react@18.3.1)
       '@portabletext/toolkit': 2.0.17
