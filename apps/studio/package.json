@@ -45,7 +45,7 @@
     "@types/react": "^18.0.25",
     "eslint": "^9.22.0",
     "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-prettier": "^5.2.5",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "jsdom": "^26.0.0"
   }
