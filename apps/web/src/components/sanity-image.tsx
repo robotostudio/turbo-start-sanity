@@ -44,15 +44,15 @@ export function SanityImage({
 
   return (
     <SanityImagePackage
-      className={cn(className)}
       id={imageId}
+      className={cn(className)}
       projectId={projectId}
       alt={alt ?? asset.alt ?? "Image"}
       aria-label={alt ?? asset.alt ?? "Image"}
       dataset={dataset}
       width={Number(width ?? dimensions.width)}
       height={Number(height ?? dimensions.height)}
-      // sizes="(max-width: 640px) 75vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+      sizes="(max-width: 640px) 75vw, (max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
       hotspot={hotspot}
       crop={crop}
       queryParams={{
