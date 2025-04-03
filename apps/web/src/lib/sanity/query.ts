@@ -7,6 +7,17 @@ const imageFragment = /* groq */ `
     "alt": coalesce(asset->altText, asset->originalFilename, "Image-Broken"),
     "blurData": asset->metadata.lqip,
     "dominantColor": asset->metadata.palette.dominant.background,
+    "id": asset._ref,
+    hotspot { 
+      x, 
+      y 
+    },
+    crop {
+      bottom,
+      left,
+      right,
+      top,
+    }
   }
 `;
 

@@ -52,7 +52,6 @@ export default async function BlogSlugPage({
   if (!data) return notFound();
   const { title, description, image, richText } = data ?? {};
 
-  // Cast richText to RichText type
   const typedRichText: PortableTextBlock[] | undefined = richText as
     | PortableTextBlock[]
     | undefined;
