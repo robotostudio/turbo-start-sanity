@@ -43,7 +43,7 @@
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22",
     "@types/react": "^19.1.0",
-    "eslint": "^9.23.0",
+    "eslint": "^9.24.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.6",
     "eslint-plugin-simple-import-sort": "^12.1.1",
