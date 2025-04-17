@@ -15,7 +15,7 @@
     "@sanity/asset-utils": "^2.2.1",
     "@sanity/client": "^6.28.4",
     "@sanity/image-url": "^1.1.0",
-    "@sanity/visual-editing": "^2.13.15",
+    "@sanity/visual-editing": "^2.13.18",
     "@workspace/ui": "workspace:*",
     "babel-plugin-react-compiler": "19.0.0-beta-e993439-20250328",
     "lucide-react": "0.487.0",
