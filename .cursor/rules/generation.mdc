@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Overall guidance 
+
+## When creating new schema types
+### Update structure.ts
+When creating new Sanity schema document types you should ALWAYS add a corresponding `createList` call in the `structure.ts` file to allow the types to show in the structure builder menu. Do not use icons from @sanity/icons that do not exist.
+
+### Place definitions in the proper folder
+If the schema being generated is of type "document", put it in `apps/studio/schemaTypes/documents`

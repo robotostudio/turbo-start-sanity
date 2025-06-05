@@ -5,6 +5,7 @@ alwaysApply: false
 ---
 # Sanity Development Guidelines
 
+
 ## Sanity Schema Rules
 
 When creating sanity schema make sure to include an appropriate icon for the schema using lucide-react or sanity icons as a fallback. Make sure it's always a named export, make sure you're always using the Sanity typescript definitions if it's a ts file.

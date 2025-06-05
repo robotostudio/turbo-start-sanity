@@ -1,0 +1,8 @@
+{
+    "command": "npx",
+    "args": [
+      "-y",
+      "mcp-remote@latest",
+      "https://mcp.sanity.io/developer"
+    ]
+  }
