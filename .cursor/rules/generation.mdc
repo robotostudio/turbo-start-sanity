@@ -5,9 +5,230 @@ alwaysApply: true
 ---
 # Overall guidance 
 
-## When creating new schema types
-### Update structure.ts
-When creating new Sanity schema document types you should ALWAYS add a corresponding `createList` call in the `structure.ts` file to allow the types to show in the structure builder menu. Do not use icons from @sanity/icons that do not exist.
+## Schema Organization and Structure
 
-### Place definitions in the proper folder
-If the schema being generated is of type "document", put it in `apps/studio/schemaTypes/documents`
+### Document Type Placement
+When creating new Sanity schema document types, you MUST:
+1. Place all document types in the `schemaTypes/documents/` directory
+2. Add the schema to `schemaTypes/documents/index.ts`
+3. Add a corresponding `createList` call in the `structure.ts` file
+
+Example structure:
+```
+schemaTypes/
+  ├── documents/
+  │   ├── index.ts
+  │   ├── book.ts
+  │   ├── author.ts
+  │   └── genre.ts
+  ├── blocks/
+  ├── definitions/
+  └── index.ts
+```
+
+### Schema File Requirements
+Each schema file MUST:
+1. Use TypeScript with proper Sanity type definitions
+2. Include a descriptive icon from @sanity/icons or lucide-react
+3. Follow the standard field structure with proper validation
+4. Include a preview configuration
+5. 
+
+Example schema structure:
+```typescript
+import {defineField, defineType} from 'sanity'
+import {BookOpen} from 'lucide-react'
+
+export default defineType({
+  name: 'book',
+  title: 'Book',
+  type: 'document',
+  icon: BookOpen,
+  fields: [
+    defineField({
+      name: 'title',
+      title: 'Title',
+      description: 'The title of the book',
+      type: 'string',
+      validation: (Rule) => Rule.required(),
+    }),
+    // ... other fields
+  ],
+  preview: {
+    select: {
+      title: 'title',
+      // ... other preview fields
+    },
+  },
+})
+```
+
+### Structure Builder Integration
+When adding a new document type you MUST also add it to the structure.ts file, including:
+1. Import the appropriate icon from lucide-react
+2. Add a `createList` call with the document type
+3. Place it in a logical location in the menu structure
+
+Example structure builder addition:
+```typescript
+import {BookOpen} from 'lucide-react'
+
+// In the structure function
+createList({ S, type: 'book', title: 'Books', icon: BookOpen })
+```
+
+## Front-end Route Integration
+
+### Presentation URL Configuration
+When creating front-end routes for content types, you MUST update the presentation URL configuration to ensure the "Open in Presentation" button works correctly in Sanity Studio.
+
+### Route Patterns
+The front-end uses these route patterns:
+- **Books**: `/books/[slug]` - for individual book pages
+- **Blog**: `/blog/[slug]` - for individual blog posts  
+- **Generic pages**: `/[...slug]` - for catch-all pages and other content types
+
+### Updating location.ts
+The current `apps/studio/location.ts` implementation uses Sanity's `defineLocations` to configure presentation URLs for different content types.
+
+**Current implementation:**
+```typescript
+export const locations = {
+  blog: defineLocations({
+    select: {
+      title: "title",
+      slug: "slug.current",
+    },
+    resolve: (doc) => {
+      return {
+        locations: [
+          {
+            title: doc?.title || "Untitled",
+            href: `${doc?.slug}`, // This should be `/blog/${doc?.slug}`
+          },
+          {
+            title: "Blog",
+            href: "/blog",
+          },
+        ],
+      };
+    },
+  }),
+  page: defineLocations({
+    select: {
+      title: "title",
+      slug: "slug.current",
+    },
+    resolve: (doc) => {
+      return {
+        locations: [
+          {
+            title: doc?.title || "Untitled",
+            href: `${doc?.slug}`,
+          },
+        ],
+      };
+    },
+  }),
+};
+```
+
+**REQUIRED UPDATE:** When adding a new content type with a dedicated route pattern, you MUST:
+
+1. **Add a new location definition** for the content type in `apps/studio/location.ts`
+2. **Use the correct href pattern** that matches your front-end routes
+3. **Update existing definitions** if they don't match the actual route patterns
+
+**Updated implementation example:**
+```typescript
+export const locations = {
+  book: defineLocations({
+    select: {
+      title: "title",
+      slug: "slug.current",
+    },
+    resolve: (doc) => {
+      return {
+        locations: [
+          {
+            title: doc?.title || "Untitled",
+            href: `/books/${doc?.slug}`,
+          },
+          {
+            title: "Books",
+            href: "/books",
+          },
+        ],
+      };
+    },
+  }),
+  blog: defineLocations({
+    select: {
+      title: "title",
+      slug: "slug.current",
+    },
+    resolve: (doc) => {
+      return {
+        locations: [
+          {
+            title: doc?.title || "Untitled",
+            href: `/blog/${doc?.slug}`, // Fixed to match route pattern
+          },
+          {
+            title: "Blog",
+            href: "/blog",
+          },
+        ],
+      };
+    },
+  }),
+  page: defineLocations({
+    select: {
+      title: "title",
+      slug: "slug.current",
+    },
+    resolve: (doc) => {
+      return {
+        locations: [
+          {
+            title: doc?.title || "Untitled",
+            href: `${doc?.slug}`, // Generic pages use full slug path
+          },
+        ],
+      };
+    },
+  }),
+};
+```
+
+### Front-end Route Creation
+When creating new front-end routes for content types, you MUST:
+
+1. **Create the appropriate directory structure** in `apps/web/src/app/`
+2. **Follow Next.js App Router conventions**
+3. **Include proper TypeScript types**
+4. **Add generateStaticParams for static generation**
+5. **Update the location.ts configuration** accordingly
+
+Example route structure for a new content type:
+```
+apps/web/src/app/
+├── [content-type]/
+│   ├── page.tsx (list page)
+│   └── [slug]/
+│       └── page.tsx (individual page)
+```
+
+### Validation Checklist
+Before committing a new schema you MUST confirm:
+- [ ] Schema is placed in `schemaTypes/documents/`
+- [ ] Schema is added to `documents/index.ts`
+- [ ] Schema is added to `structure.ts`
+- [ ] Schema uses proper TypeScript types
+- [ ] Schema includes an appropriate icon
+- [ ] Schema has proper field validation
+- [ ] Schema includes a preview configuration
+- [ ] **Front-end routes are created (if applicable)**
+- [ ] **location.ts is updated for new content types**
+- [ ] **Route patterns follow established conventions**
+

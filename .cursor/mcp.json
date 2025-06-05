@@ -1,8 +1,12 @@
 {
-    "command": "npx",
-    "args": [
-      "-y",
-      "mcp-remote@latest",
-      "https://mcp.sanity.io/developer"
-    ]
+  "mcpServers": {
+    "sanity-developer": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote@latest", "https://mcp.sanity.io/developer"]
+    },
+    "sanity-editor": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote@latest", "https://mcp.sanity.io/editor"]
+    }
   }
+}
