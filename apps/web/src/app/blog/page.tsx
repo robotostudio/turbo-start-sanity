@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { BlogCard, BlogHeader, FeaturedBlogCard } from "@/components/blog-card";
+import { BlogSearch } from "@/components/blog-search";
 import { PageBuilder } from "@/components/pagebuilder";
 import { sanityFetch } from "@/lib/sanity/live";
 import { queryBlogIndexPageData } from "@/lib/sanity/query";
@@ -52,6 +53,9 @@ export default async function BlogIndexPage() {
     return (
       <main className="container my-16 mx-auto px-4 md:px-6">
         <BlogHeader title={title} description={description} />
+        <div className="mb-8">
+          <BlogSearch />
+        </div>
         <div className="text-center py-12">
           <p className="text-muted-foreground">
             No blog posts available at the moment.
@@ -78,6 +82,11 @@ export default async function BlogIndexPage() {
     <main className="bg-background">
       <div className="container my-16 mx-auto px-4 md:px-6">
         <BlogHeader title={title} description={description} />
+
+        {/* Search Component */}
+        <div className="mt-8 mb-12">
+          <BlogSearch />
+        </div>
 
         {featuredBlogs.length > 0 && (
           <div className="mx-auto mt-8 sm:mt-12 md:mt-16 mb-12 lg:mb-20 grid grid-cols-1 gap-8 md:gap-12">
