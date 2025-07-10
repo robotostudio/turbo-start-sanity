@@ -85,9 +85,9 @@ function SocialLinks({ data }: SocialLinksProps) {
 
 export function FooterSkeleton() {
   return (
-    <section className="mt-16 pb-8">
-      <div className="container mx-auto px-4 md:px-6">
-        <footer className="h-[500px] lg:h-auto">
+    <footer className="mt-16 pb-8">
+      <section className="container mx-auto px-4 md:px-6">
+        <div className="h-[500px] lg:h-auto">
           <div className="flex flex-col items-center justify-between gap-10 text-center lg:flex-row lg:text-left">
             <div className="flex w-full max-w-96 shrink flex-col items-center justify-between gap-6 lg:items-start">
               <div>
@@ -128,9 +128,9 @@ export function FooterSkeleton() {
               <div className="h-4 w-24 bg-muted rounded animate-pulse" />
             </div>
           </div>
-        </footer>
-      </div>
-    </section>
+        </div>
+      </section>
+    </footer>
   );
 }
 
@@ -140,9 +140,9 @@ function Footer({ data, settingsData }: FooterProps) {
   const year = new Date().getFullYear();
 
   return (
-    <section className="mt-20 pb-8">
-      <div className="container mx-auto">
-        <footer className="h-[500px] lg:h-auto">
+    <footer className="mt-20 pb-8">
+      <section className="container mx-auto">
+        <div className="h-[500px] lg:h-auto">
           <div className="flex flex-col items-center justify-between gap-10 text-center lg:flex-row lg:text-left mx-auto max-w-7xl px-4 md:px-6">
             <div className="flex w-full max-w-96 shrink flex-col items-center justify-between gap-6 md:gap-8 lg:items-start">
               <div>
@@ -204,8 +204,8 @@ function Footer({ data, settingsData }: FooterProps) {
               </ul>
             </div>
           </div>
-        </footer>
-      </div>
-    </section>
+        </div>
+      </section>
+    </footer>
   );
 }

@@ -148,6 +148,17 @@ const subscribeNewsletterBlock = /* groq */ `
   }
 `;
 
+const featureCardsIconBlock = /* groq */ `
+  _type == "featureCardsIcon" => {
+    ...,
+    ${richTextFragment},
+    "cards": array::compact(cards[]{
+      ...,
+      ${richTextFragment},
+    })
+  }
+`;
+
 const pageBuilderFragment = /* groq */ `
   pageBuilder[]{
     ...,
@@ -155,6 +166,7 @@ const pageBuilderFragment = /* groq */ `
     ${ctaBlock},
     ${heroBlock},
     ${faqAccordionBlock},
+    ${featureCardsIconBlock},
     ${subscribeNewsletterBlock},
     ${imageLinkCardsBlock}
   }

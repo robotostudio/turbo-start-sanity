@@ -325,3 +325,24 @@ export function createPageTemplate() {
     };
   });
 }
+
+/**
+ * Determines the presentation URL based on the current environment.
+ * Uses localhost:3000 for development.
+ * In production, requires SANITY_STUDIO_PRESENTATION_URL to be set.
+ * @throws {Error} If SANITY_STUDIO_PRESENTATION_URL is not set in production
+ */
+export const getPresentationUrl = () => {
+  if (process.env.NODE_ENV === "development") {
+    return "http://localhost:3000";
+  }
+
+  const presentationUrl = process.env.SANITY_STUDIO_PRESENTATION_URL;
+  if (!presentationUrl) {
+    throw new Error(
+      "SANITY_STUDIO_PRESENTATION_URL must be set in production environment",
+    );
+  }
+
+  return presentationUrl;
+};

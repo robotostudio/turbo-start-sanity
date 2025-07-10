@@ -4,7 +4,7 @@ import { BlogCard, BlogHeader, FeaturedBlogCard } from "@/components/blog-card";
 import { PageBuilder } from "@/components/pagebuilder";
 import { sanityFetch } from "@/lib/sanity/live";
 import { queryBlogIndexPageData } from "@/lib/sanity/query";
-import { getMetaData } from "@/lib/seo";
+import { getSEOMetadata } from "@/lib/seo";
 import { handleErrors } from "@/utils";
 
 async function fetchBlogPosts() {
@@ -12,8 +12,21 @@ async function fetchBlogPosts() {
 }
 
 export async function generateMetadata() {
-  const result = await sanityFetch({ query: queryBlogIndexPageData });
-  return await getMetaData(result?.data ?? {});
+  const { data: result } = await sanityFetch({
+    query: queryBlogIndexPageData,
+    stega: false,
+  });
+  return getSEOMetadata(
+    result
+      ? {
+          title: result?.title ?? result?.seoTitle ?? "",
+          description: result?.description ?? result?.seoDescription ?? "",
+          slug: result?.slug,
+          contentId: result?._id,
+          contentType: result?._type,
+        }
+      : {},
+  );
 }
 
 export default async function BlogIndexPage() {

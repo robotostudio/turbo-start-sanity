@@ -1,3 +1,4 @@
+import { stegaClean } from "next-sanity";
 import type {
   Answer,
   Article,
@@ -247,20 +248,20 @@ interface CombinedJsonLdProps {
 }
 
 export async function CombinedJsonLd({
-  settings,
-  article,
-  faqs,
   includeWebsite = false,
   includeOrganization = false,
 }: CombinedJsonLdProps) {
   const [res] = await handleErrors(client.fetch(querySettingsData));
 
+  const cleanSettings = stegaClean(res);
   return (
     <>
-      {includeWebsite && res && <WebSiteJsonLd settings={res} />}
-      {includeOrganization && res && <OrganizationJsonLd settings={res} />}
-      {article && <ArticleJsonLd article={article} settings={settings} />}
-      {faqs && <FaqJsonLd faqs={faqs} />}
+      {includeWebsite && cleanSettings && (
+        <WebSiteJsonLd settings={cleanSettings} />
+      )}
+      {includeOrganization && cleanSettings && (
+        <OrganizationJsonLd settings={cleanSettings} />
+      )}
     </>
   );
 }

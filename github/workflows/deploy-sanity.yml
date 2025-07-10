@@ -1,0 +1,74 @@
+name: Deploy Sanity Studio
+on:
+  push:
+    paths:
+      - "apps/studio/**"
+      - ".github/workflows/deploy-sanity.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Build and Deploy Sanity Studio
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SANITY_AUTH_TOKEN: ${{ secrets.SANITY_DEPLOY_TOKEN }}
+      NODE_OPTIONS: "--max_old_space_size=4096"
+      PNPM_VERSION: 9.12.3
+      SANITY_STUDIO_PROJECT_ID: ${{ secrets.SANITY_STUDIO_PROJECT_ID }}
+      SANITY_STUDIO_DATASET: ${{ secrets.SANITY_STUDIO_DATASET }}
+      SANITY_STUDIO_TITLE: ${{ secrets.SANITY_STUDIO_TITLE }}
+      SANITY_STUDIO_PRESENTATION_URL: ${{ secrets.SANITY_STUDIO_PRESENTATION_URL }}
+      HOST_NAME: ${{ github.head_ref || github.ref_name }}  
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts --prefer-offline
+        
+      - name: Check if Dependabot
+        id: check-dependabot
+        run: |
+          if [[ ${{ github.actor }} == 'dependabot[bot]' ]]; then
+            echo "is_dependabot=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_dependabot=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build Sanity Studio (Dependabot)
+        if: steps.check-dependabot.outputs.is_dependabot == 'true'
+        working-directory: ./apps/studio
+        run: |
+          echo "Building Sanity Studio for Dependabot..."
+          pnpm run build
+        env:
+          CI: true
+        
+      - name: Deploy Sanity Studio
+        if: steps.check-dependabot.outputs.is_dependabot != 'true'
+        working-directory: ./apps/studio
+        run: |
+          echo "Deploying Sanity Studio..."
+          pnpm run deploy
+        env:
+          CI: true

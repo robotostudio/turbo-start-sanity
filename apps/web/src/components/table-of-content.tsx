@@ -470,7 +470,7 @@ export const TableOfContent: FC<TableOfContentProps> = ({
         "transition-all duration-200",
         className,
       )}
-      aria-label="Table of contents"
+      aria-labelledby="toc-heading"
       role="complementary"
     >
       <details className="group" open>
@@ -482,7 +482,7 @@ export const TableOfContent: FC<TableOfContentProps> = ({
             "transition-colors duration-200 focus:outline-none",
             "rounded-sm p-1",
           )}
-          aria-expanded="true"
+          id="toc-heading"
         >
           <span>Table of Contents</span>
           <ChevronDown
@@ -494,8 +494,8 @@ export const TableOfContent: FC<TableOfContentProps> = ({
           />
         </summary>
 
-        <nav className="mt-4 ml-3" aria-label="Document outline">
-          <ul className="text-sm space-y-1">
+        <nav aria-labelledby="toc-heading">
+          <ul className="text-sm space-y-1 mt-4 ml-3">
             {headings.map((heading, index) => (
               <TableOfContentAnchor
                 key={heading.id || `${heading.text}-${index}`}

@@ -4,12 +4,13 @@ import { PageBuilder } from "@/components/pagebuilder";
 import { client } from "@/lib/sanity/client";
 import { sanityFetch } from "@/lib/sanity/live";
 import { querySlugPageData, querySlugPagePaths } from "@/lib/sanity/query";
-import { getMetaData } from "@/lib/seo";
+import { getSEOMetadata } from "@/lib/seo";
 
-async function fetchSlugPageData(slug: string) {
+async function fetchSlugPageData(slug: string, stega = true) {
   return await sanityFetch({
     query: querySlugPageData,
     params: { slug: `/${slug}` },
+    stega,
   });
 }
 
@@ -31,11 +32,18 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const slugString = slug.join("/");
-  const { data: pageData } = await fetchSlugPageData(slugString);
-  if (!pageData) {
-    return getMetaData({});
-  }
-  return getMetaData(pageData);
+  const { data: pageData } = await fetchSlugPageData(slugString, false);
+  return getSEOMetadata(
+    pageData
+      ? {
+          title: pageData?.title ?? pageData?.seoTitle ?? "",
+          description: pageData?.description ?? pageData?.seoDescription ?? "",
+          slug: pageData?.slug,
+          contentId: pageData?._id,
+          contentType: pageData?._type,
+        }
+      : {},
+  );
 }
 
 export async function generateStaticParams() {
