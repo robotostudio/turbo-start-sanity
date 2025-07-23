@@ -196,21 +196,18 @@ function NavbarColumnLink({
   >;
 }) {
   return (
-    <Link
-      aria-label={`Link to ${column.name ?? column.href}`}
-      href={column.href ?? ""}
-      // legacyBehavior
-      className={cn(
-        navigationMenuTriggerStyle(),
-        "text-muted-foreground dark:text-neutral-300",
-      )}
-      // passHref
-    >
-      {/* <NavigationMenuLink
-        > */}
-      {column.name}
-      {/* </NavigationMenuLink> */}
-    </Link>
+    <NavigationMenuItem>
+      <Link
+        aria-label={`Link to ${column.name ?? column.href}`}
+        href={column.href ?? ""}
+        className={cn(
+          navigationMenuTriggerStyle(),
+          "text-muted-foreground dark:text-neutral-300",
+        )}
+      >
+        {column.name}
+      </Link>
+    </NavigationMenuItem>
   );
 }
 
@@ -234,32 +231,27 @@ export function NavbarColumn({
   );
 
   return (
-    <NavigationMenuList>
-      <NavigationMenuItem className="text-muted-foreground dark:text-neutral-300">
-        <NavigationMenuTrigger>{column.title}</NavigationMenuTrigger>
-        <NavigationMenuContent>
-          <ul className={cn("p-3", layoutClass)}>
-            {column.links?.map((item) => (
-              <li key={item._key}>
-                <MenuItemLink
-                  item={{
-                    title: item.name ?? "",
-                    description: item.description ?? "",
-                    href: item.href ?? "",
-                    icon: (
-                      <SanityIcon
-                        icon={item.icon}
-                        className="size-5 shrink-0"
-                      />
-                    ),
-                  }}
-                />
-              </li>
-            ))}
-          </ul>
-        </NavigationMenuContent>
-      </NavigationMenuItem>
-    </NavigationMenuList>
+    <NavigationMenuItem className="text-muted-foreground dark:text-neutral-300">
+      <NavigationMenuTrigger>{column.title}</NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <ul className={cn("p-3", layoutClass)}>
+          {column.links?.map((item) => (
+            <li key={item._key}>
+              <MenuItemLink
+                item={{
+                  title: item.name ?? "",
+                  description: item.description ?? "",
+                  href: item.href ?? "",
+                  icon: (
+                    <SanityIcon icon={item.icon} className="size-5 shrink-0" />
+                  ),
+                }}
+              />
+            </li>
+          ))}
+        </ul>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
   );
 }
 
@@ -272,14 +264,16 @@ export function DesktopNavbar({
 
   return (
     <div className="grid grid-cols-[1fr_auto] items-center gap-8">
-      <NavigationMenu className="">
-        {columns?.map((column) =>
-          column.type === "column" ? (
-            <NavbarColumn key={`nav-${column._key}`} column={column} />
-          ) : (
-            <NavbarColumnLink key={`nav-${column._key}`} column={column} />
-          ),
-        )}
+      <NavigationMenu>
+        <NavigationMenuList>
+          {columns?.map((column) =>
+            column.type === "column" ? (
+              <NavbarColumn key={`nav-${column._key}`} column={column} />
+            ) : (
+              <NavbarColumnLink key={`nav-${column._key}`} column={column} />
+            ),
+          )}
+        </NavigationMenuList>
       </NavigationMenu>
 
       <div className="justify-self-end flex items-center gap-4">
