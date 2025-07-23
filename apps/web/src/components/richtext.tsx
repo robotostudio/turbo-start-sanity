@@ -58,7 +58,7 @@ const components: Partial<PortableTextReactComponents> = {
   },
   marks: {
     code: ({ children }) => (
-      <code className="rounded-md border border-white/10 bg-opacity-5 p-1 text-sm lg:whitespace-nowrap">
+      <code className="rounded-md border border-white/10 bg-white/5 p-1 text-sm lg:whitespace-nowrap">
         {children}
       </code>
     ),
@@ -111,7 +111,7 @@ export function RichText<T>({
   return (
     <div
       className={cn(
-        "prose prose-zinc prose-headings:scroll-m-24 prose-headings:text-opacity-90 prose-p:text-opacity-80 prose-a:decoration-dotted prose-ol:text-opacity-80 prose-ul:text-opacity-80 prose-h2:border-b prose-h2:pb-2 prose-h2:text-3xl prose-h2:font-semibold prose-h2:first:mt-0 max-w-none dark:prose-invert",
+        "prose prose-zinc prose-headings:scroll-m-24 prose-headings:text-zinc-900/90 prose-p:text-zinc-900/80 prose-a:decoration-dotted prose-ol:text-zinc-900/80 prose-ul:text-zinc-900/80 prose-h2:border-b prose-h2:pb-2 prose-h2:text-3xl prose-h2:font-semibold prose-h2:first:mt-0 max-w-none dark:prose-invert",
         className,
       )}
     >

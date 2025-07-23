@@ -82,7 +82,7 @@ const dominantColorSeoImageRender = ({
       <div tw="flex-1 p-10 flex flex-col justify-between relative z-10">
         <div tw="flex justify-between items-start w-full">
           {logo && <img src={logo} alt="Logo" height={48} />}
-          <div tw="bg-white flex bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-medium">
+          <div tw="bg-white/20 flex text-white px-4 py-2 rounded-full text-sm font-medium">
             {new Date(date ?? new Date()).toLocaleDateString("en-US", {
               month: "long",
               day: "numeric",
@@ -106,8 +106,8 @@ const dominantColorSeoImageRender = ({
         )}
       </div>
 
-      <div tw="w-[630px] h-[630px] flex items-center justify-center p-8 relative z-10">
-        <div tw="w-[566px] h-[566px] bg-white bg-opacity-20 flex flex-col justify-center items-center rounded-3xl shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03),0_4px_6px_-1px_rgba(0,0,0,0.05),0_8px_10px_-1px_rgba(0,0,0,0.05)] overflow-hidden">
+      <div tw="size-[630px] flex items-center justify-center p-8 relative z-10">
+        <div tw="size-[566px] bg-white/20 flex flex-col justify-center items-center rounded-3xl shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03),0_4px_6px_-1px_rgba(0,0,0,0.05),0_8px_10px_-1px_rgba(0,0,0,0.05)] overflow-hidden">
           <div tw="flex relative w-full h-full">
             {image ? (
               <img
