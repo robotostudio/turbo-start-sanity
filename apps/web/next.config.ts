@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: true,
     // ppr: true,
-    inlineCss: true,
+    // inlineCss: true,
   },
   logging: {
     fetches: {},
