@@ -22,7 +22,8 @@ interface SearchResult {
   slug: string;
   publishedAt: string;
   authors?: Array<{ name: string; position: string }>;
-  image?: { asset: { url: string; altText: string } };
+  imageUrl?: string;
+  imageAlt?: string;
   richText: any[];
   orderRank: string;
 }
@@ -70,8 +71,14 @@ export function SimpleSearch({ blogs, className = '' }: SimpleSearchProps) {
 
       console.log("searchResponse", searchResponse);
 
-      if (searchResponse.results[0]?.hits) {
-        setResults(searchResponse.results[0].hits as SearchResult[]);
+      // Check if we have results and extract hits
+      if (searchResponse.results && searchResponse.results.length > 0) {
+        const firstResult = searchResponse.results[0];
+        if (firstResult && 'hits' in firstResult && Array.isArray(firstResult.hits)) {
+          setResults(firstResult.hits as SearchResult[]);
+        } else {
+          setResults([]);
+        }
       } else {
         setResults([]);
       }
@@ -82,16 +89,6 @@ export function SimpleSearch({ blogs, className = '' }: SimpleSearchProps) {
       setIsLoading(false);
     }
   }, []);
-
-  const handleSearch = useCallback((searchQuery: string) => {
-    setQuery(searchQuery);
-    if (searchQuery.trim()) {
-      performSearch(searchQuery);
-    } else {
-      setResults([]);
-      setError(null);
-    }
-  }, [performSearch]);
 
   const handleClear = useCallback(() => {
     setQuery('');
@@ -177,11 +174,26 @@ export function SimpleSearch({ blogs, className = '' }: SimpleSearchProps) {
                       description: result.description,
                       slug: result.slug,
                       publishedAt: result.publishedAt,
-                      authors: result.authors || [{ name: '', position: '' }],
-                      image: result.imageUrl
-                        ? { asset: { url: result.imageUrl, altText: result.imageAlt || '' } }
-                        : { asset: { url: '', altText: '' } },
-                      richText: [],
+                      authors: result.authors ? {
+                        _id: result.authors[0]?.name || '',
+                        name: result.authors[0]?.name || '',
+                        position: result.authors[0]?.position || null,
+                        image: null,
+                      } : null,
+                      image: result.imageUrl ? {
+                        asset: {
+                          _ref: result.imageUrl,
+                          _type: 'reference' as const,
+                        },
+                        _type: 'image' as const,
+                        alt: result.imageAlt || 'no-alt',
+                        blurData: null,
+                        dominantColor: null,
+                      } : {
+                        asset: undefined,
+                        _type: 'image' as const,
+                      },
+                      richText: result.richText || [],
                       orderRank: result.orderRank || '',
                     }}
                   />
