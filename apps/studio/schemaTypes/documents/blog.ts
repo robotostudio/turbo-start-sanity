@@ -10,6 +10,7 @@ import { GROUP, GROUPS } from "../../utils/constant";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
 import { createSlug, isUnique } from "../../utils/slug";
+import { createSlugValidator } from "../../utils/slug-validation";
 
 export const blog = defineType({
   name: "blog",
@@ -68,13 +69,12 @@ export const blog = defineType({
       },
       validation: (Rule) => [
         Rule.required().error("A URL slug is required"),
-        Rule.custom((value, context) => {
-          if (!value?.current) return true;
-          if (!value.current.startsWith("/blog/")) {
-            return 'URL slug must start with "/blog/"';
-          }
-          return true;
-        }),
+        Rule.custom(
+          createSlugValidator({
+            documentType: "Blog post",
+            requiredPrefix: "/blog/",
+          }),
+        ),
       ],
     }),
     defineField({
@@ -157,11 +157,12 @@ export const blog = defineType({
       publishDate,
     }) => {
       // Status indicators
-      const visibility = isPrivate
-        ? "🔒 Private"
-        : isHidden
-          ? "🙈 Hidden"
-          : "🌎 Public";
+      let visibility = "🌎 Public";
+      if (isPrivate) {
+        visibility = "🔒 Private";
+      } else if (isHidden) {
+        visibility = "🙈 Hidden";
+      }
 
       // Author and date
       const authorInfo = author ? `✍️ ${author}` : "👻 No author";

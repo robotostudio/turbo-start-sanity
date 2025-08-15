@@ -1,9 +1,10 @@
-import { defineArrayMember, defineField, defineType } from "sanity";
+import { defineField, defineType } from "sanity";
 
 import { GROUP, GROUPS } from "../../utils/constant";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
 import { createSlug, isUnique } from "../../utils/slug";
+import { createSlugValidator } from "../../utils/slug-validation";
 import { pageBuilderField } from "../common";
 
 export const blogIndex = defineType({
@@ -39,7 +40,13 @@ export const blogIndex = defineType({
         slugify: createSlug,
         isUnique: isUnique,
       },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.required().custom(
+          createSlugValidator({
+            documentType: "Blog index",
+            requiredPrefix: "/blog",
+          }),
+        ),
     }),
     defineField({
       name: "displayFeaturedBlogs",

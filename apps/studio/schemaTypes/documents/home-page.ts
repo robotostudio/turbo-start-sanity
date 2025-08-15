@@ -5,6 +5,7 @@ import { GROUP, GROUPS } from "../../utils/constant";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
 import { createSlug } from "../../utils/slug";
+import { createSlugValidator } from "../../utils/slug-validation";
 import { pageBuilderField } from "../common";
 
 export const homePage = defineType({
@@ -54,7 +55,13 @@ export const homePage = defineType({
         source: "title",
         slugify: createSlug,
       },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.required().custom(
+          createSlugValidator({
+            documentType: "Home page",
+            requiredPrefix: "/",
+          }),
+        ),
     }),
     pageBuilderField,
     ...seoFields.filter(

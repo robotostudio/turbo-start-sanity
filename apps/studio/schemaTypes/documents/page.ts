@@ -6,6 +6,7 @@ import { GROUP, GROUPS } from "../../utils/constant";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
 import { createSlug, isUnique } from "../../utils/slug";
+import { createSlugValidator } from "../../utils/slug-validation";
 import { pageBuilderField } from "../common";
 
 export const page = defineType({
@@ -63,7 +64,23 @@ export const page = defineType({
         isUnique,
       },
       validation: (Rule) =>
-        Rule.required().error("A URL slug is required for the page"),
+        Rule.required()
+          .error("A URL slug is required for the page")
+          .custom((slug) => {
+            // First run basic validation
+            const basicValidation = createSlugValidator({
+              documentType: "Page",
+            })(slug);
+
+            if (basicValidation !== true) return basicValidation;
+
+            // Then check that pages don't use blog prefixes
+            if (slug?.current?.startsWith("/blog")) {
+              return 'Pages cannot use "/blog" prefix - this is reserved for blog content';
+            }
+
+            return true;
+          }),
     }),
     defineField({
       name: "image",
