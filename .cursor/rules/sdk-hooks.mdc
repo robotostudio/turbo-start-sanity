@@ -1,0 +1,201 @@
+---
+globs: apps/sdk/*
+alwaysApply: false
+---
+
+# React Hooks
+
+The Sanity App SDK comes with a range of hooks available for interacting with your content. A full reference is available for your perusal here:
+
+- [Sanity React App SDK Reference Docs](https://reference.sanity.io/_sanity/sdk-react/)
+
+While visiting every hook, type and component is beyond the scope of this article, a few of the most important hooks are briefly introduced below to give you a sense of how you'll be interacting with your Sanity content using the App SDK.
+
+For the sake of legibility, assume that each example is invoked with a proper [DocumentHandle](https://reference.sanity.io/_sanity/sdk-react/Introducing_Document_Handles/), which is a valid combination of a document ID and document type, and an optional project ID and dataset name indicating the source of the document.
+
+```
+import {type DocumentHandle} from '@sanity/sdk-react'
+
+const documentHandle: DocumentHandle = {
+  documentId: 'document-id',
+  documentType: 'book',
+  projectId: 'project-id',
+  dataset: 'production',
+}
+
+<OrderLink documentHandle={documentHandle} />
+```
+
+## Data Retrieval Hooks
+
+### [useDocuments](https://reference.sanity.io/_sanity/sdk-react/exports/useDocuments/) - Getting collections of documents
+
+The `useDocuments` hook is your primary tool for retrieving collections of documents from your Sanity dataset. It returns Document Handles for documents matching your specified document type (and optional filters and parameters), making it ideal for building document lists and overviews.
+
+```tsx
+const { data, hasMore, isPending, loadMore } = useDocuments({
+  documentType: "movie",
+  batchSize: 10,
+  orderings: [{ field: "_createdAt", direction: "desc" }],
+});
+```
+
+### [usePaginatedDocuments](https://reference.sanity.io/_sanity/sdk-react/exports/usePaginatedDocuments/) - Paginated document lists
+
+The `usePaginatedDocuments` hook provides a more traditional pagination interface compared to the infinite scroll pattern of `useDocuments`. This makes it ideal for building interfaces with discrete pages of content and explicit navigation controls:
+
+```tsx
+const {
+  data,
+  isPending,
+  currentPage,
+  totalPages,
+  nextPage,
+  previousPage,
+  hasNextPage,
+  hasPreviousPage,
+} = usePaginatedDocuments({
+  documentType: "movie",
+  pageSize: 10,
+  orderings: [{ field: "_createdAt", direction: "desc" }],
+});
+```
+
+### [useDocument](https://reference.sanity.io/_sanity/sdk-react/exports/useDocument/) - Reading individual documents
+
+The `useDocument` hook provides real-time access to individual document content. It's designed for reading and subscribing to a document's state, incorporating both local and remote changes:
+
+```tsx
+// Get the full document
+const { data: movie } = useDocument({ ...movieHandle });
+
+// Get a specific field
+const { data: title } = useDocument({
+  ...movieHandle,
+  path: "title",
+});
+```
+
+The hook automatically handles displaying local-first, optimistic updates made via the `useEditDocument` hook, making it ideal for building collaborative editing interfaces that need to stay synchronized with remote changes. However, for static displays where local-first, optimistic updates aren't needed, consider using `useDocumentProjection` (which still return content that's live by default).
+
+### [useDocumentProjection](https://reference.sanity.io/_sanity/sdk-react/exports/useDocumentProjection/) - Accessing specific document fields
+
+The `useDocumentProjection` hook allows you to efficiently retrieve specific fields from a document using GROQ projections:
+
+```
+const {data: { title, authorName }} = useDocumentProjection({
+  ...documentHandle,
+  projection: `{
+    title,
+    'authorName': author->name
+  }`
+})
+```
+
+## Document Manipulation Hooks
+
+### [useEditDocument](https://reference.sanity.io/_sanity/sdk-react/exports/useEditDocument/) - Modifying documents
+
+This hook is particularly useful for building forms and collaborative editing interfaces. It provides a simple way to update document fields in real-time:
+
+```tsx
+const editTitle = useEditDocument({
+  ...movieHandle,
+  path: "title",
+});
+
+function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  editTitle(e.currentTarget.value);
+}
+return <input type="text" value={title || ""} onChange={handleTitleChange} />;
+```
+
+### [useApplyDocumentActions](https://reference.sanity.io/_sanity/sdk-react/exports/useApplyDocumentActions/) - Document operations
+
+The `useApplyDocumentActions` hook provides a way to perform document operations like publishing, unpublishing, creating, and deleting documents:
+
+```tsx
+import {
+  useApplyDocumentActions,
+  publishDocument,
+  unpublishDocument,
+} from "@sanity/sdk-react";
+
+const apply = useApplyDocumentActions();
+
+function MovieActions({ movieHandle }) {
+  return (
+    <div>
+      <button onClick={() => apply(publishDocument(movieHandle))}>
+        Publish
+      </button>
+      <button onClick={() => apply(unpublishDocument(movieHandle))}>
+        Unpublish
+      </button>
+    </div>
+  );
+}
+```
+
+### [useDocumentEvent](https://reference.sanity.io/_sanity/sdk-react/exports/useDocumentEvent/) - Handling document events
+
+The `useDocumentEvent` hook allows you to subscribe to document events like creation, deletion, and updates. This is useful for building features that need to react to changes in your content:
+
+```tsx
+import {useDocumentEvent, type DocumentEvent} from '@sanity/sdk-react'
+
+const eventCallback = (event) => {
+  if (event.type === DocumentEvent.DocumentDeletedEvent) {
+    console.log(`Document ${event.documentId} was deleted`)
+  } else if (event.type === DocumentEvent.DocumentEditedEvent) {
+    console.log(`Document ${event.documentId} was edited`)
+  }
+})
+
+useDocumentEvent({
+  ...documentHandle,
+  onEvent: eventCallback,
+})
+```
+
+This hook is particularly valuable when building interfaces that need to maintain consistency with document state changes, such as notification systems or live collaboration features.
+
+Here's an example of using `useDocumentEvent` to build a simple notification system that alerts users when documents are modified:
+
+```tsx
+function DocumentChangeNotifier({ documentHandle }) {
+  const [notifications, setNotifications] = useState<string[]>([]);
+
+  const eventCallback = (event) => {
+    switch (event.type) {
+      case DocumentEvent.DocumentEditedEvent:
+        setNotifications((prev) => [
+          `Document ${event.documentId} was just edited`,
+          ...prev,
+        ]);
+        break;
+      case DocumentEvent.DocumentPublishedEvent:
+        setNotifications((prev) => [
+          `Document ${event.documentId} was published`,
+          ...prev,
+        ]);
+        break;
+    }
+  };
+
+  useDocumentEvent({
+    ...documentHandle,
+    onEvent: eventCallback,
+  });
+
+  return (
+    <div className="notifications">
+      {notifications.map((msg, i) => (
+        <div key={i} className="notification">
+          {msg}
+        </div>
+      ))}
+    </div>
+  );
+}
+```

@@ -1,0 +1,154 @@
+---
+globs: apps/sdk/*
+alwaysApply: false
+---
+
+# Sanity App SDK Development Rules
+
+## Overview
+This application uses the **Sanity App SDK** (`@sanity/sdk-react`) for creating Sanity applications with React hooks and components, and **Sanity UI** (`@sanity/ui`) as the primary UI component library.
+
+**Official Documentation:** 
+- SDK: https://reference.sanity.io/_sanity/sdk-react/
+- UI: https://www.sanity.io/ui/docs
+
+## Development Guidelines
+
+### 1. SDK-First Approach
+When working in the `apps/sdk/` directory, you MUST:
+
+- **Prioritize SDK solutions**: Always use hooks and helpers from `@sanity/sdk-react` first
+- **Avoid redundant packages**: Only use other Sanity packages (`@sanity/client`, `@sanity/ui`, etc.) AFTER confirming the SDK cannot accomplish the task
+- **Check SDK capabilities**: Before implementing custom solutions, verify if the SDK provides the needed functionality
+
+### 2. Preferred SDK Usage Patterns
+
+#### React Hooks
+Use SDK React hooks for:
+- Data fetching and mutations
+- Authentication and user management
+- Document operations
+- Real-time subscriptions
+- Studio integration
+
+#### SDK Components and Utilities
+Use SDK-provided components and utilities for:
+- UI components that integrate with Sanity
+- Form handling
+- Validation
+- Error handling
+
+#### Sanity UI Components
+This application uses **Sanity UI** (`@sanity/ui`) as the primary UI component library. When building interfaces, you MUST:
+
+- **Default to Sanity UI components**: Always use components from `@sanity/ui` first (Button, Card, Text, Box, Flex, etc.)
+- **Leverage the theme system**: Use Sanity UI's built-in theming for consistent styling
+- **Use Sanity UI primitives**: Prefer Sanity UI layout and typography components over custom HTML elements
+- **Reference Sanity UI documentation**: https://www.sanity.io/ui/docs for component APIs and examples
+
+**Available through SanityUI provider:**
+- The app includes a `SanityUI` wrapper component that provides ThemeProvider and ToastProvider
+- All components have access to the Sanity UI theme and design system
+- Consistent spacing, colors, and typography are automatically applied
+
+### 3. Documentation and References
+
+Always reference the official SDK documentation when:
+- Implementing new features
+- Debugging issues
+- Understanding available APIs
+- Finding code examples
+
+**Primary Resources:**
+- App SDK reference docs
+- SDK Explorer for example implementations
+- Conceptual overview and quickstart guide
+
+### 4. Development Workflow
+
+1. **Research SDK capabilities** before writing custom code
+2. **Use SDK hooks and components** as the primary solution for data operations
+3. **Use Sanity UI components** as the primary solution for all UI elements
+4. **Fallback to other packages** only when SDK and Sanity UI are insufficient
+5. **Document any non-SDK/non-Sanity-UI usage** with justification
+
+**UI Development Priority:**
+- First: Check if Sanity UI has the needed component
+- Second: Compose existing Sanity UI components to create the desired interface
+- Last resort: Use custom HTML elements or third-party UI libraries
+
+### 5. Code Organization
+
+- Import SDK hooks and components as the primary dependencies
+- **Import Sanity UI components** for all UI elements before considering custom HTML or other UI libraries
+- Group imports in this order:
+  1. React and third-party libraries
+  2. `@sanity/sdk-react` hooks and utilities
+  3. `@sanity/ui` components
+  4. Other Sanity packages (only when necessary)
+- Comment when using non-SDK or non-Sanity-UI solutions and why
+
+**Example import structure:**
+```typescript
+import React from 'react'
+import {useDocument, useEditDocument} from '@sanity/sdk-react'
+import {Box, Button, Card, Flex, Text} from '@sanity/ui'
+import {SomeIcon} from '@sanity/icons' // Only if needed
+```
+
+
+### 6. Text Spacing and Legibility
+
+**CRITICAL:** Always ensure proper vertical spacing between text elements to prevent overlapping and maintain readability.
+
+#### Text Spacing Rules
+- **NEVER use `Box` for multiple text elements** without explicit spacing - this causes overlapping text
+- **ALWAYS use `Stack` components** when displaying multiple text elements vertically
+- **Use appropriate `space` values** on Stack components:
+  - `space={1}` - Minimal spacing for tightly related text (e.g., label and value)
+  - `space={2}` - Standard spacing for related text elements (e.g., title and subtitle)
+  - `space={3}` - Medium spacing for distinct but related sections
+  - `space={4}` - Large spacing for separate content sections
+
+#### Text Hierarchy and Legibility
+- **Use proper Text sizes** for hierarchy:
+  - `size={4}` or higher - Main headings
+  - `size={3}` - Section headings
+  - `size={2}` - Subheadings
+  - `size={1}` - Body text, captions, metadata
+- **Apply appropriate text weights**:
+  - `weight="bold"` - Primary headings
+  - `weight="semibold"` - Secondary headings
+  - `weight="medium"` - Emphasized text
+  - Default weight - Regular body text
+- **Use `muted` tone** for secondary/metadata text to create visual hierarchy
+
+#### Anti-patterns to Avoid
+```typescript
+// ❌ BAD: Multiple text elements in Box without spacing
+<Box>
+  <Text size={4}>Title</Text>
+  <Text size={1}>Subtitle</Text>
+</Box>
+
+// ✅ GOOD: Use Stack with proper spacing
+<Stack space={2}>
+  <Text size={4} weight="bold">Title</Text>
+  <Text size={1} muted>Subtitle</Text>
+</Stack>
+```
+
+#### Best Practices
+- **Test text rendering** at different screen sizes
+- **Ensure sufficient contrast** between text and background
+- **Group related text elements** in Stack components with consistent spacing
+- **Use Flex with `gap` prop** for horizontal text spacing when needed
+- **Combine spacing with visual hierarchy** using size, weight, and tone props
+
+### 7. Migration and Updates
+
+When updating or refactoring:
+- Check if newer SDK versions provide better solutions
+- Migrate from direct Sanity package usage to SDK equivalents when possible
+- Follow SDK migration guides for version updates
+- **Review and fix text spacing issues** when refactoring UI components

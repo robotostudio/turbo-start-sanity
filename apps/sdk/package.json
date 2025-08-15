@@ -1,0 +1,28 @@
+{
+  "name": "sdk",
+  "private": true,
+  "version": "1.0.0",
+  "main": "package.json",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "sanity dev --port 3334",
+    "build": "sanity build",
+    "start": "sanity start"
+  },
+  "keywords": [
+    "sanity"
+  ],
+  "dependencies": {
+    "@sanity/sdk": "^2",
+    "@sanity/sdk-react": "^2",
+    "@sanity/ui": "^2",
+    "react": "^19",
+    "react-dom": "^19",
+    "styled-components": "^6.1.17"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "sanity": "^4",
+    "typescript": "^5.1.6"
+  }
+}
