@@ -12,12 +12,22 @@
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
+    "dotenv": "^17.2.1",
     "prettier": "^3.6.0",
+    "tsx": "^4.20.4",
     "turbo": "^2.5.4",
     "typescript": "5.7.3"
   },
   "packageManager": "pnpm@10.12.2",
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "@sanity/client": "^7.6.0",
+    "@types/react-instantsearch": "^7.0.0",
+    "@types/react-instantsearch-dom": "^6.12.9",
+    "algoliasearch": "^5.35.0",
+    "react-instantsearch": "^7.16.2",
+    "react-instantsearch-dom": "^6.40.4"
   }
 }
