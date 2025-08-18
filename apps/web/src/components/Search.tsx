@@ -12,6 +12,8 @@ interface BlogPost {
   publishedAt: string;
 }
 
+const searchCache = new Map<string, BlogPost[]>();
+
 export default function Search() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<BlogPost[]>([]);
@@ -23,10 +25,8 @@ export default function Search() {
       return;
     }
 
-    // Check cache first
-    const cached = localStorage.getItem(`search-${query}`);
-    if (cached) {
-      setResults(JSON.parse(cached));
+    if (searchCache.has(query)) {
+      setResults(searchCache.get(query)!);
       return;
     }
 
@@ -39,7 +39,7 @@ export default function Search() {
 
         const hits = (response.results[0]?.hits as BlogPost[]) || [];
         setResults(hits);
-        localStorage.setItem(`search-${query}`, JSON.stringify(hits));
+        searchCache.set(query, hits);
       } catch (error) {
         console.error("Search error:", error);
         setResults([]);

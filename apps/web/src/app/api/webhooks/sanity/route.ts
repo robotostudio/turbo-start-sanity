@@ -24,12 +24,6 @@ export async function POST(request: NextRequest) {
     const documentId = payload._id;
     const documentType = payload._type;
 
-    // Only handle blog posts
-    if (documentType !== "blog") {
-      return NextResponse.json({ message: "Not a blog post" });
-    }
-
-    // Skip duplicates (within 10 seconds)
     const now = Date.now();
     if (recentlyProcessed.has(documentId)) {
       const lastProcessed = recentlyProcessed.get(documentId)!;
@@ -39,38 +33,79 @@ export async function POST(request: NextRequest) {
     }
     recentlyProcessed.set(documentId, now);
 
-    // Fetch the blog post
-    const post = await sanityClient.fetch(
-      `*[_type == "blog" && _id == $id][0]{
-        _id, title, "slug": slug.current, excerpt, publishedAt
-      }`,
-      { id: documentId },
-    );
+    // ✅ Handle Blog Posts
+    if (documentType === "blog") {
+      const post = await sanityClient.fetch(
+        `*[_type == "blog" && _id == $id][0]{
+          _id, title, "slug": slug.current, excerpt, publishedAt,
+          categories[]->{ _id, title, "slug": slug.current }
+        }`,
+        { id: documentId },
+      );
 
-    if (!post || !post.publishedAt) {
-      // Delete from index if not found or unpublished
-      await algolia.deleteObjects({
+      if (!post || !post.publishedAt) {
+        await algolia.deleteObjects({
+          indexName: "blog_posts",
+          objectIDs: [documentId],
+        });
+        return NextResponse.json({ message: "Blog removed from index" });
+      }
+
+      await algolia.saveObjects({
         indexName: "blog_posts",
-        objectIDs: [documentId],
+        objects: [
+          {
+            objectID: post._id,
+            title: post.title,
+            slug: post.slug,
+            excerpt: post.excerpt,
+            publishedAt: post.publishedAt,
+            categories: post.categories?.map((c: any) => ({
+              id: c._id,
+              title: c.title,
+              slug: c.slug,
+            })),
+          },
+        ],
       });
-      return NextResponse.json({ message: "Removed from index" });
+
+      return NextResponse.json({ message: "Blog indexed successfully" });
     }
 
-    // Index to Algolia
-    await algolia.saveObjects({
-      indexName: "blog_posts",
-      objects: [
-        {
-          objectID: post._id,
-          title: post.title,
-          slug: post.slug,
-          excerpt: post.excerpt,
-          publishedAt: post.publishedAt,
-        },
-      ],
-    });
+    // ✅ Handle Categories
+    if (documentType === "category") {
+      const cat = await sanityClient.fetch(
+        `*[_type == "category" && _id == $id][0]{
+          _id, title, "slug": slug.current, description, seo
+        }`,
+        { id: documentId },
+      );
 
-    return NextResponse.json({ message: "Indexed successfully" });
+      if (!cat) {
+        await algolia.deleteObjects({
+          indexName: "categories",
+          objectIDs: [documentId],
+        });
+        return NextResponse.json({ message: "Category removed from index" });
+      }
+
+      await algolia.saveObjects({
+        indexName: "categories",
+        objects: [
+          {
+            objectID: cat._id,
+            title: cat.title,
+            slug: cat.slug,
+            description: cat.description,
+            seo: cat.seo,
+          },
+        ],
+      });
+
+      return NextResponse.json({ message: "Category indexed successfully" });
+    }
+
+    return NextResponse.json({ message: "Ignored: not blog or category" });
   } catch (error) {
     console.error("Webhook error:", error);
     return NextResponse.json({ error: "Failed" }, { status: 500 });

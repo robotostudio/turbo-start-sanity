@@ -1,4 +1,4 @@
-import { defineQuery } from "next-sanity";
+import { defineQuery, groq } from "next-sanity";
 
 // Base fragments for reusable query parts
 const imageFragment = /* groq */ `
@@ -82,6 +82,7 @@ const ctaBlock = /* groq */ `
     ${buttonsFragment},
   }
 `;
+
 const imageLinkCardsBlock = /* groq */ `
   _type == "imageLinkCards" => {
     ...,
@@ -174,8 +175,6 @@ const pageBuilderFragment = /* groq */ `
 
 /**
  * Query to extract a single image from a page document
- * This is used as a type reference only and not for actual data fetching
- * Helps with TypeScript inference for image objects
  */
 export const queryImageType = defineQuery(`
   *[_type == "page" && defined(image)][0]{
@@ -200,12 +199,13 @@ export const querySlugPageData = defineQuery(`
     "slug": slug.current,
     ${pageBuilderFragment}
   }
-  `);
+`);
 
 export const querySlugPagePaths = defineQuery(`
   *[_type == "page" && defined(slug.current)].slug.current
 `);
 
+// ✅ Keep only this version
 export const queryBlogIndexPageData = defineQuery(`
   *[_type == "blogIndex"][0]{
     ...,
@@ -218,11 +218,17 @@ export const queryBlogIndexPageData = defineQuery(`
     ${pageBuilderFragment},
     "slug": slug.current,
     "blogs": *[_type == "blog" && (seoHideFromLists != true)] | order(orderRank asc){
-      ${blogCardFragment}
+      ${blogCardFragment},
+      categories[]->{
+        _id,
+        title,
+        "slug": slug.current
+      }
     }
   }
 `);
 
+// ✅ Blog single page
 export const queryBlogSlugPageData = defineQuery(`
   *[_type == "blog" && slug.current == $slug][0]{
     ...,
@@ -230,7 +236,12 @@ export const queryBlogSlugPageData = defineQuery(`
     ${blogAuthorFragment},
     ${imageFragment},
     ${richTextFragment},
-    ${pageBuilderFragment}
+    ${pageBuilderFragment},
+    categories[]->{
+      _id,
+      title,
+      "slug": slug.current
+    }
   }
 `);
 
@@ -262,7 +273,7 @@ export const queryHomePageOGData = defineQuery(`
   *[_type == "homePage" && _id == $id][0]{
     ${ogFieldsFragment}
   }
-  `);
+`);
 
 export const querySlugPageOGData = defineQuery(`
   *[_type == "page" && _id == $id][0]{
@@ -350,6 +361,7 @@ export const querySitemapData = defineQuery(`{
     "lastModified": _updatedAt
   }
 }`);
+
 export const queryGlobalSeoSettings = defineQuery(`
   *[_type == "settings"][0]{
     _id,
@@ -385,3 +397,57 @@ export const querySettingsData = defineQuery(`
     "contactEmail": contactEmail,
   }
 `);
+
+// Category queries
+export const queryAllCategories = groq`
+  *[_type == "category"] | order(title asc) {
+    _id,
+    title,
+    slug,
+    description,
+    "postCount": count(*[_type == "blog" && references(^._id)])
+  }
+`;
+
+export const queryCategoryBySlug = groq`
+  *[_type == "category" && slug.current == $slug][0] {
+    _id,
+    title,
+    slug,
+    description,
+    seoTitle,
+    seoDescription,
+    "postCount": count(*[_type == "blog" && references(^._id)])
+  }
+`;
+
+export const queryBlogPostsByCategory = groq`
+  {
+    "posts": *[_type == "blog" && references($categoryId)] | order(publishedAt desc) [$start...$end] {
+      _id,
+      title,
+      slug,
+      excerpt,
+      publishedAt,
+      mainImage,
+      author-> {
+        name,
+        image
+      },
+      categories[]-> {
+        _id,
+        title,
+        slug
+      }
+    },
+    "totalPosts": count(*[_type == "blog" && references($categoryId)]),
+    "category": *[_type == "category" && _id == $categoryId][0] {
+      _id,
+      title,
+      slug,
+      description,
+      seoTitle,
+      seoDescription
+    }
+  }
+`;

@@ -11,6 +11,7 @@ import {
   PanelTopDashedIcon,
   Settings2,
   User,
+  TagsIcon, // 👈 add an icon for categories
 } from "lucide-react";
 import type {
   StructureBuilder,
@@ -44,11 +45,6 @@ type CreateList = {
   S: StructureBuilder;
 } & Base;
 
-// This function creates a list item for a type. It takes a StructureBuilder instance (S),
-// a type, an icon, and a title as parameters. It generates a title for the type if not provided,
-// and uses a default icon if not provided. It then returns a list item with the generated or
-// provided title and icon.
-
 const createList = ({ S, type, icon, title, id }: CreateList) => {
   const newTitle = title ?? getTitleCase(type);
   return S.documentTypeListItem(type)
@@ -79,6 +75,7 @@ const createIndexListWithOrderableItems = ({
       S.list()
         .title(indexTitle)
         .items([
+          // Blog index doc
           S.listItem()
             .title(indexTitle)
             .icon(index.icon ?? File)
@@ -88,6 +85,8 @@ const createIndexListWithOrderableItems = ({
                 .schemaType(index.type)
                 .documentId(index.type),
             ),
+
+          // Orderable blog posts
           orderableDocumentListDeskItem({
             type: list.type,
             S,
@@ -95,6 +94,12 @@ const createIndexListWithOrderableItems = ({
             icon: list.icon ?? File,
             title: `${listTitle}`,
           }),
+
+          // 👇 Add Categories inside Blog group
+          S.listItem()
+            .title("Categories")
+            .icon(TagsIcon)
+            .child(S.documentTypeList("category").title("Categories")),
         ]),
     );
 };

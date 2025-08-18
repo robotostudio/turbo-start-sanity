@@ -1,3 +1,4 @@
+// scripts/indexToAlgolia.ts
 import * as dotenv from "dotenv";
 dotenv.config({ path: "./.env.local" });
 import { algoliasearch } from "algoliasearch";
@@ -18,33 +19,70 @@ const algolia = algoliasearch(
 
 async function run() {
   try {
-    const posts = await sanityClient.fetch(`
+    // ✅ Fetch all blog posts
+    const blogs = await sanityClient.fetch(`
       *[_type == "blog"]{
         _id,
         title,
         "slug": slug.current,
         excerpt,
-        publishedAt
+        publishedAt,
+        categories[]->{
+          _id,
+          title,
+          "slug": slug.current
+        }
       }
     `);
 
-    const objects = posts.map((post: any) => ({
+    const blogObjects = blogs.map((post: any) => ({
       objectID: post._id,
       title: post.title,
       slug: post.slug,
       excerpt: post.excerpt,
       publishedAt: post.publishedAt,
+      categories: post.categories?.map((c: any) => ({
+        id: c._id,
+        title: c.title,
+        slug: c.slug,
+      })),
     }));
 
-    // Save objects to the index using v5 API
-    const response = await algolia.saveObjects({
+    // ✅ Fetch all categories
+    const categories = await sanityClient.fetch(`
+      *[_type == "category"]{
+        _id,
+        title,
+        "slug": slug.current,
+        description,
+        seo
+      }
+    `);
+
+    const categoryObjects = categories.map((cat: any) => ({
+      objectID: cat._id,
+      title: cat.title,
+      slug: cat.slug,
+      description: cat.description,
+      seo: cat.seo,
+    }));
+
+    // ✅ Save to Algolia
+    await algolia.saveObjects({
       indexName: "blog_posts",
-      objects: objects,
+      objects: blogObjects,
     });
 
-    console.log(`✅ Indexed ${objects.length} posts to Algolia`);
+    await algolia.saveObjects({
+      indexName: "categories",
+      objects: categoryObjects,
+    });
+
+    console.log(
+      `✅ Indexed ${blogObjects.length} blogs and ${categoryObjects.length} categories to Algolia`,
+    );
   } catch (error) {
-    console.error("❌ Error indexing posts:", error);
+    console.error("❌ Error indexing to Algolia:", error);
     throw error;
   }
 }

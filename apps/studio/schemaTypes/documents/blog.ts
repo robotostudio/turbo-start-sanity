@@ -134,6 +134,14 @@ export const blog = defineType({
         "The main content of your blog post with text, images, and formatting",
       group: GROUP.MAIN_CONTENT,
     }),
+    defineField({
+      name: "categories",
+      title: "Categories",
+      type: "array",
+      of: [{ type: "reference", to: [{ type: "category" }] }],
+      validation: (rule) => rule.min(1).error("At least one category required"),
+    }),
+
     ...seoFields,
     ...ogFields,
   ],
