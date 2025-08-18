@@ -30,7 +30,7 @@
     "@sanity/orderable-document-list": "^1.4.0",
     "@sanity/ui": "^3.0.7",
     "@sanity/vision": "^4.4.1",
-    "lucide-react": "^0.539.0",
+    "lucide-react": "^0.540.0",
     "react": "^19.1",
     "react-dom": "^19.1",
     "sanity": "^4.4.1",
