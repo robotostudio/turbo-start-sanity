@@ -1,0 +1,107 @@
+/* Add this to your existing globals.css */
+
+/* Pokemon type colors with better contrast and accessibility */
+.bg-normal-type {
+  background-color: #a8a878;
+  color: white;
+}
+.bg-fire-type {
+  background-color: #f08030;
+  color: white;
+}
+.bg-water-type {
+  background-color: #6890f0;
+  color: white;
+}
+.bg-electric-type {
+  background-color: #f8d030;
+  color: black;
+}
+.bg-grass-type {
+  background-color: #78c850;
+  color: white;
+}
+.bg-ice-type {
+  background-color: #98d8d8;
+  color: black;
+}
+.bg-fighting-type {
+  background-color: #c03028;
+  color: white;
+}
+.bg-poison-type {
+  background-color: #a040a0;
+  color: white;
+}
+.bg-ground-type {
+  background-color: #e0c068;
+  color: black;
+}
+.bg-flying-type {
+  background-color: #a890f0;
+  color: white;
+}
+.bg-psychic-type {
+  background-color: #f85888;
+  color: white;
+}
+.bg-bug-type {
+  background-color: #a8b820;
+  color: white;
+}
+.bg-rock-type {
+  background-color: #b8a038;
+  color: white;
+}
+.bg-ghost-type {
+  background-color: #705898;
+  color: white;
+}
+.bg-dragon-type {
+  background-color: #7038f8;
+  color: white;
+}
+.bg-dark-type {
+  background-color: #705848;
+  color: white;
+}
+.bg-steel-type {
+  background-color: #b8b8d0;
+  color: black;
+}
+.bg-fairy-type {
+  background-color: #ee99ac;
+  color: black;
+}
+
+/* Pokemon sprite pixelated rendering */
+.image-pixelated {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Custom animations for Pokemon cards */
+@keyframes pokemon-bounce {
+  0%,
+  20%,
+  53%,
+  80%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%,
+  43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+.pokemon-card:hover {
+  animation: pokemon-bounce 1s ease-in-out;
+}

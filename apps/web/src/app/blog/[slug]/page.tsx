@@ -1,3 +1,5 @@
+// apps/web/src/app/blog/[slug]/page.tsx
+
 import { notFound } from "next/navigation";
 import { stegaClean } from "next-sanity";
 
@@ -5,6 +7,10 @@ import { ArticleJsonLd } from "@/components/json-ld";
 import { RichText } from "@/components/richtext";
 import { SanityImage } from "@/components/sanity-image";
 import { TableOfContent } from "@/components/table-of-content";
+import {
+  PokemonDisplay,
+  PokemonErrorBoundary,
+} from "@/components/PokemonDisplay";
 import { client } from "@/lib/sanity/client";
 import { sanityFetch } from "@/lib/sanity/live";
 import { queryBlogPaths, queryBlogSlugPageData } from "@/lib/sanity/query";
@@ -29,19 +35,18 @@ async function fetchBlogPaths() {
   return paths;
 }
 
-export async function generateMetadata({
-  params,
-}: {
+export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
+  const { slug } = await props.params;
   const { data } = await fetchBlogSlugPageData(slug, false);
+
   return getSEOMetadata(
     data
       ? {
           title: data?.title ?? data?.seoTitle ?? "",
           description: data?.description ?? data?.seoDescription ?? "",
-          slug: data?.slug,
+          slug: data?.slug?.current ?? "",
           contentId: data?._id,
           contentType: data?._type,
           pageType: "article",
@@ -50,19 +55,22 @@ export async function generateMetadata({
   );
 }
 
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<{ slug: string }[]> {
   return await fetchBlogPaths();
 }
 
-export default async function BlogSlugPage({
-  params,
-}: {
+export default async function BlogSlugPage(props: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
+  const { slug } = await props.params;
   const { data } = await fetchBlogSlugPageData(slug);
+
   if (!data) return notFound();
-  const { title, description, image, richText } = data ?? {};
+
+  const { title, description, image, richText, featuredPokemon } = data ?? {};
+
+  // Debug logging - remove in production
+  console.log("Blog data:", { title, featuredPokemon });
 
   return (
     <div className="container my-16 mx-auto px-4 md:px-6">
@@ -73,6 +81,7 @@ export default async function BlogSlugPage({
             <h1 className="mt-2 text-4xl font-bold">{title}</h1>
             <p className="mt-4 text-lg text-muted-foreground">{description}</p>
           </header>
+
           {image && (
             <div className="mb-12">
               <SanityImage
@@ -86,11 +95,21 @@ export default async function BlogSlugPage({
               />
             </div>
           )}
+
+          {/* Fixed Pokemon display with error boundary */}
+          {featuredPokemon && (
+            <div className="mb-12">
+              <PokemonErrorBoundary>
+                <PokemonDisplay pokemonRef={featuredPokemon} />
+              </PokemonErrorBoundary>
+            </div>
+          )}
+
           <RichText richText={richText ?? []} />
         </main>
 
         <div className="hidden lg:block">
-          <div className="sticky top-4 rounded-lg ">
+          <div className="sticky top-4 rounded-lg">
             <TableOfContent richText={richText} />
           </div>
         </div>

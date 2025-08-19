@@ -1,3 +1,5 @@
+// apps/web/src/app/blog/page.tsx
+
 import { notFound } from "next/navigation";
 import { BlogHeader } from "@/components/blog-card";
 import { PageBuilder } from "@/components/pagebuilder";

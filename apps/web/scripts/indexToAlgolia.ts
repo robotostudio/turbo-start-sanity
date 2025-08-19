@@ -1,7 +1,7 @@
 // scripts/indexToAlgolia.ts
 import * as dotenv from "dotenv";
 dotenv.config({ path: "./.env.local" });
-import { algoliasearch } from "algoliasearch";
+import { algoliasearch } from "algoliasearch"; // ✅ correct import
 import { createClient } from "@sanity/client";
 
 const sanityClient = createClient({
@@ -19,21 +19,33 @@ const algolia = algoliasearch(
 
 async function run() {
   try {
-    // ✅ Fetch all blog posts
+    console.log("🔄 Fetching blogs with categories + Pokémon...");
     const blogs = await sanityClient.fetch(`
-      *[_type == "blog"]{
-        _id,
-        title,
-        "slug": slug.current,
-        excerpt,
-        publishedAt,
-        categories[]->{
-          _id,
-          title,
-          "slug": slug.current
-        }
+  *[_type == "blog"]{
+    _id,
+    title,
+    "slug": slug.current,
+    excerpt,
+    publishedAt,
+    categories[]->{
+      _id,
+      title,
+      "slug": slug.current,
+      description,
+      seo
+    },
+    featuredPokemon->{
+      pokemon {
+        id,
+        name,
+        sprite,
+        types
       }
-    `);
+    }
+  }
+`);
+
+    console.log(`📝 Found ${blogs.length} blogs`);
 
     const blogObjects = blogs.map((post: any) => ({
       objectID: post._id,
@@ -45,42 +57,36 @@ async function run() {
         id: c._id,
         title: c.title,
         slug: c.slug,
+        description: c.description,
+        seo: c.seo,
       })),
+      featuredPokemon: post.featuredPokemon?.pokemon
+        ? {
+            id: post.featuredPokemon.pokemon.id ?? null,
+            name: post.featuredPokemon.pokemon.name ?? null,
+            sprite: post.featuredPokemon.pokemon.sprite ?? null,
+            types: post.featuredPokemon.pokemon.types ?? null,
+          }
+        : { id: null, name: null, sprite: null, types: null },
     }));
-
-    // ✅ Fetch all categories
-    const categories = await sanityClient.fetch(`
-      *[_type == "category"]{
-        _id,
-        title,
-        "slug": slug.current,
-        description,
-        seo
-      }
-    `);
-
-    const categoryObjects = categories.map((cat: any) => ({
-      objectID: cat._id,
-      title: cat.title,
-      slug: cat.slug,
-      description: cat.description,
-      seo: cat.seo,
-    }));
-
-    // ✅ Save to Algolia
-    await algolia.saveObjects({
-      indexName: "blog_posts",
-      objects: blogObjects,
-    });
-
-    await algolia.saveObjects({
-      indexName: "categories",
-      objects: categoryObjects,
-    });
 
     console.log(
-      `✅ Indexed ${blogObjects.length} blogs and ${categoryObjects.length} categories to Algolia`,
+      "📝 Example blog object with embedded category & Pokémon:",
+      JSON.stringify(blogObjects[0], null, 2),
     );
+
+    if (blogObjects.length > 0) {
+      console.log(
+        "🚀 Indexing blogs with categories + Pokémon into Algolia...",
+      );
+      const result = await algolia.saveObjects({
+        indexName: "blogs_with_relations",
+        objects: blogObjects,
+      });
+      console.log("✅ Indexing result:", result);
+    } else {
+      console.log("⚠️ No blogs to index");
+    }
   } catch (error) {
     console.error("❌ Error indexing to Algolia:", error);
     throw error;

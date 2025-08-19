@@ -128,6 +128,16 @@ export const blog = defineType({
       },
     }),
     defineField({
+      name: "featuredPokemon",
+      title: "Featured Pokémon",
+      type: "reference",
+      to: [{ type: "pokedex" }], // Reference to pokedex documents
+      options: {
+        disableNew: true, // Force selection from existing Pokémon
+      },
+    }),
+
+    defineField({
       name: "richText",
       type: "richText",
       description:
