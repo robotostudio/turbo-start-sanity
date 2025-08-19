@@ -1,8 +1,8 @@
-import {defineCliConfig} from 'sanity/cli'
+import { defineCliConfig } from "sanity/cli";
 
 export default defineCliConfig({
   app: {
-    organizationId: 'oonsPxPdo',
-    entry: './src/App.tsx',
+    organizationId: process.env.SANITY_APP_ORG_ID!,
+    entry: "./src/App.tsx",
   },
-})
+});
