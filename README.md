@@ -80,7 +80,7 @@ Please complete all three tasks to demonstrate your technical capabilities.
 
 ## Submission Requirements
 
-### ⏰ Expected Completion: Friday, July 25th
+### ⏰ Expected Completion: 1 week
 
 Once you've completed all three tasks, please provide the following:
 
