@@ -11,12 +11,12 @@ export default async function BlogCategoryPage({
 }: PageProps<{ category: string }>) {
   const categorySlug = params.category;
 
-  const { data: result } = await sanityFetch({
+  const { data: result, error } = await sanityFetch({
     query: queryBlogPostsByCategory,
     params: { categorySlug },
   });
 
-  if (!result?.posts) notFound();
+  if (error || !result?.posts) notFound();
 
   return (
     <main className="container my-16 mx-auto px-4 md:px-6">
