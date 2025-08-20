@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-
 import { PageBuilder } from "@/components/pagebuilder";
 import { client } from "@/lib/sanity/client";
 import { sanityFetch } from "@/lib/sanity/live";
@@ -16,13 +15,9 @@ async function fetchSlugPageData(slug: string, stega = true) {
 
 async function fetchSlugPagePaths() {
   const slugs = await client.fetch(querySlugPagePaths);
-  const paths: { slug: string[] }[] = [];
-  for (const slug of slugs) {
-    if (!slug) continue;
-    const parts = slug.split("/").filter(Boolean);
-    paths.push({ slug: parts });
-  }
-  return paths;
+  return slugs
+    .filter(Boolean)
+    .map((slug: string) => ({ slug: slug.split("/").filter(Boolean) }));
 }
 
 export async function generateMetadata({
@@ -30,9 +25,9 @@ export async function generateMetadata({
 }: {
   params: { slug: string[] };
 }) {
-  const { slug } = params;
-  const slugString = slug.join("/");
+  const slugString = params.slug.join("/");
   const { data: pageData } = await fetchSlugPageData(slugString, false);
+
   return getSEOMetadata(
     pageData
       ? {
@@ -46,7 +41,7 @@ export async function generateMetadata({
   );
 }
 
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
   return await fetchSlugPagePaths();
 }
 
@@ -55,17 +50,14 @@ export default async function SlugPage({
 }: {
   params: { slug: string[] };
 }) {
-  const { slug } = params;
-  const slugString = slug.join("/");
+  const slugString = params.slug.join("/");
   const { data: pageData } = await fetchSlugPageData(slugString);
 
-  if (!pageData) {
-    return notFound();
-  }
+  if (!pageData) return notFound();
 
   const { title, pageBuilder, _id, _type } = pageData ?? {};
 
-  return !Array.isArray(pageBuilder) || pageBuilder?.length === 0 ? (
+  return !Array.isArray(pageBuilder) || pageBuilder.length === 0 ? (
     <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-4">
       <h1 className="text-2xl font-semibold mb-4 capitalize">{title}</h1>
       <p className="text-muted-foreground mb-6">
