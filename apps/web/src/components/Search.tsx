@@ -34,7 +34,7 @@ export default function Search() {
     const timeout = setTimeout(async () => {
       try {
         const response = await searchClient.search({
-          requests: [{ indexName: "blog_posts", query }],
+          requests: [{ indexName: "blogs_with_relations", query }],
         });
 
         const hits = (response.results[0]?.hits as BlogPost[]) || [];
