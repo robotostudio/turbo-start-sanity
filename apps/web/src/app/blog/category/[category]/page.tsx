@@ -4,12 +4,11 @@ import { PageBuilder } from "@/components/pagebuilder";
 import { sanityFetch } from "@/lib/sanity/live";
 import { queryBlogPostsByCategory } from "@/lib/sanity/query";
 import BlogListWithFilters from "@/components/BlogWithFilters";
+import type { PageProps } from "next";
 
-interface Props {
-  params: { category: string };
-}
-
-export default async function BlogCategoryPage({ params }: Props) {
+export default async function BlogCategoryPage({
+  params,
+}: PageProps<{ category: string }>) {
   const categorySlug = params.category;
 
   const { data: result } = await sanityFetch({
