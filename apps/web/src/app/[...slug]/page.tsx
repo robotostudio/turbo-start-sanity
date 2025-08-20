@@ -20,11 +20,12 @@ async function fetchSlugPagePaths() {
     .map((slug: string) => ({ slug: slug.split("/").filter(Boolean) }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string[] };
-}) {
+// ✅ define proper type for params
+interface SlugPageParams {
+  slug: string[];
+}
+
+export async function generateMetadata({ params }: { params: SlugPageParams }) {
   const slugString = params.slug.join("/");
   const { data: pageData } = await fetchSlugPageData(slugString, false);
 
@@ -41,15 +42,12 @@ export async function generateMetadata({
   );
 }
 
-export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
+export async function generateStaticParams(): Promise<SlugPageParams[]> {
   return await fetchSlugPagePaths();
 }
 
-export default async function SlugPage({
-  params,
-}: {
-  params: { slug: string[] };
-}) {
+// ✅ use typed props instead of inline object
+export default async function SlugPage({ params }: { params: SlugPageParams }) {
   const slugString = params.slug.join("/");
   const { data: pageData } = await fetchSlugPageData(slugString);
 
