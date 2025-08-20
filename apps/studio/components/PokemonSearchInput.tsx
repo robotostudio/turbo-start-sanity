@@ -1,7 +1,5 @@
-// components/PokemonSearchInput.tsx - Using Sanity UI components
-
 import React, { useState, useCallback } from "react";
-import { StringInputProps, set, unset } from "sanity";
+import { set, unset, ObjectInputProps, ObjectSchemaType } from "sanity";
 import {
   Card,
   Text,
@@ -13,30 +11,28 @@ import {
   Box,
   Badge,
 } from "@sanity/ui";
+import { PokemonResult } from "../types/pokemon"; // ✅ reuse type
 
-interface Pokemon {
+// Raw PokeAPI response type (partial)
+interface ApiPokemon {
   id: number;
   name: string;
   sprites: {
     front_default: string;
   };
   types: Array<{
-    type: {
-      name: string;
-    };
+    type: { name: string };
   }>;
 }
 
-// Clean Pokemon name function
+// Helpers
 function cleanPokemonName(name: string): string {
   return name
-    .replace(/[\u200B-\u200D\uFEFF\u00A0\u2060\u180E]/g, "") // Remove invisible characters
-    .replace(/[^\w\s\-']/g, "") // Keep only safe characters
+    .replace(/[\u200B-\u200D\uFEFF\u00A0\u2060\u180E]/g, "")
+    .replace(/[^\w\s\-']/g, "")
     .trim()
     .toLowerCase();
 }
-
-// Clean Pokemon type function
 function cleanPokemonType(type: string): string {
   return type
     .replace(/[\u200B-\u200D\uFEFF\u00A0\u2060\u180E]/g, "")
@@ -45,10 +41,16 @@ function cleanPokemonType(type: string): string {
     .toLowerCase();
 }
 
-export const PokemonSearchInput: React.FC<StringInputProps> = (props) => {
+export function PokemonSearchInput(
+  props: ObjectInputProps<Record<string, any>, ObjectSchemaType>,
+) {
   const { onChange, value } = props;
+
+  // Cast to your clean type
+  const pokemonValue = value as PokemonResult | undefined;
+
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<Pokemon[]>([]);
+  const [searchResults, setSearchResults] = useState<ApiPokemon[]>([]);
   const [loading, setLoading] = useState(false);
 
   const searchPokemon = useCallback(async (term: string) => {
@@ -56,56 +58,35 @@ export const PokemonSearchInput: React.FC<StringInputProps> = (props) => {
       setSearchResults([]);
       return;
     }
-
     setLoading(true);
     try {
       const cleanTerm = term.toLowerCase().trim();
       const response = await fetch(
         `https://pokeapi.co/api/v2/pokemon/${cleanTerm}`,
       );
-
       if (response.ok) {
         const pokemon = await response.json();
         setSearchResults([pokemon]);
       } else {
-        // If direct search fails, try to search by ID if it's a number
-        if (/^\d+$/.test(cleanTerm)) {
-          const idResponse = await fetch(
-            `https://pokeapi.co/api/v2/pokemon/${cleanTerm}`,
-          );
-          if (idResponse.ok) {
-            const pokemon = await idResponse.json();
-            setSearchResults([pokemon]);
-          } else {
-            setSearchResults([]);
-          }
-        } else {
-          setSearchResults([]);
-        }
+        setSearchResults([]);
       }
-    } catch (error) {
-      console.error("Pokemon search error:", error);
+    } catch (err) {
+      console.error("Pokemon search error:", err);
       setSearchResults([]);
     }
     setLoading(false);
   }, []);
 
   const selectPokemon = useCallback(
-    (pokemon: Pokemon) => {
-      // Clean the data before saving to Sanity
-      const cleanedPokemonData = {
+    (pokemon: ApiPokemon) => {
+      const cleaned: PokemonResult = {
         _type: "pokemon",
         id: pokemon.id,
-        name: cleanPokemonName(pokemon.name), // Clean the name
+        name: cleanPokemonName(pokemon.name),
         sprite: pokemon.sprites.front_default,
-        types: pokemon.types
-          .map((t) => cleanPokemonType(t.type.name)) // Clean each type
-          .filter((type) => type.length > 0), // Remove empty types
+        types: pokemon.types.map((t) => cleanPokemonType(t.type.name)),
       };
-
-      console.log("Saving cleaned Pokemon data:", cleanedPokemonData);
-
-      onChange(set(cleanedPokemonData));
+      onChange(set(cleaned));
       setSearchTerm("");
       setSearchResults([]);
     },
@@ -118,16 +99,16 @@ export const PokemonSearchInput: React.FC<StringInputProps> = (props) => {
 
   return (
     <Stack space={3}>
-      {/* Current Selection Display */}
-      {value && (
+      {/* Current Selection */}
+      {pokemonValue && (
         <Card padding={3} tone="primary" border>
           <Flex align="center" justify="space-between">
             <Flex align="center" gap={3}>
-              {value.sprite && (
+              {pokemonValue.sprite && (
                 <Box>
                   <img
-                    src={value.sprite}
-                    alt={value.name}
+                    src={pokemonValue.sprite}
+                    alt={pokemonValue.name}
                     style={{
                       width: "48px",
                       height: "48px",
@@ -138,24 +119,22 @@ export const PokemonSearchInput: React.FC<StringInputProps> = (props) => {
               )}
               <Stack space={2}>
                 <Text weight="medium" style={{ textTransform: "capitalize" }}>
-                  {value.name}
+                  {pokemonValue.name}
                 </Text>
                 <Text size={1} muted>
-                  #{value.id?.toString().padStart(3, "0")}
+                  #{pokemonValue.id?.toString().padStart(3, "0")}
                 </Text>
-                {value.types && (
-                  <Flex gap={1} wrap="wrap">
-                    {value.types.map((type: string, index: number) => (
-                      <Badge
-                        key={index}
-                        tone="default"
-                        style={{ textTransform: "capitalize" }}
-                      >
-                        {type}
-                      </Badge>
-                    ))}
-                  </Flex>
-                )}
+                <Flex gap={1} wrap="wrap">
+                  {pokemonValue.types?.map((type, idx) => (
+                    <Badge
+                      key={idx}
+                      tone="default"
+                      style={{ textTransform: "capitalize" }}
+                    >
+                      {type}
+                    </Badge>
+                  ))}
+                </Flex>
               </Stack>
             </Flex>
             <Button
@@ -179,7 +158,7 @@ export const PokemonSearchInput: React.FC<StringInputProps> = (props) => {
         }}
       />
 
-      {/* Loading State */}
+      {/* Loading */}
       {loading && (
         <Flex align="center" gap={2}>
           <Spinner size={1} />
@@ -197,9 +176,18 @@ export const PokemonSearchInput: React.FC<StringInputProps> = (props) => {
               key={pokemon.id}
               padding={3}
               tone="transparent"
-              style={{ cursor: "pointer" }}
+              style={{
+                cursor: "pointer",
+                transition: "background 0.2s ease",
+              }}
               onClick={() => selectPokemon(pokemon)}
-              __unstable_hover={{ tone: "default" }}
+              onMouseEnter={(e) =>
+                ((e.currentTarget as HTMLElement).style.background = "#f5f5f5")
+              }
+              onMouseLeave={(e) =>
+                ((e.currentTarget as HTMLElement).style.background =
+                  "transparent")
+              }
             >
               <Flex align="center" gap={3}>
                 <Box>
@@ -221,9 +209,9 @@ export const PokemonSearchInput: React.FC<StringInputProps> = (props) => {
                     #{pokemon.id.toString().padStart(3, "0")}
                   </Text>
                   <Flex gap={1} wrap="wrap">
-                    {pokemon.types.map((type, index) => (
+                    {pokemon.types.map((type, idx) => (
                       <Badge
-                        key={index}
+                        key={idx}
                         tone="default"
                         style={{ textTransform: "capitalize" }}
                       >
@@ -246,4 +234,4 @@ export const PokemonSearchInput: React.FC<StringInputProps> = (props) => {
       )}
     </Stack>
   );
-};
+}
