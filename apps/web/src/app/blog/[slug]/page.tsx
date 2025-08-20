@@ -35,9 +35,7 @@ async function fetchBlogPaths() {
   return paths;
 }
 
-export async function generateMetadata(props: {
-  params: { slug: string };
-}) {
+export async function generateMetadata(props: { params: { slug: string } }) {
   const { slug } = props.params;
   const { data } = await fetchBlogSlugPageData(slug, false);
 
