@@ -18,7 +18,7 @@ jobs:
     env:
       SANITY_AUTH_TOKEN: ${{ secrets.SANITY_DEPLOY_TOKEN }}
       NODE_OPTIONS: "--max_old_space_size=4096"
-      PNPM_VERSION: 9.12.3
+      PNPM_VERSION: 10.12.2
       SANITY_STUDIO_PROJECT_ID: ${{ secrets.SANITY_STUDIO_PROJECT_ID }}
       SANITY_STUDIO_DATASET: ${{ secrets.SANITY_STUDIO_DATASET }}
       SANITY_STUDIO_TITLE: ${{ secrets.SANITY_STUDIO_TITLE }}
