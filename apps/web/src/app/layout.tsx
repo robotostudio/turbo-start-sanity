@@ -12,6 +12,7 @@ import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
 import { getNavigationData } from "@/lib/navigation";
 import { SanityLive } from "@/lib/sanity/live";
+import { preconnect } from "react-dom";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -28,6 +29,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  preconnect("https://cdn.sanity.io");
   const nav = await getNavigationData();
   return (
     <html lang="en" suppressHydrationWarning>
