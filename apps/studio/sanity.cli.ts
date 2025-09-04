@@ -15,7 +15,12 @@ function getStudioHost(): string | undefined {
   const projectId = process.env.SANITY_STUDIO_PROJECT_ID;
 
   if (productionHostName) {
-    if (host && host !== "main") return `${host}-${productionHostName}`;
+    if (host && host !== "main") {
+      // Sanitize branch name by replacing slashes with hyphens
+      // e.g. feature/new-component -> feature-new-component
+      const sanitizedHost = host.replace(/\//g, "-");
+      return `${sanitizedHost}-${productionHostName}`;
+    }
 
     return productionHostName;
   }
