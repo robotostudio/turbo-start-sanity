@@ -7,15 +7,25 @@ import type {
 
 import { Logo } from "./logo";
 import { NavbarClient, NavbarSkeletonResponsive } from "./navbar-client";
+import { unstable_cache } from "next/cache";
+
+const navbarDataCached = unstable_cache(
+  async () => {
+    const [navbarData, settingsData] = await Promise.all([
+      sanityFetch({ query: queryNavbarData }),
+      sanityFetch({ query: queryGlobalSeoSettings }),
+    ]);
+    return { navbarData: navbarData.data, settingsData: settingsData.data };
+  },
+  ["navbarData"],
+  {
+    revalidate: 300,
+  },
+);
 
 export async function NavbarServer() {
-  const [navbarData, settingsData] = await Promise.all([
-    sanityFetch({ query: queryNavbarData }),
-    sanityFetch({ query: queryGlobalSeoSettings }),
-  ]);
-  return (
-    <Navbar navbarData={navbarData.data} settingsData={settingsData.data} />
-  );
+  const { navbarData, settingsData } = await navbarDataCached();
+  return <Navbar navbarData={navbarData} settingsData={settingsData} />;
 }
 
 export function Navbar({

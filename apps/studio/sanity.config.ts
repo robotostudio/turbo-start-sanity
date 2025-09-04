@@ -24,6 +24,9 @@ export default defineConfig({
   logo: Logo,
   projectId: projectId,
   dataset: dataset ?? "production",
+  releases: {
+    enabled: true,
+  },
   plugins: [
     presentationTool({
       resolve: {
