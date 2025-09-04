@@ -30,7 +30,6 @@ export function HeroBlock({
                 className="text-base md:text-lg font-normal"
               />
             </div>
-
             <SanityButtons
               buttons={buttons}
               buttonClassName="w-full sm:w-auto"
@@ -45,6 +44,7 @@ export function HeroBlock({
                 loading="eager"
                 width={800}
                 height={800}
+                fetchPriority="high"
                 className="max-h-96 w-full rounded-3xl object-cover"
               />
             </div>
