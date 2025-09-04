@@ -249,22 +249,63 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
   );
 }
 
+function NavbarSkeleton() {
+  return (
+    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo skeleton - matches Logo component dimensions: width={120} height={40} */}
+          {/* <div className="flex items-center">
+            <div className="h-10 w-[120px] rounded bg-muted/50 animate-pulse" />
+          </div> */}
+          <div className="flex items-center w-[120px] h-[40px]">
+            <div className="h-10 w-[120px] rounded bg-muted/50 animate-pulse" />
+          </div>
+
+          {/* Desktop nav skeleton - matches nav gap-1 and px-3 py-2 buttons */}
+          {/* <nav className="hidden md:flex items-center gap-1">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div
+                key={`nav-${i}`}
+                className="h-9 px-3 py-2 rounded bg-muted/50 animate-pulse min-w-[60px]"
+              />
+            ))}
+          </nav> */}
+
+          {/* Desktop actions skeleton - matches gap-4, ModeToggle (icon button) + SanityButtons */}
+          {/* <div className="hidden md:flex items-center gap-4">
+            <div className="h-9 w-9 rounded bg-muted/50 animate-pulse" />
+            <div className="h-9 px-4 rounded-lg bg-muted/50 animate-pulse min-w-[80px]" />
+          </div> */}
+
+          {/* Mobile menu button skeleton - matches Button size="icon" */}
+          <div className="md:hidden h-10 w-10 rounded bg-muted/50 animate-pulse" />
+        </div>
+      </div>
+    </header>
+  );
+}
+
 export function Navbar({
   navbarData: initialNavbarData,
   settingsData: initialSettingsData,
 }: NavigationData) {
-  const { data, error } = useSWR<NavigationData>("/api/navigation", fetcher, {
-    fallbackData: {
-      navbarData: initialNavbarData,
-      settingsData: initialSettingsData,
+  const { data, error, isLoading } = useSWR<NavigationData>(
+    "/api/navigation",
+    fetcher,
+    {
+      fallbackData: {
+        navbarData: initialNavbarData,
+        settingsData: initialSettingsData,
+      },
+      revalidateOnFocus: false,
+      revalidateOnMount: false,
+      revalidateOnReconnect: true,
+      refreshInterval: 30000,
+      errorRetryCount: 3,
+      errorRetryInterval: 5000,
     },
-    revalidateOnFocus: false,
-    revalidateOnMount: false,
-    revalidateOnReconnect: true,
-    refreshInterval: 30000,
-    errorRetryCount: 3,
-    errorRetryInterval: 5000,
-  });
+  );
 
   const navigationData = data || {
     navbarData: initialNavbarData,
@@ -274,12 +315,17 @@ export function Navbar({
   const { columns, buttons } = navbarData || {};
   const { logo, siteTitle } = settingsData || {};
 
+  // Show skeleton only on initial mount when no fallback data is available
+  if (isLoading && !data && (!initialNavbarData || !initialSettingsData)) {
+    return <NavbarSkeleton />;
+  }
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center w-[120px] h-[40px]">
             {logo && (
               <Logo
                 alt={siteTitle || ""}

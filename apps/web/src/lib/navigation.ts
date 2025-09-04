@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import { client } from "./sanity/client";
+import { sanityFetch } from "./sanity/live";
 import { queryGlobalSeoSettings, queryNavbarData } from "./sanity/query";
 
 export const getNavigationData = unstable_cache(
@@ -8,17 +8,17 @@ export const getNavigationData = unstable_cache(
     console.debug("Fetching navigation and settings data...");
 
     const [navbarData, settingsData] = await Promise.all([
-      client.fetch(queryNavbarData),
-      client.fetch(queryGlobalSeoSettings),
+      sanityFetch({ query: queryNavbarData }),
+      sanityFetch({ query: queryGlobalSeoSettings }),
     ]);
 
     console.timeEnd("getNavigationData fetch duration");
-    console.debug("Navigation data fetched:", navbarData);
-    console.debug("Settings data fetched:", settingsData);
+    console.debug("Navigation data fetched:", navbarData.tags);
+    console.debug("Settings data fetched:", settingsData.tags);
 
-    return { navbarData, settingsData };
+    return { navbarData: navbarData.data, settingsData: settingsData.data };
   },
-  ["navigation-data"],
+  ["sanity"],
   {
     revalidate: 300, // Revalidate every 5 minutes
   },
