@@ -98,11 +98,17 @@ Your Next.js frontend (`/web`) and Sanity Studio (`/studio`) are still only runn
 
 The template includes a GitHub Actions workflow [`deploy-sanity.yml`](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/.github/workflows/deploy-sanity.yml) that automatically deploys your Sanity Studio whenever changes are pushed to the `studio` directory.
 
+**🛡️ Safeguard**: The workflow uses branch-based dataset selection to safeguard your production data:
+
+- **`main` branch**: Deploys to production dataset
+- **All other branches**: Deploys to development dataset (feature branches, staging)
+
 > **Note**: To use the GitHub Actions workflow, make sure to configure the following secrets in your repository settings:
 >
 > - `SANITY_DEPLOY_TOKEN`
 > - `SANITY_STUDIO_PROJECT_ID`
-> - `SANITY_STUDIO_DATASET`
+> - `SANITY_STUDIO_PRODUCTION_DATASET` (for main branch deployments)
+> - `SANITY_STUDIO_DEVELOPMENT_DATASET` (for feature branches and staging)
 > - `SANITY_STUDIO_TITLE`
 > - `SANITY_STUDIO_PRESENTATION_URL`
 > - `SANITY_STUDIO_PRODUCTION_HOSTNAME`
@@ -110,6 +116,7 @@ The template includes a GitHub Actions workflow [`deploy-sanity.yml`](https://ra
 Set `SANITY_STUDIO_PRODUCTION_HOSTNAME` to whatever you want your deployed Sanity Studio hostname to be. Eg. for `SANITY_STUDIO_PRODUCTION_HOSTNAME=my-cool-project` you'll get a studio URL of `https://my-cool-project.sanity.studio` (and `<my-branch-name>-my-cool-project.sanity.studio` for PR previews builds done automatically via the `deploy-sanity.yml` github CI workflow when you open a PR.)
 
 Set `SANITY_STUDIO_PRESENTATION_URL` to your web app front-end URL (from the Vercel deployment). This URL is required for production deployments and should be:
+
 - Set in your GitHub repository secrets for CI/CD deployments
 - Set in your local environment if deploying manually with `npx sanity deploy`
 - Not needed for local development, where preview will automatically use http://localhost:3000
