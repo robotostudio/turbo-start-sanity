@@ -1,17 +1,17 @@
 import "@workspace/ui/globals.css";
 
+import { VisualEditing } from "next-sanity";
 import { Geist, Geist_Mono } from "next/font/google";
 import { draftMode } from "next/headers";
-import { VisualEditing } from "next-sanity";
 import { Suspense } from "react";
 
 import { FooterServer, FooterSkeleton } from "@/components/footer";
 import { CombinedJsonLd } from "@/components/json-ld";
+import { Navbar } from "@/components/navbar";
 import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
-import { SanityLive } from "@/lib/sanity/live";
 import { getNavigationData } from "@/lib/navigation";
-import { MinimalNavbar } from "@/components/minimal-navbar";
+import { SanityLive } from "@/lib/sanity/live";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -35,10 +35,7 @@ export default async function RootLayout({
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
         <Providers>
-          <MinimalNavbar
-            navbarData={nav.navbarData}
-            settingsData={nav.settingsData}
-          />
+          <Navbar navbarData={nav.navbarData} settingsData={nav.settingsData} />
           {children}
           <Suspense fallback={<FooterSkeleton />}>
             <FooterServer />

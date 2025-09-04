@@ -249,7 +249,7 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
   );
 }
 
-export function MinimalNavbar({
+export function Navbar({
   navbarData: initialNavbarData,
   settingsData: initialSettingsData,
 }: NavigationData) {
