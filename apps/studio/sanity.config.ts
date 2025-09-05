@@ -48,7 +48,6 @@ export default defineConfig({
     media(),
     iconPicker(),
     assist(),
-    unsplashImageAsset(),
   ],
   document: {
     newDocumentOptions: (prev, { creationContext }) => {
