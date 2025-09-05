@@ -8,6 +8,7 @@ import { iconPicker } from "sanity-plugin-icon-picker";
 import { media } from "sanity-plugin-media";
 
 import { Logo } from "./components/logo";
+import { DatasetBanner } from "./components/dataset-banner";
 import { locations } from "./location";
 import { presentationUrl } from "./plugins/presentation-url";
 import { schemaTypes } from "./schemaTypes";
@@ -15,7 +16,7 @@ import { structure } from "./structure";
 import { createPageTemplate, getPresentationUrl } from "./utils/helper";
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
-const dataset = process.env.SANITY_STUDIO_DATASET;
+const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
 const title = process.env.SANITY_STUDIO_TITLE;
 
 export default defineConfig({
@@ -23,7 +24,7 @@ export default defineConfig({
   title: title,
   logo: Logo,
   projectId: projectId,
-  dataset: dataset ?? "production",
+  dataset: dataset,
   releases: {
     enabled: true,
   },
@@ -60,5 +61,10 @@ export default defineConfig({
   schema: {
     types: schemaTypes,
     templates: createPageTemplate(),
+  },
+  studio: {
+    components: {
+      navbar: DatasetBanner,
+    },
   },
 });
