@@ -1,6 +1,8 @@
-import { Card, Stack } from "@sanity/ui";
+import { Card, Stack, useToast } from "@sanity/ui";
 import React, { useCallback } from "react";
+import { useClient } from "sanity";
 import { useRouter } from "sanity/router";
+import { usePaneRouter } from "sanity/structure";
 
 // Custom hooks
 import { usePagesTree } from "../hooks/use-pages-tree";
@@ -17,6 +19,9 @@ import { EmptyState, ErrorState } from "./tree-states";
  */
 export const HierarchicalPagesTree: React.FC = () => {
   const router = useRouter();
+  const paneRouter = usePaneRouter();
+  const client = useClient({ apiVersion: "2023-01-01" });
+  const toast = useToast();
 
   const { pages, tree, loading, error, refetch } = usePagesTree();
 
@@ -25,17 +30,64 @@ export const HierarchicalPagesTree: React.FC = () => {
   const handlePageSelect = useCallback(
     (pageId: string) => {
       try {
-        router.navigateIntent("edit", { id: pageId, type: "page" });
-        // nav.navigateIntent("edit", { id: pageId, type: "page" });
+        paneRouter.replaceCurrent({
+          id: pageId,
+          params: { type: "page" },
+        });
       } catch (err) {
         console.error("Navigation failed:", err);
-        // Fallback navigation
-        const currentUrl = window.location.pathname;
-        const baseUrl = currentUrl.includes("/studio") ? "/studio" : "";
-        window.location.href = `${baseUrl}/structure/page;${pageId}`;
+        // Fallback to router navigation
+        try {
+          router.navigateIntent("edit", { id: pageId, type: "page" });
+        } catch (fallbackErr) {
+          console.error("Fallback navigation failed:", fallbackErr);
+          // Last resort fallback navigation
+          const currentUrl = window.location.pathname;
+          const baseUrl = currentUrl.includes("/studio") ? "/studio" : "";
+          window.location.href = `${baseUrl}/structure/page;${pageId}`;
+        }
       }
     },
-    [router],
+    [paneRouter, router],
+  );
+
+  const handleCreateChild = useCallback(
+    (parentSlug: string) => {
+      try {
+        router.navigateIntent("create", {
+          type: "page",
+          template: "nested-page-template",
+        });
+      } catch (err) {
+        console.error("Failed to create child page:", err);
+        toast.push({
+          status: "error",
+          title: "Failed to create child page",
+          description: "Please try again",
+        });
+      }
+    },
+    [router, toast],
+  );
+
+  const handleOpenInPane = useCallback(
+    (pageId: string) => {
+      console.log("🚀 ~ HierarchicalPagesTree ~ pageId:", pageId);
+      try {
+        paneRouter.replaceCurrent({
+          id: pageId,
+          params: { type: "page" },
+        });
+      } catch (err) {
+        console.error("Failed to open in pane:", err);
+        toast.push({
+          status: "error",
+          title: "Failed to open page",
+          description: "Please try again",
+        });
+      }
+    },
+    [paneRouter, toast],
   );
 
   if (loading && pages.length === 0) {
@@ -76,6 +128,8 @@ export const HierarchicalPagesTree: React.FC = () => {
           onPageSelect={handlePageSelect}
           isExpanded={isExpanded}
           onToggleExpand={toggleExpansion}
+          onCreateChild={handleCreateChild}
+          onOpenInPane={handleOpenInPane}
         />
       </Stack>
     </Card>

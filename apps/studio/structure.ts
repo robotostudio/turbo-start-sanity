@@ -121,7 +121,6 @@ export const structure = (
     .items([
       createSingleTon({ S, type: "homePage", icon: HomeIcon }),
       S.divider(),
-      // Use hierarchical page structure
       createHierarchicalPageStructure(S, context),
       createIndexListWithOrderableItems({
         S,

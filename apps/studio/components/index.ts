@@ -2,6 +2,11 @@
 export { HierarchicalPagesTree } from "./hierarchical-pages-tree-refactored";
 
 // Sub-components
+export {
+  type MenuAction,
+  type MenuGroup,
+  TreeActionMenu,
+} from "./tree-action-menu";
 export { TreeHeader } from "./tree-header";
 export { TreeItem } from "./tree-item";
 export { TreeList } from "./tree-list";
