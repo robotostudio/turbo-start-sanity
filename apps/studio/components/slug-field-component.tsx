@@ -197,7 +197,7 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
   }, [fullUrl]);
 
   return (
-    <Stack space={3}>
+    <Stack space={4}>
       <Stack space={2}>
         <Text size={1} weight="semibold">
           {title}
@@ -209,32 +209,33 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
         )}
       </Stack>
       <Stack space={4}>
-        <Flex align="center" justify="space-between">
-          <Text size={1} weight="medium">
-            URL Path
-          </Text>
-        </Flex>
-        <Flex gap={2} align="center">
-          <Box flex={1}>
-            <SlugInput
-              value={currentSlug}
-              onChange={handleInputChange}
-              onFocus={() => setIsEditing(true)}
-              onBlur={() => setIsEditing(false)}
-              placeholder="Enter URL path (e.g., about-us or blog/my-post)"
-              disabled={readOnly}
+        <Stack space={2}>
+          <Flex align="center" justify="space-between">
+            <Text size={1} weight="medium">
+              URL Path
+            </Text>
+          </Flex>
+          <Flex gap={2} align="center">
+            <Box flex={1}>
+              <SlugInput
+                value={currentSlug}
+                onChange={handleInputChange}
+                onFocus={() => setIsEditing(true)}
+                onBlur={() => setIsEditing(false)}
+                placeholder="Enter URL path (e.g., about-us or blog/my-post)"
+                disabled={readOnly}
+              />
+            </Box>
+            <GenerateButton
+              text="Generate"
+              onClick={handleGenerate}
+              disabled={!document?.title || readOnly}
+              mode="ghost"
+              tone="primary"
+              fontSize={1}
             />
-          </Box>
-          <GenerateButton
-            // icon={GenerateIcon}
-            text="Generate"
-            onClick={handleGenerate}
-            disabled={!document?.title || readOnly}
-            mode="ghost"
-            tone="primary"
-            fontSize={1}
-          />
-        </Flex>
+          </Flex>
+        </Stack>
 
         {/* Helper Text */}
         <Text size={1} muted>
@@ -249,7 +250,7 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
             </Text>
             <Flex align="center" gap={2}>
               <UrlPreview style={{ flex: 1 }}>
-                <Flex align="center" gap={1}>
+                <Flex align="center" gap={2}>
                   <span>{fullUrl}</span>
                 </Flex>
               </UrlPreview>
@@ -264,6 +265,7 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
           </Stack>
         )}
       </Stack>
+
       <ErrorStates
         errors={[
           ...combinedValidation.errors,
