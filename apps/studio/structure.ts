@@ -13,10 +13,13 @@ import {
   User,
 } from "lucide-react";
 import type {
+  ListItemBuilder,
   StructureBuilder,
   StructureResolverContext,
 } from "sanity/structure";
 
+import { HierarchicalPagesTree } from "./components";
+import { createSlugBasedStructure } from "./components/nested-pages-strucure";
 import type { SchemaType, SingletonType } from "./schemaTypes";
 import { getTitleCase } from "./utils/helper";
 
@@ -99,6 +102,17 @@ const createIndexListWithOrderableItems = ({
     );
 };
 
+// Create hierarchical page structure using custom React component
+const createHierarchicalPageStructure = (
+  S: StructureBuilder,
+  context: StructureResolverContext,
+): ListItemBuilder => {
+  return S.listItem()
+    .title("Pages")
+    .icon(File)
+    .child(S.component(HierarchicalPagesTree).id("hierarchical-pages-tree"));
+};
+
 export const structure = (
   S: StructureBuilder,
   context: StructureResolverContext,
@@ -108,7 +122,9 @@ export const structure = (
     .items([
       createSingleTon({ S, type: "homePage", icon: HomeIcon }),
       S.divider(),
-      createList({ S, type: "page", title: "Pages" }),
+      // createHierarchicalPageStructure(S, context),
+      // createSlugBasedStructure(S, "page"),
+      createSlugBasedStructure(S, "page"),
       createIndexListWithOrderableItems({
         S,
         index: { type: "blogIndex", icon: BookMarked },

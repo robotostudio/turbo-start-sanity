@@ -1,7 +1,10 @@
 import { DocumentIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 
-import { PathnameFieldComponent } from "../../components/slug-field-component";
+import {
+  PathnameFieldComponent,
+  UrlSlugFieldComponent,
+} from "../../components";
 import { GROUP, GROUPS } from "../../utils/constant";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
@@ -65,7 +68,7 @@ export const page = defineType({
       },
       validation: (Rule) =>
         Rule.required()
-          .error("A URL slug is required for the page")
+          // .error("A URL slug is required for the page")
           .custom((slug) => {
             // First run basic validation
             const basicValidation = createSlugValidator({
