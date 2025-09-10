@@ -1,7 +1,10 @@
 import { DocumentIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 
-import { UrlSlugFieldComponent } from "../../components";
+import {
+  PathnameFieldComponent,
+  UrlSlugFieldComponent,
+} from "../../components";
 import { GROUP, GROUPS } from "../../utils/constant";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
@@ -56,7 +59,7 @@ export const page = defineType({
         "The web address for this page (for example, '/about-us' would create a page at yourdomain.com/about-us)",
       group: GROUP.MAIN_CONTENT,
       components: {
-        field: UrlSlugFieldComponent,
+        field: PathnameFieldComponent,
       },
       options: {
         source: "title",

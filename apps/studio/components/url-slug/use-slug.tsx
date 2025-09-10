@@ -180,12 +180,12 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
     pathSegmentValidations.forEach((validation, index) => {
       if (validation.errors.length > 0) {
         allErrors.push(
-          `Path segment "${pathSegments[index]}": ${validation.errors.join(", ")}`,
+          `Segment "${pathSegments[index]}": ${validation.errors.join(", ")}`,
         );
       }
       if (validation.warnings.length > 0) {
         allWarnings.push(
-          `Path segment "${pathSegments[index]}": ${validation.warnings.join(", ")}`,
+          `Segment "${pathSegments[index]}": ${validation.warnings.join(", ")}`,
         );
       }
     });

@@ -15,7 +15,11 @@ function ErrorState({ type, message }: ErrorStateProps) {
   const isError = type === "error";
 
   return (
-    <Badge tone={isError ? "critical" : "caution"} padding={4} radius={2}>
+    <Badge
+      tone={isError ? "critical" : "caution"}
+      style={{ padding: "1rem" }}
+      radius={2}
+    >
       <Flex gap={2} align="center">
         {isError ? (
           <AccessDeniedIcon
@@ -41,6 +45,10 @@ function ErrorState({ type, message }: ErrorStateProps) {
 export function ErrorStates({ errors = [], warnings = [] }: ErrorStatesProps) {
   const uniqueErrors = Array.from(new Set(errors));
   const uniqueWarnings = Array.from(new Set(warnings));
+  console.log("🚀 ~ ErrorStates ~ uniqueErrors:", "uniqueWarnings:", {
+    uniqueErrors,
+    uniqueWarnings,
+  });
   if (uniqueErrors.length === 0 && uniqueWarnings.length === 0) {
     return null;
   }
