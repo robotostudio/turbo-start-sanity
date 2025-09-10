@@ -208,7 +208,7 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
           </Text>
         )}
       </Stack>
-      <Stack space={3}>
+      <Stack space={4}>
         <Flex align="center" justify="space-between">
           <Text size={1} weight="medium">
             URL Path
@@ -250,7 +250,6 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
             <Flex align="center" gap={2}>
               <UrlPreview style={{ flex: 1 }}>
                 <Flex align="center" gap={1}>
-                  <LinkIcon style={{ flexShrink: 0 }} />
                   <span>{fullUrl}</span>
                 </Flex>
               </UrlPreview>
