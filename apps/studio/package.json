@@ -26,6 +26,8 @@
   ],
   "dependencies": {
     "@sanity/assist": "^5.0.0",
+    "@sanity/client": "^7.8.2",
+    "@sanity/functions": "^1.0.3",
     "@sanity/icons": "^3.7.4",
     "@sanity/orderable-document-list": "^1.4.0",
     "@sanity/ui": "^3.0.7",
@@ -42,6 +44,7 @@
     "styled-components": "^6.1.19"
   },
   "devDependencies": {
+    "@sanity/blueprints": "0.2.0",
     "@sanity/eslint-config-studio": "^5.0.2",
     "@types/react": "^19.1",
     "eslint": "^9.28",
