@@ -1,8 +1,4 @@
-import {
-  AccessDeniedIcon,
-  ErrorOutlineIcon,
-  WarningOutlineIcon,
-} from "@sanity/icons";
+import { AccessDeniedIcon, WarningOutlineIcon } from "@sanity/icons";
 import { Badge, Flex, Stack, Text } from "@sanity/ui";
 
 interface ErrorStateProps {
@@ -43,25 +39,27 @@ function ErrorState({ type, message }: ErrorStateProps) {
 }
 
 export function ErrorStates({ errors = [], warnings = [] }: ErrorStatesProps) {
-  if (errors.length === 0 && warnings.length === 0) {
+  const uniqueErrors = Array.from(new Set(errors));
+  const uniqueWarnings = Array.from(new Set(warnings));
+  if (uniqueErrors.length === 0 && uniqueWarnings.length === 0) {
     return null;
   }
 
   return (
     <Stack space={4}>
       {/* Critical errors */}
-      {errors.length > 0 && (
+      {uniqueErrors.length > 0 && (
         <Stack space={2}>
-          {errors.map((error, index) => (
+          {uniqueErrors.map((error, index) => (
             <ErrorState key={index} type="error" message={error} />
           ))}
         </Stack>
       )}
 
       {/* Warnings */}
-      {warnings.length > 0 && (
+      {uniqueWarnings.length > 0 && (
         <Stack space={2}>
-          {warnings.map((warning, index) => (
+          {uniqueWarnings.map((warning, index) => (
             <ErrorState key={index} type="warning" message={warning} />
           ))}
         </Stack>
@@ -70,19 +68,8 @@ export function ErrorStates({ errors = [], warnings = [] }: ErrorStatesProps) {
   );
 }
 
-// Common error messages that can be used
-export const SLUG_ERROR_MESSAGES = {
-  REQUIRED: "Slug is required.",
-  INVALID_CHARACTERS:
-    "Only lowercase letters, numbers, and hyphens are allowed.",
-  INVALID_START_END: "Slug can't start or end with a hyphen.",
-  CONSECUTIVE_HYPHENS: "Use only one hyphen between words.",
-  NO_SPACES: "No spaces. Use hyphens instead.",
-  NO_UNDERSCORES: "Underscores aren't allowed. Use hyphens instead.",
-} as const;
-
-export const SLUG_WARNING_MESSAGES = {
-  TOO_SHORT: "Slug must be at least 3 characters long.",
-  TOO_LONG: "Slug can't be longer than 60 characters.",
-  ALREADY_EXISTS: "This slug is already in use. Try another.",
-} as const;
+// Re-export error messages from validation utility
+export {
+  SLUG_ERROR_MESSAGES,
+  SLUG_WARNING_MESSAGES,
+} from "../../utils/slug-validation";

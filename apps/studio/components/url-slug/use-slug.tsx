@@ -1,24 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { SanityClient, SanityDocument, SlugValue } from "sanity";
-import {
-  getPublishedId,
-  set,
-  useClient,
-  useFormValue,
-  useValidationStatus,
-} from "sanity";
+import { set, useClient, useFormValue } from "sanity";
 import slugify from "slugify";
 
-import { SLUG_ERROR_MESSAGES, SLUG_WARNING_MESSAGES } from "./error-states";
+import { validateSlug } from "../../utils/slug-validation";
 
 type SlugGenerationOptions = {
   onChange: (patch: any) => void;
 };
-
-interface SlugValidationResult {
-  errors: string[];
-  warnings: string[];
-}
 
 function transformSlug(slug: string) {
   return slugify(slug, {
@@ -32,7 +21,7 @@ function breakSlugIntoSegments(slug: string) {
 
 async function listAllSlugs(client: SanityClient) {
   const slugs = await client.fetch<string[]>(`
-    *[_type == "page" && defined(slug.current)].slug.current
+    *[defined(slug.current) && _type in ["page", "blog", "homePage", "blogIndex"]].slug.current
   `);
   const uniqueSlugs = Array.from(new Set(slugs));
   return uniqueSlugs.map(breakSlugIntoSegments);
@@ -66,52 +55,7 @@ function getSlugOptionsAtLevel(
   return Array.from(options).sort();
 }
 
-function validateSlug(slug: string): SlugValidationResult {
-  const errors: string[] = [];
-  const warnings: string[] = [];
-
-  // Required check
-  if (!slug.trim()) {
-    errors.push(SLUG_ERROR_MESSAGES.REQUIRED);
-    return { errors, warnings };
-  }
-
-  // Character validation
-  if (!/^[a-z0-9-]+$/.test(slug)) {
-    errors.push(SLUG_ERROR_MESSAGES.INVALID_CHARACTERS);
-  }
-
-  // Check for spaces
-  if (slug.includes(" ")) {
-    errors.push(SLUG_ERROR_MESSAGES.NO_SPACES);
-  }
-
-  // Check for underscores
-  if (slug.includes("_")) {
-    errors.push(SLUG_ERROR_MESSAGES.NO_UNDERSCORES);
-  }
-
-  // Check start/end with hyphen
-  if (slug.startsWith("-") || slug.endsWith("-")) {
-    errors.push(SLUG_ERROR_MESSAGES.INVALID_START_END);
-  }
-
-  // Check consecutive hyphens
-  if (slug.includes("--")) {
-    errors.push(SLUG_ERROR_MESSAGES.CONSECUTIVE_HYPHENS);
-  }
-
-  // Length warnings
-  if (slug.length < 3) {
-    warnings.push(SLUG_WARNING_MESSAGES.TOO_SHORT);
-  }
-
-  if (slug.length > 60) {
-    warnings.push(SLUG_WARNING_MESSAGES.TOO_LONG);
-  }
-
-  return { errors, warnings };
-}
+// Validation functions are now imported from slug-validation.ts
 
 export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
   const document = useFormValue([]) as SanityDocument & {
@@ -216,9 +160,6 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
 
   // Validation for final slug
   const finalSlugValidation = useMemo(() => {
-    if (!finalSlug) {
-      return { errors: [SLUG_ERROR_MESSAGES.REQUIRED], warnings: [] };
-    }
     return validateSlug(finalSlug);
   }, [finalSlug]);
 
