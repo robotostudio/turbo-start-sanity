@@ -152,10 +152,8 @@ export const usePagesTree = (): UsePagesTreeReturn => {
           title,
           "slug": slug.current,
           "versions": sanity::versionOf(_id),
-
         } | order(slug asc)
       `);
-      console.log("🚀 ~ usePagesTree ~ fetchedPages:", fetchedPages);
 
       setPages(fetchedPages);
       const newTree = buildTree(fetchedPages);

@@ -108,15 +108,11 @@ export const TreeItem: React.FC<TreeItemProps> = ({
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
           }),
         }}
-        // onClick={handleClick}
-        // onKeyDown={handleKeyDown}
         onMouseEnter={() => {
           setIsHovered(true);
-          console.log("Hover enter:", node.title);
         }}
         onMouseLeave={() => {
           setIsHovered(false);
-          console.log("Hover leave:", node.title);
         }}
         data-tree-item
         tabIndex={0}

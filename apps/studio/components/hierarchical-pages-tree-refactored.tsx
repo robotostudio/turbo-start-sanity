@@ -72,7 +72,6 @@ export const HierarchicalPagesTree: React.FC = () => {
 
   const handleOpenInPane = useCallback(
     (pageId: string) => {
-      console.log("🚀 ~ HierarchicalPagesTree ~ pageId:", pageId);
       try {
         paneRouter.replaceCurrent({
           id: pageId,
