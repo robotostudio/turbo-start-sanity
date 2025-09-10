@@ -3,10 +3,8 @@ import {
   CopyIcon,
   InfoOutlineIcon,
   SparklesIcon,
-  WarningOutlineIcon,
 } from "@sanity/icons";
 import {
-  Badge,
   Box,
   Button,
   Card,
@@ -30,6 +28,7 @@ import { styled } from "styled-components";
 
 import { getDocumentPath } from "../../utils/helper";
 import { validateSlugForDocumentType } from "../../utils/slug-validation";
+import { ErrorStates } from "./error-states";
 import { useSlugGeneration } from "./use-slug";
 
 const presentationOriginUrl = process.env.SANITY_STUDIO_PRESENTATION_URL;
@@ -114,7 +113,7 @@ const StyledTextInput = styled(TextInput)`
 export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
   const document = useFormValue([]) as SanityDocument;
   const publishedId = getPublishedId(document?._id);
-  const validation = useValidationStatus(publishedId, document?._type);
+  const sanityValidation = useValidationStatus(publishedId, document?._type);
   const {
     inputProps: { onChange, value, readOnly },
     title,
@@ -129,22 +128,23 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
     handleAddPathSegment,
     handleRemovePathSegment,
     getPathSegmentOptions,
+    validation,
   } = useSlugGeneration({ onChange });
 
   const slugValidationError = useMemo(
     () =>
-      validation.validation.find(
+      sanityValidation.validation.find(
         (v) =>
           (v?.path.includes("current") || v?.path.includes("slug")) &&
           v.message,
       ),
-    [validation.validation],
+    [sanityValidation.validation],
   );
 
   const [isPathExpanded, setIsPathExpanded] = useState(false);
   const currentSlug = value?.current || "";
 
-  // Validation for slug format
+  // Legacy validation for slug format (keeping for backward compatibility)
   const slugFormatErrors = useMemo(() => {
     if (!document?._type) return [];
     return validateSlugForDocumentType(currentSlug, document._type);
@@ -415,7 +415,9 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
             padding={3}
             radius={2}
             tone="transparent"
-            style={{ backgroundColor: "var(--card-muted-bg-color)" }}
+            style={{
+              backgroundColor: "var(--card-muted-bg-color)",
+            }}
           >
             <Flex align="center" justify="space-between">
               <Text
@@ -440,29 +442,15 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
         </Stack>
       )}
 
-      {/* Format Validation Errors */}
-      {slugFormatErrors.length > 0 && (
-        <Stack space={2}>
-          {slugFormatErrors.map((error) => (
-            <Badge key={error} tone="critical" padding={3} radius={2}>
-              <Flex gap={2} align="center">
-                <WarningOutlineIcon />
-                <Text size={1}>{error}</Text>
-              </Flex>
-            </Badge>
-          ))}
-        </Stack>
-      )}
-
-      {/* Sanity Validation Error */}
-      {slugValidationError && (
-        <Badge tone="critical" padding={3} radius={2}>
-          <Flex gap={2} align="center">
-            <WarningOutlineIcon />
-            <Text size={1}>{slugValidationError.message}</Text>
-          </Flex>
-        </Badge>
-      )}
+      {/* Error States from Hook Validation */}
+      <ErrorStates
+        errors={[
+          ...validation.errors,
+          ...slugFormatErrors,
+          ...(slugValidationError ? [slugValidationError.message] : []),
+        ]}
+        warnings={validation.warnings}
+      />
     </Stack>
   );
 }

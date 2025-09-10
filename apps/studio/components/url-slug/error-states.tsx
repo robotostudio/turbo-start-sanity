@@ -1,4 +1,9 @@
-import { AlertCircle, AlertTriangle } from "lucide-react";
+import {
+  AccessDeniedIcon,
+  ErrorOutlineIcon,
+  WarningOutlineIcon,
+} from "@sanity/icons";
+import { Badge, Flex, Stack, Text } from "@sanity/ui";
 
 interface ErrorStateProps {
   type: "error" | "warning";
@@ -14,28 +19,26 @@ function ErrorState({ type, message }: ErrorStateProps) {
   const isError = type === "error";
 
   return (
-    <div
-      className={`
-      box-border content-stretch flex gap-3 items-center justify-start p-4 relative rounded-md shrink-0 w-full
-      ${isError ? "bg-red-50" : "bg-amber-50"}
-    `}
-    >
-      <div className="relative shrink-0 size-4">
+    <Badge tone={isError ? "critical" : "caution"} padding={4} radius={2}>
+      <Flex gap={2} align="center">
         {isError ? (
-          <AlertCircle className="size-full text-red-700" />
+          <AccessDeniedIcon
+            style={{
+              color: "var(--card-fg-color)",
+            }}
+          />
         ) : (
-          <AlertTriangle className="size-full text-amber-700" />
+          <WarningOutlineIcon
+            style={{
+              color: "var(--card-fg-color)",
+            }}
+          />
         )}
-      </div>
-      <div
-        className={`
-        basis-0 font-normal grow min-h-px min-w-px relative shrink-0 text-sm leading-8
-        ${isError ? "text-red-700" : "text-amber-700"}
-      `}
-      >
-        <p>{message}</p>
-      </div>
-    </div>
+        <Text size={1} style={{ flex: 1 }}>
+          {message}
+        </Text>
+      </Flex>
+    </Badge>
   );
 }
 
@@ -45,33 +48,25 @@ export function ErrorStates({ errors = [], warnings = [] }: ErrorStatesProps) {
   }
 
   return (
-    <div className="contents relative size-full">
-      <div className="flex gap-8 w-full">
-        {/* Critical errors column */}
-        {errors.length > 0 && (
-          <div className="content-stretch flex flex-col gap-4 items-start justify-start flex-1 max-w-md">
-            <h3 className="font-medium text-lg text-zinc-900 mb-2">
-              Critical errors
-            </h3>
-            {errors.map((error, index) => (
-              <ErrorState key={index} type="error" message={error} />
-            ))}
-          </div>
-        )}
+    <Stack space={4}>
+      {/* Critical errors */}
+      {errors.length > 0 && (
+        <Stack space={2}>
+          {errors.map((error, index) => (
+            <ErrorState key={index} type="error" message={error} />
+          ))}
+        </Stack>
+      )}
 
-        {/* Warning errors column */}
-        {warnings.length > 0 && (
-          <div className="content-stretch flex flex-col gap-4 items-start justify-start flex-1 max-w-md">
-            <h3 className="font-medium text-lg text-zinc-900 mb-2">
-              Warning errors
-            </h3>
-            {warnings.map((warning, index) => (
-              <ErrorState key={index} type="warning" message={warning} />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
+      {/* Warnings */}
+      {warnings.length > 0 && (
+        <Stack space={2}>
+          {warnings.map((warning, index) => (
+            <ErrorState key={index} type="warning" message={warning} />
+          ))}
+        </Stack>
+      )}
+    </Stack>
   );
 }
 

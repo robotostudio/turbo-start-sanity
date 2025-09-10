@@ -1,11 +1,24 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { SanityClient, SanityDocument, SlugValue } from "sanity";
-import { set, unset, useClient, useFormValue } from "sanity";
+import {
+  getPublishedId,
+  set,
+  useClient,
+  useFormValue,
+  useValidationStatus,
+} from "sanity";
 import slugify from "slugify";
+
+import { SLUG_ERROR_MESSAGES, SLUG_WARNING_MESSAGES } from "./error-states";
 
 type SlugGenerationOptions = {
   onChange: (patch: any) => void;
 };
+
+interface SlugValidationResult {
+  errors: string[];
+  warnings: string[];
+}
 
 function transformSlug(slug: string) {
   return slugify(slug, {
@@ -53,6 +66,53 @@ function getSlugOptionsAtLevel(
   return Array.from(options).sort();
 }
 
+function validateSlug(slug: string): SlugValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  // Required check
+  if (!slug.trim()) {
+    errors.push(SLUG_ERROR_MESSAGES.REQUIRED);
+    return { errors, warnings };
+  }
+
+  // Character validation
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    errors.push(SLUG_ERROR_MESSAGES.INVALID_CHARACTERS);
+  }
+
+  // Check for spaces
+  if (slug.includes(" ")) {
+    errors.push(SLUG_ERROR_MESSAGES.NO_SPACES);
+  }
+
+  // Check for underscores
+  if (slug.includes("_")) {
+    errors.push(SLUG_ERROR_MESSAGES.NO_UNDERSCORES);
+  }
+
+  // Check start/end with hyphen
+  if (slug.startsWith("-") || slug.endsWith("-")) {
+    errors.push(SLUG_ERROR_MESSAGES.INVALID_START_END);
+  }
+
+  // Check consecutive hyphens
+  if (slug.includes("--")) {
+    errors.push(SLUG_ERROR_MESSAGES.CONSECUTIVE_HYPHENS);
+  }
+
+  // Length warnings
+  if (slug.length < 3) {
+    warnings.push(SLUG_WARNING_MESSAGES.TOO_SHORT);
+  }
+
+  if (slug.length > 60) {
+    warnings.push(SLUG_WARNING_MESSAGES.TOO_LONG);
+  }
+
+  return { errors, warnings };
+}
+
 export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
   const document = useFormValue([]) as SanityDocument & {
     slug?: SlugValue;
@@ -93,8 +153,6 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
             _type: "slug",
           }),
         );
-      } else {
-        // onChange(unset());
       }
     },
     [onChange],
@@ -156,6 +214,49 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
     [allSlugs, pathSegments],
   );
 
+  // Validation for final slug
+  const finalSlugValidation = useMemo(() => {
+    if (!finalSlug) {
+      return { errors: [SLUG_ERROR_MESSAGES.REQUIRED], warnings: [] };
+    }
+    return validateSlug(finalSlug);
+  }, [finalSlug]);
+
+  // Validation for path segments
+  const pathSegmentValidations = useMemo(() => {
+    return pathSegments.map((segment) => validateSlug(segment));
+  }, [pathSegments]);
+
+  // Combine all errors and warnings
+  const combinedValidation = useMemo(() => {
+    const allErrors: string[] = [];
+    const allWarnings: string[] = [];
+
+    // Add final slug errors/warnings
+    allErrors.push(...finalSlugValidation.errors);
+    allWarnings.push(...finalSlugValidation.warnings);
+    // Add path segment errors/warnings
+    pathSegmentValidations.forEach((validation, index) => {
+      if (validation.errors.length > 0) {
+        allErrors.push(
+          `Path segment "${pathSegments[index]}": ${validation.errors.join(", ")}`,
+        );
+      }
+      if (validation.warnings.length > 0) {
+        allWarnings.push(
+          `Path segment "${pathSegments[index]}": ${validation.warnings.join(", ")}`,
+        );
+      }
+    });
+
+    // Add duplicate warnings
+
+    return {
+      errors: [...new Set(allErrors)], // Remove duplicates
+      warnings: [...new Set(allWarnings)], // Remove duplicates
+    };
+  }, [finalSlugValidation, pathSegmentValidations, pathSegments]);
+
   return {
     currentSlug,
     pathSegments,
@@ -166,5 +267,6 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
     handleAddPathSegment,
     handleRemovePathSegment,
     getPathSegmentOptions,
+    validation: combinedValidation,
   };
 }

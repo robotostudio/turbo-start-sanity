@@ -65,7 +65,7 @@ export const page = defineType({
       },
       validation: (Rule) =>
         Rule.required()
-          .error("A URL slug is required for the page")
+          // .error("A URL slug is required for the page")
           .custom((slug) => {
             // First run basic validation
             const basicValidation = createSlugValidator({
