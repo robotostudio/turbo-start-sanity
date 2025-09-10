@@ -102,7 +102,6 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
 
   const handleUpdateFinalSlug = useCallback(
     (newFinalSlug: string) => {
-      console.log("🚀 ~ useSlugGeneration ~ newFinalSlug:", newFinalSlug);
       setFinalSlug(newFinalSlug.replace(/\//g, ""));
       updateFullSlug(pathSegments, newFinalSlug);
     },
