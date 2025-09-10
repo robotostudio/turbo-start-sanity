@@ -1,19 +1,5 @@
-import {
-  CopyIcon,
-  GenerateIcon,
-  LinkIcon,
-  WarningOutlineIcon,
-} from "@sanity/icons";
-import {
-  Badge,
-  Box,
-  Button,
-  Card,
-  Flex,
-  Stack,
-  Text,
-  TextInput,
-} from "@sanity/ui";
+import { CopyIcon, LinkIcon } from "@sanity/icons";
+import { Box, Button, Card, Flex, Stack, Text, TextInput } from "@sanity/ui";
 import type { ChangeEvent } from "react";
 import { useCallback, useMemo, useState } from "react";
 import {
@@ -88,7 +74,6 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
     title,
     description,
   } = props;
-  console.log("🚀 ~ PathnameFieldComponent ~ props:", props);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -223,39 +208,12 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
           </Text>
         )}
       </Stack>
-      {/* URL Preview */}
-      {/* Path Editor */}
       <Stack space={3}>
         <Flex align="center" justify="space-between">
           <Text size={1} weight="medium">
             URL Path
           </Text>
         </Flex>
-
-        {/* Visual Path Segments */}
-        {/* {segments.length > 0 && !isEditing && (
-          <Flex align="center" gap={1} wrap="wrap">
-            <Text size={1} muted>
-              /
-            </Text>
-            {segments.map((segment, index) => (
-              <Flex key={`${segment}-${index}`} align="center" gap={1}>
-                <PathSegment padding={2} radius={2}>
-                  <Text size={1} style={{ fontFamily: "monospace" }}>
-                    {segment}
-                  </Text>
-                </PathSegment>
-                {index < segments.length - 1 && (
-                  <Text size={1} muted>
-                    /
-                  </Text>
-                )}
-              </Flex>
-            ))}
-          </Flex>
-        )} */}
-
-        {/* Input Field */}
         <Flex gap={2} align="center">
           <Box flex={1}>
             <SlugInput
@@ -307,8 +265,6 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
           </Stack>
         )}
       </Stack>
-      {/* Format Validation Errors */}
-
       <ErrorStates
         errors={[
           ...combinedValidation.errors,
