@@ -94,7 +94,7 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
           }),
         );
       } else {
-        onChange(unset());
+        // onChange(unset());
       }
     },
     [onChange],

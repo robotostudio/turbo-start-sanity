@@ -64,6 +64,7 @@ export default defineConfig({
         title: "Nested Page",
         schemaType: "page",
         value: (props: { slug?: string; title?: string }) => {
+          console.log("🚀 ~ props:", props);
           return {
             ...(props.slug
               ? { slug: { current: props.slug, _type: "slug" } }

@@ -19,6 +19,7 @@ import type {
 } from "sanity/structure";
 
 import { HierarchicalPagesTree } from "./components";
+import { createSlugBasedStructure } from "./components/nested-pages-strucure";
 import type { SchemaType, SingletonType } from "./schemaTypes";
 import { getTitleCase } from "./utils/helper";
 
@@ -121,7 +122,9 @@ export const structure = (
     .items([
       createSingleTon({ S, type: "homePage", icon: HomeIcon }),
       S.divider(),
-      createHierarchicalPageStructure(S, context),
+      // createHierarchicalPageStructure(S, context),
+      // createSlugBasedStructure(S, "page"),
+      createSlugBasedStructure(S, "page"),
       createIndexListWithOrderableItems({
         S,
         index: { type: "blogIndex", icon: BookMarked },

@@ -1,6 +1,5 @@
 import { Card, Stack, useToast } from "@sanity/ui";
 import React, { useCallback } from "react";
-import { useClient } from "sanity";
 import { useRouter } from "sanity/router";
 import { usePaneRouter } from "sanity/structure";
 
@@ -20,7 +19,6 @@ import { EmptyState, ErrorState } from "./tree-states";
 export const HierarchicalPagesTree: React.FC = () => {
   const router = useRouter();
   const paneRouter = usePaneRouter();
-  const client = useClient({ apiVersion: "2023-01-01" });
   const toast = useToast();
 
   const { pages, tree, loading, error, refetch } = usePagesTree();
