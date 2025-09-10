@@ -12,7 +12,7 @@ import { locations } from "./location";
 import { presentationUrl } from "./plugins/presentation-url";
 import { schemaTypes } from "./schemaTypes";
 import { structure } from "./structure";
-import { createPageTemplate, getPresentationUrl } from "./utils/helper";
+import { getPresentationUrl } from "./utils/helper";
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
 const dataset = process.env.SANITY_STUDIO_DATASET;
@@ -58,6 +58,27 @@ export default defineConfig({
   },
   schema: {
     types: schemaTypes,
-    templates: createPageTemplate(),
+    templates: [
+      {
+        id: "nested-page-template",
+        title: "Nested Page",
+        schemaType: "page",
+        value: (props: { slug?: string; title?: string }) => {
+          console.log("🚀 ~ props:", props);
+          return {
+            ...(props.slug
+              ? { slug: { current: props.slug, _type: "slug" } }
+              : {}),
+            ...(props.title ? { title: props.title } : {}),
+          };
+        },
+        parameters: [
+          {
+            name: "slug",
+            type: "string",
+          },
+        ],
+      },
+    ],
   },
 });

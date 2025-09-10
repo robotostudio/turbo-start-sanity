@@ -31,6 +31,7 @@
     "@sanity/icons": "^3.7.4",
     "@sanity/orderable-document-list": "^1.4.0",
     "@sanity/ui": "^3.0.7",
+    "@sanity/uuid": "^3.0.2",
     "@sanity/vision": "^4.4.1",
     "lucide-react": "^0.539.0",
     "react": "^19.1",

@@ -1,19 +1,5 @@
-import {
-  CopyIcon,
-  GenerateIcon,
-  LinkIcon,
-  WarningOutlineIcon,
-} from "@sanity/icons";
-import {
-  Badge,
-  Box,
-  Button,
-  Card,
-  Flex,
-  Stack,
-  Text,
-  TextInput,
-} from "@sanity/ui";
+import { CopyIcon, LinkIcon } from "@sanity/icons";
+import { Box, Button, Card, Flex, Stack, Text, TextInput } from "@sanity/ui";
 import type { ChangeEvent } from "react";
 import { useCallback, useMemo, useState } from "react";
 import {
@@ -32,8 +18,10 @@ import { styled } from "styled-components";
 import { getDocumentPath } from "../utils/helper";
 import {
   cleanSlug,
+  validateSlug,
   validateSlugForDocumentType,
 } from "../utils/slug-validation";
+import { ErrorStates } from "./url-slug/error-states";
 
 const presentationOriginUrl = process.env.SANITY_STUDIO_PRESENTATION_URL;
 
@@ -147,11 +135,11 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
   }, [document?.title, handleChange, segments]);
 
   const handleCleanUp = useCallback(() => {
-    if (!currentSlug || !document?._type) return;
+    if (!currentSlug) return;
 
-    const cleanValue = cleanSlug(currentSlug, document._type);
+    const cleanValue = cleanSlug(currentSlug);
     handleChange(cleanValue);
-  }, [currentSlug, document?._type, handleChange]);
+  }, [currentSlug, handleChange]);
 
   const localizedPathname = getDocumentPath({
     ...document,
@@ -160,13 +148,56 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
 
   const fullUrl = `${presentationOriginUrl ?? ""}${localizedPathname}`;
 
+  // Validation for final slug
+  const finalSlugValidation = useMemo(() => {
+    return validateSlug(currentSlug);
+  }, [currentSlug]);
+
+  // Validation for path segments
+  const pathSegmentValidations = useMemo(() => {
+    return segments.map((segment) => validateSlug(segment));
+  }, [segments]);
+
+  // Combine all errors and warnings
+  const combinedValidation = useMemo(() => {
+    const allErrors: string[] = [];
+    const allWarnings: string[] = [];
+
+    // Add final slug errors/warnings
+    allErrors.push(...finalSlugValidation.errors);
+    allWarnings.push(...finalSlugValidation.warnings);
+    // Add path segment errors/warnings
+    pathSegmentValidations.forEach((validation, index) => {
+      if (validation.errors.length > 0) {
+        allErrors.push(
+          `Segment "${segments[index]}": ${validation.errors.join(", ")}`,
+        );
+      }
+      if (validation.warnings.length > 0) {
+        allWarnings.push(
+          `Segment "${segments[index]}": ${validation.warnings.join(", ")}`,
+        );
+      }
+    });
+
+    // Add duplicate warnings
+
+    return {
+      errors: [...new Set(allErrors)], // Remove duplicates
+      warnings: [...new Set(allWarnings)], // Remove duplicates
+    };
+  }, [finalSlugValidation, pathSegmentValidations, segments]);
+  console.log(
+    "🚀 ~ PathnameFieldComponent ~ combinedValidation:",
+    combinedValidation,
+  );
+
   const handleCopyUrl = useCallback(() => {
     navigator.clipboard.writeText(fullUrl);
   }, [fullUrl]);
 
   return (
     <Stack space={3}>
-      {/* Header */}
       <Stack space={2}>
         <Text size={1} weight="semibold">
           {title}
@@ -177,84 +208,12 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
           </Text>
         )}
       </Stack>
-
-      {/* URL Preview */}
-      {currentSlug && (
-        <Stack space={2}>
-          <Text size={1} weight="medium">
-            Preview
-          </Text>
-          <Flex align="center" gap={2}>
-            <UrlPreview style={{ flex: 1 }}>
-              <Flex align="center" gap={1}>
-                <LinkIcon style={{ flexShrink: 0 }} />
-                <span>{fullUrl}</span>
-              </Flex>
-            </UrlPreview>
-            <CopyButton
-              icon={CopyIcon}
-              onClick={handleCopyUrl}
-              title="Copy URL"
-              mode="ghost"
-              padding={2}
-            />
-          </Flex>
-        </Stack>
-      )}
-
-      {/* Path Editor */}
-      <Stack space={2}>
+      <Stack space={3}>
         <Flex align="center" justify="space-between">
           <Text size={1} weight="medium">
             URL Path
           </Text>
-          <Flex gap={2}>
-            {slugFormatErrors.length > 0 && (
-              <Button
-                text="Clean Up"
-                onClick={handleCleanUp}
-                disabled={readOnly}
-                mode="ghost"
-                tone="positive"
-                fontSize={1}
-              />
-            )}
-            <GenerateButton
-              icon={GenerateIcon}
-              text="Generate"
-              onClick={handleGenerate}
-              disabled={!document?.title || readOnly}
-              mode="ghost"
-              tone="primary"
-              fontSize={1}
-            />
-          </Flex>
         </Flex>
-
-        {/* Visual Path Segments */}
-        {segments.length > 0 && !isEditing && (
-          <Flex align="center" gap={1} wrap="wrap">
-            <Text size={1} muted>
-              /
-            </Text>
-            {segments.map((segment, index) => (
-              <Flex key={`${segment}-${index}`} align="center" gap={1}>
-                <PathSegment padding={2} radius={2}>
-                  <Text size={1} style={{ fontFamily: "monospace" }}>
-                    {segment}
-                  </Text>
-                </PathSegment>
-                {index < segments.length - 1 && (
-                  <Text size={1} muted>
-                    /
-                  </Text>
-                )}
-              </Flex>
-            ))}
-          </Flex>
-        )}
-
-        {/* Input Field */}
         <Flex gap={2} align="center">
           <Box flex={1}>
             <SlugInput
@@ -266,6 +225,15 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
               disabled={readOnly}
             />
           </Box>
+          <GenerateButton
+            // icon={GenerateIcon}
+            text="Generate"
+            onClick={handleGenerate}
+            disabled={!document?.title || readOnly}
+            mode="ghost"
+            tone="primary"
+            fontSize={1}
+          />
         </Flex>
 
         {/* Helper Text */}
@@ -274,31 +242,37 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
           nested paths. Only lowercase letters, numbers, hyphens, and slashes
           are allowed.
         </Text>
+        {currentSlug && (
+          <Stack space={2}>
+            <Text size={1} weight="medium">
+              Preview
+            </Text>
+            <Flex align="center" gap={2}>
+              <UrlPreview style={{ flex: 1 }}>
+                <Flex align="center" gap={1}>
+                  <LinkIcon style={{ flexShrink: 0 }} />
+                  <span>{fullUrl}</span>
+                </Flex>
+              </UrlPreview>
+              <CopyButton
+                icon={CopyIcon}
+                onClick={handleCopyUrl}
+                title="Copy URL"
+                mode="ghost"
+                padding={2}
+              />
+            </Flex>
+          </Stack>
+        )}
       </Stack>
-
-      {/* Format Validation Errors */}
-      {slugFormatErrors.length > 0 && (
-        <Stack space={2}>
-          {slugFormatErrors.map((error) => (
-            <Badge key={error} tone="critical" padding={3} radius={2}>
-              <Flex gap={2} align="center">
-                <WarningOutlineIcon />
-                <Text size={1}>{error}</Text>
-              </Flex>
-            </Badge>
-          ))}
-        </Stack>
-      )}
-
-      {/* Sanity Validation Error */}
-      {slugValidationError && (
-        <Badge tone="critical" padding={3} radius={2}>
-          <Flex gap={2} align="center">
-            <WarningOutlineIcon />
-            <Text size={1}>{slugValidationError.message}</Text>
-          </Flex>
-        </Badge>
-      )}
+      <ErrorStates
+        errors={[
+          ...combinedValidation.errors,
+          ...slugFormatErrors,
+          ...(slugValidationError ? [slugValidationError.message] : []),
+        ]}
+        warnings={combinedValidation.warnings}
+      />
     </Stack>
   );
 }

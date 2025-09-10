@@ -2,90 +2,38 @@
  * Validation utilities for URL slug formatting
  */
 
-export interface SlugValidationError {
-  type: "required" | "format" | "characters" | "structure" | "prefix";
-  message: string;
+export interface SlugValidationResult {
+  errors: string[];
+  warnings: string[];
 }
 
 export interface SlugValidationOptions {
   documentType?: string;
+  requireSlash?: boolean;
   requiredPrefix?: string;
-  allowedPrefixes?: string[];
   sanityDocumentType?: string; // Auto-configure based on Sanity document type
 }
 
+// Error messages that match the ones used in use-slug.tsx
+export const SLUG_ERROR_MESSAGES = {
+  REQUIRED: "Slug is required.",
+  INVALID_CHARACTERS:
+    "Only lowercase letters, numbers, and hyphens are allowed.",
+  INVALID_START_END: "Slug can't start or end with a hyphen.",
+  CONSECUTIVE_HYPHENS: "Use only one hyphen between words.",
+  NO_SPACES: "No spaces. Use hyphens instead.",
+  NO_UNDERSCORES: "Underscores aren't allowed. Use hyphens instead.",
+} as const;
+
+export const SLUG_WARNING_MESSAGES = {
+  TOO_SHORT: "Slug must be at least 3 characters long.",
+  TOO_LONG: "Slug can't be longer than 60 characters.",
+  ALREADY_EXISTS: "This slug is already in use. Try another.",
+} as const;
+
 /**
- * Validates a slug string and returns array of validation errors
+ * Gets document-type specific configuration
  */
-function validateBasicStructure(slug: string): SlugValidationError[] {
-  const errors: SlugValidationError[] = [];
-
-  // Check if it starts with /
-  if (!slug.startsWith("/")) {
-    errors.push({
-      type: "structure",
-      message: "URL path must start with a forward slash (/)",
-    });
-  }
-
-  // Check for double slashes
-  if (slug.includes("//")) {
-    errors.push({
-      type: "structure",
-      message: "Multiple consecutive slashes (//) are not allowed",
-    });
-  }
-
-  // Check for trailing slashes
-  if (slug.endsWith("/") && slug !== "/") {
-    errors.push({
-      type: "structure",
-      message: "Trailing slashes are not recommended",
-    });
-  }
-
-  return errors;
-}
-
-function validateCharacters(slug: string): SlugValidationError[] {
-  const errors: SlugValidationError[] = [];
-
-  // Check for invalid characters
-  const invalidChars = slug.match(/[^a-z0-9\-/\s]/gi);
-  if (invalidChars) {
-    const uniqueChars = [...new Set(invalidChars)].join(", ");
-    errors.push({
-      type: "characters",
-      message: `Invalid characters found: ${uniqueChars}`,
-    });
-  }
-
-  return errors;
-}
-
-function validateFormat(slug: string): SlugValidationError[] {
-  const errors: SlugValidationError[] = [];
-
-  // Check for spaces
-  if (slug.includes(" ")) {
-    errors.push({
-      type: "format",
-      message:
-        "Spaces should be replaced with hyphens (-) for SEO-friendly URLs",
-    });
-  }
-
-  // Check for uppercase letters
-  if (slug !== slug.toLowerCase()) {
-    errors.push({
-      type: "format",
-      message: "URLs should be lowercase for consistency",
-    });
-  }
-
-  return errors;
-}
-
 function getDocumentTypeConfig(
   sanityDocumentType: string,
 ): SlugValidationOptions {
@@ -94,81 +42,94 @@ function getDocumentTypeConfig(
       return {
         documentType: "Blog post",
         requiredPrefix: "/blog/",
+        requireSlash: true,
       };
     case "blogIndex":
       return {
         documentType: "Blog index",
         requiredPrefix: "/blog",
+        requireSlash: true,
       };
     case "homePage":
       return {
         documentType: "Home page",
         requiredPrefix: "/",
+        requireSlash: true,
       };
     case "page":
       return {
         documentType: "Page",
+        requireSlash: true,
       };
     default:
-      return {};
+      return {
+        requireSlash: true,
+      };
   }
 }
 
-function validatePrefixes(
-  slug: string,
-  options: SlugValidationOptions,
-): SlugValidationError[] {
-  const errors: SlugValidationError[] = [];
-  const { documentType, requiredPrefix, allowedPrefixes, sanityDocumentType } =
-    options;
+/**
+ * Validates a single slug segment (matches the logic from use-slug.tsx)
+ */
+function validateSlugSegment(slug: string): SlugValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
 
-  // Type-specific prefix validation
-  if (documentType && requiredPrefix) {
-    if (!slug.startsWith(requiredPrefix)) {
-      errors.push({
-        type: "prefix",
-        message: `${documentType} URLs must start with "${requiredPrefix}"`,
-      });
-    }
+  // Required check
+  if (!slug.trim()) {
+    errors.push(SLUG_ERROR_MESSAGES.REQUIRED);
+    return { errors, warnings };
   }
 
-  // Check against allowed prefixes if specified
-  if (allowedPrefixes && allowedPrefixes.length > 0) {
-    const hasValidPrefix = allowedPrefixes.some((prefix) =>
-      slug.startsWith(prefix),
-    );
-    if (!hasValidPrefix) {
-      const prefixList = allowedPrefixes.join('", "');
-      errors.push({
-        type: "prefix",
-        message: `URL must start with one of: "${prefixList}"`,
-      });
-    }
+  // Character validation
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    errors.push(SLUG_ERROR_MESSAGES.INVALID_CHARACTERS);
   }
 
-  // Special validation for pages - prevent blog prefix usage
-  if (sanityDocumentType === "page" && slug.startsWith("/blog")) {
-    errors.push({
-      type: "prefix",
-      message:
-        'Pages cannot use "/blog" prefix - this is reserved for blog content',
-    });
+  // Check for spaces
+  if (slug.includes(" ")) {
+    errors.push(SLUG_ERROR_MESSAGES.NO_SPACES);
   }
 
-  return errors;
+  // Check for underscores
+  if (slug.includes("_")) {
+    errors.push(SLUG_ERROR_MESSAGES.NO_UNDERSCORES);
+  }
+
+  // Check start/end with hyphen
+  if (slug.startsWith("-") || slug.endsWith("-")) {
+    errors.push(SLUG_ERROR_MESSAGES.INVALID_START_END);
+  }
+
+  // Check consecutive hyphens
+  if (slug.includes("--")) {
+    errors.push(SLUG_ERROR_MESSAGES.CONSECUTIVE_HYPHENS);
+  }
+
+  // Length warnings
+  if (slug.length < 3) {
+    warnings.push(SLUG_WARNING_MESSAGES.TOO_SHORT);
+  }
+
+  if (slug.length > 60) {
+    warnings.push(SLUG_WARNING_MESSAGES.TOO_LONG);
+  }
+
+  return { errors, warnings };
 }
 
+/**
+ * Validates a full slug path (with slashes)
+ */
 export function validateSlug(
   slug: string | undefined | null,
   options: SlugValidationOptions = {},
-): SlugValidationError[] {
+): SlugValidationResult {
   if (!slug) {
-    return [
-      {
-        type: "required",
-        message: "URL path is required",
-      },
-    ];
+    return {
+      errors: [SLUG_ERROR_MESSAGES.REQUIRED],
+      warnings: [],
+    };
   }
 
   // Auto-configure options based on Sanity document type if provided
@@ -176,12 +137,66 @@ export function validateSlug(
     ? { ...getDocumentTypeConfig(options.sanityDocumentType), ...options }
     : options;
 
-  return [
-    ...validateBasicStructure(slug),
-    ...validateCharacters(slug),
-    ...validateFormat(slug),
-    ...validatePrefixes(slug, finalOptions),
-  ];
+  const allErrors: string[] = [];
+  const allWarnings: string[] = [];
+
+  // Handle full paths with slashes
+  if (slug.includes("/")) {
+    const segments = slug.split("/").filter(Boolean);
+
+    // Validate each segment
+    segments.forEach((segment, index) => {
+      const segmentValidation = validateSlugSegment(segment);
+      if (segmentValidation.errors.length > 0) {
+        allErrors.push(
+          `Segment "${segment}": ${segmentValidation.errors.join(", ")}`,
+        );
+      }
+      if (segmentValidation.warnings.length > 0) {
+        allWarnings.push(
+          `Segment "${segment}": ${segmentValidation.warnings.join(", ")}`,
+        );
+      }
+    });
+
+    // Additional path-specific validations
+    if (finalOptions.requireSlash && !slug.startsWith("/")) {
+      allErrors.push("URL path must start with a forward slash (/)");
+    }
+
+    if (slug.includes("//")) {
+      allErrors.push("Multiple consecutive slashes (//) are not allowed");
+    }
+
+    // Prefix validation
+    if (finalOptions.requiredPrefix && finalOptions.documentType) {
+      if (!slug.startsWith(finalOptions.requiredPrefix)) {
+        allErrors.push(
+          `${finalOptions.documentType} URLs must start with "${finalOptions.requiredPrefix}"`,
+        );
+      }
+    }
+
+    // Special validation for pages - prevent blog prefix usage
+    if (
+      finalOptions.sanityDocumentType === "page" &&
+      slug.startsWith("/blog")
+    ) {
+      allErrors.push(
+        'Pages cannot use "/blog" prefix - this is reserved for blog content',
+      );
+    }
+  } else {
+    // Single segment validation
+    const segmentValidation = validateSlugSegment(slug);
+    allErrors.push(...segmentValidation.errors);
+    allWarnings.push(...segmentValidation.warnings);
+  }
+
+  return {
+    errors: [...new Set(allErrors)],
+    warnings: [...new Set(allWarnings)],
+  };
 }
 
 /**
@@ -192,10 +207,9 @@ export function validateSanitySlug(
   slug: { current?: string } | undefined,
   options: SlugValidationOptions = {},
 ): string | true {
-  const errors = validateSlug(slug?.current, options);
-  return errors.length > 0
-    ? errors.map((error) => error.message).join("; ")
-    : true;
+  const validation = validateSlug(slug?.current, options);
+  const allMessages = [...validation.errors, ...validation.warnings];
+  return allMessages.length > 0 ? allMessages.join("; ") : true;
 }
 
 /**
@@ -208,6 +222,16 @@ export function createSlugValidator(
 }
 
 /**
+ * Helper function to create validators based on Sanity document type
+ * More convenient for common document types
+ */
+export function createDocumentTypeValidator(
+  sanityDocumentType: string,
+): (slug: { current?: string } | undefined) => string | true {
+  return (slug) => validateSanitySlug(slug, { sanityDocumentType });
+}
+
+/**
  * Validates slug with auto-configured document type options
  * For use in components where you have the Sanity document type
  */
@@ -215,98 +239,56 @@ export function validateSlugForDocumentType(
   slug: string | undefined | null,
   sanityDocumentType: string,
 ): string[] {
-  const errors = validateSlug(slug, { sanityDocumentType });
-  return errors.map((error) => error.message);
+  const validation = validateSlug(slug, { sanityDocumentType });
+  return [...validation.errors, ...validation.warnings];
 }
 
 /**
- * Cleans a slug string to make it valid
+ * Cleans a slug string to make it valid (matches transformSlug from use-slug.tsx)
  */
-export function cleanSlug(slug: string, sanityDocumentType?: string): string {
+export function cleanSlug(slug: string): string {
+  if (!slug) return "";
+
+  return slug
+    .toLowerCase()
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/[^a-z0-9-]/g, "") // Remove invalid characters
+    .replace(/-+/g, "-") // Replace multiple hyphens with single
+    .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
+}
+
+/**
+ * Cleans a full slug path
+ */
+export function cleanSlugPath(slug: string): string {
   if (!slug) return "/";
 
   let cleaned = slug
-    // Convert to lowercase for consistency
     .toLowerCase()
-    // Replace multiple slashes with single slash
-    .replace(/\/+/g, "/")
-    // Replace spaces with hyphens for SEO-friendly URLs
-    .replace(/\s+/g, "-")
-    // Remove invalid characters but keep slashes and hyphens
-    .replace(/[^a-z0-9\-/]/g, "")
-    // Clean up multiple hyphens
-    .replace(/-+/g, "-")
-    // Remove trailing slashes (except for root)
-    .replace(/\/+$/, "")
-    // Ensure it starts with a slash if not empty
-    .replace(/^(?!\/)(.+)/, "/$1")
-    // Clean up any remaining edge cases
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/[^a-z0-9\-/]/g, "") // Keep only valid characters and slashes
+    .replace(/-+/g, "-") // Replace multiple hyphens with single
+    .replace(/\/+/g, "/") // Replace multiple slashes with single
     .replace(/\/-+/g, "/") // Remove hyphens after slashes
     .replace(/-+\//g, "/"); // Remove hyphens before slashes
 
-  // Apply document-type specific rules
-  if (sanityDocumentType) {
-    cleaned = applyDocumentTypeRules(cleaned, sanityDocumentType);
+  // Ensure it starts with / if not empty
+  if (cleaned && !cleaned.startsWith("/")) {
+    cleaned = `/${cleaned}`;
   }
 
-  return cleaned;
+  // Remove trailing slash unless it's root
+  if (cleaned.endsWith("/") && cleaned !== "/") {
+    cleaned = cleaned.replace(/\/+$/, "");
+  }
+
+  return cleaned || "/";
 }
 
 /**
- * Applies document-type specific cleaning rules
+ * Enhanced clean function that provides change tracking
  */
-function applyDocumentTypeRules(
-  slug: string,
-  sanityDocumentType: string,
-): string {
-  switch (sanityDocumentType) {
-    case "blog":
-      // Ensure blog posts start with /blog/
-      if (!slug.startsWith("/blog/")) {
-        if (slug === "/" || slug === "/blog") {
-          return "/blog/untitled";
-        }
-        // Remove any existing prefix and add /blog/
-        const cleanPath = slug.replace(/^\/+/, "");
-        return `/blog/${cleanPath}`;
-      }
-      return slug;
-
-    case "blogIndex":
-      // Blog index should be exactly /blog
-      if (slug !== "/blog") {
-        return "/blog";
-      }
-      return slug;
-
-    case "homePage":
-      // Home page should be exactly /
-      return "/";
-
-    case "page":
-      // Pages cannot use /blog prefix
-      if (slug.startsWith("/blog")) {
-        // Remove /blog prefix and clean up
-        const withoutBlogPrefix = slug.replace(/^\/blog\/?/, "");
-        if (!withoutBlogPrefix) {
-          return "/page";
-        }
-        return `/${withoutBlogPrefix}`;
-      }
-      return slug;
-
-    default:
-      return slug;
-  }
-}
-
-/**
- * Enhanced clean function that validates and provides suggestions
- */
-export function cleanSlugWithValidation(
-  slug: string,
-  sanityDocumentType?: string,
-): {
+export function cleanSlugWithValidation(slug: string): {
   cleanedSlug: string;
   wasChanged: boolean;
   changes: string[];
@@ -316,9 +298,9 @@ export function cleanSlugWithValidation(
 
   if (!slug) {
     return {
-      cleanedSlug: "/",
+      cleanedSlug: "",
       wasChanged: true,
-      changes: ["Added default '/' path"],
+      changes: ["Added empty slug"],
     };
   }
 
@@ -330,20 +312,15 @@ export function cleanSlugWithValidation(
     cleaned = cleaned.toLowerCase();
   }
 
-  if (cleaned.includes("  ") || cleaned.includes(" ")) {
+  if (cleaned.includes(" ")) {
     changes.push("Replaced spaces with hyphens");
     cleaned = cleaned.replace(/\s+/g, "-");
   }
 
-  if (cleaned.includes("//")) {
-    changes.push("Fixed multiple consecutive slashes");
-    cleaned = cleaned.replace(/\/+/g, "/");
-  }
-
-  const invalidCharRegex = /[^a-z0-9\-/]/;
-  if (invalidCharRegex.exec(cleaned)) {
+  const invalidCharRegex = /[^a-z0-9-]/;
+  if (invalidCharRegex.test(cleaned)) {
     changes.push("Removed invalid characters");
-    cleaned = cleaned.replace(/[^a-z0-9\-/]/g, "");
+    cleaned = cleaned.replace(/[^a-z0-9-]/g, "");
   }
 
   if (cleaned.includes("--")) {
@@ -351,23 +328,9 @@ export function cleanSlugWithValidation(
     cleaned = cleaned.replace(/-+/g, "-");
   }
 
-  if (cleaned.endsWith("/") && cleaned !== "/") {
-    changes.push("Removed trailing slash");
-    cleaned = cleaned.replace(/\/+$/, "");
-  }
-
-  if (!cleaned.startsWith("/") && cleaned) {
-    changes.push("Added leading slash");
-    cleaned = `/${cleaned}`;
-  }
-
-  // Apply document type rules
-  if (sanityDocumentType) {
-    const beforeTypeRules = cleaned;
-    cleaned = applyDocumentTypeRules(cleaned, sanityDocumentType);
-    if (beforeTypeRules !== cleaned) {
-      changes.push(`Applied ${sanityDocumentType} type rules`);
-    }
+  if (cleaned.startsWith("-") || cleaned.endsWith("-")) {
+    changes.push("Removed leading/trailing hyphens");
+    cleaned = cleaned.replace(/^-+|-+$/g, "");
   }
 
   return {
