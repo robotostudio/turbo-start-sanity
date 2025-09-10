@@ -86,7 +86,7 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
     (newPathSegments: string[], newFinalSlug: string) => {
       const slug = newFinalSlug.replace(/\//g, "");
       if (slug) {
-        const fullPath = [...newPathSegments, slug].join("/");
+        const fullPath = `/${[...newPathSegments, slug].join("/")}`;
         onChange(
           set({
             current: fullPath || "/",

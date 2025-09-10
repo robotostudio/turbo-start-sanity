@@ -12,7 +12,7 @@ import { locations } from "./location";
 import { presentationUrl } from "./plugins/presentation-url";
 import { schemaTypes } from "./schemaTypes";
 import { structure } from "./structure";
-import { createPageTemplate, getPresentationUrl } from "./utils/helper";
+import { getPresentationUrl } from "./utils/helper";
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
 const dataset = process.env.SANITY_STUDIO_DATASET;
