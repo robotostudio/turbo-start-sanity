@@ -395,3 +395,11 @@ export const querySettingsData = defineQuery(`
     "contactEmail": contactEmail,
   }
 `);
+
+export const queryRedirects = defineQuery(`
+  *[_type == "redirect"]{
+    "source":source.current, 
+    "destination":destination.current, 
+    permanent
+  }
+`);
