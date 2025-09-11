@@ -350,6 +350,17 @@ export type RichText = Array<
     }
 >;
 
+export type Redirect = {
+  _id: string;
+  _type: "redirect";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  source: Slug;
+  destination: Slug;
+  permanent?: boolean;
+};
+
 export type Navbar = {
   _id: string;
   _type: "navbar";
@@ -926,6 +937,7 @@ export type AllSanitySchemaTypes =
   | PageBuilder
   | Button
   | RichText
+  | Redirect
   | Navbar
   | Footer
   | Settings
@@ -2754,6 +2766,13 @@ export type QuerySettingsDataResult = {
   contactEmail: string | null;
 } | null;
 
+// Variable: queryRedirects
+// Query: *[_type == "redirect"]{    "source":source.current,    "destination":destination.current,    permanent  }
+export type QueryRedirectsResult = Array<{
+  source: string;
+  destination: string;
+  permanent: boolean;
+}>;
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
@@ -2774,5 +2793,6 @@ declare module "@sanity/client" {
     '{\n  "slugPages": *[_type == "page" && defined(slug.current)]{\n    "slug": slug.current,\n    "lastModified": _updatedAt\n  },\n  "blogPages": *[_type == "blog" && defined(slug.current)]{\n    "slug": slug.current,\n    "lastModified": _updatedAt\n  }\n}': QuerySitemapDataResult;
     '\n  *[_type == "settings"][0]{\n    _id,\n    _type,\n    siteTitle,\n    logo {\n      \n  "id": asset._ref,\n  "preview": asset->metadata.lqip,\n  hotspot {\n    x,\n    y\n  },\n  crop {\n    bottom,\n    left,\n    right,\n    top\n  }\n\n    },\n    siteDescription,\n    socialLinks{\n      linkedin,\n      facebook,\n      twitter,\n      instagram,\n      youtube\n    }\n  }\n': QueryGlobalSeoSettingsResult;
     '\n  *[_type == "settings"][0]{\n    _id,\n    _type,\n    siteTitle,\n    siteDescription,\n    "logo": logo.asset->url + "?w=80&h=40&dpr=3&fit=max",\n    "socialLinks": socialLinks,\n    "contactEmail": contactEmail,\n  }\n': QuerySettingsDataResult;
+    '\n  *[_type == \"redirect\"]{\n    \"source\":source.current, \n    \"destination\":destination.current, \n    permanent\n  }\n': QueryRedirectsResult
   }
 }
