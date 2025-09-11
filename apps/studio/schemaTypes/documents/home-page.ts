@@ -60,6 +60,7 @@ export const homePage = defineType({
           createSlugValidator({
             documentType: "Home page",
             requiredPrefix: "/",
+            sanityDocumentType: "homePage",
           }),
         ),
     }),

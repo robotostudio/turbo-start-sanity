@@ -188,7 +188,7 @@ export function validateSlug(
     if (finalOptions.requireSlash && !slug.startsWith("/")) {
       allErrors.push(SLUG_ERROR_MESSAGES.MISSING_LEADING_SLASH);
     }
-    if (slug.endsWith("/")) {
+    if (finalOptions.sanityDocumentType !== "homePage" && slug.endsWith("/")) {
       allErrors.push(SLUG_ERROR_MESSAGES.TRAILING_SLASH);
     }
 
