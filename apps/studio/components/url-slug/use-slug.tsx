@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { SanityClient, SanityDocument, SlugValue } from "sanity";
 import { set, useClient, useFormValue } from "sanity";
 import slugify from "slugify";
 
-import { validateSlug } from "../../utils/slug-validation";
+import { useSlugValidation } from "./use-slug-validation";
 
 type SlugGenerationOptions = {
   onChange: (patch: any) => void;
@@ -158,45 +158,11 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
     [allSlugs, pathSegments],
   );
 
-  // Validation for final slug
-  const finalSlugValidation = useMemo(() => {
-    return validateSlug(finalSlug);
-  }, [finalSlug]);
-
-  // Validation for path segments
-  const pathSegmentValidations = useMemo(() => {
-    return pathSegments.map((segment) => validateSlug(segment));
-  }, [pathSegments]);
-
-  // Combine all errors and warnings
-  const combinedValidation = useMemo(() => {
-    const allErrors: string[] = [];
-    const allWarnings: string[] = [];
-
-    // Add final slug errors/warnings
-    allErrors.push(...finalSlugValidation.errors);
-    allWarnings.push(...finalSlugValidation.warnings);
-    // Add path segment errors/warnings
-    pathSegmentValidations.forEach((validation, index) => {
-      if (validation.errors.length > 0) {
-        allErrors.push(
-          `Segment "${pathSegments[index]}": ${validation.errors.join(", ")}`,
-        );
-      }
-      if (validation.warnings.length > 0) {
-        allWarnings.push(
-          `Segment "${pathSegments[index]}": ${validation.warnings.join(", ")}`,
-        );
-      }
-    });
-
-    // Add duplicate warnings
-
-    return {
-      errors: [...new Set(allErrors)], // Remove duplicates
-      warnings: [...new Set(allWarnings)], // Remove duplicates
-    };
-  }, [finalSlugValidation, pathSegmentValidations, pathSegments]);
+  // Use centralized validation hook - single source of truth
+  const { allErrors, allWarnings } = useSlugValidation({
+    slug: currentSlug,
+    includeSanityValidation: false, // This hook is for internal validation only
+  });
 
   return {
     currentSlug,
@@ -208,6 +174,6 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
     handleAddPathSegment,
     handleRemovePathSegment,
     getPathSegmentOptions,
-    validation: combinedValidation,
+    validation: { errors: allErrors, warnings: allWarnings },
   };
 }

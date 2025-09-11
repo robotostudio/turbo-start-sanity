@@ -1,5 +1,6 @@
 /**
- * Validation utilities for URL slug formatting
+ * Centralized validation utilities for URL slug formatting
+ * This is the single source of truth for all slug validation logic
  */
 
 export interface SlugValidationResult {
@@ -14,7 +15,31 @@ export interface SlugValidationOptions {
   sanityDocumentType?: string; // Auto-configure based on Sanity document type
 }
 
-// Error messages that match the ones used in use-slug.tsx
+/**
+ * Classification of validation issues
+ */
+export enum ValidationSeverity {
+  ERROR = "error",
+  WARNING = "warning",
+}
+
+export enum ValidationCategory {
+  REQUIRED = "required",
+  FORMAT = "format",
+  LENGTH = "length",
+  STRUCTURE = "structure",
+  DOCUMENT_TYPE = "document_type",
+  UNIQUENESS = "uniqueness",
+}
+
+export interface ValidationIssue {
+  message: string;
+  severity: ValidationSeverity;
+  category: ValidationCategory;
+  code: string;
+}
+
+// Centralized error messages - single source of truth
 export const SLUG_ERROR_MESSAGES = {
   REQUIRED: "Slug is required.",
   INVALID_CHARACTERS:
@@ -23,6 +48,9 @@ export const SLUG_ERROR_MESSAGES = {
   CONSECUTIVE_HYPHENS: "Use only one hyphen between words.",
   NO_SPACES: "No spaces. Use hyphens instead.",
   NO_UNDERSCORES: "Underscores aren't allowed. Use hyphens instead.",
+  MULTIPLE_SLASHES: "Multiple consecutive slashes (//) are not allowed.",
+  MISSING_LEADING_SLASH: "URL path must start with a forward slash (/)",
+  TRAILING_SLASH: "URL path must not end with a forward slash (/)",
 } as const;
 
 export const SLUG_WARNING_MESSAGES = {
@@ -69,44 +97,41 @@ function getDocumentTypeConfig(
 }
 
 /**
- * Validates a single slug segment (matches the logic from use-slug.tsx)
+ * Core validation rules for a single slug segment
+ * This is the fundamental validation logic used throughout the application
  */
 function validateSlugSegment(slug: string): SlugValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
 
-  // Required check
+  // Required check - critical error
   if (!slug.trim()) {
     errors.push(SLUG_ERROR_MESSAGES.REQUIRED);
     return { errors, warnings };
   }
 
-  // Character validation
+  // Format validation - critical errors
   if (!/^[a-z0-9-]+$/.test(slug)) {
     errors.push(SLUG_ERROR_MESSAGES.INVALID_CHARACTERS);
   }
 
-  // Check for spaces
   if (slug.includes(" ")) {
     errors.push(SLUG_ERROR_MESSAGES.NO_SPACES);
   }
 
-  // Check for underscores
   if (slug.includes("_")) {
     errors.push(SLUG_ERROR_MESSAGES.NO_UNDERSCORES);
   }
 
-  // Check start/end with hyphen
   if (slug.startsWith("-") || slug.endsWith("-")) {
     errors.push(SLUG_ERROR_MESSAGES.INVALID_START_END);
   }
 
-  // Check consecutive hyphens
   if (slug.includes("--")) {
     errors.push(SLUG_ERROR_MESSAGES.CONSECUTIVE_HYPHENS);
   }
 
-  // Length warnings
+  // Length validation - warnings (non-blocking)
   if (slug.length < 3) {
     warnings.push(SLUG_WARNING_MESSAGES.TOO_SHORT);
   }
@@ -145,27 +170,30 @@ export function validateSlug(
     const segments = slug.split("/").filter(Boolean);
 
     // Validate each segment
-    segments.forEach((segment, index) => {
-      const segmentValidation = validateSlugSegment(segment);
-      if (segmentValidation.errors.length > 0) {
-        allErrors.push(
-          `Segment "${segment}": ${segmentValidation.errors.join(", ")}`,
-        );
-      }
-      if (segmentValidation.warnings.length > 0) {
-        allWarnings.push(
-          `Segment "${segment}": ${segmentValidation.warnings.join(", ")}`,
-        );
-      }
-    });
+    // segments.forEach((segment, index) => {
+    //   const segmentValidation = validateSlugSegment(segment);
+    //   if (segmentValidation.errors.length > 0) {
+    //     allErrors.push(
+    //       `Segment "${segment}": ${segmentValidation.errors.join(", ")}`,
+    //     );
+    //   }
+    //   if (segmentValidation.warnings.length > 0) {
+    //     allWarnings.push(
+    //       `Segment "${segment}": ${segmentValidation.warnings.join(", ")}`,
+    //     );
+    //   }
+    // });
 
-    // Additional path-specific validations
+    // Additional path-specific validations - critical errors
     if (finalOptions.requireSlash && !slug.startsWith("/")) {
-      allErrors.push("URL path must start with a forward slash (/)");
+      allErrors.push(SLUG_ERROR_MESSAGES.MISSING_LEADING_SLASH);
+    }
+    if (slug.endsWith("/")) {
+      allErrors.push(SLUG_ERROR_MESSAGES.TRAILING_SLASH);
     }
 
     if (slug.includes("//")) {
-      allErrors.push("Multiple consecutive slashes (//) are not allowed");
+      allErrors.push(SLUG_ERROR_MESSAGES.MULTIPLE_SLASHES);
     }
 
     // Prefix validation
@@ -283,6 +311,37 @@ export function cleanSlugPath(slug: string): string {
   }
 
   return cleaned || "/";
+}
+
+/**
+ * Comprehensive validation function that returns structured validation results
+ * This is the preferred validation function for components
+ */
+export function validateSlugComprehensive(
+  slug: string | undefined | null,
+  options: SlugValidationOptions = {},
+): {
+  isValid: boolean;
+  hasErrors: boolean;
+  hasWarnings: boolean;
+  validation: SlugValidationResult;
+  segments: string[];
+  segmentValidations: SlugValidationResult[];
+} {
+  const validation = validateSlug(slug, options);
+  const segments = slug ? slug.split("/").filter(Boolean) : [];
+  const segmentValidations = segments.map((segment) =>
+    validateSlugSegment(segment),
+  );
+
+  return {
+    isValid: validation.errors.length === 0,
+    hasErrors: validation.errors.length > 0,
+    hasWarnings: validation.warnings.length > 0,
+    validation,
+    segments,
+    segmentValidations,
+  };
 }
 
 /**

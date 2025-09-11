@@ -1,27 +1,22 @@
-import { CopyIcon, LinkIcon } from "@sanity/icons";
-import { Box, Button, Card, Flex, Stack, Text, TextInput } from "@sanity/ui";
+import { CopyIcon } from "@sanity/icons";
+import { Box, Button, Flex, Stack, Text, TextInput } from "@sanity/ui";
 import type { ChangeEvent } from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback } from "react";
 import {
-  getPublishedId,
   type ObjectFieldProps,
   type SanityDocument,
   set,
   type SlugValue,
   unset,
   useFormValue,
-  useValidationStatus,
 } from "sanity";
 import slugify from "slugify";
 import { styled } from "styled-components";
 
 import { getDocumentPath } from "../utils/helper";
-import {
-  cleanSlug,
-  validateSlug,
-  validateSlugForDocumentType,
-} from "../utils/slug-validation";
+// import { cleanSlug } from "../utils/slug-validation";
 import { ErrorStates } from "./url-slug/error-states";
+import { useSlugValidation } from "./url-slug/use-slug-validation";
 
 const presentationOriginUrl = process.env.SANITY_STUDIO_PRESENTATION_URL;
 
@@ -38,11 +33,6 @@ const SlugInput = styled(TextInput)`
   font-size: 14px;
 `;
 
-const PathSegment = styled(Card)`
-  background: var(--card-muted-bg-color);
-  border: 1px solid var(--card-border-color);
-`;
-
 const UrlPreview = styled.div`
   font-family: monospace;
   font-size: 12px;
@@ -56,39 +46,23 @@ const UrlPreview = styled.div`
 `;
 
 export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
-  const document = useFormValue([]) as SanityDocument;
-  const publishedId = getPublishedId(document?._id);
-  const validation = useValidationStatus(publishedId, document?._type);
-  const slugValidationError = useMemo(
-    () =>
-      validation.validation.find(
-        (v) =>
-          (v?.path.includes("current") || v?.path.includes("slug")) &&
-          v.message,
-      ),
-    [validation.validation],
-  );
-
   const {
     inputProps: { onChange, value, readOnly },
     title,
     description,
   } = props;
 
-  const [isEditing, setIsEditing] = useState(false);
+  // const [isEditing, setIsEditing] = useState(false);
 
+  // Get document context for title and path generation
+  const document = useFormValue([]) as SanityDocument;
   const currentSlug = value?.current || "";
-  const segments = useMemo(
-    () => currentSlug.split("/").filter(Boolean),
-    [currentSlug],
-  );
 
-  // Validation for slug format
-  const slugFormatErrors = useMemo(() => {
-    if (!document?._type) return [];
-
-    return validateSlugForDocumentType(currentSlug, document._type);
-  }, [currentSlug, document?._type]);
+  // Use centralized validation hook - single source of truth
+  const { allErrors, allWarnings } = useSlugValidation({
+    slug: currentSlug,
+    includeSanityValidation: true,
+  });
 
   const handleChange = useCallback(
     (newValue?: string) => {
@@ -118,6 +92,7 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
     const title = document?.title as string | undefined;
     if (!title) return;
 
+    const segments = currentSlug.split("/").filter(Boolean);
     const newSlug = slugify(title, {
       lower: true,
       remove: /[^a-zA-Z0-9\s-]/g,
@@ -132,14 +107,13 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
       const fullPath = `/${newSlug}`;
       handleChange(fullPath);
     }
-  }, [document?.title, handleChange, segments]);
+  }, [document?.title, currentSlug, handleChange]);
 
-  const handleCleanUp = useCallback(() => {
-    if (!currentSlug) return;
-
-    const cleanValue = cleanSlug(currentSlug);
-    handleChange(cleanValue);
-  }, [currentSlug, handleChange]);
+  // const handleCleanUp = useCallback(() => {
+  //   if (!currentSlug) return;
+  //   const cleanValue = cleanSlug(currentSlug);
+  //   handleChange(cleanValue);
+  // }, [currentSlug, handleChange]);
 
   const localizedPathname = getDocumentPath({
     ...document,
@@ -147,50 +121,6 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
   });
 
   const fullUrl = `${presentationOriginUrl ?? ""}${localizedPathname}`;
-
-  // Validation for final slug
-  const finalSlugValidation = useMemo(() => {
-    return validateSlug(currentSlug);
-  }, [currentSlug]);
-
-  // Validation for path segments
-  const pathSegmentValidations = useMemo(() => {
-    return segments.map((segment) => validateSlug(segment));
-  }, [segments]);
-
-  // Combine all errors and warnings
-  const combinedValidation = useMemo(() => {
-    const allErrors: string[] = [];
-    const allWarnings: string[] = [];
-
-    // Add final slug errors/warnings
-    allErrors.push(...finalSlugValidation.errors);
-    allWarnings.push(...finalSlugValidation.warnings);
-    // Add path segment errors/warnings
-    pathSegmentValidations.forEach((validation, index) => {
-      if (validation.errors.length > 0) {
-        allErrors.push(
-          `Segment "${segments[index]}": ${validation.errors.join(", ")}`,
-        );
-      }
-      if (validation.warnings.length > 0) {
-        allWarnings.push(
-          `Segment "${segments[index]}": ${validation.warnings.join(", ")}`,
-        );
-      }
-    });
-
-    // Add duplicate warnings
-
-    return {
-      errors: [...new Set(allErrors)], // Remove duplicates
-      warnings: [...new Set(allWarnings)], // Remove duplicates
-    };
-  }, [finalSlugValidation, pathSegmentValidations, segments]);
-  console.log(
-    "🚀 ~ PathnameFieldComponent ~ combinedValidation:",
-    combinedValidation,
-  );
 
   const handleCopyUrl = useCallback(() => {
     navigator.clipboard.writeText(fullUrl);
@@ -220,8 +150,8 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
               <SlugInput
                 value={currentSlug}
                 onChange={handleInputChange}
-                onFocus={() => setIsEditing(true)}
-                onBlur={() => setIsEditing(false)}
+                // onFocus={() => setIsEditing(true)}
+                // onBlur={() => setIsEditing(false)}
                 placeholder="Enter URL path (e.g., about-us or blog/my-post)"
                 disabled={readOnly}
               />
@@ -266,14 +196,7 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
         )}
       </Stack>
 
-      <ErrorStates
-        errors={[
-          ...combinedValidation.errors,
-          ...slugFormatErrors,
-          ...(slugValidationError ? [slugValidationError.message] : []),
-        ]}
-        warnings={combinedValidation.warnings}
-      />
+      <ErrorStates errors={allErrors} warnings={allWarnings} />
     </Stack>
   );
 }
