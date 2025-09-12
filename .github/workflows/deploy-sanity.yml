@@ -20,11 +20,11 @@ jobs:
       NODE_OPTIONS: "--max_old_space_size=4096"
       PNPM_VERSION: 10.12.2
       SANITY_STUDIO_PROJECT_ID: ${{ secrets.SANITY_STUDIO_PROJECT_ID }}
-      SANITY_STUDIO_DATASET: ${{ secrets.SANITY_STUDIO_DATASET }}
+      SANITY_STUDIO_DATASET: ${{ github.ref_name == 'main' && secrets.SANITY_STUDIO_PRODUCTION_DATASET || secrets.SANITY_STUDIO_DEVELOPMENT_DATASET }}
       SANITY_STUDIO_TITLE: ${{ secrets.SANITY_STUDIO_TITLE }}
       SANITY_STUDIO_PRESENTATION_URL: ${{ secrets.SANITY_STUDIO_PRESENTATION_URL }}
       SANITY_STUDIO_PRODUCTION_HOSTNAME: ${{ secrets.SANITY_STUDIO_PRODUCTION_HOSTNAME }}
-      HOST_NAME: ${{ github.head_ref || github.ref_name }}  
+      HOST_NAME: ${{ github.head_ref || github.ref_name }}
 
     steps:
       - name: Checkout repository
@@ -42,11 +42,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts --prefer-offline
-        
+
       - name: Check if Dependabot
         id: check-dependabot
         run: |
@@ -64,7 +64,7 @@ jobs:
           pnpm run build
         env:
           CI: true
-        
+
       - name: Deploy Sanity Studio
         if: steps.check-dependabot.outputs.is_dependabot != 'true'
         working-directory: ./apps/studio
