@@ -25,7 +25,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.12",
     "@turbo/gen": "^2.5.6",
-    "@types/node": "^20.19.9",
+    "@types/node": "^24.5.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@workspace/eslint-config": "workspace:*",
