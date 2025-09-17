@@ -34,7 +34,7 @@
     "swr": "^2.3.6"
   },
   "devDependencies": {
-    "@types/node": "^20.19.9",
+    "@types/node": "^24.5.1",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@workspace/eslint-config": "workspace:^",
