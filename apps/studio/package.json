@@ -20,6 +20,7 @@
   ],
   "dependencies": {
     "@sanity/assist": "^4.4.7",
+    "@sanity/document-internationalization": "^4.0.0",
     "@sanity/icons": "^3.7.4",
     "@sanity/orderable-document-list": "^1.4.0",
     "@sanity/ui": "^3.0.6",

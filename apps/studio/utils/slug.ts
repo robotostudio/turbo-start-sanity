@@ -39,12 +39,52 @@ export async function isUnique(
   const client = getClient({ apiVersion: "2025-02-10" });
   const id = getPublishedId(document?._id ?? "");
   const draftId = getDraftId(id);
+
+  // Get the current document's language for internationalization support
+  const currentLanguage = document?.language;
+
   const params = {
     draft: draftId,
     published: id,
     slug,
+    language: currentLanguage,
   };
-  const query = "*[!(_id in [$draft, $published]) && slug.current == $slug]";
+
+  // For documents with language field (internationalized), check uniqueness within the same language
+  // For documents without language field, check global uniqueness
+  const query = currentLanguage
+    ? "*[!(_id in [$draft, $published]) && slug.current == $slug && language == $language]"
+    : "*[!(_id in [$draft, $published]) && slug.current == $slug]";
+
+  const result = await client.fetch(query, params);
+  return result.length === 0;
+}
+
+// Language-aware uniqueness function for internationalized documents
+export async function isUniqueForLanguage(
+  slug: string,
+  context: SlugValidationContext,
+): Promise<boolean> {
+  const { document, getClient } = context;
+  const client = getClient({ apiVersion: "2025-02-10" });
+  const id = getPublishedId(document?._id ?? "");
+  const draftId = getDraftId(id);
+  const currentLanguage = document?.language;
+
+  if (!currentLanguage) {
+    // Fallback to regular uniqueness check if no language
+    return isUnique(slug, context);
+  }
+
+  const params = {
+    draft: draftId,
+    published: id,
+    slug,
+    language: currentLanguage,
+  };
+
+  const query =
+    "*[!(_id in [$draft, $published]) && slug.current == $slug && language == $language]";
   const result = await client.fetch(query, params);
   return result.length === 0;
 }
