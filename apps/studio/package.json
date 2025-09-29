@@ -5,7 +5,7 @@
   "main": "package.json",
   "license": "UNLICENSED",
   "scripts": {
-    "dev": "sanity dev",
+    "dev": "NODE_ENV=swede sanity dev",
     "format": "prettier --write .",
     "start": "sanity start",
     "lint": "eslint .",
