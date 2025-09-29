@@ -1,5 +1,3 @@
-import { client } from "@/lib/sanity/client";
-import { queryRedirects } from "@/lib/sanity/query";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -20,11 +18,7 @@ const nextConfig: NextConfig = {
         pathname: `/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/**`,
       },
     ],
-  },
-  async redirects() {
-    const redirects = await client.fetch(queryRedirects);
-    return redirects;
-  },
+  }
 };
 
 export default nextConfig;
