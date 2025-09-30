@@ -13,6 +13,7 @@ export interface SlugValidationOptions {
   requireSlash?: boolean;
   requiredPrefix?: string;
   sanityDocumentType?: string; // Auto-configure based on Sanity document type
+  segmentCount?: number;
 }
 
 /**
@@ -62,27 +63,38 @@ export const SLUG_WARNING_MESSAGES = {
 /**
  * Gets document-type specific configuration
  */
-function getDocumentTypeConfig(
+export function getDocumentTypeConfig(
   sanityDocumentType: string,
 ): SlugValidationOptions {
   switch (sanityDocumentType) {
+    case "author":
+      return {
+        documentType: "Author",
+        requiredPrefix: "/author/",
+        requireSlash: true,
+        segmentCount: 2,
+      };
     case "blog":
       return {
         documentType: "Blog post",
         requiredPrefix: "/blog/",
         requireSlash: true,
+        segmentCount: 2,
       };
     case "blogIndex":
       return {
         documentType: "Blog index",
         requiredPrefix: "/blog",
         requireSlash: true,
+        segmentCount: 1,
       };
     case "homePage":
       return {
         documentType: "Home page",
+        sanityDocumentType: "homePage",
         requiredPrefix: "/",
         requireSlash: true,
+        segmentCount: 0,
       };
     case "page":
       return {
@@ -183,6 +195,14 @@ export function validateSlug(
     //     );
     //   }
     // });
+
+    if (finalOptions.segmentCount !== undefined) {
+      if (segments.length !== finalOptions.segmentCount) {
+        allErrors.push(
+          `${finalOptions.documentType} URLs must have ${finalOptions.segmentCount} segments`,
+        );
+      }
+    }
 
     // Additional path-specific validations - critical errors
     if (finalOptions.requireSlash && !slug.startsWith("/")) {

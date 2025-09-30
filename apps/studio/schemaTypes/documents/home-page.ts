@@ -4,9 +4,7 @@ import { defineField, defineType } from "sanity";
 import { GROUP, GROUPS } from "../../utils/constant";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
-import { createSlug } from "../../utils/slug";
-import { createSlugValidator } from "../../utils/slug-validation";
-import { pageBuilderField } from "../common";
+import { documentSlugField, pageBuilderField } from "../common";
 
 export const homePage = defineType({
   name: "homePage",
@@ -45,24 +43,8 @@ export const homePage = defineType({
           ),
       ],
     }),
-    defineField({
-      name: "slug",
-      type: "slug",
-      description:
-        "The web address for your home page. Usually this is just '/' for the main page of your website.",
+    documentSlugField("homePage", {
       group: GROUP.MAIN_CONTENT,
-      options: {
-        source: "title",
-        slugify: createSlug,
-      },
-      validation: (Rule) =>
-        Rule.required().custom(
-          createSlugValidator({
-            documentType: "Home page",
-            requiredPrefix: "/",
-            sanityDocumentType: "homePage",
-          }),
-        ),
     }),
     pageBuilderField,
     ...seoFields.filter(

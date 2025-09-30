@@ -3,9 +3,7 @@ import { defineField, defineType } from "sanity";
 import { GROUP, GROUPS } from "../../utils/constant";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
-import { createSlug, isUnique } from "../../utils/slug";
-import { createSlugValidator } from "../../utils/slug-validation";
-import { pageBuilderField } from "../common";
+import { documentSlugField, pageBuilderField } from "../common";
 
 export const blogIndex = defineType({
   name: "blogIndex",
@@ -29,24 +27,8 @@ export const blogIndex = defineType({
         "A short summary of what visitors can find on your blog. This helps people understand what your blog is about.",
       group: GROUP.MAIN_CONTENT,
     }),
-    defineField({
-      name: "slug",
-      type: "slug",
-      description:
-        "The web address for your blog page (for example, '/blog' would create a page at yourdomain.com/blog)",
+    documentSlugField("blogIndex", {
       group: GROUP.MAIN_CONTENT,
-      options: {
-        source: "title",
-        slugify: createSlug,
-        isUnique: isUnique,
-      },
-      validation: (Rule) =>
-        Rule.required().custom(
-          createSlugValidator({
-            documentType: "Blog index",
-            requiredPrefix: "/blog",
-          }),
-        ),
     }),
     defineField({
       name: "displayFeaturedBlogs",
