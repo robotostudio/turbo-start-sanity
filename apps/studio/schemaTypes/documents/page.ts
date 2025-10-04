@@ -1,16 +1,10 @@
 import { DocumentIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 
-import {
-  PathnameFieldComponent,
-  UrlSlugFieldComponent,
-} from "../../components";
 import { GROUP, GROUPS } from "../../utils/constant";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
-import { createSlug, isUnique } from "../../utils/slug";
-import { createSlugValidator } from "../../utils/slug-validation";
-import { pageBuilderField } from "../common";
+import { documentSlugField, pageBuilderField } from "../common";
 
 export const page = defineType({
   name: "page",
@@ -51,39 +45,8 @@ export const page = defineType({
           ),
       ],
     }),
-    defineField({
-      name: "slug",
-      type: "slug",
-      title: "URL",
-      description:
-        "The web address for this page (for example, '/about-us' would create a page at yourdomain.com/about-us)",
+    documentSlugField("page", {
       group: GROUP.MAIN_CONTENT,
-      components: {
-        field: PathnameFieldComponent,
-      },
-      options: {
-        source: "title",
-        slugify: createSlug,
-        isUnique,
-      },
-      validation: (Rule) =>
-        Rule.required()
-          // .error("A URL slug is required for the page")
-          .custom((slug) => {
-            // First run basic validation
-            const basicValidation = createSlugValidator({
-              documentType: "Page",
-            })(slug);
-
-            if (basicValidation !== true) return basicValidation;
-
-            // Then check that pages don't use blog prefixes
-            if (slug?.current?.startsWith("/blog")) {
-              return 'Pages cannot use "/blog" prefix - this is reserved for blog content';
-            }
-
-            return true;
-          }),
     }),
     defineField({
       name: "image",

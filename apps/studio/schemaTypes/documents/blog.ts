@@ -5,12 +5,10 @@ import {
 import { FileTextIcon } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
-import { PathnameFieldComponent } from "../../components/slug-field-component";
 import { GROUP, GROUPS } from "../../utils/constant";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
-import { createSlug, isUnique } from "../../utils/slug";
-import { createSlugValidator } from "../../utils/slug-validation";
+import { documentSlugField } from "../common";
 
 export const blog = defineType({
   name: "blog",
@@ -52,30 +50,8 @@ export const blog = defineType({
           ),
       ],
     }),
-    defineField({
-      name: "slug",
-      type: "slug",
-      title: "URL",
-      description:
-        "The web address where people can find your blog post (automatically created from title)",
+    documentSlugField("blog", {
       group: GROUP.MAIN_CONTENT,
-      components: {
-        field: PathnameFieldComponent,
-      },
-      options: {
-        source: "title",
-        slugify: createSlug,
-        isUnique,
-      },
-      validation: (Rule) => [
-        Rule.required().error("A URL slug is required"),
-        Rule.custom(
-          createSlugValidator({
-            documentType: "Blog post",
-            requiredPrefix: "/blog/",
-          }),
-        ),
-      ],
     }),
     defineField({
       name: "authors",

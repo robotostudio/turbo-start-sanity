@@ -1,6 +1,11 @@
 import { defineField } from "sanity";
 
+import { PathnameFieldComponent } from "../components";
 import { GROUP } from "../utils/constant";
+import {
+  createSlugValidator,
+  getDocumentTypeConfig,
+} from "../utils/slug-validation";
 
 export const richTextField = defineField({
   name: "richText",
@@ -36,3 +41,33 @@ export const iconField = defineField({
   description:
     "Choose a small picture symbol to represent this item, like a home icon or shopping cart",
 });
+
+export const documentSlugField = (
+  documentType: string,
+  options: {
+    group?: string;
+    description?: string;
+    title?: string;
+  } = {},
+) => {
+  const {
+    group,
+    description = `The web address where people can find your ${documentType} (automatically created from title)`,
+    title = "URL",
+  } = options;
+
+  return defineField({
+    name: "slug",
+    type: "slug",
+    title,
+    description,
+    group,
+    components: {
+      field: PathnameFieldComponent,
+    },
+    validation: (Rule) => [
+      Rule.required().error("A URL slug is required"),
+      Rule.custom(createSlugValidator(getDocumentTypeConfig(documentType))),
+    ],
+  });
+};
