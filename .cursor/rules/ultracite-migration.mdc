@@ -1,0 +1,338 @@
+---
+description: Guide for migrating from ESLint/Prettier to Ultracite
+alwaysApply: false
+---
+
+# Ultracite Migration Guide
+
+Quick reference for migrating Turbostart monorepo projects from ESLint/Prettier to Ultracite (Biome preset).
+
+**Project Structure Assumed:**
+```
+/
+├── apps/
+│   ├── studio/      # Sanity CMS
+│   └── web/         # Next.js app
+├── packages/
+│   ├── eslint-config/  # To be deleted
+│   └── ui/             # Shared components
+├── turbo.json
+└── package.json
+```
+
+## 1. Install Dependencies
+
+```bash
+pnpm add -D -w ultracite @biomejs/biome@latest
+```
+
+## 2. Create Root Configuration
+
+Create `biome.jsonc`:
+
+```json
+{
+  "$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
+  "extends": ["ultracite"]
+}
+```
+
+## 3. Configure Cursor
+
+Create/update `.vscode/settings.json`:
+
+```json
+{
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": false,
+  "editor.formatOnPaste": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
+}
+```
+
+**Important:** Set `formatOnSave: false` and use `codeActionsOnSave` to prevent double-formatting issues.
+
+## 4. Update All package.json Scripts
+
+Replace in root and all workspace packages:
+
+```json
+{
+  "scripts": {
+    "lint": "npx ultracite lint",
+    "format": "npx ultracite fix"
+  }
+}
+```
+
+## 5. Remove Old Dependencies & Configs
+
+### Root (`package.json`)
+Remove from `devDependencies`:
+- `@workspace/eslint-config`
+- `prettier`
+
+### `apps/studio/package.json`
+Remove from `devDependencies`:
+- `eslint`
+- `eslint-plugin-import`
+- `eslint-plugin-prettier`
+- `eslint-plugin-simple-import-sort`
+- `prettier`
+- `typescript-eslint`
+
+Delete files:
+- `apps/studio/eslint.config.mjs`
+- `apps/studio/prettier.config.mjs`
+
+### `apps/web/package.json`
+Remove from `devDependencies`:
+- `@workspace/eslint-config`
+- `prettier`
+
+Delete files:
+- `apps/web/eslint.config.js`
+- `apps/web/prettier.config.mjs`
+- `apps/web/.prettierignore` (if exists)
+
+### `packages/ui/package.json`
+Remove from `devDependencies`:
+- `@workspace/eslint-config`
+- `eslint`
+
+Delete files:
+- `packages/ui/eslint.config.js`
+
+### Delete Entire Package
+- Delete entire `packages/eslint-config/` directory
+
+## 6. Update Next.js Config
+
+In `apps/web/next.config.ts`, disable ESLint during builds:
+
+```typescript
+export default {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  // ... rest of config
+}
+```
+
+**Important:** If you have redirects from Sanity, ensure they handle `null` values:
+
+```typescript
+async redirects() {
+  const redirects = await client.fetch(queryRedirects);
+  return redirects.map((redirect) => ({
+    ...redirect,
+    permanent: redirect.permanent ?? false,
+  }));
+}
+```
+
+## 7. Update Turborepo Config
+
+In `turbo.json`:
+
+```json
+{
+  "tasks": {
+    "//#format": {},
+    "//#lint": {
+      "cache": false
+    }
+  }
+}
+```
+
+## 8. Common Rule Adjustments
+
+### For Tailwind CSS (apps/web uses this)
+Add to `biome.jsonc`:
+
+```json
+{
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noUnknownAtRules": "off",
+        "noExplicitAny": "warn"
+      }
+    }
+  }
+}
+```
+
+### If you encounter namespace import issues
+```json
+{
+  "linter": {
+    "rules": {
+      "performance": {
+        "noNamespaceImport": "off"
+      }
+    }
+  }
+}
+```
+
+## 9. Testing Checklist
+
+### Step 1: Install & Format
+```bash
+# Install dependencies
+pnpm install
+
+# Format all code (from root)
+pnpm format
+
+# Review the changes - should reorganize imports and format code
+git diff
+```
+
+### Step 2: Lint
+```bash
+# Run linter (from root)
+pnpm lint
+
+# Fix any auto-fixable issues
+pnpm format
+```
+
+### Step 3: Build All Packages
+```bash
+# From root - build everything
+pnpm build
+```
+
+Should successfully build:
+- `apps/studio` (Sanity Studio)
+- `apps/web` (Next.js)
+- `packages/ui`
+
+### Step 4: Test Individual Packages
+```bash
+# Test studio
+cd apps/studio
+pnpm lint
+pnpm format
+
+# Test web
+cd apps/web
+pnpm lint
+pnpm format
+
+# Test ui
+cd packages/ui
+pnpm lint
+pnpm format
+```
+
+### Step 5: Test Dev Servers
+```bash
+# From root
+pnpm dev
+```
+
+Verify both studio and web start correctly.
+
+### Step 6: Restart Cursor & Test Editor
+1. Restart Cursor: `Cmd/Ctrl + Shift + P` → "Developer: Reload Window"
+2. Open a `.ts` or `.tsx` file
+3. Make a change and hit `Cmd/Ctrl + S`
+4. Verify:
+   - Code formats automatically
+   - Imports organize automatically
+   - No double-formatting or jerking
+   - No ESLint/Prettier errors in problems panel
+
+## Key Differences from ESLint/Prettier
+
+- Use `npx ultracite fix` instead of `prettier --write` (formats + fixes + organizes imports)
+- Use `npx ultracite lint` instead of `eslint`
+- Biome is **much faster** (written in Rust)
+- Zero config by default - trust Ultracite's presets
+- Import sorting is built-in, no extra plugins needed
+
+## Troubleshooting
+
+### Double formatting on save?
+**Symptom:** Code jumps/jerks when pressing Cmd+S
+**Fix:** 
+- Ensure `formatOnSave: false` in `.vscode/settings.json`
+- Check your user settings don't have conflicting formatter settings
+- Only use `codeActionsOnSave` with Biome actions
+
+### Linting CSS/Tailwind errors?
+**Symptom:** `Unexpected unknown at-rule: apply`
+**Fix:** Disable `noUnknownAtRules` in biome.jsonc (see section 8)
+
+### Type errors in Next.js pages?
+**Symptom:** `Parameter 'item' implicitly has an 'any' type`
+**Fix:** Add explicit type annotations:
+```typescript
+type Item = NonNullable<QueryResultType>["items"][number];
+data.map((item: Item) => ...)
+```
+
+### Next.js build fails with PageNotFoundError?
+**Symptom:** `Cannot find module for page: /[...slug]`
+**Fix:** Add error handling in `generateStaticParams`:
+```typescript
+export async function generateStaticParams() {
+  try {
+    const slugs = await client.fetch(queryPaths);
+    if (!Array.isArray(slugs) || slugs.length === 0) {
+      return [];
+    }
+    return slugs.map(slug => ({ slug: slug.split("/").filter(Boolean) }));
+  } catch (error) {
+    console.error("Error fetching paths:", error);
+    return [];
+  }
+}
+
+export const dynamicParams = true; // Allow runtime generation
+```
+
+### Sanity redirects causing type errors?
+**Symptom:** `Type 'boolean | null' is not assignable to type 'boolean'`
+**Fix:** See section 6 - ensure redirects handle null values
+
+## Quick Command Reference
+
+```bash
+# Format entire project
+pnpm format
+
+# Lint entire project
+pnpm lint
+
+# Build all packages
+pnpm build
+
+# Format & lint specific package
+cd apps/web && pnpm format && pnpm lint
+
+# Run in watch mode (for development)
+cd apps/web && npx ultracite lint --watch
+```
