@@ -17,18 +17,30 @@ async function fetchBlogSlugPageData(slug: string, stega = true) {
 }
 
 async function fetchBlogPaths() {
-  const slugs = await client.fetch(queryBlogPaths);
-  const paths: { slug: string }[] = [];
-  for (const slug of slugs) {
-    if (!slug) {
-      continue;
+  try {
+    const slugs = await client.fetch(queryBlogPaths);
+    
+    // If no slugs found, return empty array to prevent build errors
+    if (!Array.isArray(slugs) || slugs.length === 0) {
+      return [];
     }
-    const [, , path] = slug.split("/");
-    if (path) {
-      paths.push({ slug: path });
+    
+    const paths: { slug: string }[] = [];
+    for (const slug of slugs) {
+      if (!slug) {
+        continue;
+      }
+      const [, , path] = slug.split("/");
+      if (path) {
+        paths.push({ slug: path });
+      }
     }
+    return paths;
+  } catch (error) {
+    console.error("Error fetching blog paths:", error);
+    // Return empty array to allow build to continue
+    return [];
   }
-  return paths;
 }
 
 export async function generateMetadata({
@@ -53,8 +65,12 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  return await fetchBlogPaths();
+  const paths = await fetchBlogPaths();
+  return paths;
 }
+
+// Allow dynamic params for paths not generated at build time
+export const dynamicParams = true;
 
 export default async function BlogSlugPage({
   params,

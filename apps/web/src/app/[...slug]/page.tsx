@@ -15,16 +15,28 @@ async function fetchSlugPageData(slug: string, stega = true) {
 }
 
 async function fetchSlugPagePaths() {
-  const slugs = await client.fetch(querySlugPagePaths);
-  const paths: { slug: string[] }[] = [];
-  for (const slug of slugs) {
-    if (!slug) {
-      continue;
+  try {
+    const slugs = await client.fetch(querySlugPagePaths);
+    
+    // If no slugs found, return empty array to prevent build errors
+    if (!Array.isArray(slugs) || slugs.length === 0) {
+      return [];
     }
-    const parts = slug.split("/").filter(Boolean);
-    paths.push({ slug: parts });
+    
+    const paths: { slug: string[] }[] = [];
+    for (const slug of slugs) {
+      if (!slug) {
+        continue;
+      }
+      const parts = slug.split("/").filter(Boolean);
+      paths.push({ slug: parts });
+    }
+    return paths;
+  } catch (error) {
+    console.error("Error fetching slug paths:", error);
+    // Return empty array to allow build to continue
+    return [];
   }
-  return paths;
 }
 
 export async function generateMetadata({
@@ -49,8 +61,12 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  return await fetchSlugPagePaths();
+  const paths = await fetchSlugPagePaths();
+  return paths;
 }
+
+// Allow dynamic params for paths not generated at build time
+export const dynamicParams = true;
 
 export default async function SlugPage({
   params,
