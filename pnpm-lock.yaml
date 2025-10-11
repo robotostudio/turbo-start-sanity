@@ -21,8 +21,8 @@ importers:
         specifier: 5.9.2
         version: 5.9.2
       ultracite:
-        specifier: 5.6.1
-        version: 5.6.1(typescript@5.9.2)(valibot@1.1.0(typescript@5.9.2))
+        specifier: 5.6.2
+        version: 5.6.2(typescript@5.9.2)(valibot@1.1.0(typescript@5.9.2))
 
   apps/studio:
     dependencies:
@@ -6162,8 +6162,8 @@ packages:
     engines: {node: '>=0.8.0'}
     hasBin: true
 
-  ultracite@5.6.1:
-    resolution: {integrity: sha512-RzfjJhCgTs3RbmZeAt7hTxvPxMtRFH/i3QeAm3HXX9FvAdoGW0U8dYvyAQALhQp6S5zGyuXEKft8lXz5Pq2u7A==}
+  ultracite@5.6.2:
+    resolution: {integrity: sha512-ku0OhXCE8P7HZ8eUghFxhWroNiDTGv+5sKOgtyeTuOIvdfyyhVie5ijG/qFcleDOq5nvENolj/y51SJ5ddXbfw==}
     hasBin: true
 
   unbzip2-stream@1.4.3:
@@ -13680,7 +13680,7 @@ snapshots:
   uglify-js@3.19.3:
     optional: true
 
-  ultracite@5.6.1(typescript@5.9.2)(valibot@1.1.0(typescript@5.9.2)):
+  ultracite@5.6.2(typescript@5.9.2)(valibot@1.1.0(typescript@5.9.2)):
     dependencies:
       '@clack/prompts': 0.11.0
       '@trpc/server': 11.6.0(typescript@5.9.2)
