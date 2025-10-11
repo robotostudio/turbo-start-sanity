@@ -135,10 +135,9 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
     () =>
       sanityValidation.validation.find(
         (v) =>
-          (v?.path.includes("current") || v?.path.includes("slug")) &&
-          v.message,
+          (v?.path.includes("current") || v?.path.includes("slug")) && v.message
       ),
-    [sanityValidation.validation],
+    [sanityValidation.validation]
   );
 
   const [isPathExpanded, setIsPathExpanded] = useState(false);
@@ -146,7 +145,9 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
 
   // Legacy validation for slug format (keeping for backward compatibility)
   const slugFormatErrors = useMemo(() => {
-    if (!document?._type) return [];
+    if (!document?._type) {
+      return [];
+    }
     return validateSlugForDocumentType(currentSlug, document._type);
   }, [currentSlug, document?._type]);
 
@@ -154,7 +155,7 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
     (e: ChangeEvent<HTMLInputElement>) => {
       handleUpdateFinalSlug(e.target.value);
     },
-    [handleUpdateFinalSlug],
+    [handleUpdateFinalSlug]
   );
 
   const handleKeyDown = useCallback(
@@ -164,7 +165,7 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
         setIsPathExpanded(!isPathExpanded);
       }
     },
-    [isPathExpanded],
+    [isPathExpanded]
   );
 
   const localizedPathname = getDocumentPath({
@@ -202,12 +203,16 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
       </Flex>
 
       {/* URL Path Accordion Section */}
-      <Card padding={0} radius={2} border style={{ overflow: "hidden" }}>
+      <Card border padding={0} radius={2} style={{ overflow: "hidden" }}>
         {/* Accordion Header */}
         <AccordionButton
+          aria-controls="url-path-content"
+          aria-expanded={isPathExpanded}
+          aria-label={`${isPathExpanded ? "Collapse" : "Expand"} URL path details`}
           as="button"
           onClick={() => setIsPathExpanded(!isPathExpanded)}
           onKeyDown={handleKeyDown}
+          role="button"
           style={{
             width: "100%",
             height: "40px",
@@ -218,10 +223,6 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
             cursor: "pointer",
             transition: "background-color 0.2s ease-in-out",
           }}
-          aria-expanded={isPathExpanded}
-          aria-controls="url-path-content"
-          aria-label={`${isPathExpanded ? "Collapse" : "Expand"} URL path details`}
-          role="button"
           tabIndex={0}
         >
           <Flex
@@ -229,7 +230,7 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
             justify="space-between"
             style={{ height: "100%" }}
           >
-            <Text size={2} weight="medium" style={{ lineHeight: 1 }}>
+            <Text size={2} style={{ lineHeight: 1 }} weight="medium">
               URL Path
             </Text>
             <Box
@@ -266,37 +267,37 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
                 </Text>
                 {pathSegments.length > 0 ? (
                   <Flex align="center" gap={1} wrap="wrap">
-                    <Text size={1} muted>
+                    <Text muted size={1}>
                       /
                     </Text>
                     {pathSegments.map((segment, index) => {
                       const segmentOptions = getPathSegmentOptions(index);
                       const allSegmentOptions = Array.from(
-                        new Set([segment, ...segmentOptions]),
+                        new Set([segment, ...segmentOptions])
                       );
 
                       return (
                         <Flex
-                          key={`${segment}-${index}`}
                           align="center"
                           gap={1}
+                          key={`${segment}-${index}`}
                         >
                           <PathSegmentChip
                             padding={2}
                             radius={1}
-                            tone="transparent"
                             style={{
                               display: "flex",
                               alignItems: "center",
                               gap: "8px",
                             }}
+                            tone="transparent"
                           >
                             <select
-                              value={segment}
+                              disabled={readOnly}
                               onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                                 handleUpdatePathSegment(
                                   index,
-                                  e.currentTarget.value,
+                                  e.currentTarget.value
                                 );
                               }}
                               style={{
@@ -309,7 +310,7 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
                                 width: `${Math.max(segment.length * 8, 60)}px`,
                                 outline: "none",
                               }}
-                              disabled={readOnly}
+                              value={segment}
                             >
                               {allSegmentOptions.map((s) => (
                                 <option key={s} value={s}>
@@ -318,17 +319,17 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
                               ))}
                             </select>
                             <Button
+                              disabled={readOnly}
                               icon={<Text size={0}>×</Text>}
                               mode="ghost"
-                              padding={1}
                               onClick={() => {
                                 handleRemovePathSegment(index);
                               }}
-                              disabled={readOnly}
+                              padding={1}
                               title="Remove segment"
                             />
                           </PathSegmentChip>
-                          <Text size={1} muted>
+                          <Text muted size={1}>
                             /
                           </Text>
                         </Flex>
@@ -336,27 +337,23 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
                     })}
                   </Flex>
                 ) : (
-                  <>
-                    <Text size={1} muted>
-                      No path segments. The URL will be directly under the root
-                      (/).
-                    </Text>
-                  </>
+                  <Text muted size={1}>
+                    No path segments. The URL will be directly under the root
+                    (/).
+                  </Text>
                 )}
-                <>
-                  <Flex gap={2}>
-                    <Button
-                      text="Add Segment"
-                      mode="ghost"
-                      tone="primary"
-                      fontSize={1}
-                      onClick={() => {
-                        handleAddPathSegment();
-                      }}
-                      disabled={readOnly}
-                    />
-                  </Flex>
-                </>
+                <Flex gap={2}>
+                  <Button
+                    disabled={readOnly}
+                    fontSize={1}
+                    mode="ghost"
+                    onClick={() => {
+                      handleAddPathSegment();
+                    }}
+                    text="Add Segment"
+                    tone="primary"
+                  />
+                </Flex>
               </Stack>
             </Stack>
           </Box>
@@ -373,32 +370,32 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
         {/* Input container with embedded button */}
         <InputContainer>
           <StyledTextInput
-            value={finalSlug}
+            aria-describedby="slug-helper-text"
+            disabled={readOnly}
             onChange={handleFinalSlugChange}
             placeholder="Define your URL slug (this-is-slug)"
-            disabled={readOnly}
             style={{
               fontFamily: "var(--font-family-mono)",
             }}
-            aria-describedby="slug-helper-text"
+            value={finalSlug}
           />
 
           <Button
-            icon={SparklesIcon}
-            text="Use title"
-            style={{ marginLeft: "auto" }}
-            onClick={generateSlugFromTitle}
-            disabled={!document?.title || readOnly}
-            mode="ghost"
-            tone="primary"
-            fontSize={1}
-            padding={2}
             aria-label="Generate slug from title"
+            disabled={!document?.title || readOnly}
+            fontSize={1}
+            icon={SparklesIcon}
+            mode="ghost"
+            onClick={generateSlugFromTitle}
+            padding={2}
+            style={{ marginLeft: "auto" }}
+            text="Use title"
+            tone="primary"
           />
         </InputContainer>
 
         {/* Helper Text */}
-        <Text size={1} muted id="slug-helper-text">
+        <Text id="slug-helper-text" muted size={1}>
           Enter only the page name (e.g., &ldquo;about-us&rdquo;,
           &ldquo;contact&rdquo;). Path segments can be edited in the URL Path
           section above. Only lowercase letters, numbers, and hyphens are
@@ -414,10 +411,10 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
           <Card
             padding={3}
             radius={2}
-            tone="transparent"
             style={{
               backgroundColor: "var(--card-muted-bg-color)",
             }}
+            tone="transparent"
           >
             <Flex align="center" justify="space-between">
               <Text
@@ -432,10 +429,10 @@ export function UrlSlugFieldComponent(props: ObjectFieldProps<SlugValue>) {
               </Text>
               <Button
                 icon={CopyIcon}
-                onClick={handleCopyUrl}
-                title="Copy URL"
                 mode="ghost"
+                onClick={handleCopyUrl}
                 padding={2}
+                title="Copy URL"
               />
             </Flex>
           </Card>

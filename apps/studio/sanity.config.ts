@@ -20,9 +20,9 @@ const title = process.env.SANITY_STUDIO_TITLE;
 
 export default defineConfig({
   name: "default",
-  title: title,
+  title,
   icon: Logo,
-  projectId: projectId,
+  projectId,
   dataset: dataset ?? "production",
   releases: {
     enabled: true,
@@ -52,7 +52,9 @@ export default defineConfig({
   document: {
     newDocumentOptions: (prev, { creationContext }) => {
       const { type } = creationContext;
-      if (type === "global") return [];
+      if (type === "global") {
+        return [];
+      }
       return prev;
     },
   },
@@ -63,15 +65,12 @@ export default defineConfig({
         id: "nested-page-template",
         title: "Nested Page",
         schemaType: "page",
-        value: (props: { slug?: string; title?: string }) => {
-          console.log("🚀 ~ props:", props);
-          return {
-            ...(props.slug
-              ? { slug: { current: props.slug, _type: "slug" } }
-              : {}),
-            ...(props.title ? { title: props.title } : {}),
-          };
-        },
+        value: (props: { slug?: string; title?: string }) => ({
+          ...(props.slug
+            ? { slug: { current: props.slug, _type: "slug" } }
+            : {}),
+          ...(props.title ? { title: props.title } : {}),
+        }),
         parameters: [
           {
             name: "slug",

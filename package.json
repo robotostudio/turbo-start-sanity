@@ -5,16 +5,16 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "turbo lint",
-    "check-types": "turbo check-types",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "lint": "npx ultracite lint",
+    "format": "npx ultracite fix",
+    "check-types": "turbo check-types"
   },
   "devDependencies": {
-    "@workspace/eslint-config": "workspace:*",
+    "@biomejs/biome": "2.2.5",
     "@workspace/typescript-config": "workspace:*",
-    "prettier": "^3.6.0",
     "turbo": "^2.5.4",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "ultracite": "5.6.1"
   },
   "packageManager": "pnpm@10.12.2",
   "engines": {

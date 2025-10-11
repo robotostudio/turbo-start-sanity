@@ -4,12 +4,12 @@ import type { Maybe } from "@/types";
 import { capitalize, getBaseUrl } from "@/utils";
 
 // Site-wide configuration interface
-interface SiteConfig {
+type SiteConfig = {
   title: string;
   description: string;
   twitterHandle: string;
   keywords: string[];
-}
+};
 
 // Page-specific SEO data interface
 interface PageSeoData extends Metadata {
@@ -24,10 +24,10 @@ interface PageSeoData extends Metadata {
 }
 
 // OpenGraph image generation parameters
-interface OgImageParams {
+type OgImageParams = {
   type?: string;
   id?: string;
-}
+};
 
 // Default site configuration
 const siteConfig: SiteConfig = {
@@ -41,8 +41,12 @@ function generateOgImageUrl(params: OgImageParams = {}): string {
   const { type, id } = params;
   const searchParams = new URLSearchParams();
 
-  if (id) searchParams.set("id", id);
-  if (type) searchParams.set("type", type);
+  if (id) {
+    searchParams.set("id", id);
+  }
+  if (type) {
+    searchParams.set("type", type);
+  }
 
   const baseUrl = getBaseUrl();
   return `${baseUrl}/api/og?${searchParams.toString()}`;
@@ -68,8 +72,12 @@ function extractTitle({
   slug: string;
   siteTitle: string;
 }): string {
-  if (pageTitle) return pageTitle;
-  if (slug && slug !== "/") return capitalize(slug.replace(/^\//, ""));
+  if (pageTitle) {
+    return pageTitle;
+  }
+  if (slug && slug !== "/") {
+    return capitalize(slug.replace(/^\//, ""));
+  }
   return siteTitle;
 }
 

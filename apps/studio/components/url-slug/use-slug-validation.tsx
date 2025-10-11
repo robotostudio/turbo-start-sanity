@@ -8,7 +8,7 @@ import {
   validateSlugForDocumentType,
 } from "../../utils/slug-validation";
 
-export interface UseSlugValidationOptions {
+export type UseSlugValidationOptions = {
   /**
    * The current slug value to validate
    */
@@ -25,9 +25,9 @@ export interface UseSlugValidationOptions {
    * @default true
    */
   includeSanityValidation?: boolean;
-}
+};
 
-export interface UseSlugValidationResult {
+export type UseSlugValidationResult = {
   /**
    * Combined validation result with all errors and warnings
    */
@@ -72,14 +72,14 @@ export interface UseSlugValidationResult {
    * Whether the slug has critical errors (blocking)
    */
   hasCriticalErrors: boolean;
-}
+};
 
 /**
  * Centralized slug validation hook that serves as the single source of truth
  * for all slug validation logic across the application
  */
 export function useSlugValidation(
-  options: UseSlugValidationOptions,
+  options: UseSlugValidationOptions
 ): UseSlugValidationResult {
   const {
     slug,
@@ -97,36 +97,43 @@ export function useSlugValidation(
 
   // Extract Sanity slug validation errors
   const sanityValidationErrors = useMemo(() => {
-    if (!includeSanityValidation) return [];
+    if (!includeSanityValidation) {
+      return [];
+    }
 
     return sanityValidation.validation
       .filter(
         (v) =>
-          (v?.path.includes("current") || v?.path.includes("slug")) &&
-          v.message,
+          (v?.path.includes("current") || v?.path.includes("slug")) && v.message
       )
       .map((v) => v.message);
   }, [sanityValidation.validation, includeSanityValidation]);
 
   // Parse slug into segments
   const segments = useMemo(() => {
-    if (!slug) return [];
+    if (!slug) {
+      return [];
+    }
     return slug.split("/").filter(Boolean);
   }, [slug]);
 
   // Validate individual segments
-  const segmentValidations = useMemo(() => {
-    return segments.map((segment) => validateSlug(segment));
-  }, [segments]);
+  const segmentValidations = useMemo(
+    () => segments.map((segment) => validateSlug(segment)),
+    [segments]
+  );
 
   // Validate full path structure
-  const pathValidation = useMemo(() => {
-    return validateSlug(slug, { sanityDocumentType: documentType });
-  }, [slug, documentType]);
+  const pathValidation = useMemo(
+    () => validateSlug(slug, { sanityDocumentType: documentType }),
+    [slug, documentType]
+  );
 
   // Document type specific validation
   const documentTypeErrors = useMemo(() => {
-    if (!documentType || !slug) return [];
+    if (!(documentType && slug)) {
+      return [];
+    }
     return validateSlugForDocumentType(slug, documentType);
   }, [slug, documentType]);
 
@@ -144,14 +151,14 @@ export function useSlugValidation(
       const segment = segments[index];
       if (validation.errors.length > 0) {
         allErrors.push(
-          ...validation.errors.map((error) => `Segment "${segment}": ${error}`),
+          ...validation.errors.map((error) => `Segment "${segment}": ${error}`)
         );
       }
       if (validation.warnings.length > 0) {
         allWarnings.push(
           ...validation.warnings.map(
-            (warning) => `Segment "${segment}": ${warning}`,
-          ),
+            (warning) => `Segment "${segment}": ${warning}`
+          )
         );
       }
     });
@@ -160,7 +167,7 @@ export function useSlugValidation(
     allErrors.push(...sanityValidationErrors);
     const errorSet = new Set(allErrors);
     const uniqueWarnings = Array.from(new Set(allWarnings)).filter(
-      (warning) => !errorSet.has(warning),
+      (warning) => !errorSet.has(warning)
     );
     return {
       errors: Array.from(errorSet),

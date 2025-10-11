@@ -29,12 +29,12 @@ export const SanityIcon = memo(function SanityIconUnmemorized({
   return (
     <span
       {...props}
+      aria-label={alt}
       className={cn(
-        "flex size-12 items-center justify-center sanity-icon",
-        className,
+        "sanity-icon flex size-12 items-center justify-center",
+        className
       )}
       dangerouslySetInnerHTML={{ __html: svg }}
-      aria-label={alt}
       title={alt}
     />
   );

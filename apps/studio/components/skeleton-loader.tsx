@@ -154,25 +154,25 @@ const SkeletonHeader = styled(Flex)`
 `;
 
 // Component interfaces
-interface SkeletonBoxProps {
+type SkeletonBoxProps = {
   width?: string;
   height?: string;
   delay?: number;
-}
+};
 
 const SkeletonBox: React.FC<SkeletonBoxProps> = ({
   width = "100%",
   height = "16px",
   delay = 0,
-}) => <StyledSkeletonBox width={width} height={height} delay={delay} />;
+}) => <StyledSkeletonBox delay={delay} height={height} width={width} />;
 
-interface SkeletonTreeItemProps {
+type SkeletonTreeItemProps = {
   depth: number;
   hasChildren?: boolean;
   showPath?: boolean;
   variant?: "folder" | "page";
   animationDelay?: number;
-}
+};
 
 const SkeletonTreeItem: React.FC<SkeletonTreeItemProps> = ({
   depth,
@@ -182,11 +182,11 @@ const SkeletonTreeItem: React.FC<SkeletonTreeItemProps> = ({
   animationDelay = 0,
 }) => (
   <SkeletonTreeItemContainer
+    animationDelay={animationDelay}
+    depth={depth}
     padding={2}
     radius={2}
     tone="transparent"
-    depth={depth}
-    animationDelay={animationDelay}
   >
     <Flex align="center" gap={2}>
       {hasChildren ? (
@@ -199,45 +199,45 @@ const SkeletonTreeItem: React.FC<SkeletonTreeItemProps> = ({
 
       {/* Title skeleton - varies by type */}
       <SkeletonBox
-        width={variant === "folder" ? "100px" : "140px"}
         height="14px"
+        width={variant === "folder" ? "100px" : "140px"}
       />
 
       {showPath && variant === "page" && (
         <Box style={{ marginLeft: "auto" }}>
-          <SkeletonBox width="60px" height="12px" />
+          <SkeletonBox height="12px" width="60px" />
         </Box>
       )}
     </Flex>
   </SkeletonTreeItemContainer>
 );
 
-interface SkeletonHeaderProps {
+type SkeletonHeaderProps = {
   showRefresh?: boolean;
-}
+};
 
 const SkeletonTreeHeader: React.FC<SkeletonHeaderProps> = ({
   showRefresh = true,
 }) => (
   <SkeletonHeader align="center" gap={2}>
     <SkeletonIcon />
-    <SkeletonBox width="60px" height="16px" />
-    <SkeletonBox width="80px" height="14px" />
+    <SkeletonBox height="16px" width="60px" />
+    <SkeletonBox height="14px" width="80px" />
 
     {showRefresh && (
       <Box style={{ marginLeft: "auto" }}>
-        <SkeletonBox width="32px" height="32px" />
+        <SkeletonBox height="32px" width="32px" />
       </Box>
     )}
   </SkeletonHeader>
 );
 
-interface SkeletonTreeProps {
+type SkeletonTreeProps = {
   itemCount?: number;
   maxDepth?: number;
   showHeader?: boolean;
   realistic?: boolean;
-}
+};
 
 export const SkeletonTree: React.FC<SkeletonTreeProps> = ({
   itemCount = 8,
@@ -278,7 +278,9 @@ export const SkeletonTree: React.FC<SkeletonTreeProps> = ({
     const folderNames = ["about", "services", "products", "blog"];
 
     for (let i = 0; i < Math.min(folderNames.length, itemCount - 1); i++) {
-      if (items.length >= itemCount) break;
+      if (items.length >= itemCount) {
+        break;
+      }
 
       const hasSubPages = Math.random() > 0.4;
 
@@ -322,19 +324,19 @@ export const SkeletonTree: React.FC<SkeletonTreeProps> = ({
   const skeletonItems = generateSkeletonItems;
 
   return (
-    <Card padding={3} role="status" aria-label="Loading page tree">
+    <Card aria-label="Loading page tree" padding={3} role="status">
       <Stack space={3}>
         {showHeader && <SkeletonTreeHeader />}
 
         <Stack space={1}>
           {skeletonItems.map((item, index) => (
             <SkeletonTreeItem
-              key={`skeleton-${index}`}
+              animationDelay={item.animationDelay}
               depth={item.depth}
               hasChildren={item.hasChildren}
+              key={`skeleton-${index}`}
               showPath={item.showPath}
               variant={item.variant as "folder" | "page"}
-              animationDelay={item.animationDelay}
             />
           ))}
         </Stack>
@@ -347,7 +349,7 @@ export const SkeletonTree: React.FC<SkeletonTreeProps> = ({
 export const ProgressiveSkeletonTree: React.FC<SkeletonTreeProps> = (props) => {
   const [currentItemCount, setCurrentItemCount] = React.useState(2);
   const [phase, setPhase] = React.useState<"initial" | "loading" | "complete">(
-    "initial",
+    "initial"
   );
 
   React.useEffect(() => {
@@ -359,13 +361,12 @@ export const ProgressiveSkeletonTree: React.FC<SkeletonTreeProps> = (props) => {
           setPhase("loading");
           setCurrentItemCount((prev) => Math.min(prev + 2, maxItems));
         },
-        200 + Math.random() * 300,
+        200 + Math.random() * 300
       ); // Stagger for realism
 
       return () => clearTimeout(timer);
-    } else {
-      setPhase("complete");
     }
+    setPhase("complete");
   }, [currentItemCount, props.itemCount]);
 
   return (
@@ -391,8 +392,8 @@ export const EnhancedLoadingState: React.FC<{
       <SkeletonComponent
         itemCount={40}
         maxDepth={3}
-        showHeader={true}
         realistic={true}
+        showHeader={true}
       />
       {message && (
         <Box paddingTop={2}>

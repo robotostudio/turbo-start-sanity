@@ -11,7 +11,7 @@ import slugify from "slugify";
 import type { PathnameParams } from "./types";
 
 export function defineSlug(
-  schema: PathnameParams = { name: "slug" },
+  schema: PathnameParams = { name: "slug" }
 ): FieldDefinition<"slug"> {
   const slugOptions = schema?.options;
 
@@ -33,7 +33,7 @@ export function defineSlug(
 
 export async function isUnique(
   slug: string,
-  context: SlugValidationContext,
+  context: SlugValidationContext
 ): Promise<boolean> {
   const { document, getClient } = context;
   const client = getClient({ apiVersion: "2025-02-10" });
@@ -50,7 +50,9 @@ export async function isUnique(
 }
 
 export const getDocTypePrefix = (type: string) => {
-  if (["page"].includes(type)) return "";
+  if (["page"].includes(type)) {
+    return "";
+  }
   return type;
 };
 
@@ -64,7 +66,9 @@ export const createSlug: SlugifierFn = (input, _, { parent }) => {
     _type: string;
   };
 
-  if (slugMapper[_type]) return slugMapper[_type];
+  if (slugMapper[_type]) {
+    return slugMapper[_type];
+  }
 
   const prefix = getDocTypePrefix(_type);
 

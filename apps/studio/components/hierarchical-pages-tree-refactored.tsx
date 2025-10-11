@@ -1,5 +1,6 @@
 import { Card, Stack, useToast } from "@sanity/ui";
-import React, { useCallback } from "react";
+import type React from "react";
+import { useCallback } from "react";
 import { useRouter } from "sanity/router";
 import { usePaneRouter } from "sanity/structure";
 
@@ -32,13 +33,11 @@ export const HierarchicalPagesTree: React.FC = () => {
           id: pageId,
           params: { type: "page" },
         });
-      } catch (err) {
-        console.error("Navigation failed:", err);
+      } catch (_err) {
         // Fallback to router navigation
         try {
           router.navigateIntent("edit", { id: pageId, type: "page" });
-        } catch (fallbackErr) {
-          console.error("Fallback navigation failed:", fallbackErr);
+        } catch (_fallbackErr) {
           // Last resort fallback navigation
           const currentUrl = window.location.pathname;
           const baseUrl = currentUrl.includes("/studio") ? "/studio" : "";
@@ -46,18 +45,17 @@ export const HierarchicalPagesTree: React.FC = () => {
         }
       }
     },
-    [paneRouter, router],
+    [paneRouter, router]
   );
 
   const handleCreateChild = useCallback(
-    (parentSlug: string) => {
+    (_parentSlug: string) => {
       try {
         router.navigateIntent("create", {
           type: "page",
           template: "nested-page-template",
         });
-      } catch (err) {
-        console.error("Failed to create child page:", err);
+      } catch (_err) {
         toast.push({
           status: "error",
           title: "Failed to create child page",
@@ -65,7 +63,7 @@ export const HierarchicalPagesTree: React.FC = () => {
         });
       }
     },
-    [router, toast],
+    [router, toast]
   );
 
   const handleOpenInPane = useCallback(
@@ -75,8 +73,7 @@ export const HierarchicalPagesTree: React.FC = () => {
           id: pageId,
           params: { type: "page" },
         });
-      } catch (err) {
-        console.error("Failed to open in pane:", err);
+      } catch (_err) {
         toast.push({
           status: "error",
           title: "Failed to open page",
@@ -84,7 +81,7 @@ export const HierarchicalPagesTree: React.FC = () => {
         });
       }
     },
-    [paneRouter, toast],
+    [paneRouter, toast]
   );
 
   if (loading && pages.length === 0) {
@@ -105,28 +102,28 @@ export const HierarchicalPagesTree: React.FC = () => {
   if (!loading && pages.length === 0) {
     return (
       <EmptyState
-        title="No pages yet"
         description="Create your first page in Sanity Studio to see it appear in this hierarchical tree view."
+        title="No pages yet"
       />
     );
   }
 
   return (
-    <Card padding={3} role="tree" aria-label="Page hierarchy">
+    <Card aria-label="Page hierarchy" padding={3} role="tree">
       <Stack space={3}>
         <TreeHeader
-          totalPages={pages.length}
           loading={loading}
           onRefresh={refetch}
+          totalPages={pages.length}
         />
 
         <TreeList
-          tree={tree}
-          onPageSelect={handlePageSelect}
           isExpanded={isExpanded}
-          onToggleExpand={toggleExpansion}
           onCreateChild={handleCreateChild}
           onOpenInPane={handleOpenInPane}
+          onPageSelect={handlePageSelect}
+          onToggleExpand={toggleExpansion}
+          tree={tree}
         />
       </Stack>
     </Card>

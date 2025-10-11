@@ -6,12 +6,13 @@ import {
   HomeIcon,
 } from "@sanity/icons";
 import { Box, Card, Flex, Stack, Text } from "@sanity/ui";
-import React, { useCallback, useState } from "react";
+import type React from "react";
+import { useCallback, useState } from "react";
 
 import type { TreeNode } from "../hooks/use-pages-tree";
 import { TreeActionMenu } from "./tree-action-menu";
 
-interface TreeItemProps {
+type TreeItemProps = {
   node: TreeNode;
   depth: number;
   onPageSelect: (pageId: string) => void;
@@ -23,7 +24,7 @@ interface TreeItemProps {
   onOpenInPane?: (pageId: string) => void;
   onDuplicate?: (pageId: string) => void;
   onDelete?: (pageId: string) => void;
-}
+};
 
 export const TreeItem: React.FC<TreeItemProps> = ({
   node,
@@ -55,10 +56,10 @@ export const TreeItem: React.FC<TreeItemProps> = ({
         onToggleExpand(node.slug);
       }
     },
-    [hasChildren, onToggleExpand, node.slug],
+    [hasChildren, onToggleExpand, node.slug]
   );
 
-  const handleKeyDown = useCallback(
+  const _handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -71,7 +72,7 @@ export const TreeItem: React.FC<TreeItemProps> = ({
         onToggleExpand(node.slug);
       }
     },
-    [handleClick, hasChildren, isExpanded, onToggleExpand, node.slug],
+    [handleClick, hasChildren, isExpanded, onToggleExpand, node.slug]
   );
 
   const getIcon = () => {
@@ -94,9 +95,18 @@ export const TreeItem: React.FC<TreeItemProps> = ({
   return (
     <Stack space={1}>
       <Card
+        aria-expanded={hasChildren ? isExpanded : undefined}
+        aria-label={getAriaLabel()}
+        data-tree-item
+        onMouseEnter={() => {
+          setIsHovered(true);
+        }}
+        onMouseLeave={() => {
+          setIsHovered(false);
+        }}
         padding={2}
         radius={2}
-        tone={node.type === "page" ? "default" : "transparent"}
+        role={node.type === "folder" ? "button" : "link"}
         style={{
           marginLeft: `${depth * 16}px`,
           // cursor: "pointer",
@@ -108,22 +118,14 @@ export const TreeItem: React.FC<TreeItemProps> = ({
             boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
           }),
         }}
-        onMouseEnter={() => {
-          setIsHovered(true);
-        }}
-        onMouseLeave={() => {
-          setIsHovered(false);
-        }}
-        data-tree-item
         tabIndex={0}
-        role={node.type === "folder" ? "button" : "link"}
-        aria-label={getAriaLabel()}
-        aria-expanded={hasChildren ? isExpanded : undefined}
+        tone={node.type === "page" ? "default" : "transparent"}
       >
         <Flex align="center" gap={2} justify="space-between">
-          <Flex align="center" gap={2} flex={1}>
+          <Flex align="center" flex={1} gap={2}>
             {hasChildren ? (
               <Box
+                aria-label={`${isExpanded ? "Collapse" : "Expand"} ${node.title}`}
                 onClick={handleToggle}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
@@ -131,10 +133,9 @@ export const TreeItem: React.FC<TreeItemProps> = ({
                     handleToggle(e as any);
                   }
                 }}
+                role="button"
                 style={{ cursor: "pointer" }}
                 tabIndex={-1}
-                role="button"
-                aria-label={`${isExpanded ? "Collapse" : "Expand"} ${node.title}`}
               >
                 {isExpanded ? (
                   <ChevronDownIcon style={{ width: 12, height: 12 }} />
@@ -156,7 +157,7 @@ export const TreeItem: React.FC<TreeItemProps> = ({
             </Text>
 
             {node.type === "page" && (
-              <Text size={0} muted>
+              <Text muted size={0}>
                 {node.slug}
               </Text>
             )}
@@ -181,15 +182,15 @@ export const TreeItem: React.FC<TreeItemProps> = ({
             <TreeActionMenu
               node={node}
               onCreateChild={onCreateChild}
-              onOpenInPane={onOpenInPane}
-              onDuplicate={onDuplicate}
               onDelete={onDelete}
+              onDuplicate={onDuplicate}
+              onOpenInPane={onOpenInPane}
             />
           </Flex>
         </Flex>
       </Card>
       {isExpanded && hasChildren && children && (
-        <Box role="group" aria-label={`${node.title} contents`}>
+        <Box aria-label={`${node.title} contents`} role="group">
           {children}
         </Box>
       )}

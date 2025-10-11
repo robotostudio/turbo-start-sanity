@@ -5,8 +5,8 @@ import { useCallback } from "react";
 import {
   type ObjectFieldProps,
   type SanityDocument,
-  set,
   type SlugValue,
+  set,
   unset,
   useFormValue,
 } from "sanity";
@@ -77,7 +77,7 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
 
       onChange(patch);
     },
-    [onChange],
+    [onChange]
   );
 
   const handleInputChange = useCallback(
@@ -86,11 +86,13 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
       // Allow users to type anything - don't clean while typing
       handleChange(rawValue);
     },
-    [handleChange],
+    [handleChange]
   );
   const handleGenerate = useCallback(() => {
     const title = document?.title as string | undefined;
-    if (!title) return;
+    if (!title) {
+      return;
+    }
 
     const segments = currentSlug.split("/").filter(Boolean);
     const newSlug = slugify(title, {
@@ -133,7 +135,7 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
           {title}
         </Text>
         {description && (
-          <Text size={1} muted>
+          <Text muted size={1}>
             {description}
           </Text>
         )}
@@ -145,30 +147,30 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
               URL Path
             </Text>
           </Flex>
-          <Flex gap={2} align="center">
+          <Flex align="center" gap={2}>
             <Box flex={1}>
               <SlugInput
-                value={currentSlug}
+                disabled={readOnly}
                 onChange={handleInputChange}
                 // onFocus={() => setIsEditing(true)}
                 // onBlur={() => setIsEditing(false)}
                 placeholder="Enter URL path (e.g., about-us or blog/my-post)"
-                disabled={readOnly}
+                value={currentSlug}
               />
             </Box>
             <GenerateButton
-              text="Generate"
-              onClick={handleGenerate}
               disabled={!document?.title || readOnly}
-              mode="ghost"
-              tone="primary"
               fontSize={1}
+              mode="ghost"
+              onClick={handleGenerate}
+              text="Generate"
+              tone="primary"
             />
           </Flex>
         </Stack>
 
         {/* Helper Text */}
-        <Text size={1} muted>
+        <Text muted size={1}>
           Must start with a forward slash (/). Use forward slashes to create
           nested paths. Only lowercase letters, numbers, hyphens, and slashes
           are allowed.
@@ -186,10 +188,10 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
               </UrlPreview>
               <CopyButton
                 icon={CopyIcon}
-                onClick={handleCopyUrl}
-                title="Copy URL"
                 mode="ghost"
+                onClick={handleCopyUrl}
                 padding={2}
+                title="Copy URL"
               />
             </Flex>
           </Stack>

@@ -22,7 +22,7 @@ export async function generateMetadata() {
           contentId: homePageData?._id,
           contentType: homePageData?._type,
         }
-      : {},
+      : {}
   );
 }
 
@@ -35,5 +35,5 @@ export default async function Page() {
 
   const { _id, _type, pageBuilder } = homePageData ?? {};
 
-  return <PageBuilder pageBuilder={pageBuilder ?? []} id={_id} type={_type} />;
+  return <PageBuilder id={_id} pageBuilder={pageBuilder ?? []} type={_type} />;
 }

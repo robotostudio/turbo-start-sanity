@@ -13,7 +13,7 @@ const getTitleCase = (name: string) => {
  */
 export const createSlugBasedStructure = (
   S: StructureBuilder,
-  schemaType: string,
+  schemaType: string
 ) => {
   return S.listItem()
     .title(`${getTitleCase(schemaType)}s by Path`)
@@ -42,7 +42,7 @@ export const createSlugBasedStructure = (
       documents.forEach((doc: { _id: string; title: string; slug: string }) => {
         const normalizedId = normalizeId(doc._id);
         // Only keep one version of each document (prefer published)
-        if (!documentMap.has(normalizedId) || !doc._id.startsWith("drafts.")) {
+        if (!(documentMap.has(normalizedId) && doc._id.startsWith("drafts."))) {
           documentMap.set(normalizedId, {
             ...doc,
             _id: normalizedId, // Store normalized ID
@@ -67,7 +67,9 @@ export const createSlugBasedStructure = (
 
       // Process each document to create a nested structure
       for (const doc of uniqueDocuments) {
-        if (!doc.slug) continue;
+        if (!doc.slug) {
+          continue;
+        }
 
         // Get path segments
         const segments = doc.slug.split("/").filter(Boolean);
@@ -142,8 +144,8 @@ export const createSlugBasedStructure = (
             children: Record<string, any>;
           }
         >,
-        depth: number = 0,
-        parentPath: string = "",
+        depth = 0,
+        parentPath = ""
       ) => {
         // Separate folders and individual files
         const folders: ListItemBuilder[] = [];
@@ -167,7 +169,7 @@ export const createSlugBasedStructure = (
               ? createListItemsFromStructure(
                   folder.children,
                   depth + 1,
-                  `${key}-`,
+                  `${key}-`
                 )
               : [];
 
@@ -176,13 +178,13 @@ export const createSlugBasedStructure = (
 
             // Find the main page for this folder (exact path match)
             const mainPageDoc = folder.documents.find(
-              (doc) => doc.slug === folder.path,
+              (doc) => doc.slug === folder.path
             );
             const mainPageId = mainPageDoc ? mainPageDoc._id : null;
 
             // Filter out all the remaining documents (those that are not the main parent)
             const otherDocs = folder.documents.filter(
-              (doc) => doc._id !== mainPageId,
+              (doc) => doc._id !== mainPageId
             );
 
             // 1. Add child documents first
@@ -194,8 +196,8 @@ export const createSlugBasedStructure = (
                     .title(doc.title)
                     .icon(DocumentIcon)
                     .child(
-                      S.document().documentId(doc._id).schemaType(schemaType),
-                    ),
+                      S.document().documentId(doc._id).schemaType(schemaType)
+                    )
                 );
               });
             }
@@ -224,15 +226,11 @@ export const createSlugBasedStructure = (
                   .child(
                     S.document()
                       .documentId(mainPageDoc._id)
-                      .schemaType(schemaType),
-                  ),
+                      .schemaType(schemaType)
+                  )
               );
             }
             const pageUuid = uuid();
-            console.log(
-              "🚀 ~ createListItemsFromStructure ~ pageUuid:",
-              folder,
-            );
             // Create the folder item with the prepared list items
             folders.push(
               S.listItem()
@@ -257,8 +255,8 @@ export const createSlugBasedStructure = (
                           ],
                         },
                       },
-                    ]),
-                ),
+                    ])
+                )
             );
           }
           // If it's a single document with no children, it's a file
@@ -270,7 +268,7 @@ export const createSlugBasedStructure = (
                 .id(`single-${uniqueId}`)
                 .title(doc.title || folder.title)
                 .icon(DocumentIcon)
-                .child(S.document().documentId(doc._id).schemaType(schemaType)),
+                .child(S.document().documentId(doc._id).schemaType(schemaType))
             );
           }
         });

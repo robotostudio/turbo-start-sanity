@@ -90,7 +90,7 @@ const createIndexListWithOrderableItems = ({
               S.document()
                 .views([S.view.form()])
                 .schemaType(index.type)
-                .documentId(index.type),
+                .documentId(index.type)
             ),
           orderableDocumentListDeskItem({
             type: list.type,
@@ -99,24 +99,23 @@ const createIndexListWithOrderableItems = ({
             icon: list.icon ?? File,
             title: `${listTitle}`,
           }),
-        ]),
+        ])
     );
 };
 
 // Create hierarchical page structure using custom React component
-const createHierarchicalPageStructure = (
+const _createHierarchicalPageStructure = (
   S: StructureBuilder,
-  context: StructureResolverContext,
-): ListItemBuilder => {
-  return S.listItem()
+  _context: StructureResolverContext
+): ListItemBuilder =>
+  S.listItem()
     .title("Pages")
     .icon(File)
     .child(S.component(HierarchicalPagesTree).id("hierarchical-pages-tree"));
-};
 
 export const structure = (
   S: StructureBuilder,
-  context: StructureResolverContext,
+  context: StructureResolverContext
 ) => {
   return S.list()
     .title("Content")
@@ -139,7 +138,12 @@ export const structure = (
         icon: MessageCircle,
       }),
       createList({ S, type: "author", title: "Authors", icon: User }),
-      createList({ S, type: "redirect", title: "Redirects", icon: TrendingUpDown }),
+      createList({
+        S,
+        type: "redirect",
+        title: "Redirects",
+        icon: TrendingUpDown,
+      }),
       S.divider(),
       S.listItem()
         .title("Site Configuration")
@@ -166,7 +170,7 @@ export const structure = (
                 title: "Global Settings",
                 icon: CogIcon,
               }),
-            ]),
+            ])
         ),
     ]);
 };

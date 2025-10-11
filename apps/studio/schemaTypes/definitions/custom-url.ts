@@ -42,9 +42,13 @@ export const customUrl = defineType({
         Rule.custom((value, { parent }) => {
           const type = (parent as { type?: string })?.type;
           if (type === "external") {
-            if (!value) return "URL can't be empty";
+            if (!value) {
+              return "URL can't be empty";
+            }
             const isValid = isValidUrl(value);
-            if (!isValid) return "Invalid URL";
+            if (!isValid) {
+              return "Invalid URL";
+            }
           }
           return true;
         }),
@@ -70,8 +74,9 @@ export const customUrl = defineType({
       validation: (rule) => [
         rule.custom((value, { parent }) => {
           const type = (parent as { type?: string })?.type;
-          if (type === "internal" && !value?._ref)
+          if (type === "internal" && !value?._ref) {
             return "internal can't be empty";
+          }
           return true;
         }),
       ],

@@ -1,28 +1,28 @@
 import { useCallback, useEffect, useState } from "react";
 import { useClient } from "sanity";
 
-export interface Page {
+export type Page = {
   _id: string;
   title: string;
   slug: string | null;
-}
+};
 
-export interface TreeNode {
+export type TreeNode = {
   type: "page" | "folder";
   title: string;
   _id?: string;
   slug: string;
   children: Record<string, TreeNode>;
   hasChildren: boolean;
-}
+};
 
-interface UsePagesTreeReturn {
+type UsePagesTreeReturn = {
   pages: Page[];
   tree: Record<string, TreeNode>;
   loading: boolean;
   error: string | null;
   refetch: () => void;
-}
+};
 
 /**
  * Builds a hierarchical tree structure from a flat list of pages based on their slugs.
@@ -42,7 +42,7 @@ const buildTree = (pages: Page[]): Record<string, TreeNode> => {
    * @param segments - An array of slug segments (e.g., ['about', 'team']).
    * @param fullPath - The complete slug path (e.g., '/about/team').
    */
-  const ensurePath = (segments: string[], fullPath: string) => {
+  const ensurePath = (segments: string[], _fullPath: string) => {
     // Start at the root of the tree.
     let currentLevel = tree;
     // Keep track of the current path being built for slug generation.
@@ -121,7 +121,7 @@ const buildTree = (pages: Page[]): Record<string, TreeNode> => {
           type: "page",
           title: page.title || "Untitled", // Use page's title, default to 'Untitled'.
           _id: page._id,
-          slug: slug,
+          slug,
         };
       } else {
         // If not the last segment, move down to the children to continue traversal.
@@ -159,7 +159,6 @@ export const usePagesTree = (): UsePagesTreeReturn => {
       const newTree = buildTree(fetchedPages);
       setTree(newTree);
     } catch (err) {
-      console.error("Error fetching pages:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch pages");
     } finally {
       setLoading(false);

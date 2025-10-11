@@ -9,29 +9,29 @@ export type CTABlockProps = PagebuilderType<"cta">;
 
 export function CTABlock({ richText, title, eyebrow, buttons }: CTABlockProps) {
   return (
-    <section id="features" className="my-6 md:my-16">
+    <section className="my-6 md:my-16" id="features">
       <div className="container mx-auto px-4 md:px-8">
-        <div className="bg-muted py-16 rounded-3xl px-4">
-          <div className="text-center max-w-3xl mx-auto space-y-8">
+        <div className="rounded-3xl bg-muted px-4 py-16">
+          <div className="mx-auto max-w-3xl space-y-8 text-center">
             {eyebrow && (
               <Badge
-                variant="secondary"
                 className="bg-zinc-200 dark:text-black"
+                variant="secondary"
               >
                 {eyebrow}
               </Badge>
             )}
-            <h2 className="text-3xl font-semibold md:text-5xl text-balance">
+            <h2 className="text-balance font-semibold text-3xl md:text-5xl">
               {title}
             </h2>
             <div className="text-lg text-muted-foreground">
-              <RichText richText={richText} className="text-balance" />
+              <RichText className="text-balance" richText={richText} />
             </div>
             <div className="flex justify-center">
               <SanityButtons
-                buttons={buttons}
                 buttonClassName="w-full sm:w-auto"
-                className="w-full sm:w-fit grid gap-2 sm:grid-flow-col lg:justify-start mb-8"
+                buttons={buttons}
+                className="mb-8 grid w-full gap-2 sm:w-fit sm:grid-flow-col lg:justify-start"
               />
             </div>
           </div>

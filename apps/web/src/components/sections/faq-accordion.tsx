@@ -22,38 +22,38 @@ export function FaqAccordion({
   link,
 }: FaqAccordionProps) {
   return (
-    <section id="faq" className="my-8">
+    <section className="my-8" id="faq">
       {/* <FaqJsonLd faqs={stegaClean(faqs)} /> */}
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex w-full flex-col items-center">
           <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">
             <Badge variant="secondary">{eyebrow}</Badge>
-            <h2 className="text-3xl font-semibold md:text-5xl">{title}</h2>
-            <h3 className="text-lg font-normal text-[#374151] text-balance dark:text-zinc-400">
+            <h2 className="font-semibold text-3xl md:text-5xl">{title}</h2>
+            <h3 className="text-balance font-normal text-[#374151] text-lg dark:text-zinc-400">
               {subtitle}
             </h3>
           </div>
         </div>
-        <div className="my-16 max-w-xl mx-auto">
+        <div className="mx-auto my-16 max-w-xl">
           <Accordion
-            type="single"
-            collapsible
             className="w-full"
+            collapsible
             defaultValue="3"
+            type="single"
           >
             {faqs?.map((faq, index) => (
               <AccordionItem
-                value={faq?._id}
-                key={`AccordionItem-${faq?._id}-${index}`}
                 className="py-2"
+                key={`AccordionItem-${faq?._id}-${index}`}
+                value={faq?._id}
               >
-                <AccordionTrigger className="py-2 text-[15px] leading-6 hover:no-underline group">
+                <AccordionTrigger className="group py-2 text-[15px] leading-6 hover:no-underline">
                   {faq?.title}
                 </AccordionTrigger>
                 <AccordionContent className="pb-2 text-muted-foreground">
                   <RichText
-                    richText={faq?.richText ?? []}
                     className="text-sm md:text-base"
+                    richText={faq?.richText ?? []}
                   />
                 </AccordionContent>
               </AccordionItem>
@@ -64,17 +64,17 @@ export function FaqAccordion({
             <div className="w-full py-6">
               <p className="mb-1 text-xs">{link?.title}</p>
               <Link
+                className="flex items-center gap-2"
                 href={link.href ?? "#"}
                 target={link.openInNewTab ? "_blank" : "_self"}
-                className="flex items-center gap-2"
               >
-                <p className="text-[15px] font-[500] leading-6">
+                <p className="font-[500] text-[15px] leading-6">
                   {link?.description}
                 </p>
                 <span className="rounded-full border p-1">
                   <ArrowUpRight
-                    size={16}
                     className="text-[#374151] dark:text-neutral-300"
+                    size={16}
                   />
                 </span>
               </Link>

@@ -18,7 +18,9 @@ async function fetchSlugPagePaths() {
   const slugs = await client.fetch(querySlugPagePaths);
   const paths: { slug: string[] }[] = [];
   for (const slug of slugs) {
-    if (!slug) continue;
+    if (!slug) {
+      continue;
+    }
     const parts = slug.split("/").filter(Boolean);
     paths.push({ slug: parts });
   }
@@ -42,7 +44,7 @@ export async function generateMetadata({
           contentId: pageData?._id,
           contentType: pageData?._type,
         }
-      : {},
+      : {}
   );
 }
 
@@ -66,13 +68,13 @@ export default async function SlugPage({
   const { title, pageBuilder, _id, _type } = pageData ?? {};
 
   return !Array.isArray(pageBuilder) || pageBuilder?.length === 0 ? (
-    <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-4">
-      <h1 className="text-2xl font-semibold mb-4 capitalize">{title}</h1>
-      <p className="text-muted-foreground mb-6">
+    <div className="flex min-h-[50vh] flex-col items-center justify-center p-4 text-center">
+      <h1 className="mb-4 font-semibold text-2xl capitalize">{title}</h1>
+      <p className="mb-6 text-muted-foreground">
         This page has no content blocks yet.
       </p>
     </div>
   ) : (
-    <PageBuilder pageBuilder={pageBuilder} id={_id} type={_type} />
+    <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
   );
 }

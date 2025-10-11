@@ -4,6 +4,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@workspace/ui"],
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   experimental: {
     reactCompiler: true,
     inlineCss: true,
@@ -12,7 +15,7 @@ const nextConfig: NextConfig = {
     fetches: {},
   },
   images: {
-    minimumCacheTTL: 31536000,
+    minimumCacheTTL: 31_536_000,
     remotePatterns: [
       {
         protocol: "https",
@@ -23,7 +26,10 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     const redirects = await client.fetch(queryRedirects);
-    return redirects;
+    return redirects.map((redirect) => ({
+      ...redirect,
+      permanent: redirect.permanent ?? false,
+    }));
   },
 };
 
