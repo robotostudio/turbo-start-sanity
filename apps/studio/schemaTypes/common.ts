@@ -1,6 +1,6 @@
 import { defineField } from "sanity";
 
-import { PathnameFieldComponent } from "../components";
+import { PathnameFieldComponent } from "../components/slug-field-component";
 import { GROUP } from "../utils/constant";
 import {
   createSlugValidator,

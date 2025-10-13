@@ -19,19 +19,23 @@ export type SlugValidationOptions = {
 /**
  * Classification of validation issues
  */
-export enum ValidationSeverity {
-  ERROR = "error",
-  WARNING = "warning",
-}
+export const ValidationSeverity = {
+  ERROR: "error",
+  WARNING: "warning",
+} as const;
+export type ValidationSeverity =
+  (typeof ValidationSeverity)[keyof typeof ValidationSeverity];
 
-export enum ValidationCategory {
-  REQUIRED = "required",
-  FORMAT = "format",
-  LENGTH = "length",
-  STRUCTURE = "structure",
-  DOCUMENT_TYPE = "document_type",
-  UNIQUENESS = "uniqueness",
-}
+export const ValidationCategory = {
+  REQUIRED: "required",
+  FORMAT: "format",
+  LENGTH: "length",
+  STRUCTURE: "structure",
+  DOCUMENT_TYPE: "document_type",
+  UNIQUENESS: "uniqueness",
+} as const;
+export type ValidationCategory =
+  (typeof ValidationCategory)[keyof typeof ValidationCategory];
 
 export type ValidationIssue = {
   message: string;
@@ -54,9 +58,17 @@ export const SLUG_ERROR_MESSAGES = {
   TRAILING_SLASH: "URL path must not end with a forward slash (/)",
 } as const;
 
+// Constants for validation
+const MIN_SLUG_LENGTH = 3;
+const MAX_SLUG_LENGTH = 60;
+const VALID_SLUG_REGEX = /^[a-z0-9-]+$/;
+const INVALID_CHAR_REGEX = /[^a-z0-9-]/;
+const CLEAN_INVALID_CHARS_REGEX = /[^a-z0-9-]/g;
+const TRAILING_SLASH_REGEX = /\/+$/;
+
 export const SLUG_WARNING_MESSAGES = {
-  TOO_SHORT: "Slug must be at least 3 characters long.",
-  TOO_LONG: "Slug can't be longer than 60 characters.",
+  TOO_SHORT: `Slug must be at least ${MIN_SLUG_LENGTH} characters long.`,
+  TOO_LONG: `Slug can't be longer than ${MAX_SLUG_LENGTH} characters.`,
   ALREADY_EXISTS: "This slug is already in use. Try another.",
 } as const;
 
@@ -109,21 +121,22 @@ export function getDocumentTypeConfig(
 }
 
 /**
- * Core validation rules for a single slug segment
- * This is the fundamental validation logic used throughout the application
+ * Validates if slug is empty or whitespace only
  */
-function validateSlugSegment(slug: string): SlugValidationResult {
-  const errors: string[] = [];
-  const warnings: string[] = [];
-
-  // Required check - critical error
+function validateSlugRequired(slug: string): string[] {
   if (!slug.trim()) {
-    errors.push(SLUG_ERROR_MESSAGES.REQUIRED);
-    return { errors, warnings };
+    return [SLUG_ERROR_MESSAGES.REQUIRED];
   }
+  return [];
+}
 
-  // Format validation - critical errors
-  if (!/^[a-z0-9-]+$/.test(slug)) {
+/**
+ * Validates slug format and character restrictions
+ */
+function validateSlugFormat(slug: string): string[] {
+  const errors: string[] = [];
+
+  if (!VALID_SLUG_REGEX.test(slug)) {
     errors.push(SLUG_ERROR_MESSAGES.INVALID_CHARACTERS);
   }
 
@@ -143,16 +156,127 @@ function validateSlugSegment(slug: string): SlugValidationResult {
     errors.push(SLUG_ERROR_MESSAGES.CONSECUTIVE_HYPHENS);
   }
 
-  // Length validation - warnings (non-blocking)
-  if (slug.length < 3) {
+  return errors;
+}
+
+/**
+ * Validates slug length and returns warnings
+ */
+function validateSlugLength(slug: string): string[] {
+  const warnings: string[] = [];
+
+  if (slug.length < MIN_SLUG_LENGTH) {
     warnings.push(SLUG_WARNING_MESSAGES.TOO_SHORT);
   }
 
-  if (slug.length > 60) {
+  if (slug.length > MAX_SLUG_LENGTH) {
     warnings.push(SLUG_WARNING_MESSAGES.TOO_LONG);
   }
 
-  return { errors, warnings };
+  return warnings;
+}
+
+/**
+ * Core validation rules for a single slug segment
+ * This is the fundamental validation logic used throughout the application
+ */
+function validateSlugSegment(slug: string): SlugValidationResult {
+  // Early return for empty slugs
+  const requiredErrors = validateSlugRequired(slug);
+  if (requiredErrors.length > 0) {
+    return { errors: requiredErrors, warnings: [] };
+  }
+
+  // Validate format and length
+  const formatErrors = validateSlugFormat(slug);
+  const lengthWarnings = validateSlugLength(slug);
+
+  return { 
+    errors: formatErrors, 
+    warnings: lengthWarnings 
+  };
+}
+
+/**
+ * Validates path structure (slashes, segments)
+ */
+function validatePathStructure(
+  slug: string,
+  options: SlugValidationOptions
+): string[] {
+  const errors: string[] = [];
+  const segments = slug.split("/").filter(Boolean);
+
+  // Segment count validation
+  if (
+    options.segmentCount !== undefined &&
+    segments.length !== options.segmentCount
+  ) {
+    errors.push(
+      `${options.documentType} URLs must have ${options.segmentCount} segments`
+    );
+  }
+
+  // Leading slash validation
+  if (options.requireSlash && !slug.startsWith("/")) {
+    errors.push(SLUG_ERROR_MESSAGES.MISSING_LEADING_SLASH);
+  }
+
+  // Trailing slash validation (except for home page)
+  if (options.sanityDocumentType !== "homePage" && slug.endsWith("/")) {
+    errors.push(SLUG_ERROR_MESSAGES.TRAILING_SLASH);
+  }
+
+  // Multiple slashes validation
+  if (slug.includes("//")) {
+    errors.push(SLUG_ERROR_MESSAGES.MULTIPLE_SLASHES);
+  }
+
+  return errors;
+}
+
+/**
+ * Validates required prefix for document types
+ */
+function validateRequiredPrefix(
+  slug: string,
+  options: SlugValidationOptions
+): string[] {
+  const errors: string[] = [];
+
+  if (
+    options.requiredPrefix &&
+    options.documentType &&
+    !slug.startsWith(options.requiredPrefix)
+  ) {
+    errors.push(
+      `${options.documentType} URLs must start with "${options.requiredPrefix}"`
+    );
+  }
+
+  return errors;
+}
+
+/**
+ * Validates document type specific rules
+ */
+function validateDocumentTypeRules(
+  slug: string,
+  options: SlugValidationOptions
+): string[] {
+  const errors: string[] = [];
+
+  // Special validation for pages - prevent blog prefix usage
+  if (
+    options.sanityDocumentType === "page" &&
+    slug.startsWith("/blog")
+  ) {
+    errors.push(
+      'Pages cannot use "/blog" prefix - this is reserved for blog content'
+    );
+  }
+
+  return errors;
 }
 
 /**
@@ -179,64 +303,14 @@ export function validateSlug(
 
   // Handle full paths with slashes
   if (slug.includes("/")) {
-    const segments = slug.split("/").filter(Boolean);
-
-    // Validate each segment
-    // segments.forEach((segment, index) => {
-    //   const segmentValidation = validateSlugSegment(segment);
-    //   if (segmentValidation.errors.length > 0) {
-    //     allErrors.push(
-    //       `Segment "${segment}": ${segmentValidation.errors.join(", ")}`,
-    //     );
-    //   }
-    //   if (segmentValidation.warnings.length > 0) {
-    //     allWarnings.push(
-    //       `Segment "${segment}": ${segmentValidation.warnings.join(", ")}`,
-    //     );
-    //   }
-    // });
-
-    if (
-      finalOptions.segmentCount !== undefined &&
-      segments.length !== finalOptions.segmentCount
-    ) {
-      allErrors.push(
-        `${finalOptions.documentType} URLs must have ${finalOptions.segmentCount} segments`
-      );
-    }
-
-    // Additional path-specific validations - critical errors
-    if (finalOptions.requireSlash && !slug.startsWith("/")) {
-      allErrors.push(SLUG_ERROR_MESSAGES.MISSING_LEADING_SLASH);
-    }
-    if (finalOptions.sanityDocumentType !== "homePage" && slug.endsWith("/")) {
-      allErrors.push(SLUG_ERROR_MESSAGES.TRAILING_SLASH);
-    }
-
-    if (slug.includes("//")) {
-      allErrors.push(SLUG_ERROR_MESSAGES.MULTIPLE_SLASHES);
-    }
-
-    // Prefix validation
-    if (
-      finalOptions.requiredPrefix &&
-      finalOptions.documentType &&
-      !slug.startsWith(finalOptions.requiredPrefix)
-    ) {
-      allErrors.push(
-        `${finalOptions.documentType} URLs must start with "${finalOptions.requiredPrefix}"`
-      );
-    }
-
-    // Special validation for pages - prevent blog prefix usage
-    if (
-      finalOptions.sanityDocumentType === "page" &&
-      slug.startsWith("/blog")
-    ) {
-      allErrors.push(
-        'Pages cannot use "/blog" prefix - this is reserved for blog content'
-      );
-    }
+    // Validate path structure
+    allErrors.push(...validatePathStructure(slug, finalOptions));
+    
+    // Validate required prefix
+    allErrors.push(...validateRequiredPrefix(slug, finalOptions));
+    
+    // Validate document type specific rules
+    allErrors.push(...validateDocumentTypeRules(slug, finalOptions));
   } else {
     // Single segment validation
     const segmentValidation = validateSlugSegment(slug);
@@ -334,7 +408,7 @@ export function cleanSlugPath(slug: string): string {
 
   // Remove trailing slash unless it's root
   if (cleaned.endsWith("/") && cleaned !== "/") {
-    cleaned = cleaned.replace(/\/+$/, "");
+    cleaned = cleaned.replace(TRAILING_SLASH_REGEX, "");
   }
 
   return cleaned || "/";
@@ -403,10 +477,9 @@ export function cleanSlugWithValidation(slug: string): {
     cleaned = cleaned.replace(/\s+/g, "-");
   }
 
-  const invalidCharRegex = /[^a-z0-9-]/;
-  if (invalidCharRegex.test(cleaned)) {
+  if (INVALID_CHAR_REGEX.test(cleaned)) {
     changes.push("Removed invalid characters");
-    cleaned = cleaned.replace(/[^a-z0-9-]/g, "");
+    cleaned = cleaned.replace(CLEAN_INVALID_CHARS_REGEX, "");
   }
 
   if (cleaned.includes("--")) {

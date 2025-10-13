@@ -28,11 +28,6 @@ type StructureOptions = {
 // Type for Sanity list items (includes dividers)
 type SanityListItem = ListItemBuilder | ReturnType<StructureBuilder["divider"]>;
 
-// // Helper function to title-case names
-// const getTitleCase = (name: string): string => {
-//   const titleTemp = name.replace(/([A-Z])/g, " $1");
-//   return titleTemp.charAt(0).toUpperCase() + titleTemp.slice(1);
-// };
 
 // Helper function to fetch documents with error handling
 const fetchDocuments = async (

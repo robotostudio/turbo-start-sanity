@@ -6,7 +6,37 @@ import {
   type SlugValidationResult,
   validateSlug,
   validateSlugForDocumentType,
-} from "../../utils/slug-validation";
+} from "../utils/slug-validation";
+
+// Helper function to extract Sanity validation errors
+function extractSanityValidationErrors(
+  validation: ReturnType<typeof useValidationStatus>["validation"],
+  includeSanityValidation: boolean
+): string[] {
+  if (!includeSanityValidation) {
+    return [];
+  }
+
+  return validation
+    .filter(
+      (v) =>
+        (v?.path.includes("current") || v?.path.includes("slug")) && v.message
+    )
+    .map((v) => v.message);
+}
+
+// Helper function to parse slug into segments
+function parseSlugSegments(slug: string | undefined | null): string[] {
+  if (!slug) {
+    return [];
+  }
+  return slug.split("/").filter(Boolean);
+}
+
+// Helper function to validate individual segments
+function validateSegments(segments: string[]): SlugValidationResult[] {
+  return segments.map((segment) => validateSlug(segment));
+}
 
 export type UseSlugValidationOptions = {
   /**
@@ -92,34 +122,28 @@ export function useSlugValidation(
   const documentType = providedDocumentType || document?._type;
 
   // Get Sanity validation status
-  const publishedId = getPublishedId(document?._id);
-  const sanityValidation = useValidationStatus(publishedId, document?._type);
+  const publishedId = useMemo(
+    () => (document?._id ? getPublishedId(document._id) : ""),
+    [document?._id]
+  );
+  
+  const sanityValidation = useValidationStatus(publishedId || "", document?._type);
 
   // Extract Sanity slug validation errors
-  const sanityValidationErrors = useMemo(() => {
-    if (!includeSanityValidation) {
-      return [];
-    }
-
-    return sanityValidation.validation
-      .filter(
-        (v) =>
-          (v?.path.includes("current") || v?.path.includes("slug")) && v.message
-      )
-      .map((v) => v.message);
-  }, [sanityValidation.validation, includeSanityValidation]);
+  const sanityValidationErrors = useMemo(
+    () => extractSanityValidationErrors(
+      sanityValidation.validation,
+      includeSanityValidation
+    ),
+    [sanityValidation.validation, includeSanityValidation]
+  );
 
   // Parse slug into segments
-  const segments = useMemo(() => {
-    if (!slug) {
-      return [];
-    }
-    return slug.split("/").filter(Boolean);
-  }, [slug]);
+  const segments = useMemo(() => parseSlugSegments(slug), [slug]);
 
   // Validate individual segments
   const segmentValidations = useMemo(
-    () => segments.map((segment) => validateSlug(segment)),
+    () => validateSegments(segments),
     [segments]
   );
 
@@ -146,14 +170,17 @@ export function useSlugValidation(
     allErrors.push(...pathValidation.errors);
     allWarnings.push(...pathValidation.warnings);
 
-    // // Add segment validation errors/warnings with context
-    segmentValidations.forEach((validation, index) => {
-      const segment = segments[index];
+    // Add segment validation errors/warnings with context
+    for (let i = 0; i < segmentValidations.length; i++) {
+      const validation = segmentValidations[i];
+      const segment = segments[i];
+      
       if (validation.errors.length > 0) {
         allErrors.push(
           ...validation.errors.map((error) => `Segment "${segment}": ${error}`)
         );
       }
+      
       if (validation.warnings.length > 0) {
         allWarnings.push(
           ...validation.warnings.map(
@@ -161,14 +188,17 @@ export function useSlugValidation(
           )
         );
       }
-    });
+    }
 
-    allErrors.push(...documentTypeErrors);
-    allErrors.push(...sanityValidationErrors);
+    // Add document type and Sanity validation errors
+    allErrors.push(...documentTypeErrors, ...sanityValidationErrors);
+    
+    // Deduplicate and filter
     const errorSet = new Set(allErrors);
     const uniqueWarnings = Array.from(new Set(allWarnings)).filter(
       (warning) => !errorSet.has(warning)
     );
+    
     return {
       errors: Array.from(errorSet),
       warnings: uniqueWarnings,
@@ -182,10 +212,12 @@ export function useSlugValidation(
   ]);
 
   // Derived state
-  const hasValidationIssues =
-    combinedValidation.errors.length > 0 ||
-    combinedValidation.warnings.length > 0;
-  const hasCriticalErrors = combinedValidation.errors.length > 0;
+  const derivedState = useMemo(() => ({
+    hasValidationIssues:
+      combinedValidation.errors.length > 0 ||
+      combinedValidation.warnings.length > 0,
+    hasCriticalErrors: combinedValidation.errors.length > 0,
+  }), [combinedValidation]);
 
   return {
     validation: combinedValidation,
@@ -195,8 +227,8 @@ export function useSlugValidation(
     sanityValidationErrors,
     allErrors: combinedValidation.errors,
     allWarnings: combinedValidation.warnings,
-    hasValidationIssues,
-    hasCriticalErrors,
+    hasValidationIssues: derivedState.hasValidationIssues,
+    hasCriticalErrors: derivedState.hasCriticalErrors,
   };
 }
 
