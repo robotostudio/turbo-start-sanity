@@ -29,11 +29,11 @@ export const SanityIcon = memo(function SanityIconUnmemorized({
   return (
     <span
       {...props}
-      aria-label={alt}
       className={cn(
         "sanity-icon flex size-12 items-center justify-center",
         className
       )}
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: safe SVG from CMS
       dangerouslySetInnerHTML={{ __html: svg }}
       title={alt}
     />

@@ -82,7 +82,7 @@ export function FaqJsonLd({ faqs }: FaqJsonLdProps) {
     return null;
   }
 
-  const validFaqs = faqs.filter((faq) => faq?.title && faq?.richText);
+  const validFaqs = stegaClean(faqs.filter((faq) => faq?.title && faq?.richText));
 
   if (!validFaqs.length) {
     return null;
@@ -106,15 +106,19 @@ export function FaqJsonLd({ faqs }: FaqJsonLdProps) {
   return <JsonLdScript data={faqJsonLd} id="faq-json-ld" />;
 }
 
+const IMAGE_SIZE_WIDTH = 1920;    
+const IMAGE_SIZE_HEIGHT = 1080;
+const IMAGE_QUALITY = 80;
+
 function buildSafeImageUrl(image?: { id?: string | null }) {
   if (!image?.id) {
     return;
   }
   return urlFor({ ...image, _id: image.id })
-    .size(1920, 1080)
+    .size(IMAGE_SIZE_WIDTH, IMAGE_SIZE_HEIGHT)
     .dpr(2)
     .auto("format")
-    .quality(80)
+    .quality(IMAGE_QUALITY)
     .url();
 }
 
@@ -123,10 +127,11 @@ type ArticleJsonLdProps = {
   article: QueryBlogSlugPageDataResult;
   settings?: QuerySettingsDataResult;
 };
-export function ArticleJsonLd({ article, settings }: ArticleJsonLdProps) {
-  if (!article) {
+export function ArticleJsonLd({ article: rawArticle, settings }: ArticleJsonLdProps) {
+  if (!rawArticle) {
     return null;
   }
+  const article = stegaClean(rawArticle);
 
   const baseUrl = getBaseUrl();
   const articleUrl = `${baseUrl}${article.slug}`;

@@ -7,7 +7,8 @@
     "rules": {
       "suspicious": {
         "noUnknownAtRules": "off",
-        "noExplicitAny": "warn"
+        "noExplicitAny": "warn",
+        "noConsole": "warn"
       },
       "performance": {
         "noNamespaceImport": "off"

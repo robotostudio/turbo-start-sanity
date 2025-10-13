@@ -1,26 +1,14 @@
 "use client";
 import { Button } from "@workspace/ui/components/button";
 import { ChevronRight, LoaderCircle } from "lucide-react";
-import Form from "next/form";
 import { useFormStatus } from "react-dom";
-
-// import { newsletterSubmission } from "@/action/newsletter-submission";
 import type { PagebuilderType } from "@/types";
-
 import { RichText } from "../elements/rich-text";
 
-// const InteractiveGridPattern = dynamic(
-//   () =>
-//     import("@workspace/ui/components/interactive-grid-pattern").then(
-//       (mod) => mod.InteractiveGridPattern,
-//     ),
-//   {
-//     ssr: false,
-//   },
-// );
-
 type SubscribeNewsletterProps = PagebuilderType<"subscribeNewsletter">;
+
 export default function SubscribeNewsletterButton() {
+  // if using useFormStatus, for the submission logic, you need to use the form action
   const { pending } = useFormStatus();
   return (
     <Button
@@ -69,10 +57,12 @@ export function SubscribeNewsletter({
               richText={subTitle}
             />
           )}
-          <Form
-            action={() => {}}
-            // action={newsletterSubmission}
+          <form
             className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              // custom submit logic
+            }}
           >
             <div className="flex items-center justify-between rounded-xl border bg-white p-2 pl-4 drop-shadow-lg md:w-96 dark:bg-zinc-200">
               <input
@@ -84,7 +74,7 @@ export function SubscribeNewsletter({
               />
               <SubscribeNewsletterButton />
             </div>
-          </Form>
+          </form>
           {helperText && (
             <RichText
               className="mt-3 text-gray-800 text-sm opacity-80 sm:mt-4 dark:text-neutral-300"
@@ -92,12 +82,6 @@ export function SubscribeNewsletter({
             />
           )}
         </div>
-        {/* <InteractiveGridPattern
-          className={cn(
-            "absolute scale-125 inset-0 -z-0 w-full opacity-50",
-            "[mask-image:radial-gradient(1000px_circle_at_center,transparent,white)]",
-          )}
-        /> */}
       </div>
     </section>
   );
