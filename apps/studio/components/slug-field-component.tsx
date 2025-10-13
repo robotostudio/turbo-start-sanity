@@ -222,7 +222,7 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
     try {
       const documentTitle = document?.title as string | undefined;
       const documentType = document?._type;
-      
+
       if (!(documentTitle?.trim() && documentType)) {
         return;
       }

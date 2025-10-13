@@ -43,5 +43,8 @@ export const handler = documentEventHandler(async ({ context, event }) => {
 
   try {
     const _res = await client.create(redirect);
-  } catch (_error) {}
+  } catch (_error) {
+    // biome-ignore lint/suspicious/noConsole: console is used for logging
+    console.error(_error);
+  }
 });

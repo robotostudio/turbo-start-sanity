@@ -90,14 +90,11 @@ export const customUrl = defineType({
       openInNewTab: "openInNewTab",
     },
     prepare({ externalUrl, urlType, internalUrl, openInNewTab }) {
-      const url = urlType === "external" ? externalUrl : `/${internalUrl}`;
+      const url = urlType === "external" ? externalUrl : `${internalUrl}`;
       const newTabIndicator = openInNewTab ? " ↗" : "";
-      const truncatedUrl =
-        url?.length > 30 ? `${url.substring(0, 30)}...` : url;
-
       return {
         title: `${urlType === "external" ? "External" : "Internal"} Link`,
-        subtitle: `${truncatedUrl}${newTabIndicator}`,
+        subtitle: `${url}${newTabIndicator}`,
       };
     },
   },

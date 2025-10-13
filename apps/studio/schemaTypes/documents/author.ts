@@ -48,15 +48,10 @@ export const author = defineType({
       bio: "bio",
     },
     prepare: ({ title, position, media, bio }) => {
-      // Create a playful subtitle with emojis
       const positionInfo = position ? `💼 ${position}` : "🎭 Mystery Writer";
-      const bioPreview = bio
-        ? `📝 ${bio.substring(0, 20)}${bio.length > 20 ? "..." : ""}`
-        : "📝 No bio yet";
-
       return {
         title: `✍️ ${title || "Unnamed Author"}`,
-        subtitle: `${positionInfo} | ${bioPreview}`,
+        subtitle: `${positionInfo} | ${bio}`,
         media,
       };
     },

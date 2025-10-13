@@ -2,7 +2,6 @@
 
 import { draftMode } from "next/headers";
 
-
 const DISABLE_DELAY = 1000;
 
 export async function disableDraftMode() {

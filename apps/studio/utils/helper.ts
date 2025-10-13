@@ -80,8 +80,8 @@ export type RetryOptions = {
 };
 
 export async function retryPromise<T>(
-  promiseFn: () => Promise<T>,
-  options: RetryOptions = {},
+  promiseFn: Promise<T>,
+  options: RetryOptions = {}
 ): Promise<T> {
   const {
     maxRetries = 3,
@@ -96,7 +96,7 @@ export async function retryPromise<T>(
   while (attempt < maxRetries) {
     try {
       // Attempt the async operation
-      return await promiseFn();
+      return await promiseFn;
     } catch (e) {
       const error = e instanceof Error ? e : new Error("Unknown error");
       lastError = error;

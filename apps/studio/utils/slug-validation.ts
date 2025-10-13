@@ -106,7 +106,10 @@ const DOCUMENT_TYPE_CONFIGS: Record<string, SlugValidationOptions> = {
     customValidators: [
       (slug: string) => {
         const segments = slug.split("/").filter(Boolean);
-        if (segments.length === 2 && segments[1].length < MIN_BLOG_SLUG_LENGTH) {
+        if (
+          segments.length === 2 &&
+          segments[1].length < MIN_BLOG_SLUG_LENGTH
+        ) {
           return ["Blog post slug must be at least 3 characters"];
         }
         return [];
@@ -148,21 +151,32 @@ const DOCUMENT_TYPE_CONFIGS: Record<string, SlugValidationOptions> = {
     documentType: "Page",
     requireSlash: true,
     sanityDocumentType: "page",
-    forbiddenPatterns: [/^\/blog/, /^\/author/, FORBIDDEN_ADMIN_PATTERN, FORBIDDEN_API_PATTERN],
+    forbiddenPatterns: [
+      /^\/blog/,
+      /^\/author/,
+      FORBIDDEN_ADMIN_PATTERN,
+      FORBIDDEN_API_PATTERN,
+    ],
     customValidators: [
       (slug: string) => {
         const errors: string[] = [];
         if (slug.startsWith("/blog")) {
-          errors.push('Pages cannot use "/blog" prefix - reserved for blog content');
+          errors.push(
+            'Pages cannot use "/blog" prefix - reserved for blog content'
+          );
         }
         if (slug.startsWith("/author")) {
-          errors.push('Pages cannot use "/author" prefix - reserved for authors');
+          errors.push(
+            'Pages cannot use "/author" prefix - reserved for authors'
+          );
         }
         if (slug.startsWith("/admin")) {
           errors.push('Pages cannot use "/admin" prefix - reserved for admin');
         }
         if (slug.startsWith("/api")) {
-          errors.push('Pages cannot use "/api" prefix - reserved for API routes');
+          errors.push(
+            'Pages cannot use "/api" prefix - reserved for API routes'
+          );
         }
         return errors;
       },
@@ -178,7 +192,7 @@ export function getDocumentTypeConfig(
   sanityDocumentType: string
 ): SlugValidationOptions {
   const config = DOCUMENT_TYPE_CONFIGS[sanityDocumentType];
-  
+
   if (config) {
     return { ...config };
   }
@@ -264,9 +278,9 @@ function validateSlugSegment(slug: string): SlugValidationResult {
   const formatErrors = validateSlugFormat(slug);
   const lengthWarnings = validateSlugLength(slug);
 
-  return { 
-    errors: formatErrors, 
-    warnings: lengthWarnings 
+  return {
+    errors: formatErrors,
+    warnings: lengthWarnings,
   };
 }
 
@@ -338,15 +352,17 @@ function validateForbiddenPatterns(
   options: SlugValidationOptions
 ): string[] {
   const errors: string[] = [];
-  
+
   if (options.forbiddenPatterns) {
     for (const pattern of options.forbiddenPatterns) {
       if (pattern.test(slug)) {
-        errors.push(`URL pattern not allowed for ${options.documentType || 'this document type'}`);
+        errors.push(
+          `URL pattern not allowed for ${options.documentType || "this document type"}`
+        );
       }
     }
   }
-  
+
   return errors;
 }
 
@@ -358,13 +374,13 @@ function validateCustomRules(
   options: SlugValidationOptions
 ): string[] {
   const errors: string[] = [];
-  
+
   if (options.customValidators) {
     for (const validator of options.customValidators) {
       errors.push(...validator(slug));
     }
   }
-  
+
   return errors;
 }
 
@@ -394,16 +410,16 @@ export function validateSlug(
   if (slug.includes("/")) {
     // Core path structure validation
     allErrors.push(...validatePathStructure(slug, config));
-    
+
     // Required prefix validation
     allErrors.push(...validateRequiredPrefix(slug, config));
-    
+
     // Forbidden patterns validation (from config)
     allErrors.push(...validateForbiddenPatterns(slug, config));
-    
+
     // Custom validation rules (from config)
     allErrors.push(...validateCustomRules(slug, config));
-    
+
     // Validate individual segments
     const segments = slug.split("/").filter(Boolean);
     for (const segment of segments) {
@@ -416,7 +432,7 @@ export function validateSlug(
     const segmentValidation = validateSlugSegment(slug);
     allErrors.push(...segmentValidation.errors);
     allWarnings.push(...segmentValidation.warnings);
-    
+
     // Apply custom validators even for single segments
     allErrors.push(...validateCustomRules(slug, config));
   }
@@ -501,7 +517,7 @@ export function generateSlugFromTitle(
 
   const config = getDocumentTypeConfig(documentType);
   const cleanTitle = cleanSlug(title);
-  
+
   if (!cleanTitle) {
     return "";
   }
@@ -510,16 +526,16 @@ export function generateSlugFromTitle(
   switch (documentType) {
     case "homePage":
       return "/";
-      
+
     case "blogIndex":
       return "/blog";
-      
+
     case "author":
       return `/author/${cleanTitle}`;
-      
+
     case "blog":
       return `/blog/${cleanTitle}`;
-      
+
     case "page":
       // For pages, preserve existing path structure if it exists
       if (currentSlug?.includes("/")) {
@@ -530,18 +546,17 @@ export function generateSlugFromTitle(
         }
       }
       return `/${cleanTitle}`;
-      
+
     default:
       // Use required prefix if specified in config
       if (config.requiredPrefix) {
-        return config.requiredPrefix.endsWith("/") 
+        return config.requiredPrefix.endsWith("/")
           ? `${config.requiredPrefix}${cleanTitle}`
           : `${config.requiredPrefix}/${cleanTitle}`;
       }
       return `/${cleanTitle}`;
   }
 }
-
 
 /**
  * Comprehensive validation function that returns structured validation results

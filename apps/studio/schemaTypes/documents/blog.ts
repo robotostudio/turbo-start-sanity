@@ -126,10 +126,10 @@ export const blog = defineType({
     prepare: ({
       title,
       media,
-      slug,
       isPrivate,
       isHidden,
       author,
+      slug,
       publishDate,
     }) => {
       // Status indicators
@@ -149,7 +149,7 @@ export const blog = defineType({
       return {
         title: title || "Untitled Blog",
         media,
-        subtitle: `${visibility} | ${authorInfo} | ${dateInfo}`,
+        subtitle: `🔗 ${slug} | ${visibility} | ${authorInfo} | ${dateInfo}`,
       };
     },
   },

@@ -28,7 +28,6 @@ type StructureOptions = {
 // Type for Sanity list items (includes dividers)
 type SanityListItem = ListItemBuilder | ReturnType<StructureBuilder["divider"]>;
 
-
 // Helper function to fetch documents with error handling
 const fetchDocuments = async (
   client: SanityClient,
@@ -363,7 +362,6 @@ export const createSlugBasedStructure = (
         if (!client) {
           throw new Error("Unable to get Sanity client");
         }
-
         // 2. Fetch and process documents
         const documents = await fetchDocuments(client, schemaType);
         const uniqueDocuments = deduplicateDocuments(documents);

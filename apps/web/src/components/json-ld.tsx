@@ -82,7 +82,9 @@ export function FaqJsonLd({ faqs }: FaqJsonLdProps) {
     return null;
   }
 
-  const validFaqs = stegaClean(faqs.filter((faq) => faq?.title && faq?.richText));
+  const validFaqs = stegaClean(
+    faqs.filter((faq) => faq?.title && faq?.richText)
+  );
 
   if (!validFaqs.length) {
     return null;
@@ -106,7 +108,7 @@ export function FaqJsonLd({ faqs }: FaqJsonLdProps) {
   return <JsonLdScript data={faqJsonLd} id="faq-json-ld" />;
 }
 
-const IMAGE_SIZE_WIDTH = 1920;    
+const IMAGE_SIZE_WIDTH = 1920;
 const IMAGE_SIZE_HEIGHT = 1080;
 const IMAGE_QUALITY = 80;
 
@@ -127,7 +129,10 @@ type ArticleJsonLdProps = {
   article: QueryBlogSlugPageDataResult;
   settings?: QuerySettingsDataResult;
 };
-export function ArticleJsonLd({ article: rawArticle, settings }: ArticleJsonLdProps) {
+export function ArticleJsonLd({
+  article: rawArticle,
+  settings,
+}: ArticleJsonLdProps) {
   if (!rawArticle) {
     return null;
   }
