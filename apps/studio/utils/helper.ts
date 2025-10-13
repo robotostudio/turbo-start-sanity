@@ -13,15 +13,13 @@ export const isValidUrl = (url: string) => {
   try {
     new URL(url);
     return true;
-  } catch (e) {
-    console.error(e);
+  } catch (_e) {
     return isRelativeUrl(url);
   }
 };
 
-export const capitalize = (str: string) => {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
+export const capitalize = (str: string) =>
+  str.charAt(0).toUpperCase() + str.slice(1);
 
 export const getTitleCase = (name: string) => {
   const titleTemp = name.replace(/([A-Z])/g, " $1");
@@ -30,7 +28,7 @@ export const getTitleCase = (name: string) => {
 
 export const createRadioListLayout = (
   items: Array<string | { title: string; value: string }>,
-  options?: StringOptions,
+  options?: StringOptions
 ): StringOptions => {
   const list = items.map((item) => {
     if (typeof item === "string") {
@@ -50,20 +48,25 @@ export const createRadioListLayout = (
 
 export const parseRichTextToString = (
   value: unknown,
-  maxWords: number | undefined = undefined,
+  maxWords: number | undefined
 ) => {
-  if (!Array.isArray(value)) return "No Content";
+  if (!Array.isArray(value)) {
+    return "No Content";
+  }
 
   const text = value.map((val) => {
     const test = isPortableTextTextBlock(val);
-    if (!test) return "";
+    if (!test) {
+      return "";
+    }
     return val.children
       .map((child) => child.text)
       .filter(Boolean)
       .join(" ");
   });
-  if (maxWords)
+  if (maxWords) {
     return `${text.join(" ").split(" ").slice(0, maxWords).join(" ")}...`;
+  }
   return text.join(" ");
 };
 
@@ -75,20 +78,20 @@ export function splitArray<T>(array: T[], numChunks: number): T[][] {
   return result;
 }
 
-export interface RetryOptions {
+export type RetryOptions = {
   maxRetries?: number;
   initialDelay?: number;
   maxDelay?: number;
   onRetry?: (error: Error, attempt: number) => void;
-}
+};
 export async function retryPromise<T>(
   promiseFn: () => Promise<T>,
-  options: RetryOptions = {},
+  options: RetryOptions = {}
 ): Promise<T> {
   const {
     maxRetries = 3,
     initialDelay = 1000,
-    maxDelay = 30000,
+    maxDelay = 30_000,
     onRetry,
   } = options;
 
@@ -123,7 +126,9 @@ export async function retryPromise<T>(
  * Converts a URL pathname to a human-readable title
  */
 export function pathnameToTitle(pathname: string): string {
-  if (pathname === "/") return "Home";
+  if (pathname === "/") {
+    return "Home";
+  }
   const lastSegment = pathname.split("/").filter(Boolean).pop() || "";
   return lastSegment
     .charAt(0)
@@ -140,7 +145,7 @@ export function buildTree(pages: Page[]): Tree {
   function createNode(
     item: Page,
     pathSoFar: string,
-    isFolder: boolean,
+    isFolder: boolean
   ): TreeNode {
     return {
       ...item,
@@ -156,7 +161,7 @@ export function buildTree(pages: Page[]): Tree {
   function processSegments(
     item: Page,
     segments: string[],
-    currentFolder: Tree,
+    currentFolder: Tree
   ): void {
     let pathSoFar = "";
 
@@ -193,14 +198,18 @@ export function buildTree(pages: Page[]): Tree {
  * Finds the closest tree containing a folder at the given path
  */
 export function findTreeByPath(root: Tree, path?: string): Tree {
-  if (!path || path === "/") return root;
+  if (!path || path === "/") {
+    return root;
+  }
 
   let currentTree = root;
   const segments = path.split("/").filter(Boolean);
 
   for (const segment of segments) {
     const node = currentTree[segment];
-    if (!node || node._type !== "folder") break;
+    if (!node || node._type !== "folder") {
+      break;
+    }
     currentTree = node.children;
   }
 
@@ -214,7 +223,9 @@ export function findTreeByPath(root: Tree, path?: string): Tree {
  * 4. Handling undefined/invalid inputs
  */
 export function formatPath(path: string | undefined | null): string {
-  if (typeof path !== "string") return "/";
+  if (typeof path !== "string") {
+    return "/";
+  }
 
   return (
     path
@@ -233,7 +244,9 @@ export function formatPath(path: string | undefined | null): string {
  * Useful for path matching and comparisons
  */
 export function getPathVariations(path: string | undefined): string[] {
-  if (typeof path !== "string") return [];
+  if (typeof path !== "string") {
+    return [];
+  }
 
   const normalizedPath = formatPath(path).slice(1); // Remove leading slash
 
@@ -245,18 +258,18 @@ export function getPathVariations(path: string | undefined): string[] {
   ];
 }
 
-export const getTemplateName = (template: string) => {
-  return `${template}-with-slug`;
-};
+export const getTemplateName = (template: string) => `${template}-with-slug`;
 
 export const getDocumentPath = (document: SanityDocument) => {
-  if (typeof document.slug !== "string") return;
+  if (typeof document.slug !== "string") {
+    return;
+  }
   return formatPath(document.slug);
 };
 
-interface PathnameOptions {
+type PathnameOptions = {
   allowTrailingSlash?: boolean;
-}
+};
 
 /**
  * Converts a string into a valid pathname by:
@@ -304,26 +317,20 @@ export function createPageTemplate() {
       type: "blog",
     },
   ];
-  return pages.map((page) => {
-    return {
-      schemaType: page.type,
-      id: getTemplateName(page.type),
-      title: `${page.title} with slug`,
-      value: (props: { slug?: string }) => {
-        return {
-          ...(props.slug
-            ? { slug: { current: props.slug, _type: "slug" } }
-            : {}),
-        };
+  return pages.map((page) => ({
+    schemaType: page.type,
+    id: getTemplateName(page.type),
+    title: `${page.title} with slug`,
+    value: (props: { slug?: string }) => ({
+      ...(props.slug ? { slug: { current: props.slug, _type: "slug" } } : {}),
+    }),
+    parameters: [
+      {
+        name: "slug",
+        type: "string",
       },
-      parameters: [
-        {
-          name: "slug",
-          type: "string",
-        },
-      ],
-    };
-  });
+    ],
+  }));
 }
 
 /**
@@ -340,7 +347,7 @@ export const getPresentationUrl = () => {
   const presentationUrl = process.env.SANITY_STUDIO_PRESENTATION_URL;
   if (!presentationUrl) {
     throw new Error(
-      "SANITY_STUDIO_PRESENTATION_URL must be set in production environment",
+      "SANITY_STUDIO_PRESENTATION_URL must be set in production environment"
     );
   }
 

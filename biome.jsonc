@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": [
+    "ultracite"
+  ],
+  "linter": {
+    "rules": {
+      "suspicious": {
+        "noUnknownAtRules": "off",
+        "noExplicitAny": "warn"
+      },
+      "performance": {
+        "noNamespaceImport": "off"
+      },
+      "correctness": {
+        "noInvalidPositionAtImportRule": "off"
+      }
+    }
+  }
+}

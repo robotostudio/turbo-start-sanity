@@ -2,11 +2,11 @@ import { RefreshIcon } from "@sanity/icons";
 import { Button, Card, Flex, Stack, Text } from "@sanity/ui";
 import React from "react";
 
-interface ErrorStateProps {
+type ErrorStateProps = {
   error: string;
   onRetry?: () => void;
   retryLabel?: string;
-}
+};
 
 export const ErrorState: React.FC<ErrorStateProps> = ({
   error,
@@ -16,7 +16,9 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   const [isRetrying, setIsRetrying] = React.useState(false);
 
   const handleRetry = React.useCallback(async () => {
-    if (!onRetry) return;
+    if (!onRetry) {
+      return;
+    }
 
     setIsRetrying(true);
     try {
@@ -28,7 +30,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   }, [onRetry]);
 
   return (
-    <Card padding={4} tone="critical" radius={2}>
+    <Card padding={4} radius={2} tone="critical">
       <Stack space={4}>
         <Stack space={2}>
           <Text size={2} weight="semibold">
@@ -42,12 +44,12 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
         {onRetry && (
           <Flex justify="flex-start">
             <Button
+              disabled={isRetrying}
               icon={RefreshIcon}
-              text={isRetrying ? "Retrying..." : retryLabel}
-              tone="critical"
               mode="default"
               onClick={handleRetry}
-              disabled={isRetrying}
+              text={isRetrying ? "Retrying..." : retryLabel}
+              tone="critical"
               // size="small"
             />
           </Flex>
@@ -57,11 +59,11 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   );
 };
 
-interface EmptyStateProps {
+type EmptyStateProps = {
   title?: string;
   description?: string;
   illustration?: React.ReactNode;
-}
+};
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
   title = "No pages found",
@@ -75,8 +77,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
       <Stack space={2}>
         <Text
           size={2}
-          weight="medium"
           style={{ color: "var(--card-fg-color)" }}
+          weight="medium"
         >
           {title}
         </Text>

@@ -15,14 +15,18 @@ function getStudioHost(): string | undefined {
   const projectId = process.env.SANITY_STUDIO_PROJECT_ID;
 
   if (productionHostName) {
-    if (host && host !== "main") return `${host}-${productionHostName}`;
+    if (host && host !== "main") {
+      return `${host}-${productionHostName}`;
+    }
 
     return productionHostName;
   }
 
-  if (projectId) return `${projectId}`;
+  if (projectId) {
+    return `${projectId}`;
+  }
 
-  return undefined;
+  return;
 }
 
 export default defineCliConfig({

@@ -1,24 +1,24 @@
 import { useCallback, useState } from "react";
 
-interface UseTreeExpansionReturn {
+type UseTreeExpansionReturn = {
   expanded: Set<string>;
   isExpanded: (path: string) => boolean;
   toggleExpansion: (path: string) => void;
   expandAll: () => void;
   collapseAll: () => void;
   setExpanded: (paths: string[]) => void;
-}
+};
 
 export const useTreeExpansion = (
-  initialExpanded: string[] = ["/"],
+  initialExpanded: string[] = ["/"]
 ): UseTreeExpansionReturn => {
   const [expanded, setExpandedState] = useState<Set<string>>(
-    new Set(initialExpanded),
+    new Set(initialExpanded)
   );
 
   const isExpanded = useCallback(
     (path: string): boolean => expanded.has(path),
-    [expanded],
+    [expanded]
   );
 
   const toggleExpansion = useCallback((path: string) => {

@@ -13,16 +13,16 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "dist/**",
-        ".sanity/**"
-      ]
+      "outputs": [".next/**", "!.next/cache/**", "dist/**", ".sanity/**"]
+    },
+    "//#format": {},
+    "//#lint": {
+      "cache": false
     },
     "lint": {
       "dependsOn": ["^lint"]
     },
+    "format": {},
     "check-types": {
       "dependsOn": ["^check-types"]
     },

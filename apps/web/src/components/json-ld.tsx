@@ -21,32 +21,34 @@ import type {
 } from "@/lib/sanity/sanity.types";
 import { getBaseUrl, handleErrors } from "@/utils";
 
-interface RichTextChild {
+type RichTextChild = {
   _type: string;
   text?: string;
   marks?: string[];
   _key: string;
-}
+};
 
-interface RichTextBlock {
+type RichTextBlock = {
   _type: string;
   children?: RichTextChild[];
   style?: string;
   _key: string;
-}
+};
 
 // Flexible FAQ type that can accept different rich text structures
-interface FlexibleFaq {
+type FlexibleFaq = {
   _id: string;
   title: string;
   richText?: RichTextBlock[] | null;
-}
+};
 
 // Utility function to safely extract plain text from rich text blocks
 function extractPlainTextFromRichText(
-  richText: RichTextBlock[] | null | undefined,
+  richText: RichTextBlock[] | null | undefined
 ): string {
-  if (!Array.isArray(richText)) return "";
+  if (!Array.isArray(richText)) {
+    return "";
+  }
 
   return richText
     .filter((block) => block._type === "block" && Array.isArray(block.children))
@@ -55,7 +57,7 @@ function extractPlainTextFromRichText(
         block.children
           ?.filter((child) => child._type === "span" && Boolean(child.text))
           .map((child) => child.text)
-          .join("") ?? "",
+          .join("") ?? ""
     )
     .join(" ")
     .trim();
@@ -64,23 +66,27 @@ function extractPlainTextFromRichText(
 // Utility function to safely render JSON-LD
 export function JsonLdScript<T>({ data, id }: { data: T; id: string }) {
   return (
-    <script type="application/ld+json" id={id}>
+    <script id={id} type="application/ld+json">
       {JSON.stringify(data, null, 0)}
     </script>
   );
 }
 
 // FAQ JSON-LD Component
-interface FaqJsonLdProps {
+type FaqJsonLdProps = {
   faqs: FlexibleFaq[];
-}
+};
 
 export function FaqJsonLd({ faqs }: FaqJsonLdProps) {
-  if (!faqs?.length) return null;
+  if (!faqs?.length) {
+    return null;
+  }
 
   const validFaqs = faqs.filter((faq) => faq?.title && faq?.richText);
 
-  if (!validFaqs.length) return null;
+  if (!validFaqs.length) {
+    return null;
+  }
 
   const faqJsonLd: WithContext<FAQPage> = {
     "@context": "https://schema.org",
@@ -93,7 +99,7 @@ export function FaqJsonLd({ faqs }: FaqJsonLdProps) {
           "@type": "Answer",
           text: extractPlainTextFromRichText(faq.richText),
         } as Answer,
-      }),
+      })
     ),
   };
 
@@ -102,7 +108,7 @@ export function FaqJsonLd({ faqs }: FaqJsonLdProps) {
 
 function buildSafeImageUrl(image?: { id?: string | null }) {
   if (!image?.id) {
-    return undefined;
+    return;
   }
   return urlFor({ ...image, _id: image.id })
     .size(1920, 1080)
@@ -113,12 +119,14 @@ function buildSafeImageUrl(image?: { id?: string | null }) {
 }
 
 // Article JSON-LD Component
-interface ArticleJsonLdProps {
+type ArticleJsonLdProps = {
   article: QueryBlogSlugPageDataResult;
   settings?: QuerySettingsDataResult;
-}
+};
 export function ArticleJsonLd({ article, settings }: ArticleJsonLdProps) {
-  if (!article) return null;
+  if (!article) {
+    return null;
+  }
 
   const baseUrl = getBaseUrl();
   const articleUrl = `${baseUrl}${article.slug}`;
@@ -156,10 +164,10 @@ export function ArticleJsonLd({ article, settings }: ArticleJsonLdProps) {
         : undefined,
     } as Organization,
     datePublished: new Date(
-      article.publishedAt || article._createdAt || new Date().toISOString(),
+      article.publishedAt || article._createdAt || new Date().toISOString()
     ).toISOString(),
     dateModified: new Date(
-      article._updatedAt || new Date().toISOString(),
+      article._updatedAt || new Date().toISOString()
     ).toISOString(),
     url: articleUrl,
     mainEntityOfPage: {
@@ -174,12 +182,14 @@ export function ArticleJsonLd({ article, settings }: ArticleJsonLdProps) {
 }
 
 // Organization JSON-LD Component
-interface OrganizationJsonLdProps {
+type OrganizationJsonLdProps = {
   settings: QuerySettingsDataResult;
-}
+};
 
 export function OrganizationJsonLd({ settings }: OrganizationJsonLdProps) {
-  if (!settings) return null;
+  if (!settings) {
+    return null;
+  }
 
   const baseUrl = getBaseUrl();
 
@@ -213,12 +223,14 @@ export function OrganizationJsonLd({ settings }: OrganizationJsonLdProps) {
 }
 
 // Website JSON-LD Component
-interface WebSiteJsonLdProps {
+type WebSiteJsonLdProps = {
   settings: QuerySettingsDataResult;
-}
+};
 
 export function WebSiteJsonLd({ settings }: WebSiteJsonLdProps) {
-  if (!settings) return null;
+  if (!settings) {
+    return null;
+  }
 
   const baseUrl = getBaseUrl();
 
@@ -238,13 +250,13 @@ export function WebSiteJsonLd({ settings }: WebSiteJsonLdProps) {
 }
 
 // Combined JSON-LD Component for pages with multiple structured data
-interface CombinedJsonLdProps {
+type CombinedJsonLdProps = {
   settings?: QuerySettingsDataResult;
   article?: QueryBlogSlugPageDataResult;
   faqs?: FlexibleFaq[];
   includeWebsite?: boolean;
   includeOrganization?: boolean;
-}
+};
 
 export async function CombinedJsonLd({
   includeWebsite = false,

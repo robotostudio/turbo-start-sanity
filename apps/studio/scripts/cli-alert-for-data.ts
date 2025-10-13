@@ -35,16 +35,16 @@ function printSeedDataImportInstructions() {
     "",
     `┌${"─".repeat(BOX_WIDTH)}┐`,
     padLine(
-      `${COLOR_BLUE}To import the provided seed data into your Sanity dataset, run:${COLOR_RESET}`,
+      `${COLOR_BLUE}To import the provided seed data into your Sanity dataset, run:${COLOR_RESET}`
     ),
     padLine(),
     padLine(
-      `${COLOR_BLUE}${styleCommand("cd apps/studio && npx sanity dataset import seed-data.tar.gz <TARGET_DATASET>")}${COLOR_RESET}`,
+      `${COLOR_BLUE}${styleCommand("cd apps/studio && npx sanity dataset import seed-data.tar.gz <TARGET_DATASET>")}${COLOR_RESET}`
     ),
     padLine(),
     padLine(`${COLOR_BLUE}Example:${COLOR_RESET}`),
     padLine(
-      `${COLOR_BLUE}${styleCommand("cd apps/studio && npx sanity dataset import seed-data.tar.gz production --replace")}${COLOR_RESET}`,
+      `${COLOR_BLUE}${styleCommand("cd apps/studio && npx sanity dataset import seed-data.tar.gz production --replace")}${COLOR_RESET}`
     ),
     padLine(),
     `└${"─".repeat(BOX_WIDTH)}┘`,
@@ -53,7 +53,9 @@ function printSeedDataImportInstructions() {
     "",
   ];
 
-  for (const line of lines) console.log(line);
+  for (const line of lines) {
+    console.log(line);
+  }
 }
 
 printSeedDataImportInstructions();

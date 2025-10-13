@@ -17,14 +17,30 @@ async function fetchBlogSlugPageData(slug: string, stega = true) {
 }
 
 async function fetchBlogPaths() {
-  const slugs = await client.fetch(queryBlogPaths);
-  const paths: { slug: string }[] = [];
-  for (const slug of slugs) {
-    if (!slug) continue;
-    const [, , path] = slug.split("/");
-    if (path) paths.push({ slug: path });
+  try {
+    const slugs = await client.fetch(queryBlogPaths);
+    
+    // If no slugs found, return empty array to prevent build errors
+    if (!Array.isArray(slugs) || slugs.length === 0) {
+      return [];
+    }
+    
+    const paths: { slug: string }[] = [];
+    for (const slug of slugs) {
+      if (!slug) {
+        continue;
+      }
+      const [, , path] = slug.split("/");
+      if (path) {
+        paths.push({ slug: path });
+      }
+    }
+    return paths;
+  } catch (error) {
+    console.error("Error fetching blog paths:", error);
+    // Return empty array to allow build to continue
+    return [];
   }
-  return paths;
 }
 
 export async function generateMetadata({
@@ -44,13 +60,17 @@ export async function generateMetadata({
           contentType: data?._type,
           pageType: "article",
         }
-      : {},
+      : {}
   );
 }
 
 export async function generateStaticParams() {
-  return await fetchBlogPaths();
+  const paths = await fetchBlogPaths();
+  return paths;
 }
+
+// Allow dynamic params for paths not generated at build time
+export const dynamicParams = true;
 
 export default async function BlogSlugPage({
   params,
@@ -59,27 +79,29 @@ export default async function BlogSlugPage({
 }) {
   const { slug } = await params;
   const { data } = await fetchBlogSlugPageData(slug);
-  if (!data) return notFound();
+  if (!data) {
+    return notFound();
+  }
   const { title, description, image, richText } = data ?? {};
 
   return (
-    <div className="container my-16 mx-auto px-4 md:px-6">
+    <div className="container mx-auto my-16 px-4 md:px-6">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
         <main>
           {/* <ArticleJsonLd article={stegaClean(data)} /> */}
           <header className="mb-8">
-            <h1 className="mt-2 text-4xl font-bold">{title}</h1>
+            <h1 className="mt-2 font-bold text-4xl">{title}</h1>
             <p className="mt-4 text-lg text-muted-foreground">{description}</p>
           </header>
           {image && (
             <div className="mb-12">
               <SanityImage
-                image={image}
                 alt={title}
-                width={1600}
-                loading="eager"
+                className="h-auto w-full rounded-lg"
                 height={900}
-                className="rounded-lg h-auto w-full"
+                image={image}
+                loading="eager"
+                width={1600}
               />
             </div>
           )}
@@ -87,7 +109,7 @@ export default async function BlogSlugPage({
         </main>
 
         <div className="hidden lg:block">
-          <div className="sticky top-4 rounded-lg ">
+          <div className="sticky top-4 rounded-lg">
             <TableOfContent richText={richText} />
           </div>
         </div>

@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "lint": "eslint . --max-warnings 0"
+    "lint": "npx ultracite lint",
+    "format": "npx ultracite fix"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
@@ -28,9 +29,7 @@
     "@types/node": "^20.19.9",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
-    "@workspace/eslint-config": "workspace:*",
     "@workspace/typescript-config": "workspace:*",
-    "eslint": "^9.32.0",
     "tailwindcss": "^4.1.12"
   },
   "exports": {

@@ -3,18 +3,18 @@
  * This is the single source of truth for all slug validation logic
  */
 
-export interface SlugValidationResult {
+export type SlugValidationResult = {
   errors: string[];
   warnings: string[];
-}
+};
 
-export interface SlugValidationOptions {
+export type SlugValidationOptions = {
   documentType?: string;
   requireSlash?: boolean;
   requiredPrefix?: string;
   sanityDocumentType?: string; // Auto-configure based on Sanity document type
   segmentCount?: number;
-}
+};
 
 /**
  * Classification of validation issues
@@ -33,12 +33,12 @@ export enum ValidationCategory {
   UNIQUENESS = "uniqueness",
 }
 
-export interface ValidationIssue {
+export type ValidationIssue = {
   message: string;
   severity: ValidationSeverity;
   category: ValidationCategory;
   code: string;
-}
+};
 
 // Centralized error messages - single source of truth
 export const SLUG_ERROR_MESSAGES = {
@@ -64,7 +64,7 @@ export const SLUG_WARNING_MESSAGES = {
  * Gets document-type specific configuration
  */
 export function getDocumentTypeConfig(
-  sanityDocumentType: string,
+  sanityDocumentType: string
 ): SlugValidationOptions {
   switch (sanityDocumentType) {
     case "author":
@@ -160,7 +160,7 @@ function validateSlugSegment(slug: string): SlugValidationResult {
  */
 export function validateSlug(
   slug: string | undefined | null,
-  options: SlugValidationOptions = {},
+  options: SlugValidationOptions = {}
 ): SlugValidationResult {
   if (!slug) {
     return {
@@ -196,12 +196,13 @@ export function validateSlug(
     //   }
     // });
 
-    if (finalOptions.segmentCount !== undefined) {
-      if (segments.length !== finalOptions.segmentCount) {
-        allErrors.push(
-          `${finalOptions.documentType} URLs must have ${finalOptions.segmentCount} segments`,
-        );
-      }
+    if (
+      finalOptions.segmentCount !== undefined &&
+      segments.length !== finalOptions.segmentCount
+    ) {
+      allErrors.push(
+        `${finalOptions.documentType} URLs must have ${finalOptions.segmentCount} segments`
+      );
     }
 
     // Additional path-specific validations - critical errors
@@ -217,12 +218,14 @@ export function validateSlug(
     }
 
     // Prefix validation
-    if (finalOptions.requiredPrefix && finalOptions.documentType) {
-      if (!slug.startsWith(finalOptions.requiredPrefix)) {
-        allErrors.push(
-          `${finalOptions.documentType} URLs must start with "${finalOptions.requiredPrefix}"`,
-        );
-      }
+    if (
+      finalOptions.requiredPrefix &&
+      finalOptions.documentType &&
+      !slug.startsWith(finalOptions.requiredPrefix)
+    ) {
+      allErrors.push(
+        `${finalOptions.documentType} URLs must start with "${finalOptions.requiredPrefix}"`
+      );
     }
 
     // Special validation for pages - prevent blog prefix usage
@@ -231,7 +234,7 @@ export function validateSlug(
       slug.startsWith("/blog")
     ) {
       allErrors.push(
-        'Pages cannot use "/blog" prefix - this is reserved for blog content',
+        'Pages cannot use "/blog" prefix - this is reserved for blog content'
       );
     }
   } else {
@@ -253,7 +256,7 @@ export function validateSlug(
  */
 export function validateSanitySlug(
   slug: { current?: string } | undefined,
-  options: SlugValidationOptions = {},
+  options: SlugValidationOptions = {}
 ): string | true {
   const validation = validateSlug(slug?.current, options);
   const allMessages = [...validation.errors, ...validation.warnings];
@@ -264,7 +267,7 @@ export function validateSanitySlug(
  * Helper function to create type-specific validators
  */
 export function createSlugValidator(
-  options: SlugValidationOptions,
+  options: SlugValidationOptions
 ): (slug: { current?: string } | undefined) => string | true {
   return (slug) => validateSanitySlug(slug, options);
 }
@@ -274,7 +277,7 @@ export function createSlugValidator(
  * More convenient for common document types
  */
 export function createDocumentTypeValidator(
-  sanityDocumentType: string,
+  sanityDocumentType: string
 ): (slug: { current?: string } | undefined) => string | true {
   return (slug) => validateSanitySlug(slug, { sanityDocumentType });
 }
@@ -285,7 +288,7 @@ export function createDocumentTypeValidator(
  */
 export function validateSlugForDocumentType(
   slug: string | undefined | null,
-  sanityDocumentType: string,
+  sanityDocumentType: string
 ): string[] {
   const validation = validateSlug(slug, { sanityDocumentType });
   return [...validation.errors, ...validation.warnings];
@@ -295,7 +298,9 @@ export function validateSlugForDocumentType(
  * Cleans a slug string to make it valid (matches transformSlug from use-slug.tsx)
  */
 export function cleanSlug(slug: string): string {
-  if (!slug) return "";
+  if (!slug) {
+    return "";
+  }
 
   return slug
     .toLowerCase()
@@ -309,7 +314,9 @@ export function cleanSlug(slug: string): string {
  * Cleans a full slug path
  */
 export function cleanSlugPath(slug: string): string {
-  if (!slug) return "/";
+  if (!slug) {
+    return "/";
+  }
 
   let cleaned = slug
     .toLowerCase()
@@ -339,7 +346,7 @@ export function cleanSlugPath(slug: string): string {
  */
 export function validateSlugComprehensive(
   slug: string | undefined | null,
-  options: SlugValidationOptions = {},
+  options: SlugValidationOptions = {}
 ): {
   isValid: boolean;
   hasErrors: boolean;
@@ -351,7 +358,7 @@ export function validateSlugComprehensive(
   const validation = validateSlug(slug, options);
   const segments = slug ? slug.split("/").filter(Boolean) : [];
   const segmentValidations = segments.map((segment) =>
-    validateSlugSegment(segment),
+    validateSlugSegment(segment)
   );
 
   return {

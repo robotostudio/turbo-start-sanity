@@ -12,7 +12,9 @@ export const redirect = defineType({
       type: "slug",
       validation: (rule) =>
         rule.required().custom((value) => {
-          if (!value || !value.current) return "Can't be blank";
+          if (!value?.current) {
+            return "Can't be blank";
+          }
           if (!value.current.startsWith("/")) {
             return "The path must start with a /";
           }
@@ -24,7 +26,9 @@ export const redirect = defineType({
       type: "slug",
       validation: (rule) =>
         rule.required().custom((value) => {
-          if (!value || !value.current) return "Can't be blank";
+          if (!value?.current) {
+            return "Can't be blank";
+          }
           if (!value.current.startsWith("/")) {
             return "The path must start with a /";
           }
