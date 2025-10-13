@@ -1,10 +1,10 @@
 import "@workspace/ui/globals.css";
 
-import { VisualEditing } from "next-sanity";
 import { Geist, Geist_Mono } from "next/font/google";
 import { draftMode } from "next/headers";
+import { VisualEditing } from "next-sanity";
 import { Suspense } from "react";
-
+import { preconnect } from "react-dom";
 import { FooterServer, FooterSkeleton } from "@/components/footer";
 import { CombinedJsonLd } from "@/components/json-ld";
 import { Navbar } from "@/components/navbar";
@@ -12,7 +12,6 @@ import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
 import { getNavigationData } from "@/lib/navigation";
 import { SanityLive } from "@/lib/sanity/live";
-import { preconnect } from "react-dom";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -43,7 +42,7 @@ export default async function RootLayout({
             <FooterServer />
           </Suspense>
           <SanityLive />
-          <CombinedJsonLd includeWebsite includeOrganization />
+          <CombinedJsonLd includeOrganization includeWebsite />
           {(await draftMode()).isEnabled && (
             <>
               <PreviewBar />

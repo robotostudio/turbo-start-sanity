@@ -27,8 +27,7 @@ export const isValidUrl = (url: string) => {
   try {
     new URL(url);
     return true;
-  } catch (e) {
-    console.log(e);
+  } catch (_e) {
     return isRelativeUrl(url);
   }
 };
@@ -44,7 +43,7 @@ export const getTitleCase = (name: string) => {
 type Response<T> = [T, undefined] | [undefined, string];
 
 export async function handleErrors<T>(
-  promise: Promise<T>,
+  promise: Promise<T>
 ): Promise<Response<T>> {
   try {
     const data = await promise;
@@ -59,9 +58,11 @@ export async function handleErrors<T>(
 
 export function convertToSlug(
   text?: string,
-  { fallback }: { fallback?: string } = { fallback: "top-level" },
+  { fallback }: { fallback?: string } = { fallback: "top-level" }
 ) {
-  if (!text) return fallback;
+  if (!text) {
+    return fallback;
+  }
   return slugify(text.trim(), {
     lower: true,
     remove: /[^a-zA-Z0-9 ]/g,
@@ -69,6 +70,8 @@ export function convertToSlug(
 }
 
 export function parseChildrenToSlug(children: PortableTextBlock["children"]) {
-  if (!children) return "";
+  if (!children) {
+    return "";
+  }
   return convertToSlug(children.map((child) => child.text).join(""));
 }

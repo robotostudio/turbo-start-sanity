@@ -17,8 +17,8 @@ const components: Partial<PortableTextReactComponents> = {
       const slug = parseChildrenToSlug(value.children);
       return (
         <h2
+          className="scroll-m-20 border-b pb-2 font-semibold text-3xl first:mt-0"
           id={slug}
-          className="scroll-m-20 border-b pb-2 text-3xl font-semibold first:mt-0"
         >
           {children}
         </h2>
@@ -27,7 +27,7 @@ const components: Partial<PortableTextReactComponents> = {
     h3: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h3 id={slug} className="scroll-m-20 text-2xl font-semibold">
+        <h3 className="scroll-m-20 font-semibold text-2xl" id={slug}>
           {children}
         </h3>
       );
@@ -35,7 +35,7 @@ const components: Partial<PortableTextReactComponents> = {
     h4: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h4 id={slug} className="scroll-m-20 text-xl font-semibold">
+        <h4 className="scroll-m-20 font-semibold text-xl" id={slug}>
           {children}
         </h4>
       );
@@ -43,7 +43,7 @@ const components: Partial<PortableTextReactComponents> = {
     h5: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h5 id={slug} className="scroll-m-20 text-lg font-semibold">
+        <h5 className="scroll-m-20 font-semibold text-lg" id={slug}>
           {children}
         </h5>
       );
@@ -51,7 +51,7 @@ const components: Partial<PortableTextReactComponents> = {
     h6: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h6 id={slug} className="scroll-m-20 text-base font-semibold">
+        <h6 className="scroll-m-20 font-semibold text-base" id={slug}>
           {children}
         </h6>
       );
@@ -65,7 +65,6 @@ const components: Partial<PortableTextReactComponents> = {
     ),
     customLink: ({ children, value }) => {
       if (!value.href || value.href === "#") {
-        console.warn("🚀 link is not set", value);
         return (
           <span className="underline decoration-dotted underline-offset-2">
             Link Broken
@@ -74,10 +73,10 @@ const components: Partial<PortableTextReactComponents> = {
       }
       return (
         <Link
+          aria-label={`Link to ${value?.href}`}
           className="underline decoration-dotted underline-offset-2"
           href={value.href}
           prefetch={false}
-          aria-label={`Link to ${value?.href}`}
           target={value.openInNewTab ? "_blank" : "_self"}
         >
           {children}
@@ -87,14 +86,16 @@ const components: Partial<PortableTextReactComponents> = {
   },
   types: {
     image: ({ value }) => {
-      if (!value?.id) return null;
+      if (!value?.id) {
+        return null;
+      }
       return (
         <figure className="my-4">
           <SanityImage
-            image={value}
-            className="h-auto rounded-lg w-full"
-            width={1600}
+            className="h-auto w-full rounded-lg"
             height={900}
+            image={value}
+            width={1600}
           />
           {value?.caption && (
             <figcaption className="mt-2 text-center text-sm text-zinc-500 dark:text-zinc-400">
@@ -115,21 +116,21 @@ export function RichText<T>({
   richText?: T | null;
   className?: string;
 }) {
-  if (!richText) return null;
+  if (!richText) {
+    return null;
+  }
 
   return (
     <div
       className={cn(
-        "prose prose-zinc prose-headings:scroll-m-24 prose-headings:text-opacity-90 prose-p:text-opacity-80 prose-a:decoration-dotted prose-ol:text-opacity-80 prose-ul:text-opacity-80 prose-h2:border-b prose-h2:pb-2 prose-h2:text-3xl prose-h2:font-semibold prose-h2:first:mt-0 max-w-none dark:prose-invert",
-        className,
+        "prose prose-zinc dark:prose-invert max-w-none prose-headings:scroll-m-24 prose-h2:border-b prose-h2:pb-2 prose-h2:font-semibold prose-h2:text-3xl prose-headings:text-opacity-90 prose-ol:text-opacity-80 prose-p:text-opacity-80 prose-ul:text-opacity-80 prose-a:decoration-dotted prose-h2:first:mt-0",
+        className
       )}
     >
       <PortableText
-        value={richText as unknown as PortableTextBlock[]}
         components={components}
-        onMissingComponent={(_, { nodeType, type }) =>
-          console.log("missing component", nodeType, type)
-        }
+        onMissingComponent={(_, { nodeType, type }) => {}}
+        value={richText as unknown as PortableTextBlock[]}
       />
     </div>
   );

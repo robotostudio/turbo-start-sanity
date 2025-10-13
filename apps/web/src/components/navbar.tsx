@@ -27,37 +27,40 @@ type NavColumn = NonNullable<
   NonNullable<QueryNavbarDataResult>["columns"]
 >[number];
 
-type ColumnLink =
-  Extract<NavColumn, { type: "column" }>["links"] extends Array<infer T>
-    ? T
-    : never;
+type ColumnLink = Extract<NavColumn, { type: "column" }>["links"] extends Array<
+  infer T
+>
+  ? T
+  : never;
 
-interface MenuLinkProps {
+type MenuLinkProps = {
   name: string;
   href: string;
   description?: string;
   icon?: any;
   onClick?: () => void;
-}
+};
 
 // Fetcher function
 const fetcher = async (url: string): Promise<NavigationData> => {
   const response = await fetch(url);
-  if (!response.ok) throw new Error("Failed to fetch navigation data");
+  if (!response.ok) {
+    throw new Error("Failed to fetch navigation data");
+  }
   return response.json();
 };
 
 function MenuLink({ name, href, description, icon, onClick }: MenuLinkProps) {
   return (
     <Link
+      className="group flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-accent"
       href={href || "#"}
       onClick={onClick}
-      className="group flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-accent"
     >
       {icon && (
         <SanityIcon
-          icon={icon}
           className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+          icon={icon}
         />
       )}
       <div className="grid gap-1">
@@ -65,7 +68,7 @@ function MenuLink({ name, href, description, icon, onClick }: MenuLinkProps) {
           {name}
         </div>
         {description && (
-          <div className="text-sm text-muted-foreground line-clamp-2">
+          <div className="line-clamp-2 text-muted-foreground text-sm">
             {description}
           </div>
         )}
@@ -82,11 +85,11 @@ function DesktopColumnDropdown({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="relative group">
+    <div className="group relative">
       <button
+        className="flex items-center gap-1 px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
         onMouseEnter={() => setIsOpen(true)}
         onMouseLeave={() => setIsOpen(false)}
-        className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
       >
         {column.title}
         <ChevronDown className="size-3 transition-transform group-hover:rotate-180" />
@@ -94,18 +97,18 @@ function DesktopColumnDropdown({
 
       {isOpen && (
         <div
+          className="fade-in-0 zoom-in-95 absolute top-full left-0 z-50 min-w-[280px] animate-in rounded-lg border bg-popover p-2 shadow-lg"
           onMouseEnter={() => setIsOpen(true)}
           onMouseLeave={() => setIsOpen(false)}
-          className="absolute left-0 top-full z-50 min-w-[280px] rounded-lg border bg-popover p-2 shadow-lg animate-in fade-in-0 zoom-in-95"
         >
           <div className="grid gap-1">
             {column.links?.map((link: ColumnLink) => (
               <MenuLink
+                description={link.description || ""}
+                href={link.href || ""}
+                icon={link.icon}
                 key={link._key}
                 name={link.name || ""}
-                href={link.href || ""}
-                description={link.description || ""}
-                icon={link.icon}
               />
             ))}
           </div>
@@ -122,8 +125,8 @@ function DesktopColumnLink({
 }) {
   return (
     <Link
+      className="px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
       href={column.href || "#"}
-      className="px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
     >
       {column.name}
     </Link>
@@ -150,10 +153,10 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
     <>
       {/* Mobile menu button */}
       <Button
-        variant="ghost"
-        size="icon"
         className="md:hidden"
         onClick={() => setIsOpen(!isOpen)}
+        size="icon"
+        variant="ghost"
       >
         {isOpen ? <X className="size-4" /> : <Menu className="size-4" />}
         <span className="sr-only">Toggle menu</span>
@@ -162,16 +165,16 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
       {/* Mobile menu overlay */}
       {isOpen && (
         <div className="fixed inset-0 top-16 z-50 bg-background/80 backdrop-blur-sm md:hidden">
-          <div className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-full border-r bg-background p-6 shadow-lg">
+          <div className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-full border-r bg-background p-6 shadow-lg">
             <div className="grid gap-6">
               {/* Logo for mobile */}
               {logo && (
-                <div className="flex justify-center pb-4 border-b">
+                <div className="flex justify-center border-b pb-4">
                   <Logo
                     alt={siteTitle || ""}
+                    height={40}
                     image={logo}
                     width={120}
-                    height={40}
                   />
                 </div>
               )}
@@ -182,10 +185,10 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
                   if (column.type === "link") {
                     return (
                       <Link
-                        key={column._key}
+                        className="flex items-center py-2 font-medium text-sm transition-colors hover:text-primary"
                         href={column.href || "#"}
+                        key={column._key}
                         onClick={closeMenu}
-                        className="flex items-center py-2 text-sm font-medium transition-colors hover:text-primary"
                       >
                         {column.name}
                       </Link>
@@ -195,28 +198,28 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
                   if (column.type === "column") {
                     const isDropdownOpen = openDropdown === column._key;
                     return (
-                      <div key={column._key} className="grid gap-2">
+                      <div className="grid gap-2" key={column._key}>
                         <button
+                          className="flex items-center justify-between py-2 font-medium text-sm transition-colors hover:text-primary"
                           onClick={() => toggleDropdown(column._key)}
-                          className="flex items-center justify-between py-2 text-sm font-medium transition-colors hover:text-primary"
                         >
                           {column.title}
                           <ChevronDown
                             className={cn(
                               "size-3 transition-transform",
-                              isDropdownOpen && "rotate-180",
+                              isDropdownOpen && "rotate-180"
                             )}
                           />
                         </button>
                         {isDropdownOpen && (
-                          <div className="grid gap-1 pl-4 border-l-2 border-border">
+                          <div className="grid gap-1 border-border border-l-2 pl-4">
                             {column.links?.map((link: ColumnLink) => (
                               <MenuLink
+                                description={link.description || ""}
+                                href={link.href || ""}
+                                icon={link.icon}
                                 key={link._key}
                                 name={link.name || ""}
-                                href={link.href || ""}
-                                description={link.description || ""}
-                                icon={link.icon}
                                 onClick={closeMenu}
                               />
                             ))}
@@ -231,14 +234,14 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
               </div>
 
               {/* Action buttons */}
-              <div className="grid gap-3 pt-4 border-t">
+              <div className="grid gap-3 border-t pt-4">
                 <div className="flex justify-center">
                   <ModeToggle />
                 </div>
                 <SanityButtons
+                  buttonClassName="w-full justify-center"
                   buttons={buttons || []}
                   className="grid gap-3"
-                  buttonClassName="w-full justify-center"
                 />
               </div>
             </div>
@@ -258,8 +261,8 @@ function NavbarSkeleton() {
           {/* <div className="flex items-center">
             <div className="h-10 w-[120px] rounded bg-muted/50 animate-pulse" />
           </div> */}
-          <div className="flex items-center w-[120px] h-[40px]">
-            <div className="h-10 w-[120px] rounded bg-muted/50 animate-pulse" />
+          <div className="flex h-[40px] w-[120px] items-center">
+            <div className="h-10 w-[120px] animate-pulse rounded bg-muted/50" />
           </div>
 
           {/* Desktop nav skeleton - matches nav gap-1 and px-3 py-2 buttons */}
@@ -279,7 +282,7 @@ function NavbarSkeleton() {
           </div> */}
 
           {/* Mobile menu button skeleton - matches Button size="icon" */}
-          <div className="md:hidden h-10 w-10 rounded bg-muted/50 animate-pulse" />
+          <div className="h-10 w-10 animate-pulse rounded bg-muted/50 md:hidden" />
         </div>
       </div>
     </header>
@@ -301,10 +304,10 @@ export function Navbar({
       revalidateOnFocus: false,
       revalidateOnMount: false,
       revalidateOnReconnect: true,
-      refreshInterval: 30000,
+      refreshInterval: 30_000,
       errorRetryCount: 3,
       errorRetryInterval: 5000,
-    },
+    }
   );
 
   const navigationData = data || {
@@ -316,7 +319,7 @@ export function Navbar({
   const { logo, siteTitle } = settingsData || {};
 
   // Show skeleton only on initial mount when no fallback data is available
-  if (isLoading && !data && (!initialNavbarData || !initialSettingsData)) {
+  if (isLoading && !data && !(initialNavbarData && initialSettingsData)) {
     return <NavbarSkeleton />;
   }
 
@@ -325,40 +328,40 @@ export function Navbar({
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center w-[120px] h-[40px]">
+          <div className="flex h-[40px] w-[120px] items-center">
             {logo && (
               <Logo
                 alt={siteTitle || ""}
+                height={40}
                 image={logo}
                 priority
                 width={120}
-                height={40}
               />
             )}
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden items-center gap-1 md:flex">
             {columns?.map((column) => {
               if (column.type === "column") {
                 return (
-                  <DesktopColumnDropdown key={column._key} column={column} />
+                  <DesktopColumnDropdown column={column} key={column._key} />
                 );
               }
               if (column.type === "link") {
-                return <DesktopColumnLink key={column._key} column={column} />;
+                return <DesktopColumnLink column={column} key={column._key} />;
               }
               return null;
             })}
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden items-center gap-4 md:flex">
             <ModeToggle />
             <SanityButtons
+              buttonClassName="rounded-lg"
               buttons={buttons || []}
               className="flex items-center gap-2"
-              buttonClassName="rounded-lg"
             />
           </div>
 
@@ -369,7 +372,7 @@ export function Navbar({
 
       {/* Error boundary for SWR */}
       {error && process.env.NODE_ENV === "development" && (
-        <div className="bg-destructive/10 border-b border-destructive/20 px-4 py-2 text-xs text-destructive">
+        <div className="border-destructive/20 border-b bg-destructive/10 px-4 py-2 text-destructive text-xs">
           Navigation data fetch error: {error.message}
         </div>
       )}

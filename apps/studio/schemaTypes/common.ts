@@ -48,7 +48,7 @@ export const documentSlugField = (
     group?: string;
     description?: string;
     title?: string;
-  } = {},
+  } = {}
 ) => {
   const {
     group,

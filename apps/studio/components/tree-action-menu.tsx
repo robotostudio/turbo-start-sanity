@@ -1,12 +1,4 @@
-import {
-  AddIcon,
-  CopyIcon,
-  EditIcon,
-  EllipsisVerticalIcon,
-  LinkIcon,
-  SplitVerticalIcon,
-  TrashIcon,
-} from "@sanity/icons";
+import { AddIcon, EditIcon, EllipsisVerticalIcon } from "@sanity/icons";
 import {
   Box,
   Button,
@@ -19,13 +11,12 @@ import {
 } from "@sanity/ui";
 import { uuid } from "@sanity/uuid";
 import React from "react";
-import { IntentLink, useIntentLink } from "sanity/router";
-import { usePaneRouter } from "sanity/structure";
+import { useIntentLink } from "sanity/router";
 
 import type { TreeNode } from "../hooks/use-pages-tree";
 
 // Menu action types for better type safety and extensibility
-export interface MenuAction {
+export type MenuAction = {
   id: string;
   label: string;
   icon: React.ComponentType;
@@ -39,15 +30,15 @@ export interface MenuAction {
     type: string;
     params?: Record<string, any>;
   };
-}
+};
 
-export interface MenuGroup {
+export type MenuGroup = {
   id: string;
   label?: string;
   actions: MenuAction[];
-}
+};
 
-interface TreeActionMenuProps {
+type TreeActionMenuProps = {
   node: TreeNode;
   onNestPage?: (pageId: string, parentSlug: string) => void;
   onCreateChild?: (parentSlug: string) => void;
@@ -59,7 +50,7 @@ interface TreeActionMenuProps {
   customMenuGroups?: MenuGroup[];
   onMenuAction?: (actionId: string, node: TreeNode) => void;
   showShortcuts?: boolean;
-}
+};
 
 export const TreeActionMenu: React.FC<TreeActionMenuProps> = ({
   node,
@@ -102,26 +93,26 @@ export const TreeActionMenu: React.FC<TreeActionMenuProps> = ({
           <Text size={1} weight="medium">
             Page actions
           </Text>
-          <Text size={0} muted>
+          <Text muted size={0}>
             {isPage ? "Edit, duplicate, or manage page" : "Create new page"}
           </Text>
         </Box>
       }
+      disabled={disabled}
       placement="top"
       portal
-      disabled={disabled}
     >
       <MenuButton
         button={
           <Button
+            aria-label={`Actions for ${node.title}`}
+            data-action-button
+            disabled={disabled}
             icon={EllipsisVerticalIcon}
             mode="bleed"
             padding={2}
             radius={2}
             tone="default"
-            disabled={disabled}
-            aria-label={`Actions for ${node.title}`}
-            data-action-button
           />
         }
         id={`tree-actions-${node._id || node.slug}`}
@@ -129,11 +120,11 @@ export const TreeActionMenu: React.FC<TreeActionMenuProps> = ({
           <Menu>
             {/* Create child page - always available */}
             <MenuItem
-              icon={AddIcon}
-              text="Create child page"
-              onClick={createChildLink.onClick}
-              href={createChildLink.href}
               disabled={disabled}
+              href={createChildLink.href}
+              icon={AddIcon}
+              onClick={createChildLink.onClick}
+              text="Create child page"
             />
 
             {isPage && node._id && (
@@ -142,11 +133,11 @@ export const TreeActionMenu: React.FC<TreeActionMenuProps> = ({
 
                 {/* Edit page */}
                 <MenuItem
-                  icon={EditIcon}
-                  text="Edit page"
-                  onClick={editLink.onClick}
-                  href={editLink.href}
                   disabled={disabled}
+                  href={editLink.href}
+                  icon={EditIcon}
+                  onClick={editLink.onClick}
+                  text="Edit page"
                 />
               </>
             )}
@@ -159,20 +150,20 @@ export const TreeActionMenu: React.FC<TreeActionMenuProps> = ({
                   .filter((action) => !action.hidden)
                   .map((action) => (
                     <MenuItem
-                      key={action.id}
+                      disabled={disabled || action.disabled}
+                      href={action.href}
                       icon={action.icon}
+                      key={action.id}
+                      onClick={() => {
+                        action.onClick?.();
+                        handleMenuAction(action.id);
+                      }}
                       text={
                         showShortcuts && action.shortcut
                           ? `${action.label} (${action.shortcut})`
                           : action.label
                       }
                       tone={action.tone}
-                      onClick={() => {
-                        action.onClick?.();
-                        handleMenuAction(action.id);
-                      }}
-                      href={action.href}
-                      disabled={disabled || action.disabled}
                     />
                   ))}
               </React.Fragment>

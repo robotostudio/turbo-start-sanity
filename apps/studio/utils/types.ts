@@ -16,7 +16,7 @@ export type NormalizedCreatablePage = {
 };
 
 export type PagesNavigatorOptions = {
-  creatablePages?: Array<NormalizedCreatablePage>;
+  creatablePages?: NormalizedCreatablePage[];
 };
 
 export type PagesNavigatorPluginOptions = PresentationPluginOptions & {
@@ -104,7 +104,7 @@ export interface SectionSchema extends Omit<ObjectDefinition, "options"> {
   options: SectionOptions;
 }
 
-export interface SectionVariant {
+export type SectionVariant = {
   /**
    * URl to an image, video or GIF that shows what this block variant looks like.
    */
@@ -123,7 +123,7 @@ export interface SectionVariant {
    * }
    */
   initialValue?: Record<string, unknown>;
-}
+};
 
 export type SectionType = ObjectSchemaType & {
   options: SectionOptions;

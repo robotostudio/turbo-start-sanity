@@ -11,13 +11,13 @@ import type { SanityRichTextBlock, SanityRichTextProps } from "@/types";
 // TYPES & INTERFACES
 // ============================================================================
 
-interface TableOfContentProps {
+type TableOfContentProps = {
   richText?: SanityRichTextProps;
   className?: string;
   maxDepth?: number;
-}
+};
 
-interface ProcessedHeading {
+type ProcessedHeading = {
   readonly id: string;
   readonly text: string;
   readonly href: string;
@@ -26,19 +26,19 @@ interface ProcessedHeading {
   readonly children: ProcessedHeading[];
   readonly isChild: boolean;
   readonly _key?: string;
-}
+};
 
-interface AnchorProps {
+type AnchorProps = {
   readonly heading: ProcessedHeading;
   readonly maxDepth?: number;
   readonly currentDepth?: number;
-}
+};
 
-interface TableOfContentState {
+type TableOfContentState = {
   readonly shouldShow: boolean;
   readonly headings: ProcessedHeading[];
   readonly error?: string;
-}
+};
 
 type HeadingStyle = "h2" | "h3" | "h4" | "h5" | "h6";
 
@@ -103,7 +103,7 @@ function isValidTextChild(child: unknown): child is SanityTextChild {
 }
 
 function hasValidTextChildren(
-  children: unknown,
+  children: unknown
 ): children is readonly SanityTextChild[] {
   return (
     Array.isArray(children) &&
@@ -141,8 +141,7 @@ function createSlug(text: string): string {
 
   try {
     return slugify(text.trim(), SLUGIFY_OPTIONS);
-  } catch (error) {
-    console.warn("Failed to create slug for text:", text, error);
+  } catch (_error) {
     return text
       .toLowerCase()
       .replace(/\s+/g, "-")
@@ -157,8 +156,7 @@ function extractTextFromChildren(children: readonly SanityTextChild[]): string {
       .filter(Boolean)
       .join(" ")
       .trim();
-  } catch (error) {
-    console.warn("Failed to extract text from children:", error);
+  } catch (_error) {
     return "";
   }
 }
@@ -173,21 +171,20 @@ function generateUniqueId(text: string, index: number, _key?: string): string {
 // ============================================================================
 
 function extractHeadingBlocks(richText: SanityRichTextProps): HeadingBlock[] {
-  if (!richText || !Array.isArray(richText)) {
+  if (!(richText && Array.isArray(richText))) {
     return [];
   }
 
   try {
     return richText.filter(isHeadingBlock);
-  } catch (error) {
-    console.error("Failed to extract heading blocks:", error);
+  } catch (_error) {
     return [];
   }
 }
 
 function createProcessedHeading(
   block: HeadingBlock,
-  index: number,
+  index: number
 ): ProcessedHeading | null {
   try {
     const text = extractTextFromChildren(block.children);
@@ -210,15 +207,14 @@ function createProcessedHeading(
       isChild: false,
       _key: block._key,
     };
-  } catch (error) {
-    console.warn("Failed to create processed heading:", error);
+  } catch (_error) {
     return null;
   }
 }
 
 function buildHeadingHierarchy(
   flatHeadings: ProcessedHeading[],
-  maxDepth: number = DEFAULT_MAX_DEPTH,
+  maxDepth: number = DEFAULT_MAX_DEPTH
 ): ProcessedHeading[] {
   if (flatHeadings.length === 0) {
     return [];
@@ -237,7 +233,7 @@ function buildHeadingHierarchy(
         flatHeadings,
         index,
         processed,
-        maxDepth,
+        maxDepth
       );
 
       result.push({
@@ -247,8 +243,7 @@ function buildHeadingHierarchy(
     });
 
     return result;
-  } catch (error) {
-    console.error("Failed to build heading hierarchy:", error);
+  } catch (_error) {
     return flatHeadings.map((heading) => ({
       ...heading,
       children: [],
@@ -260,7 +255,7 @@ function collectChildHeadings(
   headings: ProcessedHeading[],
   parentIndex: number,
   processed: Set<number>,
-  maxDepth: number,
+  maxDepth: number
 ): ProcessedHeading[] {
   const parentHeading = headings[parentIndex];
 
@@ -288,7 +283,7 @@ function collectChildHeadings(
       headings,
       i,
       processed,
-      maxDepth,
+      maxDepth
     );
 
     children.push({
@@ -303,7 +298,7 @@ function collectChildHeadings(
 
 function processHeadingBlocks(
   headingBlocks: HeadingBlock[],
-  maxDepth: number = DEFAULT_MAX_DEPTH,
+  maxDepth: number = DEFAULT_MAX_DEPTH
 ): ProcessedHeading[] {
   if (!Array.isArray(headingBlocks) || headingBlocks.length === 0) {
     return [];
@@ -315,8 +310,7 @@ function processHeadingBlocks(
       .filter((heading): heading is ProcessedHeading => heading !== null);
 
     return buildHeadingHierarchy(processedHeadings, maxDepth);
-  } catch (error) {
-    console.error("Failed to process heading blocks:", error);
+  } catch (_error) {
     return [];
   }
 }
@@ -327,11 +321,11 @@ function processHeadingBlocks(
 
 function useTableOfContentState(
   richText?: SanityRichTextProps,
-  maxDepth: number = DEFAULT_MAX_DEPTH,
+  maxDepth: number = DEFAULT_MAX_DEPTH
 ): TableOfContentState {
   return useMemo(() => {
     try {
-      if (!richText || !Array.isArray(richText) || richText.length === 0) {
+      if (!(richText && Array.isArray(richText)) || richText.length === 0) {
         return {
           shouldShow: false,
           headings: [],
@@ -354,7 +348,6 @@ function useTableOfContentState(
         headings: processedHeadings,
       };
     } catch (error) {
-      console.error("Error processing table of contents:", error);
       return {
         shouldShow: false,
         headings: [],
@@ -375,11 +368,11 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
 }) => {
   const { href, text, children, isChild, style, id } = heading;
 
-  const shouldRenderChildren = useCallback(() => {
-    return (
-      Array.isArray(children) && children.length > 0 && currentDepth < maxDepth
-    );
-  }, [children, currentDepth, maxDepth]);
+  const shouldRenderChildren = useCallback(
+    () =>
+      Array.isArray(children) && children.length > 0 && currentDepth < maxDepth,
+    [children, currentDepth, maxDepth]
+  );
 
   // Don't render if we're at max depth and this is a child
   if (currentDepth > maxDepth) {
@@ -387,7 +380,7 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
   }
 
   // Don't render if text or href is invalid
-  if (!text?.trim() || !href?.trim()) {
+  if (!(text?.trim() && href?.trim())) {
     return null;
   }
 
@@ -396,33 +389,33 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
   return (
     <li
       className={cn(
-        "list-inside my-2 transition-all duration-200",
+        "my-2 list-inside transition-all duration-200",
         // paddingClass,
-        isChild && "ml-1.5",
+        isChild && "ml-1.5"
       )}
     >
       <div className="flex items-center gap-2">
         <Circle
-          className={cn(
-            "min-w-1.5 min-h-1.5 size-1.5 transition-colors duration-200",
-            !isChild
-              ? "dark:fill-zinc-100 fill-zinc-900"
-              : "dark:fill-zinc-400 fill-zinc-600",
-          )}
           aria-hidden="true"
+          className={cn(
+            "size-1.5 min-h-1.5 min-w-1.5 transition-colors duration-200",
+            isChild
+              ? "fill-zinc-600 dark:fill-zinc-400"
+              : "fill-zinc-900 dark:fill-zinc-100"
+          )}
         />
         <Link
-          href={href}
-          className={cn(
-            "hover:text-blue-500 hover:underline line-clamp-1",
-            "transition-colors duration-200 focus:outline-none",
-            "rounded-sm px-1 py-0.5",
-          )}
           aria-describedby={`${id}-level`}
+          className={cn(
+            "line-clamp-1 hover:text-blue-500 hover:underline",
+            "transition-colors duration-200 focus:outline-none",
+            "rounded-sm px-1 py-0.5"
+          )}
+          href={href}
         >
           {text}
         </Link>
-        <span id={`${id}-level`} className="sr-only">
+        <span className="sr-only" id={`${id}-level`}>
           Heading level {heading.level}
         </span>
       </div>
@@ -431,10 +424,10 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
         <ul className="mt-1">
           {children.map((child, index) => (
             <TableOfContentAnchor
-              key={child.id || `${child.text}-${index}-${currentDepth}`}
-              heading={child}
-              maxDepth={maxDepth}
               currentDepth={currentDepth + 1}
+              heading={child}
+              key={child.id || `${child.text}-${index}-${currentDepth}`}
+              maxDepth={maxDepth}
             />
           ))}
         </ul>
@@ -450,12 +443,11 @@ export const TableOfContent: FC<TableOfContentProps> = ({
 }) => {
   const { shouldShow, headings, error } = useTableOfContentState(
     richText,
-    maxDepth,
+    maxDepth
   );
 
   // Early return for error state
   if (error) {
-    console.error("Table of Contents error:", error);
     return null;
   }
 
@@ -466,46 +458,46 @@ export const TableOfContent: FC<TableOfContentProps> = ({
 
   return (
     <aside
+      aria-labelledby="toc-heading"
       className={cn(
-        "sticky top-8 flex flex-col w-full max-w-xs p-4",
+        "sticky top-8 flex w-full max-w-xs flex-col p-4",
         "bg-gradient-to-b from-zinc-50 to-zinc-100",
         "dark:from-zinc-800 dark:to-zinc-900",
-        "shadow-sm rounded-lg border border-zinc-300 dark:border-zinc-700",
+        "rounded-lg border border-zinc-300 shadow-sm dark:border-zinc-700",
         "transition-all duration-200",
-        className,
+        className
       )}
-      aria-labelledby="toc-heading"
       //   role="complementary"
     >
       <details className="group" open>
         <summary
           className={cn(
             "flex cursor-pointer items-center justify-between",
-            "text-lg font-semibold text-zinc-800 dark:text-zinc-200",
+            "font-semibold text-lg text-zinc-800 dark:text-zinc-200",
             "hover:text-blue-600 dark:hover:text-blue-400",
             "transition-colors duration-200 focus:outline-none",
-            "rounded-sm p-1",
+            "rounded-sm p-1"
           )}
           id="toc-heading"
         >
           <span>Table of Contents</span>
           <ChevronDown
+            aria-hidden="true"
             className={cn(
               "h-5 w-5 transform transition-transform duration-200",
-              "group-open:rotate-180",
+              "group-open:rotate-180"
             )}
-            aria-hidden="true"
           />
         </summary>
 
         <nav aria-labelledby="toc-heading">
-          <ul className="text-sm space-y-1 mt-4 ml-3">
+          <ul className="mt-4 ml-3 space-y-1 text-sm">
             {headings.map((heading, index) => (
               <TableOfContentAnchor
-                key={heading.id || `${heading.text}-${index}`}
-                heading={heading}
-                maxDepth={maxDepth}
                 currentDepth={1}
+                heading={heading}
+                key={heading.id || `${heading.text}-${index}`}
+                maxDepth={maxDepth}
               />
             ))}
           </ul>

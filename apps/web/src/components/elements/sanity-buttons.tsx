@@ -21,7 +21,6 @@ function SanityButton({
   ...props
 }: SanityButtonProps & ComponentProps<typeof Button>) {
   if (!href) {
-    console.log("Link Broken", { text, href, variant, openInNewTab });
     return <Button>Link Broken</Button>;
   }
 
@@ -33,9 +32,9 @@ function SanityButton({
       className={cn("rounded-[10px]", className)}
     >
       <Link
+        aria-label={`Navigate to ${text}`}
         href={href || "#"}
         target={openInNewTab ? "_blank" : "_self"}
-        aria-label={`Navigate to ${text}`}
         title={`Click to visit ${text}`}
       >
         {text}
@@ -50,10 +49,12 @@ export function SanityButtons({
   buttonClassName,
   size = "default",
 }: SanityButtonsProps) {
-  if (!buttons?.length) return null;
+  if (!buttons?.length) {
+    return null;
+  }
 
   return (
-    <div className={cn("flex flex-col sm:flex-row gap-4", className)}>
+    <div className={cn("flex flex-col gap-4 sm:flex-row", className)}>
       {buttons.map((button) => (
         <SanityButton
           key={`button-${button._key}`}

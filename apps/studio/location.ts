@@ -6,51 +6,45 @@ export const locations = {
       title: "title",
       slug: "slug.current",
     },
-    resolve: (doc) => {
-      return {
-        locations: [
-          {
-            title: doc?.title || "Untitled",
-            href: `${doc?.slug}`,
-          },
-          {
-            title: "Blog",
-            href: "/blog",
-          },
-        ],
-      };
-    },
+    resolve: (doc) => ({
+      locations: [
+        {
+          title: doc?.title || "Untitled",
+          href: `${doc?.slug}`,
+        },
+        {
+          title: "Blog",
+          href: "/blog",
+        },
+      ],
+    }),
   }),
   home: defineLocations({
     select: {
       title: "title",
       slug: "slug.current",
     },
-    resolve: () => {
-      return {
-        locations: [
-          {
-            title: "Home",
-            href: "/",
-          },
-        ],
-      };
-    },
+    resolve: () => ({
+      locations: [
+        {
+          title: "Home",
+          href: "/",
+        },
+      ],
+    }),
   }),
   page: defineLocations({
     select: {
       title: "title",
       slug: "slug.current",
     },
-    resolve: (doc) => {
-      return {
-        locations: [
-          {
-            title: doc?.title || "Untitled",
-            href: `${doc?.slug}`,
-          },
-        ],
-      };
-    },
+    resolve: (doc) => ({
+      locations: [
+        {
+          title: doc?.title || "Untitled",
+          href: `${doc?.slug}`,
+        },
+      ],
+    }),
   }),
 };

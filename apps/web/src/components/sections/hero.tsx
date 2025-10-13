@@ -16,36 +16,36 @@ export function HeroBlock({
   richText,
 }: HeroBlockProps) {
   return (
-    <section id="hero" className="mt-4 md:my-16">
+    <section className="mt-4 md:my-16" id="hero">
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid items-center gap-8 lg:grid-cols-2">
-          <div className="grid h-full grid-rows-[auto_1fr_auto] gap-4 items-center justify-items-center text-center lg:items-start lg:justify-items-start lg:text-left">
+          <div className="grid h-full grid-rows-[auto_1fr_auto] items-center justify-items-center gap-4 text-center lg:items-start lg:justify-items-start lg:text-left">
             <Badge variant="secondary">{badge}</Badge>
             <div className="grid gap-4">
-              <h1 className="text-4xl lg:text-6xl font-semibold text-balance">
+              <h1 className="text-balance font-semibold text-4xl lg:text-6xl">
                 {title}
               </h1>
               <RichText
+                className="font-normal text-base md:text-lg"
                 richText={richText}
-                className="text-base md:text-lg font-normal"
               />
             </div>
             <SanityButtons
-              buttons={buttons}
               buttonClassName="w-full sm:w-auto"
-              className="w-full sm:w-fit grid gap-2 sm:grid-flow-col lg:justify-start mb-8"
+              buttons={buttons}
+              className="mb-8 grid w-full gap-2 sm:w-fit sm:grid-flow-col lg:justify-start"
             />
           </div>
 
           {image && (
             <div className="h-96 w-full">
               <SanityImage
+                className="max-h-96 w-full rounded-3xl object-cover"
+                fetchPriority="high"
+                height={800}
                 image={image}
                 loading="eager"
                 width={800}
-                height={800}
-                fetchPriority="high"
-                className="max-h-96 w-full rounded-3xl object-cover"
               />
             </div>
           )}

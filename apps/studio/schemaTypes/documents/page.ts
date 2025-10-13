@@ -36,12 +36,12 @@ export const page = defineType({
         rule
           .min(140)
           .warning(
-            "The meta description should be at least 140 characters for optimal SEO visibility in search results",
+            "The meta description should be at least 140 characters for optimal SEO visibility in search results"
           ),
         rule
           .max(160)
           .warning(
-            "The meta description should not exceed 160 characters as it will be truncated in search results",
+            "The meta description should not exceed 160 characters as it will be truncated in search results"
           ),
       ],
     }),

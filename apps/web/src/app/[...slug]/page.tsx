@@ -15,14 +15,28 @@ async function fetchSlugPageData(slug: string, stega = true) {
 }
 
 async function fetchSlugPagePaths() {
-  const slugs = await client.fetch(querySlugPagePaths);
-  const paths: { slug: string[] }[] = [];
-  for (const slug of slugs) {
-    if (!slug) continue;
-    const parts = slug.split("/").filter(Boolean);
-    paths.push({ slug: parts });
+  try {
+    const slugs = await client.fetch(querySlugPagePaths);
+    
+    // If no slugs found, return empty array to prevent build errors
+    if (!Array.isArray(slugs) || slugs.length === 0) {
+      return [];
+    }
+    
+    const paths: { slug: string[] }[] = [];
+    for (const slug of slugs) {
+      if (!slug) {
+        continue;
+      }
+      const parts = slug.split("/").filter(Boolean);
+      paths.push({ slug: parts });
+    }
+    return paths;
+  } catch (error) {
+    console.error("Error fetching slug paths:", error);
+    // Return empty array to allow build to continue
+    return [];
   }
-  return paths;
 }
 
 export async function generateMetadata({
@@ -42,13 +56,17 @@ export async function generateMetadata({
           contentId: pageData?._id,
           contentType: pageData?._type,
         }
-      : {},
+      : {}
   );
 }
 
 export async function generateStaticParams() {
-  return await fetchSlugPagePaths();
+  const paths = await fetchSlugPagePaths();
+  return paths;
 }
+
+// Allow dynamic params for paths not generated at build time
+export const dynamicParams = true;
 
 export default async function SlugPage({
   params,
@@ -66,13 +84,13 @@ export default async function SlugPage({
   const { title, pageBuilder, _id, _type } = pageData ?? {};
 
   return !Array.isArray(pageBuilder) || pageBuilder?.length === 0 ? (
-    <div className="flex flex-col items-center justify-center min-h-[50vh] text-center p-4">
-      <h1 className="text-2xl font-semibold mb-4 capitalize">{title}</h1>
-      <p className="text-muted-foreground mb-6">
+    <div className="flex min-h-[50vh] flex-col items-center justify-center p-4 text-center">
+      <h1 className="mb-4 font-semibold text-2xl capitalize">{title}</h1>
+      <p className="mb-6 text-muted-foreground">
         This page has no content blocks yet.
       </p>
     </div>
   ) : (
-    <PageBuilder pageBuilder={pageBuilder} id={_id} type={_type} />
+    <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
   );
 }

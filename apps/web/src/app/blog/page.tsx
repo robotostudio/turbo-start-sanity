@@ -4,8 +4,11 @@ import { BlogCard, BlogHeader, FeaturedBlogCard } from "@/components/blog-card";
 import { PageBuilder } from "@/components/pagebuilder";
 import { sanityFetch } from "@/lib/sanity/live";
 import { queryBlogIndexPageData } from "@/lib/sanity/query";
+import type { QueryBlogIndexPageDataResult } from "@/lib/sanity/sanity.types";
 import { getSEOMetadata } from "@/lib/seo";
 import { handleErrors } from "@/utils";
+
+type Blog = NonNullable<QueryBlogIndexPageDataResult>["blogs"][number];
 
 async function fetchBlogPosts() {
   return await handleErrors(sanityFetch({ query: queryBlogIndexPageData }));
@@ -25,13 +28,15 @@ export async function generateMetadata() {
           contentId: result?._id,
           contentType: result?._type,
         }
-      : {},
+      : {}
   );
 }
 
 export default async function BlogIndexPage() {
   const [res, err] = await fetchBlogPosts();
-  if (err || !res?.data) notFound();
+  if (err || !res?.data) {
+    notFound();
+  }
 
   const {
     blogs = [],
@@ -45,20 +50,20 @@ export default async function BlogIndexPage() {
   } = res.data;
 
   const validFeaturedBlogsCount = featuredBlogsCount
-    ? Number.parseInt(featuredBlogsCount)
+    ? Number.parseInt(featuredBlogsCount, 10)
     : 0;
 
   if (!blogs.length) {
     return (
-      <main className="container my-16 mx-auto px-4 md:px-6">
-        <BlogHeader title={title} description={description} />
-        <div className="text-center py-12">
+      <main className="container mx-auto my-16 px-4 md:px-6">
+        <BlogHeader description={description} title={title} />
+        <div className="py-12 text-center">
           <p className="text-muted-foreground">
             No blog posts available at the moment.
           </p>
         </div>
         {pageBuilder && pageBuilder.length > 0 && (
-          <PageBuilder pageBuilder={pageBuilder} id={_id} type={_type} />
+          <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
         )}
       </main>
     );
@@ -76,28 +81,28 @@ export default async function BlogIndexPage() {
 
   return (
     <main className="bg-background">
-      <div className="container my-16 mx-auto px-4 md:px-6">
-        <BlogHeader title={title} description={description} />
+      <div className="container mx-auto my-16 px-4 md:px-6">
+        <BlogHeader description={description} title={title} />
 
         {featuredBlogs.length > 0 && (
-          <div className="mx-auto mt-8 sm:mt-12 md:mt-16 mb-12 lg:mb-20 grid grid-cols-1 gap-8 md:gap-12">
-            {featuredBlogs.map((blog) => (
-              <FeaturedBlogCard key={blog._id} blog={blog} />
+          <div className="mx-auto mt-8 mb-12 grid grid-cols-1 gap-8 sm:mt-12 md:mt-16 md:gap-12 lg:mb-20">
+            {featuredBlogs.map((blog: Blog) => (
+              <FeaturedBlogCard blog={blog} key={blog._id} />
             ))}
           </div>
         )}
 
         {remainingBlogs.length > 0 && (
-          <div className="grid grid-cols-1 gap-8 md:gap-12 lg:grid-cols-2 mt-8">
-            {remainingBlogs.map((blog) => (
-              <BlogCard key={blog._id} blog={blog} />
+          <div className="mt-8 grid grid-cols-1 gap-8 md:gap-12 lg:grid-cols-2">
+            {remainingBlogs.map((blog: Blog) => (
+              <BlogCard blog={blog} key={blog._id} />
             ))}
           </div>
         )}
       </div>
 
       {pageBuilder && pageBuilder.length > 0 && (
-        <PageBuilder pageBuilder={pageBuilder} id={_id} type={_type} />
+        <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
       )}
     </main>
   );

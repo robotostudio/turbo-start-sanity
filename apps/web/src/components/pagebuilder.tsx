@@ -20,23 +20,23 @@ type PageBuilderBlock = NonNullable<
   NonNullable<QueryHomePageDataResult>["pageBuilder"]
 >[number];
 
-export interface PageBuilderProps {
+export type PageBuilderProps = {
   readonly pageBuilder?: PageBuilderBlock[];
   readonly id: string;
   readonly type: string;
-}
+};
 
-interface PageData {
+type PageData = {
   readonly _id: string;
   readonly _type: string;
   readonly pageBuilder?: PageBuilderBlock[];
-}
+};
 
-interface SanityDataAttributeConfig {
+type SanityDataAttributeConfig = {
   readonly id: string;
   readonly type: string;
   readonly path: string;
-}
+};
 
 // Strongly typed component mapping with proper component signatures
 const BLOCK_COMPONENTS = {
@@ -82,14 +82,14 @@ function UnknownBlockError({
 }) {
   return (
     <div
-      key={`${blockType}-${blockKey}`}
-      className="flex items-center justify-center p-8 text-center text-muted-foreground bg-muted rounded-lg border-2 border-dashed border-muted-foreground/20"
-      role="alert"
       aria-label={`Unknown block type: ${blockType}`}
+      className="flex items-center justify-center rounded-lg border-2 border-muted-foreground/20 border-dashed bg-muted p-8 text-center text-muted-foreground"
+      key={`${blockType}-${blockKey}`}
+      role="alert"
     >
       <div className="space-y-2">
         <p>Component not found for block type:</p>
-        <code className="font-mono text-sm bg-background px-2 py-1 rounded">
+        <code className="rounded bg-background px-2 py-1 font-mono text-sm">
           {blockType}
         </code>
       </div>
@@ -102,7 +102,7 @@ function UnknownBlockError({
  */
 function useOptimisticPageBuilder(
   initialBlocks: PageBuilderBlock[],
-  documentId: string,
+  documentId: string
 ) {
   return useOptimistic<PageBuilderBlock[], any>(
     initialBlocks,
@@ -111,7 +111,7 @@ function useOptimisticPageBuilder(
         return action.document.pageBuilder;
       }
       return currentBlocks;
-    },
+    }
   );
 }
 
@@ -126,34 +126,34 @@ function useBlockRenderer(id: string, type: string) {
         type,
         path: `pageBuilder[_key=="${blockKey}"]`,
       }),
-    [id, type],
+    [id, type]
   );
 
   const renderBlock = useCallback(
-    (block: PageBuilderBlock, index: number) => {
+    (block: PageBuilderBlock, _index: number) => {
       const Component =
         BLOCK_COMPONENTS[block._type as keyof typeof BLOCK_COMPONENTS];
 
       if (!Component) {
         return (
           <UnknownBlockError
-            key={`${block._type}-${block._key}`}
-            blockType={block._type}
             blockKey={block._key}
+            blockType={block._type}
+            key={`${block._type}-${block._key}`}
           />
         );
       }
 
       return (
         <div
-          key={`${block._type}-${block._key}`}
           data-sanity={createBlockDataAttribute(block._key)}
+          key={`${block._type}-${block._key}`}
         >
           <Component {...(block as any)} />
         </div>
       );
     },
-    [createBlockDataAttribute],
+    [createBlockDataAttribute]
   );
 
   return { renderBlock };
@@ -172,7 +172,7 @@ export function PageBuilder({
 
   const containerDataAttribute = useMemo(
     () => createSanityDataAttribute({ id, type, path: "pageBuilder" }),
-    [id, type],
+    [id, type]
   );
 
   if (!blocks.length) {
@@ -181,9 +181,9 @@ export function PageBuilder({
 
   return (
     <section
-      className="flex flex-col gap-16 my-16 max-w-7xl mx-auto"
-      data-sanity={containerDataAttribute}
       aria-label="Page content"
+      className="mx-auto my-16 flex max-w-7xl flex-col gap-16"
+      data-sanity={containerDataAttribute}
     >
       {blocks.map(renderBlock)}
     </section>

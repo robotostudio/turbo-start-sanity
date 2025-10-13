@@ -17,8 +17,8 @@ export const client = createClient({
 });
 
 const imageBuilder = createImageUrlBuilder({
-  projectId: projectId,
-  dataset: dataset,
+  projectId,
+  dataset,
 });
 
 export const urlFor = (source: SanityImageSource) =>

@@ -30,20 +30,24 @@ async function listAllSlugs(client: SanityClient) {
 function getSlugOptionsAtLevel(
   allSlugs: string[][],
   level: number,
-  prefix: string[] = [],
+  prefix: string[] = []
 ): string[] {
   const options = new Set<string>();
 
   for (const segments of allSlugs) {
     // Check if this slug has enough segments for the requested level
-    if (segments.length < level) continue;
+    if (segments.length < level) {
+      continue;
+    }
 
     // Check if the prefix matches
     const matchesPrefix = prefix.every(
-      (prefixSegment, index) => segments[index] === prefixSegment,
+      (prefixSegment, index) => segments[index] === prefixSegment
     );
 
-    if (!matchesPrefix) continue;
+    if (!matchesPrefix) {
+      continue;
+    }
 
     // Get the segment at the requested level (level is 1-based)
     const segmentAtLevel = segments[level - 1];
@@ -79,7 +83,7 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
     const allSegments = currentSlug.split("/").filter(Boolean);
     if (allSegments.length > 0) {
       setPathSegments(allSegments.slice(0, -1));
-      setFinalSlug(allSegments[allSegments.length - 1]);
+      setFinalSlug(allSegments.at(-1));
     } else {
       setPathSegments([]);
       setFinalSlug("");
@@ -95,11 +99,11 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
           set({
             current: fullPath || "/",
             _type: "slug",
-          }),
+          })
         );
       }
     },
-    [onChange],
+    [onChange]
   );
 
   const handleUpdateFinalSlug = useCallback(
@@ -107,7 +111,7 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
       setFinalSlug(newFinalSlug.replace(/\//g, ""));
       updateFullSlug(pathSegments, newFinalSlug);
     },
-    [pathSegments, updateFullSlug],
+    [pathSegments, updateFullSlug]
   );
 
   const handleUpdatePathSegment = useCallback(
@@ -120,7 +124,7 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
       setPathSegments(newPathSegments);
       updateFullSlug(newPathSegments, finalSlug);
     },
-    [finalSlug, pathSegments, updateFullSlug],
+    [finalSlug, pathSegments, updateFullSlug]
   );
 
   const handleAddPathSegment = useCallback(
@@ -129,7 +133,7 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
       setPathSegments(newPathSegments);
       updateFullSlug(newPathSegments, finalSlug);
     },
-    [finalSlug, pathSegments, updateFullSlug],
+    [finalSlug, pathSegments, updateFullSlug]
   );
 
   const handleRemovePathSegment = useCallback(
@@ -138,12 +142,14 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
       setPathSegments(newPathSegments);
       updateFullSlug(newPathSegments, finalSlug);
     },
-    [finalSlug, pathSegments, updateFullSlug],
+    [finalSlug, pathSegments, updateFullSlug]
   );
 
   const generateSlugFromTitle = useCallback(() => {
     const title = document?.title;
-    if (!title) return;
+    if (!title) {
+      return;
+    }
 
     const newFinalSlug = transformSlug(title);
     setFinalSlug(newFinalSlug);
@@ -155,7 +161,7 @@ export function useSlugGeneration({ onChange }: SlugGenerationOptions) {
       const prefix = pathSegments.slice(0, index);
       return getSlugOptionsAtLevel(allSlugs, index + 1, prefix);
     },
-    [allSlugs, pathSegments],
+    [allSlugs, pathSegments]
   );
 
   // Use centralized validation hook - single source of truth

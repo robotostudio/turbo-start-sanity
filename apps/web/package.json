@@ -7,12 +7,10 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
+    "lint": "npx ultracite lint",
+    "format": "npx ultracite fix",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run format:check && npm run typecheck"
+    "check": "npm run lint && npm run typecheck"
   },
   "dependencies": {
     "@sanity/asset-utils": "^2.2.1",
@@ -37,7 +35,6 @@
     "@types/node": "^20.19.9",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
-    "@workspace/eslint-config": "workspace:^",
     "@workspace/typescript-config": "workspace:*"
   }
 }

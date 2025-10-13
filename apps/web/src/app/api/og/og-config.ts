@@ -7,13 +7,13 @@ export const getOgMetaData = (searchParams: URLSearchParams) => {
   const width = searchParams.get("width") as string;
   const height = searchParams.get("height") as string;
 
-  const ogWidth = Number.isNaN(Number.parseInt(width))
+  const ogWidth = Number.isNaN(Number.parseInt(width, 10))
     ? ogImageDimensions.width
-    : Number.parseInt(width);
+    : Number.parseInt(width, 10);
 
-  const ogHeight = Number.isNaN(Number.parseInt(height))
+  const ogHeight = Number.isNaN(Number.parseInt(height, 10))
     ? ogImageDimensions.height
-    : Number.parseInt(height);
+    : Number.parseInt(height, 10);
 
   return { width: ogWidth, height: ogHeight };
 };
