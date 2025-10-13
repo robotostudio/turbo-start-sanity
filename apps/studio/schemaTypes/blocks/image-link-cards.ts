@@ -53,17 +53,11 @@ const imageLinkCard = defineField({
     }) => {
       const url = urlType === "external" ? externalUrl : internalUrl;
       const newTabIndicator = openInNewTab ? " ↗" : "";
-      const truncatedUrl =
-        url?.length > 30 ? `${url.substring(0, 30)}...` : url;
-      const truncatedDesc =
-        description?.length > 50
-          ? `${description.substring(0, 50)}...`
-          : description;
 
       return {
         title: title || "Untitled Card",
         subtitle:
-          truncatedDesc + (url ? ` • ${truncatedUrl}${newTabIndicator}` : ""),
+          description + (url ? ` • ${url}${newTabIndicator}` : ""),
         media,
       };
     },

@@ -16,6 +16,7 @@ function printSeedDataImportInstructions() {
    * Strips ANSI codes to calculate visible length.
    */
   function padLine(text = ""): string {
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: control characters are used for styling
     const visibleLength = text.replace(/\x1b\[[0-9;]*m/g, "").length;
     const totalPadding = BOX_WIDTH - visibleLength;
     const left = " ".repeat(SIDE_PADDING);

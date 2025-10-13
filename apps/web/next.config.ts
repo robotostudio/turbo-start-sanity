@@ -1,12 +1,9 @@
+import type { NextConfig } from "next";
 import { client } from "@/lib/sanity/client";
 import { queryRedirects } from "@/lib/sanity/query";
-import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@workspace/ui"],
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   experimental: {
     reactCompiler: true,
     inlineCss: true,

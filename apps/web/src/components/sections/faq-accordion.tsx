@@ -7,10 +7,9 @@ import {
 import { Badge } from "@workspace/ui/components/badge";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-
 import type { PagebuilderType } from "@/types";
-
 import { RichText } from "../elements/rich-text";
+import { FaqJsonLd } from "../json-ld";
 
 type FaqAccordionProps = PagebuilderType<"faqAccordion">;
 
@@ -23,7 +22,7 @@ export function FaqAccordion({
 }: FaqAccordionProps) {
   return (
     <section className="my-8" id="faq">
-      {/* <FaqJsonLd faqs={stegaClean(faqs)} /> */}
+      <FaqJsonLd faqs={faqs} />
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex w-full flex-col items-center">
           <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">

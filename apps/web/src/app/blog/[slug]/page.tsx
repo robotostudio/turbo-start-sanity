@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { RichText } from "@/components/elements/rich-text";
 import { SanityImage } from "@/components/elements/sanity-image";
 import { TableOfContent } from "@/components/elements/table-of-content";
+import { ArticleJsonLd } from "@/components/json-ld";
 import { client } from "@/lib/sanity/client";
 import { sanityFetch } from "@/lib/sanity/live";
 import { queryBlogPaths, queryBlogSlugPageData } from "@/lib/sanity/query";
@@ -19,12 +20,12 @@ async function fetchBlogSlugPageData(slug: string, stega = true) {
 async function fetchBlogPaths() {
   try {
     const slugs = await client.fetch(queryBlogPaths);
-    
+
     // If no slugs found, return empty array to prevent build errors
     if (!Array.isArray(slugs) || slugs.length === 0) {
       return [];
     }
-    
+
     const paths: { slug: string }[] = [];
     for (const slug of slugs) {
       if (!slug) {
@@ -88,7 +89,7 @@ export default async function BlogSlugPage({
     <div className="container mx-auto my-16 px-4 md:px-6">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
         <main>
-          {/* <ArticleJsonLd article={stegaClean(data)} /> */}
+          <ArticleJsonLd article={data} />
           <header className="mb-8">
             <h1 className="mt-2 font-bold text-4xl">{title}</h1>
             <p className="mt-4 text-lg text-muted-foreground">{description}</p>
@@ -105,12 +106,12 @@ export default async function BlogSlugPage({
               />
             </div>
           )}
-          <RichText richText={richText ?? []} />
+          <RichText richText={richText} />
         </main>
 
         <div className="hidden lg:block">
           <div className="sticky top-4 rounded-lg">
-            <TableOfContent richText={richText} />
+            <TableOfContent richText={richText ?? []} />
           </div>
         </div>
       </div>

@@ -5,7 +5,7 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "npx ultracite lint",
+    "lint": "npx ultracite check",
     "format": "npx ultracite fix",
     "check-types": "turbo check-types"
   },

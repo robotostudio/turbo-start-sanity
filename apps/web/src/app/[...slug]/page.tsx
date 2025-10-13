@@ -17,12 +17,12 @@ async function fetchSlugPageData(slug: string, stega = true) {
 async function fetchSlugPagePaths() {
   try {
     const slugs = await client.fetch(querySlugPagePaths);
-    
+
     // If no slugs found, return empty array to prevent build errors
     if (!Array.isArray(slugs) || slugs.length === 0) {
       return [];
     }
-    
+
     const paths: { slug: string[] }[] = [];
     for (const slug of slugs) {
       if (!slug) {

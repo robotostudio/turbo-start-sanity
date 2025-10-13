@@ -55,10 +55,9 @@ export const homePage = defineType({
   preview: {
     select: {
       title: "title",
-      description: "description",
       slug: "slug.current",
     },
-    prepare: ({ title, description, slug }) => ({
+    prepare: ({ title, slug }) => ({
       title: title || "Untitled Home Page",
       media: HomeIcon,
       subtitle: slug || "Home Page",
