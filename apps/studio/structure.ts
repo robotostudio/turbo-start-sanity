@@ -18,7 +18,7 @@ import type {
   StructureResolverContext,
 } from "sanity/structure";
 
-import { createSlugBasedStructure } from "./components/nested-pages-strucure";
+import { createSlugBasedStructure } from "./components/nested-pages-structure";
 import type { SchemaType, SingletonType } from "./schemaTypes";
 import { getTitleCase } from "./utils/helper";
 
