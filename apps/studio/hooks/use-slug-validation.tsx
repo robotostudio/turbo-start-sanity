@@ -3,9 +3,9 @@ import type { SanityDocument } from "sanity";
 import { getPublishedId, useFormValue, useValidationStatus } from "sanity";
 
 import {
+  getDocumentTypeConfig,
   type SlugValidationResult,
   validateSlug,
-  validateSlugForDocumentType,
 } from "../utils/slug-validation";
 
 // Helper function to extract Sanity validation errors
@@ -105,8 +105,8 @@ export type UseSlugValidationResult = {
 };
 
 /**
- * Centralized slug validation hook that serves as the single source of truth
- * for all slug validation logic across the application
+ * Optimized slug validation hook using unified config system
+ * Single source of truth for all slug validation logic
  */
 export function useSlugValidation(
   options: UseSlugValidationOptions
@@ -121,109 +121,92 @@ export function useSlugValidation(
   const document = useFormValue([]) as SanityDocument;
   const documentType = providedDocumentType || document?._type;
 
+  // Get document type configuration (single source of truth)
+  const documentConfig = useMemo(
+    () => (documentType ? getDocumentTypeConfig(documentType) : {}),
+    [documentType]
+  );
+
   // Get Sanity validation status
   const publishedId = useMemo(
     () => (document?._id ? getPublishedId(document._id) : ""),
     [document?._id]
   );
-  
-  const sanityValidation = useValidationStatus(publishedId || "", document?._type);
+
+  const sanityValidation = useValidationStatus(
+    publishedId || "",
+    document?._type
+  );
 
   // Extract Sanity slug validation errors
   const sanityValidationErrors = useMemo(
-    () => extractSanityValidationErrors(
-      sanityValidation.validation,
-      includeSanityValidation
-    ),
+    () =>
+      extractSanityValidationErrors(
+        sanityValidation.validation,
+        includeSanityValidation
+      ),
     [sanityValidation.validation, includeSanityValidation]
   );
 
-  // Parse slug into segments
+  // Unified validation using config-driven approach
+  const validation = useMemo(() => {
+    if (!slug) {
+      return { errors: [], warnings: [] };
+    }
+
+    // Use unified validation with document type config
+    return validateSlug(slug, documentConfig);
+  }, [slug, documentConfig]);
+
+  // Parse segments for detailed reporting
   const segments = useMemo(() => parseSlugSegments(slug), [slug]);
 
-  // Validate individual segments
+  // Individual segment validations for detailed error reporting
   const segmentValidations = useMemo(
     () => validateSegments(segments),
     [segments]
   );
-
-  // Validate full path structure
-  const pathValidation = useMemo(
-    () => validateSlug(slug, { sanityDocumentType: documentType }),
-    [slug, documentType]
-  );
-
-  // Document type specific validation
-  const documentTypeErrors = useMemo(() => {
-    if (!(documentType && slug)) {
-      return [];
-    }
-    return validateSlugForDocumentType(slug, documentType);
-  }, [slug, documentType]);
 
   // Combine all validation results
   const combinedValidation = useMemo((): SlugValidationResult => {
     const allErrors: string[] = [];
     const allWarnings: string[] = [];
 
-    // Add path validation errors/warnings
-    allErrors.push(...pathValidation.errors);
-    allWarnings.push(...pathValidation.warnings);
+    // Add unified validation results
+    allErrors.push(...validation.errors);
+    allWarnings.push(...validation.warnings);
 
-    // Add segment validation errors/warnings with context
-    for (let i = 0; i < segmentValidations.length; i++) {
-      const validation = segmentValidations[i];
-      const segment = segments[i];
-      
-      if (validation.errors.length > 0) {
-        allErrors.push(
-          ...validation.errors.map((error) => `Segment "${segment}": ${error}`)
-        );
-      }
-      
-      if (validation.warnings.length > 0) {
-        allWarnings.push(
-          ...validation.warnings.map(
-            (warning) => `Segment "${segment}": ${warning}`
-          )
-        );
-      }
-    }
+    // Add Sanity validation errors
+    allErrors.push(...sanityValidationErrors);
 
-    // Add document type and Sanity validation errors
-    allErrors.push(...documentTypeErrors, ...sanityValidationErrors);
-    
-    // Deduplicate and filter
+    // Deduplicate
     const errorSet = new Set(allErrors);
     const uniqueWarnings = Array.from(new Set(allWarnings)).filter(
       (warning) => !errorSet.has(warning)
     );
-    
+
     return {
       errors: Array.from(errorSet),
       warnings: uniqueWarnings,
     };
-  }, [
-    pathValidation,
-    segmentValidations,
-    segments,
-    documentTypeErrors,
-    sanityValidationErrors,
-  ]);
+  }, [validation, sanityValidationErrors]);
 
   // Derived state
-  const derivedState = useMemo(() => ({
-    hasValidationIssues:
-      combinedValidation.errors.length > 0 ||
-      combinedValidation.warnings.length > 0,
-    hasCriticalErrors: combinedValidation.errors.length > 0,
-  }), [combinedValidation]);
+  const derivedState = useMemo(
+    () => ({
+      hasValidationIssues:
+        combinedValidation.errors.length > 0 ||
+        combinedValidation.warnings.length > 0,
+      hasCriticalErrors: combinedValidation.errors.length > 0,
+    }),
+    [combinedValidation]
+  );
 
   return {
     validation: combinedValidation,
     segmentValidations,
-    pathValidation,
-    documentTypeErrors,
+    pathValidation: validation, // Unified validation result
+    documentTypeErrors: validation.errors, // Now part of unified validation
     sanityValidationErrors,
     allErrors: combinedValidation.errors,
     allWarnings: combinedValidation.warnings,

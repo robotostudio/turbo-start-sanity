@@ -10,9 +10,9 @@ import {
   unset,
   useFormValue,
 } from "sanity";
-import slugify from "slugify";
 import { styled } from "styled-components";
 import { useSlugValidation } from "../hooks/use-slug-validation";
+import { generateSlugFromTitle } from "../utils/slug-validation";
 import { ErrorStates } from "./url-slug/error-states";
 
 const presentationOriginUrl = process.env.SANITY_STUDIO_PRESENTATION_URL;
@@ -168,9 +168,10 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
   const document = useFormValue([]) as SanityDocument;
   const currentSlug = value?.current || "";
 
-  // Use centralized validation hook - single source of truth
+  // Use centralized validation hook with document type for unified config
   const { allErrors, allWarnings } = useSlugValidation({
     slug: currentSlug,
+    documentType: document?._type,
     includeSanityValidation: true,
   });
 
@@ -220,31 +221,26 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
   const handleGenerate = useCallback(() => {
     try {
       const documentTitle = document?.title as string | undefined;
-      if (!documentTitle?.trim()) {
+      const documentType = document?._type;
+      
+      if (!(documentTitle?.trim() && documentType)) {
         return;
       }
 
-      const segments = currentSlug.split("/").filter(Boolean);
-      const newSlug = slugify(documentTitle, {
-        lower: true,
-        remove: /[^a-zA-Z0-9\s-]/g,
-      });
+      // Use unified slug generation with document type config
+      const generatedSlug = generateSlugFromTitle(
+        documentTitle,
+        documentType,
+        currentSlug
+      );
 
-      if (!newSlug) {
-        return;
+      if (generatedSlug) {
+        handleChange(generatedSlug);
       }
-
-      // Keep existing path structure if it exists
-      const fullPath =
-        segments.length > 1
-          ? `/${segments.slice(0, -1).join("/")}/${newSlug}`
-          : `/${newSlug}`;
-
-      handleChange(fullPath);
     } catch {
       // Silently handle errors
     }
-  }, [document?.title, currentSlug, handleChange]);
+  }, [document?.title, document?._type, currentSlug, handleChange]);
 
   const handleCopyUrl = useCallback(async () => {
     try {
