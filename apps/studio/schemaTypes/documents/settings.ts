@@ -6,7 +6,6 @@ const socialLinks = defineField({
   title: "Social Media Links",
   description: "Add links to your social media profiles",
   type: "object",
-  options: {},
   fields: [
     defineField({
       name: "linkedin",

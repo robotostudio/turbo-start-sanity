@@ -11,40 +11,49 @@ export const handler = documentEventHandler(async ({ context, event }) => {
   const { beforeSlug, slug } = event.data;
 
   if (!(slug && beforeSlug)) {
+    console.log("No slug or beforeSlug");
     return;
   }
   if (slug === beforeSlug) {
+    console.log("Slug did not change");
     return;
   }
   // check if redirect already exists
   const existingRedirect = await client.fetch(
-    `*[_type == "redirect" && source.current == "${beforeSlug}"][0]`
+    `*[_type == "redirect" && source.current == $beforeSlug][0]`,
+    { beforeSlug },
   );
   if (existingRedirect) {
+    console.log(`Redirect already exists for source ${beforeSlug}`);
     return;
   }
   // check for loops
   const loopRedirect = await client.fetch(
-    `*[_type == "redirect" && source.current == "${slug}" && destination.current == "${beforeSlug}"][0]`
+    `*[_type == "redirect" && source.current == $slug && destination.current == $beforeSlug][0]`,
+    { slug, beforeSlug },
   );
   if (loopRedirect) {
+    console.log("Redirect loop detected");
     return;
   }
   const redirect = {
     _type: "redirect",
+    status: "active",
     source: {
       current: beforeSlug,
     },
     destination: {
       current: slug,
     },
-    permanent: true,
+    permanent: "true",
   };
 
   try {
-    const _res = await client.create(redirect);
-  } catch (_error) {
-    // biome-ignore lint/suspicious/noConsole: console is used for logging
-    console.error(_error);
+    const res = await client.create(redirect);
+    console.log(
+      `🔗 Redirect from ${beforeSlug} to ${slug} was created ${JSON.stringify(res)}`
+    );
+  } catch (error) {
+    console.log(error);
   }
 });

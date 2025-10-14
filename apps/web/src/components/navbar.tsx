@@ -84,22 +84,33 @@ function DesktopColumnDropdown({
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleMouseEnter = () => {
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsOpen(false);
+  };
+
   return (
     <div className="group relative">
       <button
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
         className="flex items-center gap-1 px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        type="button"
       >
         {column.title}
         <ChevronDown className="size-3 transition-transform group-hover:rotate-180" />
       </button>
-
-      {isOpen && (
+      {isOpen ? (
         <div
           className="fade-in-0 zoom-in-95 absolute top-full left-0 z-50 min-w-[280px] animate-in rounded-lg border bg-popover p-2 shadow-lg"
-          onMouseEnter={() => setIsOpen(true)}
-          onMouseLeave={() => setIsOpen(false)}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          role="menu"
         >
           <div className="grid gap-1">
             {column.links?.map((link: ColumnLink) => (
@@ -113,7 +124,7 @@ function DesktopColumnDropdown({
             ))}
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -202,6 +213,7 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
                         <button
                           className="flex items-center justify-between py-2 font-medium text-sm transition-colors hover:text-primary"
                           onClick={() => toggleDropdown(column._key)}
+                          type="button"
                         >
                           {column.title}
                           <ChevronDown

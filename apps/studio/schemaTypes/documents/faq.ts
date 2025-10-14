@@ -2,7 +2,7 @@ import { MessageCircle } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
 import { parseRichTextToString } from "../../utils/helper";
-import { richTextField } from "../common";
+import { customRichText } from "../definitions/rich-text";
 
 export const faq = defineType({
   name: "faq",
@@ -20,8 +20,7 @@ export const faq = defineType({
         "Write the question exactly as someone might ask it. For example: 'How do I reset my password?'",
       validation: (Rule) => Rule.required(),
     }),
-    defineField({
-      ...richTextField,
+    customRichText(["block"], {
       title: "Answer",
       description:
         "Write a friendly, clear answer that directly addresses the question. Keep it simple enough that anyone can understand it.",

@@ -118,28 +118,8 @@ function BlogContent({
   );
 }
 
-function _AuthorSection({ authors }: { authors: Blog["authors"] }) {
-  if (!authors) {
-    return null;
-  }
-
-  return (
-    <div className="mt-6 flex border-gray-900/5 border-t pt-6">
-      <div className="relative flex items-center gap-x-4">
-        <AuthorImage author={authors} />
-        <div className="text-sm leading-6">
-          <p className="font-semibold">
-            <span className="absolute inset-0" />
-            {authors.name}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function FeaturedBlogCard({ blog }: BlogCardProps) {
-  const { title, publishedAt, slug, authors, description, image } = blog ?? {};
+  const { title, publishedAt, slug, description, image } = blog ?? {};
 
   return (
     <article className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
@@ -152,7 +132,6 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
           slug={slug}
           title={title}
         />
-        {/* <AuthorSection authors={authors} /> */}
       </div>
     </article>
   );
@@ -172,7 +151,7 @@ export function BlogCard({ blog }: BlogCardProps) {
     );
   }
 
-  const { title, publishedAt, slug, authors, description, image } = blog;
+  const { title, publishedAt, slug, description, image } = blog;
 
   return (
     <article className="grid w-full grid-cols-1 gap-4">
@@ -183,7 +162,6 @@ export function BlogCard({ blog }: BlogCardProps) {
       <div className="w-full space-y-4">
         <BlogMeta publishedAt={publishedAt} />
         <BlogContent description={description} slug={slug} title={title} />
-        {/* <AuthorSection authors={authors} /> */}
       </div>
     </article>
   );
