@@ -1,5 +1,10 @@
 import { ImageIcon, LinkIcon } from "@sanity/icons";
-import { defineArrayMember, defineField, defineType } from "sanity";
+import {
+  type ConditionalProperty,
+  defineArrayMember,
+  defineField,
+  defineType,
+} from "sanity";
 
 const richTextMembers = [
   defineArrayMember({
@@ -70,9 +75,15 @@ type Type = NonNullable<(typeof memberTypes)[number]>;
 
 export const customRichText = (
   type: Type[],
-  options?: { name?: string; title?: string; group?: string }
+  options?: {
+    name?: string;
+    title?: string;
+    group?: string[] | string;
+    description?: string;
+    hidden?: ConditionalProperty;
+  }
 ) => {
-  const { name } = options ?? {};
+  const { name, description, hidden } = options ?? {};
   const customMembers = richTextMembers.filter(
     (member) => member.name && type.includes(member.name)
   );
@@ -80,6 +91,8 @@ export const customRichText = (
     ...options,
     name: name ?? "richText",
     type: "array",
+    description: description ?? "",
+    hidden,
     of: customMembers,
   });
 };

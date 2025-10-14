@@ -1,7 +1,8 @@
 import { ImageIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { buttonsField, richTextField } from "../common";
+import { buttonsField } from "../common";
+import { customRichText } from "../definitions/rich-text";
 
 const imageLinkCard = defineField({
   name: "imageLinkCard",
@@ -56,8 +57,7 @@ const imageLinkCard = defineField({
 
       return {
         title: title || "Untitled Card",
-        subtitle:
-          description + (url ? ` • ${url}${newTabIndicator}` : ""),
+        subtitle: description + (url ? ` • ${url}${newTabIndicator}` : ""),
         media,
       };
     },
@@ -83,7 +83,7 @@ export const imageLinkCards = defineType({
       description: "The main heading for this cards section",
       validation: (Rule) => Rule.required(),
     }),
-    richTextField,
+    customRichText(["block"]),
     buttonsField,
     defineField({
       name: "cards",

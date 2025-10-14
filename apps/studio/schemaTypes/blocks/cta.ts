@@ -1,7 +1,8 @@
 import { PhoneIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { buttonsField, richTextField } from "../common";
+import { buttonsField } from "../common";
+import { customRichText } from "../definitions/rich-text";
 
 export const cta = defineType({
   name: "cta",
@@ -21,7 +22,7 @@ export const cta = defineType({
       type: "string",
       description: "The large text that is the primary focus of the block",
     }),
-    richTextField,
+    customRichText(["block"]),
     buttonsField,
   ],
   preview: {

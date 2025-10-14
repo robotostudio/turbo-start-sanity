@@ -26,11 +26,6 @@ export type PageBuilderProps = {
   readonly type: string;
 };
 
-type PageData = {
-  readonly _id: string;
-  readonly _type: string;
-  readonly pageBuilder?: PageBuilderBlock[];
-};
 
 type SanityDataAttributeConfig = {
   readonly id: string;
