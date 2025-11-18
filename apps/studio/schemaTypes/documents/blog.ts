@@ -8,7 +8,7 @@ import { defineArrayMember, defineField, defineType } from "sanity";
 import { GROUP, GROUPS } from "../../utils/constant";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
-import { documentSlugField } from "../common";
+import { documentSlugField, imageWithAltField } from "../common";
 
 export const blog = defineType({
   name: "blog",
@@ -91,17 +91,12 @@ export const blog = defineType({
         "The date when your blog post will appear to have been published",
       group: GROUP.MAIN_CONTENT,
     }),
-    defineField({
-      name: "image",
+    imageWithAltField({
       title: "Image",
       description:
         "The main picture that will appear at the top of your blog post and in previews",
-      type: "image",
       group: GROUP.MAIN_CONTENT,
       validation: (Rule) => Rule.required(),
-      options: {
-        hotspot: true,
-      },
     }),
     defineField({
       name: "richText",

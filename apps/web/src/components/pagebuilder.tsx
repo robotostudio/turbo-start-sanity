@@ -26,7 +26,6 @@ export type PageBuilderProps = {
   readonly type: string;
 };
 
-
 type SanityDataAttributeConfig = {
   readonly id: string;
   readonly type: string;

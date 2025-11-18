@@ -4,7 +4,11 @@ import { defineField, defineType } from "sanity";
 import { GROUP, GROUPS } from "../../utils/constant";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
-import { documentSlugField, pageBuilderField } from "../common";
+import {
+  documentSlugField,
+  imageWithAltField,
+  pageBuilderField,
+} from "../common";
 
 export const page = defineType({
   name: "page",
@@ -48,16 +52,11 @@ export const page = defineType({
     documentSlugField("page", {
       group: GROUP.MAIN_CONTENT,
     }),
-    defineField({
-      name: "image",
-      type: "image",
+    imageWithAltField({
       title: "Image",
       description:
         "A main picture for this page that can be used when sharing on social media or in search results",
       group: GROUP.MAIN_CONTENT,
-      options: {
-        hotspot: true,
-      },
     }),
     pageBuilderField,
     ...seoFields.filter((field) => field.name !== "seoHideFromLists"),

@@ -176,7 +176,7 @@ function Footer({ data, settingsData }: FooterProps) {
                     <h3 className="mb-6 font-semibold">{column?.title}</h3>
                     {column?.links && column?.links?.length > 0 && (
                       <ul className="space-y-4 text-muted-foreground text-sm dark:text-zinc-400">
-                        {column?.links?.map((link,columnIndex) => (
+                        {column?.links?.map((link, columnIndex) => (
                           <li
                             className="font-medium hover:text-primary"
                             key={`${link?._key}-${columnIndex}-column-${column?._key}`}

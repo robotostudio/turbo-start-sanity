@@ -1,7 +1,7 @@
 import { Star } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { buttonsField } from "../common";
+import { buttonsField, imageWithAltField } from "../common";
 import { customRichText } from "../definitions/rich-text";
 
 export const hero = defineType({
@@ -25,16 +25,7 @@ export const hero = defineType({
         "The main heading text for the hero section that captures attention",
     }),
     customRichText(["block"]),
-    defineField({
-      name: "image",
-      type: "image",
-      title: "Image",
-      description:
-        "The main hero image - should be high quality and visually impactful",
-      options: {
-        hotspot: true,
-      },
-    }),
+    imageWithAltField(),
     buttonsField,
   ],
   preview: {

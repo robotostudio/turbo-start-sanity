@@ -3,6 +3,13 @@ import { defineQuery } from "next-sanity";
 const imageFields = /* groq */ `
   "id": asset._ref,
   "preview": asset->metadata.lqip,
+  "alt": coalesce(
+    alt,
+    asset->altText,
+    caption,
+    asset->originalFilename,
+    "untitled"
+  ),
   hotspot {
     x,
     y
