@@ -21,7 +21,7 @@ export const handler = documentEventHandler(async ({ context, event }) => {
   // check if redirect already exists
   const existingRedirect = await client.fetch(
     `*[_type == "redirect" && source.current == $beforeSlug][0]`,
-    { beforeSlug },
+    { beforeSlug }
   );
   if (existingRedirect) {
     console.log(`Redirect already exists for source ${beforeSlug}`);
@@ -30,7 +30,7 @@ export const handler = documentEventHandler(async ({ context, event }) => {
   // check for loops
   const loopRedirect = await client.fetch(
     `*[_type == "redirect" && source.current == $slug && destination.current == $beforeSlug][0]`,
-    { slug, beforeSlug },
+    { slug, beforeSlug }
   );
   if (loopRedirect) {
     console.log("Redirect loop detected");

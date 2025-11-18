@@ -9,7 +9,7 @@
         "noConsole": "warn"
       },
       "style": {
-        "noMagicNumbers": "info"
+        "noMagicNumbers": "off"
       },
       "performance": {
         "noNamespaceImport": "off"

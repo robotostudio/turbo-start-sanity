@@ -1,5 +1,6 @@
 import { UserIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
+import { imageWithAltField } from "../common";
 
 export const author = defineType({
   name: "author",
@@ -21,15 +22,10 @@ export const author = defineType({
       description:
         "The job title or role of this person, like 'Editor' or 'Writer'",
     }),
-    defineField({
-      name: "image",
-      type: "image",
+    imageWithAltField({
       title: "Image",
       description:
         "A photo of the author that will appear next to their articles",
-      options: {
-        hotspot: true,
-      },
     }),
     defineField({
       name: "bio",

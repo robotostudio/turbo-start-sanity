@@ -1,7 +1,7 @@
 import { ImageIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { buttonsField } from "../common";
+import { buttonsField, imageWithAltField } from "../common";
 import { customRichText } from "../definitions/rich-text";
 
 const imageLinkCard = defineField({
@@ -21,10 +21,8 @@ const imageLinkCard = defineField({
       type: "text",
       validation: (Rule) => Rule.required(),
     }),
-    defineField({
-      name: "image",
+    imageWithAltField({
       title: "Card Image",
-      type: "image",
       description: "Add an image or illustration for this card",
     }),
     defineField({

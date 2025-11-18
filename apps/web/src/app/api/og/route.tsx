@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/performance/noImgElement: this is a edge runtime function */
 import { ImageResponse } from "next/og";
 import type { ImageResponseOptions } from "next/server";
 
@@ -17,7 +18,9 @@ export const runtime = "edge";
 const errorContent = (
   <div tw="flex flex-col w-full h-full items-center justify-center">
     <div tw=" flex w-full h-full items-center justify-center ">
-      <h1 tw="text-white">Something went Wrong with image generation</h1>
+      <h1 tw="text-white">
+        Something went Wrong with image generation
+      </h1>
     </div>
   </div>
 );
@@ -44,6 +47,27 @@ const seoImageRender = ({ seoImage }: SeoImageRenderProps) => (
   </div>
 );
 
+const FallbackImage = ({ logo }: { logo: Maybe<string> }) => {
+  if (logo) {
+    return (
+      <div tw="flex items-center justify-center h-full w-full">
+        <img alt="Logo" height={400} src={logo} width={400} />
+      </div>
+    );
+  }
+
+  return (
+    <div tw="flex items-center justify-center h-full w-full">
+      <img
+        alt="Logo"
+        height={400}
+        src={"https://picsum.photos/566/566"}
+        width={400}
+      />
+    </div>
+  );
+};
+
 const dominantColorSeoImageRender = ({
   image,
   title,
@@ -66,17 +90,28 @@ const dominantColorSeoImageRender = ({
       width="100%"
     >
       <defs>
-        <linearGradient id="gradient" x1="0%" x2="100%" y1="100%" y2="0%">
+        <linearGradient
+          id="gradient"
+          x1="0%"
+          x2="100%"
+          y1="100%"
+          y2="0%"
+        >
           <stop offset="0%" style={{ stopColor: "transparent" }} />
           <stop offset="100%" style={{ stopColor: "white" }} />
         </linearGradient>
       </defs>
-      <rect fill="url(#gradient)" height="100%" opacity="0.2" width="100%" />
+      <rect
+        fill="url(#gradient)"
+        height="100%"
+        opacity="0.2"
+        width="100%"
+      />
     </svg>
 
     <div tw="flex-1 p-10 flex flex-col justify-between relative z-10">
       <div tw="flex justify-between items-start w-full">
-        {logo && <img alt="Logo" height={48} src={logo} />}
+        {logo && <img alt="Logo" height={48} src={logo} width={48} />}
         <div tw="bg-white flex bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-medium">
           {new Date(date ?? new Date()).toLocaleDateString("en-US", {
             month: "long",
@@ -115,25 +150,16 @@ const dominantColorSeoImageRender = ({
               tw="w-full h-full rounded-3xl shadow-2xl"
               width={566}
             />
-          ) : logo ? (
-            <div tw="flex items-center justify-center h-full w-full">
-              <img alt="Logo" height={400} src={logo} width={400} />
-            </div>
           ) : (
-            <div tw="flex items-center justify-center h-full w-full">
-              <img
-                alt="Logo"
-                height={400}
-                src={"https://picsum.photos/566/566"}
-                width={400}
-              />
-            </div>
+            <FallbackImage logo={logo} />
           )}
         </div>
       </div>
     </div>
   </div>
 );
+
+const FONT_REGEX = /url\(([^)]+)\)/;
 
 async function getTtfFont(
   family: string,
@@ -153,7 +179,7 @@ async function getTtfFont(
   );
 
   const css = await cssCall.text();
-  const ttfUrl = css.match(/url\(([^)]+)\)/)?.[1];
+  const ttfUrl = css.match(FONT_REGEX)?.[1];
 
   if (!ttfUrl) {
     throw new Error("Failed to extract font URL from CSS");
@@ -270,7 +296,10 @@ export async function GET({ url }: Request): Promise<ImageResponse> {
   const image = block[type] ?? getGenericPageContent;
   try {
     const content = await image(para);
-    return new ImageResponse(content ? content : errorContent, options);
+    return new ImageResponse(
+      content ? content : errorContent,
+      options
+    );
   } catch (_err) {
     return new ImageResponse(errorContent, options);
   }

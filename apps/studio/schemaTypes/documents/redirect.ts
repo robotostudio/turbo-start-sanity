@@ -61,7 +61,7 @@ export const redirect = defineType({
           if (!(value && source)) {
             return "Can't be blank";
           }
-          if (!source.startsWith("/")) {  
+          if (!source.startsWith("/")) {
             return "The path must start with a /";
           }
 
