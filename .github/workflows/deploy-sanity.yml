@@ -1,6 +1,8 @@
 name: Deploy Sanity Studio
 on:
   push:
+    branches:
+      - main
     paths:
       - "apps/studio/**"
       - ".github/workflows/deploy-sanity.yml"
