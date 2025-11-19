@@ -11,7 +11,8 @@ const dataset = process.env.SANITY_STUDIO_DATASET;
  */
 function getStudioHost(): string | undefined {
   const host = process.env.HOST_NAME;
-  const productionHostName = process.env.SANITY_STUDIO_PRODUCTION_HOSTNAME;
+  const productionHostName =
+    process.env.SANITY_STUDIO_PRODUCTION_HOSTNAME;
 
   if (productionHostName) {
     if (host && host !== "main") {
@@ -26,6 +27,12 @@ function getStudioHost(): string | undefined {
   }
 
   return;
+}
+
+const studioHost = getStudioHost();
+
+if (studioHost) {
+  console.log(`🪩 Sanity Studio Host: https://${studioHost}.sanity.studio`);
 }
 
 export default defineCliConfig({
