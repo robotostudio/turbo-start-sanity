@@ -1,10 +1,17 @@
 name: Deploy Sanity Studio
 on:
   push:
+    branches:
+      - main
     paths:
       - "apps/studio/**"
       - ".github/workflows/deploy-sanity.yml"
   workflow_dispatch:
+    inputs:
+      presentation_url:
+        description: 'Override SANITY_STUDIO_PRESENTATION_URL (do not include a trailing slash)'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -22,8 +29,7 @@ jobs:
       SANITY_STUDIO_PROJECT_ID: ${{ secrets.SANITY_STUDIO_PROJECT_ID }}
       SANITY_STUDIO_DATASET: ${{ secrets.SANITY_STUDIO_DATASET }}
       SANITY_STUDIO_TITLE: ${{ secrets.SANITY_STUDIO_TITLE }}
-      SANITY_STUDIO_PRESENTATION_URL: ${{ secrets.SANITY_STUDIO_PRESENTATION_URL }}
-      SANITY_STUDIO_PRODUCTION_HOSTNAME: ${{ secrets.SANITY_STUDIO_PRODUCTION_HOSTNAME }}
+      SANITY_STUDIO_PRESENTATION_URL: ${{ github.event.inputs.presentation_url || secrets.SANITY_STUDIO_PRESENTATION_URL }}
       HOST_NAME: ${{ github.head_ref || github.ref_name }}  
 
     steps:
