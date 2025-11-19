@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       presentation_url:
-        description: 'Override SANITY_STUDIO_PRESENTATION_URL'
+        description: 'Override SANITY_STUDIO_PRESENTATION_URL (do not include a trailing slash)'
         required: false
         type: string
 
