@@ -4,7 +4,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@workspace/ui/*": ["../../packages/ui/src/*"]
+      "@workspace/ui/*": ["../../packages/ui/src/*"],
+      "env": ["./env"]
     },
     "plugins": [
       {
@@ -14,7 +15,7 @@
   },
   "include": [
     "next-env.d.ts",
-    "next.config.ts",
+    "next.config.js",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"

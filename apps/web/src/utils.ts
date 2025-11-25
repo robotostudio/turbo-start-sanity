@@ -1,3 +1,4 @@
+import { env } from "env";
 import type { PortableTextBlock } from "next-sanity";
 import slugify from "slugify";
 
@@ -10,11 +11,12 @@ export function assertValue<T>(v: T | undefined, errorMessage: string): T {
 }
 
 export const getBaseUrl = () => {
-  if (process.env.VERCEL_ENV === "production") {
-    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  if (env.VERCEL_ENV === "production") {
+    return `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`;
   }
-  if (process.env.VERCEL_ENV === "preview") {
-    return `https://${process.env.VERCEL_URL}`;
+
+  if (env.VERCEL_ENV === "preview") {
+    return `https://${env.VERCEL_URL}`;
   }
 
   return "http://localhost:3000";
@@ -43,7 +45,7 @@ export const getTitleCase = (name: string) => {
 type Response<T> = [T, undefined] | [undefined, string];
 
 export async function handleErrors<T>(
-  promise: Promise<T>
+  promise: Promise<T>,
 ): Promise<Response<T>> {
   try {
     const data = await promise;
@@ -58,7 +60,7 @@ export async function handleErrors<T>(
 
 export function convertToSlug(
   text?: string,
-  { fallback }: { fallback?: string } = { fallback: "top-level" }
+  { fallback }: { fallback?: string } = { fallback: "top-level" },
 ) {
   if (!text) {
     return fallback;
