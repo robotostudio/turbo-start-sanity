@@ -2,16 +2,15 @@
 
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
+import { env } from "env";
 import { ChevronDown, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
-
 import type {
   QueryGlobalSeoSettingsResult,
   QueryNavbarDataResult,
 } from "@/lib/sanity/sanity.types";
-
 import { SanityButtons } from "./elements/sanity-buttons";
 import { SanityIcon } from "./elements/sanity-icon";
 import { Logo } from "./logo";
@@ -383,7 +382,7 @@ export function Navbar({
       </div>
 
       {/* Error boundary for SWR */}
-      {error && process.env.NODE_ENV === "development" && (
+      {error && env.NODE_ENV === "development" && (
         <div className="border-destructive/20 border-b bg-destructive/10 px-4 py-2 text-destructive text-xs">
           Navigation data fetch error: {error.message}
         </div>

@@ -1,13 +1,11 @@
 "use client";
 
 import { useOptimistic } from "@sanity/visual-editing/react";
+import { env } from "env";
 import { createDataAttribute } from "next-sanity";
 import { useCallback, useMemo } from "react";
-
-import { dataset, projectId, studioUrl } from "@/config";
 import type { QueryHomePageDataResult } from "@/lib/sanity/sanity.types";
 import type { PageBuilderBlockTypes, PagebuilderType } from "@/types";
-
 import { CTABlock } from "./sections/cta";
 import { FaqAccordion } from "./sections/faq-accordion";
 import { FeatureCardsWithIcon } from "./sections/feature-cards-with-icon";
@@ -56,9 +54,9 @@ const BLOCK_COMPONENTS = {
 function createSanityDataAttribute(config: SanityDataAttributeConfig): string {
   return createDataAttribute({
     id: config.id,
-    baseUrl: studioUrl,
-    projectId,
-    dataset,
+    baseUrl: env.NEXT_PUBLIC_SANITY_STUDIO_URL,
+    projectId: env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+    dataset: env.NEXT_PUBLIC_SANITY_DATASET,
     type: config.type,
     path: config.path,
   }).toString();
