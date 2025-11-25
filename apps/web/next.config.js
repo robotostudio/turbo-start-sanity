@@ -4,12 +4,14 @@ import { createJiti } from "jiti";
 const jiti = createJiti(fileURLToPath(import.meta.url), {
   alias: {
     "@": fileURLToPath(new URL("./src", import.meta.url)),
+    "@workspace/ui/*": fileURLToPath(new URL("../../packages/ui/src", import.meta.url)),
+    "env": fileURLToPath(new URL("./env", import.meta.url)),
   },
   interopDefault: true,
   sourceMaps: process.env.NODE_ENV === "development",
 });
 
-await jiti.import("./env");
+await jiti.import("env");
 
 /**
  * @typedef {import("@sanity/client").SanityClient} SanityClient
