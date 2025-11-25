@@ -4,14 +4,13 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "pnpm with-env next dev --turbopack",
-    "build": "pnpm with-env next build",
-    "start": "pnpm with-env next start",
+    "dev": "pnpm next dev --turbopack",
+    "build": "pnpm next build",
+    "start": "pnpm next start",
     "lint": "npx ultracite lint",
     "format": "npx ultracite fix",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck",
-    "with-env": "dotenv -e ../../.env --"
+    "check": "npm run lint && npm run typecheck"
   },
   "dependencies": {
     "@sanity/asset-utils": "^2.2.1",
