@@ -1,7 +1,7 @@
 import type { SanityImageSource } from "@sanity/asset-utils";
 import createImageUrlBuilder from "@sanity/image-url";
+import { env } from "env";
 import { createClient } from "next-sanity";
-import { env } from "../../../env";
 
 export const client = createClient({
   projectId: env.NEXT_PUBLIC_SANITY_PROJECT_ID,
@@ -11,7 +11,7 @@ export const client = createClient({
   perspective: "published",
   stega: {
     studioUrl: env.NEXT_PUBLIC_SANITY_STUDIO_URL,
-    enabled: env.NEXT_PUBLIC_VERCEL_ENV === "production",
+    enabled: env.NEXT_PUBLIC_VERCEL_ENV === "preview",
   },
 });
 
