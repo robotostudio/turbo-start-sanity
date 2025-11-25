@@ -4,9 +4,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "pnpm next dev --turbopack",
-    "build": "pnpm next build",
-    "start": "pnpm next start",
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
     "lint": "npx ultracite lint",
     "format": "npx ultracite fix",
     "typecheck": "tsc --noEmit",
