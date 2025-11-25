@@ -15,7 +15,9 @@ export const env = createEnv({
   },
 
   client: {
-    // Vercel System (Framework) Vars: Auto-injected in Prod/Preview, missing locally (https://vercel.com/docs/environment-variables/framework-environment-variables#using-prefixed-framework-environment-variables-locally).
+    /** Vercel System (Framework) Vars: Auto-injected in Prod/Preview, missing locally
+     *  Learn more: https://vercel.com/docs/environment-variables/framework-environment-variables#using-prefixed-framework-environment-variables-locally)
+     */
 
     NEXT_PUBLIC_VERCEL_ENV: z
       .enum(["production", "preview", "development"])
