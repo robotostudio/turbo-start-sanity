@@ -238,13 +238,20 @@ export const queryBlogIndexPageData = defineQuery(`
     "displayFeaturedBlogs" : displayFeaturedBlogs == "yes",
     "featuredBlogsCount" : featuredBlogsCount,
     ${pageBuilderFragment},
-    "slug": slug.current,
-    "blogs": *[_type == "blog" && (seoHideFromLists != true)] | order(orderRank asc){
-      ${blogCardFragment}
-    }
+    "slug": slug.current
   }
 `);
 
+
+export const queryBlogIndexPageBlogs = defineQuery(`
+  *[_type == "blog" && (seoHideFromLists != true)] | order(orderRank asc) [$start...$end]{
+    ${blogCardFragment}
+  }
+`);
+
+export const queryBlogIndexPageBlogsCount = defineQuery(`
+  count(*[_type == "blog" && (seoHideFromLists != true)])
+`);
 export const queryBlogSlugPageData = defineQuery(`
   *[_type == "blog" && slug.current == $slug][0]{
     ...,

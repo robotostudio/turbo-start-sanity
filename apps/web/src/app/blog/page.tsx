@@ -1,17 +1,38 @@
 import { notFound } from "next/navigation";
-
-import { BlogCard, BlogHeader, FeaturedBlogCard } from "@/components/blog-card";
+import { BlogHeader } from "@/components/blog-card";
+import { BlogPageContent } from "@/components/blog-page-content";
 import { PageBuilder } from "@/components/pagebuilder";
 import { sanityFetch } from "@/lib/sanity/live";
-import { queryBlogIndexPageData } from "@/lib/sanity/query";
-import type { QueryBlogIndexPageDataResult } from "@/lib/sanity/sanity.types";
+import {
+  queryBlogIndexPageBlogs,
+  queryBlogIndexPageBlogsCount,
+  queryBlogIndexPageData,
+} from "@/lib/sanity/query";
 import { getSEOMetadata } from "@/lib/seo";
-import { handleErrors } from "@/utils";
+import {
+  calculatePaginationMetadata,
+  getBlogPaginationStartEnd,
+  handleErrors,
+} from "@/utils";
 
-type Blog = NonNullable<QueryBlogIndexPageDataResult>["blogs"][number];
+async function fetchBlogIndexPageData() {
+  const res = await sanityFetch({ query: queryBlogIndexPageData });
+  return res.data;
+}
 
-async function fetchBlogPosts() {
-  return await handleErrors(sanityFetch({ query: queryBlogIndexPageData }));
+async function fetchBlogIndexPageBlogs(start: number, end: number) {
+  const res = await sanityFetch({
+    query: queryBlogIndexPageBlogs,
+    params: { start, end },
+  });
+  return res.data;
+}
+
+async function fetchBlogIndexPageBlogsCount() {
+  const res = await sanityFetch({
+    query: queryBlogIndexPageBlogsCount,
+  });
+  return res.data;
 }
 
 export async function generateMetadata() {
@@ -32,78 +53,90 @@ export async function generateMetadata() {
   );
 }
 
-export default async function BlogIndexPage() {
-  const [res, err] = await fetchBlogPosts();
-  if (err || !res?.data) {
+type BlogPageProps = {
+  searchParams: Promise<{
+    page?: string;
+  }>;
+};
+
+export default async function BlogIndexPage({ searchParams }: BlogPageProps) {
+  const { page } = await searchParams;
+  const currentPage = page ? Number(page) : 1;
+
+  // Fetch page data and total count in parallel
+  const [[indexPageData, errIndexPageData], [totalCount, errTotalCount]] =
+    await Promise.all([
+      handleErrors(fetchBlogIndexPageData()),
+      handleErrors(fetchBlogIndexPageBlogsCount()),
+    ]);
+
+  if (errIndexPageData || !indexPageData) {
     notFound();
   }
 
-  const {
-    blogs = [],
-    title,
-    description,
-    pageBuilder = [],
-    _id,
-    _type,
-    displayFeaturedBlogs,
-    featuredBlogsCount,
-  } = res.data;
-
-  const validFeaturedBlogsCount = featuredBlogsCount
-    ? Number.parseInt(featuredBlogsCount, 10)
-    : 0;
-
-  if (!blogs.length) {
+  if (errTotalCount || totalCount === null || totalCount === undefined) {
     return (
       <main className="container mx-auto my-16 px-4 md:px-6">
-        <BlogHeader description={description} title={title} />
+        <BlogHeader
+          description={indexPageData.description}
+          title={indexPageData.title}
+        />
         <div className="py-12 text-center">
           <p className="text-muted-foreground">
-            No blog posts available at the moment.
+            Unable to load blog posts at the moment.
           </p>
         </div>
-        {pageBuilder && pageBuilder.length > 0 && (
-          <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
+        {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
+          <PageBuilder
+            id={indexPageData._id}
+            pageBuilder={indexPageData.pageBuilder}
+            type={indexPageData._type}
+          />
         )}
       </main>
     );
   }
 
-  const shouldDisplayFeaturedBlogs =
-    displayFeaturedBlogs && validFeaturedBlogsCount > 0;
+  // Calculate pagination metadata
+  const paginationMetadata = calculatePaginationMetadata(
+    totalCount,
+    currentPage
+  );
 
-  const featuredBlogs = shouldDisplayFeaturedBlogs
-    ? blogs.slice(0, validFeaturedBlogsCount)
-    : [];
-  const remainingBlogs = shouldDisplayFeaturedBlogs
-    ? blogs.slice(validFeaturedBlogsCount)
-    : blogs;
+  // Fetch blogs for current page
+  const { start, end } = getBlogPaginationStartEnd(page);
+  const [blogs, errBlogs] = await handleErrors(
+    fetchBlogIndexPageBlogs(start, end)
+  );
+
+  if (errBlogs || !blogs) {
+    return (
+      <main className="container mx-auto my-16 px-4 md:px-6">
+        <BlogHeader
+          description={indexPageData.description}
+          title={indexPageData.title}
+        />
+        <div className="py-12 text-center">
+          <p className="text-muted-foreground">
+            No blog posts available at the moment.
+          </p>
+        </div>
+        {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
+          <PageBuilder
+            id={indexPageData._id}
+            pageBuilder={indexPageData.pageBuilder}
+            type={indexPageData._type}
+          />
+        )}
+      </main>
+    );
+  }
 
   return (
-    <main className="bg-background">
-      <div className="container mx-auto my-16 px-4 md:px-6">
-        <BlogHeader description={description} title={title} />
-
-        {featuredBlogs.length > 0 && (
-          <div className="mx-auto mt-8 mb-12 grid grid-cols-1 gap-8 sm:mt-12 md:mt-16 md:gap-12 lg:mb-20">
-            {featuredBlogs.map((blog: Blog) => (
-              <FeaturedBlogCard blog={blog} key={blog._id} />
-            ))}
-          </div>
-        )}
-
-        {remainingBlogs.length > 0 && (
-          <div className="mt-8 grid grid-cols-1 gap-8 md:gap-12 lg:grid-cols-2">
-            {remainingBlogs.map((blog: Blog) => (
-              <BlogCard blog={blog} key={blog._id} />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {pageBuilder && pageBuilder.length > 0 && (
-        <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
-      )}
-    </main>
+    <BlogPageContent
+      blogs={blogs}
+      indexPageData={indexPageData}
+      paginationMetadata={paginationMetadata}
+    />
   );
 }

@@ -45,7 +45,7 @@ export const getTitleCase = (name: string) => {
 type Response<T> = [T, undefined] | [undefined, string];
 
 export async function handleErrors<T>(
-  promise: Promise<T>,
+  promise: Promise<T>
 ): Promise<Response<T>> {
   try {
     const data = await promise;
@@ -60,7 +60,7 @@ export async function handleErrors<T>(
 
 export function convertToSlug(
   text?: string,
-  { fallback }: { fallback?: string } = { fallback: "top-level" },
+  { fallback }: { fallback?: string } = { fallback: "top-level" }
 ) {
   if (!text) {
     return fallback;
@@ -76,4 +76,44 @@ export function parseChildrenToSlug(children: PortableTextBlock["children"]) {
     return "";
   }
   return convertToSlug(children.map((child) => child.text).join(""));
+}
+
+const BLOG_ITEMS_PER_PAGE = 10;
+
+export function getBlogPaginationStartEnd(page?: string): {
+  start: number;
+  end: number;
+} {
+  const pageNumber = page ? Number(page) : 1;
+  const start = (pageNumber - 1) * BLOG_ITEMS_PER_PAGE;
+  const end = start + BLOG_ITEMS_PER_PAGE;
+  return { start, end };
+}
+
+export type PaginationMetadata = {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+};
+
+export function calculatePaginationMetadata(
+  totalItems: number,
+  currentPage = 1,
+  itemsPerPage = BLOG_ITEMS_PER_PAGE
+): PaginationMetadata {
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const hasNextPage = currentPage < totalPages;
+  const hasPreviousPage = currentPage > 1;
+
+  return {
+    currentPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    hasNextPage,
+    hasPreviousPage,
+  };
 }
