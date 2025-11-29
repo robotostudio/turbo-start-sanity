@@ -11,8 +11,7 @@ const dataset = process.env.SANITY_STUDIO_DATASET;
  */
 function getStudioHost(): string | undefined {
   const host = process.env.HOST_NAME;
-  const productionHostName =
-    process.env.SANITY_STUDIO_PRODUCTION_HOSTNAME;
+  const productionHostName = process.env.SANITY_STUDIO_PRODUCTION_HOSTNAME;
 
   if (productionHostName) {
     if (host && host !== "main") {
@@ -41,7 +40,7 @@ export default defineCliConfig({
     dataset,
   },
   studioHost: getStudioHost(),
-  deployment:{
+  deployment: {
     autoUpdates: false,
-  }
+  },
 });

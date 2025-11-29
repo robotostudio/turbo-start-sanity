@@ -87,14 +87,13 @@ function LoadingState() {
   );
 }
 
-export function BlogSearchResults({ 
-  className, 
-  results, 
-  isSearching, 
-  hasQuery, 
-  searchQuery 
+export function BlogSearchResults({
+  className,
+  results,
+  isSearching,
+  hasQuery,
+  searchQuery,
 }: BlogSearchResultsProps) {
-
   if (!hasQuery) {
     return null;
   }

@@ -8,8 +8,6 @@ import {
   PaginationPrevious,
 } from "@workspace/ui/components/pagination";
 
-
-
 export type PaginationProps = {
   currentPage: number;
   totalPages: number;
@@ -17,7 +15,6 @@ export type PaginationProps = {
   hasPreviousPage: boolean;
   basePath?: string;
 };
-
 
 interface BlogPaginationProps extends PaginationProps {
   className?: string;
@@ -99,7 +96,9 @@ export function BlogPagination({
           )}
 
           {paginationItems.map((item, index) => (
-            <PaginationItem key={item === "ellipsis" ? `ellipsis-${index}` : item}>
+            <PaginationItem
+              key={item === "ellipsis" ? `ellipsis-${index}` : item}
+            >
               {item === "ellipsis" ? (
                 <PaginationEllipsis />
               ) : (

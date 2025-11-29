@@ -97,15 +97,19 @@ export default async function BlogIndexPage({ searchParams }: BlogPageProps) {
     );
   }
 
-  const featuredBlogsCount = indexPageData.displayFeaturedBlogs 
-    ? Number(indexPageData.featuredBlogsCount) || 0 
+  const featuredBlogsCount = indexPageData.displayFeaturedBlogs
+    ? Number(indexPageData.featuredBlogsCount) || 0
     : 0;
 
-  const paginationMetadata = calculatePaginationMetadata(totalCount, currentPage);
-  
+  const paginationMetadata = calculatePaginationMetadata(
+    totalCount,
+    currentPage
+  );
+
   const { start, end } = getBlogPaginationStartEnd(currentPage);
   const blogStart = currentPage === 1 ? 0 : start + featuredBlogsCount;
-  const blogEnd = currentPage === 1 ? end + featuredBlogsCount : end + featuredBlogsCount;
+  const blogEnd =
+    currentPage === 1 ? end + featuredBlogsCount : end + featuredBlogsCount;
 
   const [blogs, errBlogs] = await handleErrors(
     fetchBlogIndexPageBlogs(blogStart, blogEnd)

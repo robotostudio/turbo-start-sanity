@@ -18,9 +18,7 @@ export const runtime = "edge";
 const errorContent = (
   <div tw="flex flex-col w-full h-full items-center justify-center">
     <div tw=" flex w-full h-full items-center justify-center ">
-      <h1 tw="text-white">
-        Something went Wrong with image generation
-      </h1>
+      <h1 tw="text-white">Something went Wrong with image generation</h1>
     </div>
   </div>
 );
@@ -90,23 +88,12 @@ const dominantColorSeoImageRender = ({
       width="100%"
     >
       <defs>
-        <linearGradient
-          id="gradient"
-          x1="0%"
-          x2="100%"
-          y1="100%"
-          y2="0%"
-        >
+        <linearGradient id="gradient" x1="0%" x2="100%" y1="100%" y2="0%">
           <stop offset="0%" style={{ stopColor: "transparent" }} />
           <stop offset="100%" style={{ stopColor: "white" }} />
         </linearGradient>
       </defs>
-      <rect
-        fill="url(#gradient)"
-        height="100%"
-        opacity="0.2"
-        width="100%"
-      />
+      <rect fill="url(#gradient)" height="100%" opacity="0.2" width="100%" />
     </svg>
 
     <div tw="flex-1 p-10 flex flex-col justify-between relative z-10">
@@ -296,10 +283,7 @@ export async function GET({ url }: Request): Promise<ImageResponse> {
   const image = block[type] ?? getGenericPageContent;
   try {
     const content = await image(para);
-    return new ImageResponse(
-      content ? content : errorContent,
-      options
-    );
+    return new ImageResponse(content ? content : errorContent, options);
   } catch (_err) {
     return new ImageResponse(errorContent, options);
   }

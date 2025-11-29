@@ -26,11 +26,10 @@ type NavColumn = NonNullable<
   NonNullable<QueryNavbarDataResult>["columns"]
 >[number];
 
-type ColumnLink = Extract<NavColumn, { type: "column" }>["links"] extends Array<
-  infer T
->
-  ? T
-  : never;
+type ColumnLink =
+  Extract<NavColumn, { type: "column" }>["links"] extends Array<infer T>
+    ? T
+    : never;
 
 type MenuLinkProps = {
   name: string;

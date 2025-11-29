@@ -242,20 +242,17 @@ export const queryBlogIndexPageData = defineQuery(`
   }
 `);
 
-
 export const queryBlogIndexPageBlogs = defineQuery(`
   *[_type == "blog" && (seoHideFromLists != true)] | order(orderRank asc) [$start...$end]{
     ${blogCardFragment}
   }
 `);
 
-
 export const queryAllBlogDataForSearch = defineQuery(`
   *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true)]{
     ${blogCardFragment}
   }
 `);
-
 
 export const queryBlogIndexPageBlogsCount = defineQuery(`
   count(*[_type == "blog" && (seoHideFromLists != true)])

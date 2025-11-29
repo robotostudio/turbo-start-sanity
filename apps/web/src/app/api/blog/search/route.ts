@@ -13,8 +13,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Query is required" }, { status: 400 });
   }
 
-  const {data} = await sanityFetch({ query: queryAllBlogDataForSearch, stega: false, });
-
+  const { data } = await sanityFetch({
+    query: queryAllBlogDataForSearch,
+    stega: false,
+  });
 
   if (!data) {
     return NextResponse.json({ error: "No data found" }, { status: 404 });
