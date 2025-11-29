@@ -1,22 +1,85 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["ultracite"],
+  "files": {
+    "ignoreUnknown": true
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 80
+  },
   "linter": {
+    "enabled": true,
     "rules": {
+      "recommended": true,
       "suspicious": {
-        "noUnknownAtRules": "off",
         "noExplicitAny": "warn",
         "noConsole": "warn"
       },
       "style": {
-        "noMagicNumbers": "off"
+        "noMagicNumbers": "off",
+        "useConst": "error",
+        "useTemplate": "error"
       },
       "performance": {
         "noNamespaceImport": "off"
       },
       "correctness": {
-        "noInvalidPositionAtImportRule": "off"
+        "noInvalidPositionAtImportRule": "off",
+        "useExhaustiveDependencies": "warn"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "warn"
       }
     }
-  }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "jsxQuoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "es5"
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": true
+    }
+  },
+  "css": {
+    "parser": {
+      "cssModules": true
+    },
+    "formatter": {
+      "enabled": true
+    }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "**/.turbo/**",
+        "**/.next/**",
+        "**/node_modules/**",
+        "**/dist/**"
+      ],
+      "linter": {
+        "enabled": false
+      },
+      "formatter": {
+        "enabled": false
+      }
+    },
+    {
+      "includes": ["**/*.css", "**/dist/**", "**/.sanity/**"],
+      "linter": {
+        "enabled": false
+      },
+      "formatter": {
+        "enabled": false
+      }
+    }
+  ]
 }

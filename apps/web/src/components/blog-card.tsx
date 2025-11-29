@@ -1,13 +1,7 @@
 "use client";
 import Link from "next/link";
-
-import type { QueryBlogIndexPageDataResult } from "@/lib/sanity/sanity.types";
-
+import type { Blog } from "@/types";
 import { SanityImage } from "./elements/sanity-image";
-
-type Blog = NonNullable<
-  NonNullable<QueryBlogIndexPageDataResult>["blogs"]
->[number];
 
 type BlogImageProps = {
   image: Blog["image"];
@@ -155,7 +149,7 @@ export function BlogCard({ blog }: BlogCardProps) {
 
   return (
     <article className="grid w-full grid-cols-1 gap-4">
-      <div className="relative aspect-[16/9] h-auto w-full overflow-hidden rounded-2xl">
+      <div className="relative aspect-video h-auto w-full overflow-hidden rounded-2xl">
         <BlogImage image={image} title={title} />
         <div className="absolute inset-0 rounded-2xl ring-1 ring-gray-900/10 ring-inset" />
       </div>
