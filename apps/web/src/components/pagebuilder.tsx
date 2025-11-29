@@ -172,12 +172,11 @@ export function PageBuilder({
   }
 
   return (
-    <section
-      aria-label="Page content"
+    <main
       className="mx-auto my-16 flex max-w-7xl flex-col gap-16"
       data-sanity={containerDataAttribute}
     >
       {blocks.map(renderBlock)}
-    </section>
+    </main>
   );
 }
