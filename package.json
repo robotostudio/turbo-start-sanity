@@ -13,7 +13,7 @@
     "@biomejs/biome": "2.2.5",
     "@workspace/typescript-config": "workspace:*",
     "turbo": "^2.5.4",
-    "typescript": "5.9.2",
+    "typescript": "catalog:",
     "ultracite": "5.6.2"
   },
   "packageManager": "pnpm@10.12.2",
