@@ -1,5 +1,5 @@
 import type { SanityImageSource } from "@sanity/asset-utils";
-import createImageUrlBuilder from "@sanity/image-url";
+import { createImageUrlBuilder } from "@sanity/image-url";
 import { env } from "env";
 import { createClient } from "next-sanity";
 
@@ -21,4 +21,4 @@ const imageBuilder = createImageUrlBuilder({
 });
 
 export const urlFor = (source: SanityImageSource) =>
-  imageBuilder.image(source).auto("format").fit("max").format("webp");
+  imageBuilder.image(source).auto("format").quality(80).format("webp");

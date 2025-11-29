@@ -31,8 +31,8 @@ const { queryRedirects } = queryResultModule;
 /** @type {import("next").NextConfig} */
 const nextConfig = {
   transpilePackages: ["@workspace/ui"],
+  reactCompiler: true,
   experimental: {
-    reactCompiler: true,
     inlineCss: true,
   },
   logging: {

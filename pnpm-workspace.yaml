@@ -21,7 +21,7 @@ catalog:
   zod: ^4.1.12
   
   # Sanity
-  '@sanity/client': ^7.8.2
+  '@sanity/client': ^7.12.0
 
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
