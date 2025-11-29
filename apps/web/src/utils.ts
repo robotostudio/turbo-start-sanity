@@ -80,12 +80,11 @@ export function parseChildrenToSlug(children: PortableTextBlock["children"]) {
 
 const BLOG_ITEMS_PER_PAGE = 10;
 
-export function getBlogPaginationStartEnd(page?: string): {
+export function getBlogPaginationStartEnd(page: number): {
   start: number;
   end: number;
 } {
-  const pageNumber = page ? Number(page) : 1;
-  const start = (pageNumber - 1) * BLOG_ITEMS_PER_PAGE;
+  const start = (page - 1) * BLOG_ITEMS_PER_PAGE;
   const end = start + BLOG_ITEMS_PER_PAGE;
   return { start, end };
 }

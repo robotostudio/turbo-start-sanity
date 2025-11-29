@@ -249,6 +249,14 @@ export const queryBlogIndexPageBlogs = defineQuery(`
   }
 `);
 
+
+export const queryAllBlogDataForSearch = defineQuery(`
+  *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true)]{
+    ${blogCardFragment}
+  }
+`);
+
+
 export const queryBlogIndexPageBlogsCount = defineQuery(`
   count(*[_type == "blog" && (seoHideFromLists != true)])
 `);
