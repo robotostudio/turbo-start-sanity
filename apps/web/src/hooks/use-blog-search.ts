@@ -11,6 +11,8 @@ async function searchBlog(query: string, signal: AbortSignal) {
     return [];
   }
 
+
+
   const response = await fetch(
     `/api/blog/search?q=${encodeURIComponent(query)}`,
     { signal }

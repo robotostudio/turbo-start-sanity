@@ -10,6 +10,7 @@ type BlogSearchResultsProps = {
   isSearching: boolean;
   hasQuery: boolean;
   searchQuery: string;
+  error?: Error | null;
 };
 
 function SearchResultsHeader({
@@ -55,6 +56,29 @@ function EmptySearchState({ query }: { query: string }) {
   );
 }
 
+function ErrorState({ query }: { query: string }) {
+  return (
+    <div className="py-12 text-center">
+      <div className="mx-auto max-w-md">
+        <h3 className="mb-2 font-medium text-destructive text-lg">
+          Search failed
+        </h3>
+        <p className="mb-4 text-muted-foreground">
+          We encountered an error while searching for "{query}". Please try again.
+        </p>
+        <div className="text-muted-foreground text-sm">
+          <p>If the problem persists:</p>
+          <ul className="mt-2 space-y-1">
+            <li>• Check your internet connection</li>
+            <li>• Refresh the page</li>
+            <li>• Try again in a few moments</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const LOADING_SKELETONS = [
   "skeleton-1",
   "skeleton-2",
@@ -93,6 +117,7 @@ export function BlogSearchResults({
   isSearching,
   hasQuery,
   searchQuery,
+  error,
 }: BlogSearchResultsProps) {
   if (!hasQuery) {
     return null;
@@ -110,7 +135,9 @@ export function BlogSearchResults({
     <section className={cn("mt-8", className)}>
       <SearchResultsHeader count={results.length} query={searchQuery} />
 
-      {results.length === 0 ? (
+      {error ? (
+        <ErrorState query={searchQuery} />
+      ) : results.length === 0 ? (
         <EmptySearchState query={searchQuery} />
       ) : (
         <BlogList blogs={results} />

@@ -30,6 +30,5 @@ export async function GET(request: Request) {
   const results = fuse.search(query, {
     limit: 10,
   });
-
   return NextResponse.json(results.map((result) => result.item));
 }
