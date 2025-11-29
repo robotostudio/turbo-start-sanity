@@ -41,5 +41,7 @@ export default defineCliConfig({
     dataset,
   },
   studioHost: getStudioHost(),
-  autoUpdates: false,
+  deployment:{
+    autoUpdates: false,
+  }
 });
