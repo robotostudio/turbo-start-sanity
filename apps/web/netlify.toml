@@ -1,0 +1,12 @@
+[build]
+  base = "/apps/web"
+  command = "pnpm --filter web build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  PNPM_VERSION = "10.12.2"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+

@@ -1,25 +1,14 @@
+import { JsonIcon } from "@sanity/icons";
 import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
-import {
-  BookMarked,
-  CogIcon,
-  File,
-  FileText,
-  HomeIcon,
-  type LucideIcon,
-  MessageCircle,
-  PanelBottom,
-  PanelBottomIcon,
-  Settings2,
-  TrendingUpDown,
-  User,
-} from "lucide-react";
+import { File, type LucideIcon, Settings2 } from "lucide-react";
 import type {
+  ListItemBuilder,
   StructureBuilder,
   StructureResolverContext,
 } from "sanity/structure";
-
 import { createSlugBasedStructure } from "./components/nested-pages-structure";
 import type { SchemaType, SingletonType } from "./schemaTypes";
+import { getStructureIcon } from "./utils/document-icons";
 import { getTitleCase } from "./utils/helper";
 
 type Base<T = SchemaType> = {
@@ -108,29 +97,45 @@ export const structure = (
   S.list()
     .title("Content")
     .items([
-      createSingleTon({ S, type: "homePage", icon: HomeIcon }),
+      createSingleTon({
+        S,
+        type: "homePage",
+        icon: getStructureIcon("homePage"),
+      }),
       S.divider(),
       createSlugBasedStructure(S, "page"),
       createIndexListWithOrderableItems({
         S,
-        index: { type: "blogIndex", icon: BookMarked },
-        list: { type: "blog", title: "Blogs", icon: FileText },
+        index: {
+          type: "collectionIndex",
+          icon: getStructureIcon("collectionIndex"),
+        },
+        list: {
+          type: "collection",
+          title: "Collections",
+          icon: getStructureIcon("collection"),
+        },
         context,
       }),
       createList({
         S,
-        type: "faq",
-        title: "FAQs",
-        icon: MessageCircle,
-      }),
-      createList({ S, type: "author", title: "Authors", icon: User }),
-      createList({
-        S,
         type: "redirect",
         title: "Redirects",
-        icon: TrendingUpDown,
+        icon: getStructureIcon("redirect"),
       }),
       S.divider(),
+      createSingleTon({
+        S,
+        type: "navbar",
+        title: "Navigation",
+        icon: getStructureIcon("navbar"),
+      }),
+      createSingleTon({
+        S,
+        type: "footer",
+        title: "Footer",
+        icon: getStructureIcon("footer"),
+      }),
       S.listItem()
         .title("Site Configuration")
         .icon(Settings2)
@@ -140,22 +145,21 @@ export const structure = (
             .items([
               createSingleTon({
                 S,
-                type: "navbar",
-                title: "Navigation",
-                icon: PanelBottom,
-              }),
-              createSingleTon({
-                S,
-                type: "footer",
-                title: "Footer",
-                icon: PanelBottomIcon,
-              }),
-              createSingleTon({
-                S,
                 type: "settings",
                 title: "Global Settings",
-                icon: CogIcon,
+                icon: getStructureIcon("settings"),
               }),
             ])
+        ),
+      S.divider(),
+      // list default document list under developer tools list
+      S.listItem()
+        .title("Developer Tools")
+        .id("developer-tools")
+        .icon(JsonIcon)
+        .child(
+          S.list()
+            .id("developer-tools-list")
+            .items(S.documentTypeListItems() as ListItemBuilder[])
         ),
     ]);

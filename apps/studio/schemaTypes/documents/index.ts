@@ -1,14 +1,12 @@
-import { author } from "./author";
-import { blog } from "./blog";
-import { blogIndex } from "./blog-index";
-import { faq } from "./faq";
-import { footer } from "./footer";
+import { collection } from "./collection";
+import { collectionIndex } from "./collection-index";
+import { footer } from './footer';
 import { homePage } from "./home-page";
 import { navbar } from "./navbar";
 import { page } from "./page";
 import { redirect } from "./redirect";
 import { settings } from "./settings";
 
-export const singletons = [homePage, blogIndex, settings, footer, navbar];
+export const singletons = [homePage, collectionIndex, settings, footer, navbar];
 
-export const documents = [blog, page, faq, author, ...singletons, redirect];
+export const documents = [page, collection, ...singletons, redirect];

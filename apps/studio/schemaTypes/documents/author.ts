@@ -1,12 +1,12 @@
-import { UserIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
-import { imageWithAltField } from "../common";
+
+import { getDocumentIcon } from "../../utils/document-icons";
 
 export const author = defineType({
   name: "author",
   title: "Author",
   type: "document",
-  icon: UserIcon,
+  icon: getDocumentIcon("author"),
   fields: [
     defineField({
       name: "name",
@@ -22,10 +22,15 @@ export const author = defineType({
       description:
         "The job title or role of this person, like 'Editor' or 'Writer'",
     }),
-    imageWithAltField({
+    defineField({
+      name: "image",
+      type: "image",
       title: "Image",
       description:
         "A photo of the author that will appear next to their articles",
+      options: {
+        hotspot: true,
+      },
     }),
     defineField({
       name: "bio",

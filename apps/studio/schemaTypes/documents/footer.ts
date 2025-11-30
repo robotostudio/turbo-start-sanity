@@ -1,5 +1,7 @@
-import { LayoutPanelLeft, Link, PanelBottom } from "lucide-react";
+import { LayoutPanelLeft, Link } from "lucide-react";
 import { defineField, defineType } from "sanity";
+
+import { getDocumentIcon } from "../../utils/document-icons";
 
 const footerColumnLink = defineField({
   name: "footerColumnLink",
@@ -108,7 +110,7 @@ export const footer = defineType({
     },
     prepare: ({ title }) => ({
       title: title || "Untitled Footer",
-      media: PanelBottom,
+      media: getDocumentIcon("footer"),
     }),
   },
 });

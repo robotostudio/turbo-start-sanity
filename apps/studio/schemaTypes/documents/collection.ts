@@ -1,35 +1,35 @@
+import { orderRankField } from "@sanity/orderable-document-list";
 import { defineField, defineType } from "sanity";
-
 import { GROUP, GROUPS } from "../../utils/constant";
 import { getDocumentIcon } from "../../utils/document-icons";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
 import { documentSlugField, pageBuilderField } from "../common";
 
-export const page = defineType({
-  name: "page",
-  title: "Page",
+export const collection = defineType({
+  name: "collection",
+  title: "Collection",
   type: "document",
-  icon: getDocumentIcon("page"),
+  icon: getDocumentIcon("collection"),
   description:
-    "Create a new page for your website, like an 'About Us' or 'Contact' page. Each page has its own web address and content that you can customize.",
+    "Create a new collection page for your website. Collections are organized content that must have a URL starting with /collections/. Each collection has its own web address and content that you can customize.",
   groups: GROUPS,
   fields: [
+    orderRankField({ type: "collection" }),
     defineField({
       name: "title",
       type: "string",
       title: "Title",
-      description:
-        "The main heading that appears at the top of your page and in browser tabs",
+      description: "The title of the collection",
       group: GROUP.MAIN_CONTENT,
-      validation: (Rule) => Rule.required().error("A page title is required"),
+      validation: (Rule) => Rule.required().error("A collection title is required"),
     }),
     defineField({
       name: "description",
       type: "text",
       title: "Description",
       description:
-        "A brief summary of what this page is about. This text helps search engines understand your page and may appear in search results.",
+        "A brief summary of what this collection is about. This text helps search engines understand your collection and may appear in search results.",
       rows: 3,
       group: GROUP.MAIN_CONTENT,
       validation: (rule) => [
@@ -45,7 +45,7 @@ export const page = defineType({
           ),
       ],
     }),
-    documentSlugField("page", {
+    documentSlugField("collection", {
       group: GROUP.MAIN_CONTENT,
     }),
     defineField({
@@ -53,7 +53,7 @@ export const page = defineType({
       type: "image",
       title: "Image",
       description:
-        "A main picture for this page that can be used when sharing on social media or in search results",
+        "A main picture for this collection that can be used when sharing on social media or in search results",
       group: GROUP.MAIN_CONTENT,
       options: {
         hotspot: true,
@@ -78,7 +78,7 @@ export const page = defineType({
         : "🏗️";
 
       return {
-        title: `${title || "Untitled Page"}`,
+        title: `${title || "Untitled Collection"}`,
         subtitle: `${statusEmoji} ${builderEmoji} | 🔗 ${slug || "no-slug"}`,
         media,
       };

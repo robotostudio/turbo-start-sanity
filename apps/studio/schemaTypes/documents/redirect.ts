@@ -1,6 +1,7 @@
-import { TrendingUpDown } from "lucide-react";
 import type { SanityClient, SlugValue } from "sanity";
 import { defineField, defineType, getDraftId, getPublishedId } from "sanity";
+
+import { getDocumentIcon } from "../../utils/document-icons";
 
 type Redirect = {
   source: SlugValue;
@@ -61,7 +62,7 @@ export const redirect = defineType({
           if (!(value && source)) {
             return "Can't be blank";
           }
-          if (!source.startsWith("/")) {
+          if (!source.startsWith("/")) {  
             return "The path must start with a /";
           }
 
@@ -139,7 +140,7 @@ export const redirect = defineType({
     prepare: ({ title, subtitle, permanent, status }) => ({
       title: `${title ?? "Untitled"} to ${subtitle ?? "Untitled"}`,
       subtitle: `${permanent ? "Permanent" : "Temporary"}, ${status}`,
-      media: TrendingUpDown,
+      media: getDocumentIcon("redirect"),
     }),
   },
 });

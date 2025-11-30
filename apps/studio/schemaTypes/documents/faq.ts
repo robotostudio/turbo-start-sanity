@@ -1,6 +1,6 @@
-import { MessageCircle } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
+import { getDocumentIcon } from "../../utils/document-icons";
 import { parseRichTextToString } from "../../utils/helper";
 import { customRichText } from "../definitions/rich-text";
 
@@ -10,7 +10,7 @@ export const faq = defineType({
   title: "Frequently Asked Question",
   description:
     "A simple question and answer pair that helps visitors find information quickly. Think of it like writing down the questions customers often ask, along with clear answers.",
-  icon: MessageCircle,
+  icon: getDocumentIcon("faq"),
   fields: [
     defineField({
       name: "title",

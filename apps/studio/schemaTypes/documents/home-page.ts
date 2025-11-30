@@ -1,7 +1,7 @@
-import { HomeIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 
 import { GROUP, GROUPS } from "../../utils/constant";
+import { getDocumentIcon } from "../../utils/document-icons";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
 import { documentSlugField, pageBuilderField } from "../common";
@@ -10,7 +10,7 @@ export const homePage = defineType({
   name: "homePage",
   type: "document",
   title: "Home Page",
-  icon: HomeIcon,
+  icon: getDocumentIcon("homePage"),
   description:
     "This is where you create the main page visitors see when they first come to your website. Think of it like the front door to your online home - you can add a welcoming title, a short description, and build the page with different sections like pictures, text, and buttons.",
   groups: GROUPS,
@@ -59,7 +59,7 @@ export const homePage = defineType({
     },
     prepare: ({ title, slug }) => ({
       title: title || "Untitled Home Page",
-      media: HomeIcon,
+      media: getDocumentIcon("homePage"),
       subtitle: slug || "Home Page",
     }),
   },

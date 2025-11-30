@@ -1,11 +1,13 @@
 import { assist } from "@sanity/assist";
+import { debugSecrets } from "@sanity/preview-url-secret/sanity-plugin-debug-secrets";
 import { visionTool } from "@sanity/vision";
-import { defineConfig } from "sanity";
+import { type Config, defineConfig } from "sanity";
 import { presentationTool } from "sanity/presentation";
 import { structureTool } from "sanity/structure";
 import { unsplashImageAsset } from "sanity-plugin-asset-source-unsplash";
 import { iconPicker } from "sanity-plugin-icon-picker";
 import { media } from "sanity-plugin-media";
+import { muxInput } from "sanity-plugin-mux-input";
 
 import { Logo } from "./components/logo";
 import { locations } from "./location";
@@ -47,7 +49,9 @@ export default defineConfig({
     unsplashImageAsset(),
     media(),
     iconPicker(),
+    muxInput({}),
     assist(),
+    debugSecrets(),
   ],
   document: {
     newDocumentOptions: (prev, { creationContext }) => {
@@ -80,4 +84,4 @@ export default defineConfig({
       },
     ],
   },
-});
+}) as Config;

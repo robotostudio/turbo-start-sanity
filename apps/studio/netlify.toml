@@ -1,0 +1,10 @@
+[build]
+  base = "/apps/studio"
+  command = "pnpm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  PNPM_VERSION = "10.12.2"
+  NODE_OPTIONS = "--max-old-space-size=4096"
+

@@ -1,6 +1,6 @@
-import { LayoutPanelLeft, Link, PanelTop } from "lucide-react";
+import { LayoutPanelLeft, Link } from "lucide-react";
 import { defineField, defineType } from "sanity";
-
+import { getDocumentIcon } from "../../utils/document-icons";
 import { buttonsField, iconField } from "../common";
 
 const navbarLink = defineField({
@@ -137,7 +137,7 @@ export const navbar = defineType({
   name: "navbar",
   title: "Site Navigation",
   type: "document",
-  icon: PanelTop,
+  icon: getDocumentIcon("navbar"),
   description: "Configure the main navigation structure for your site",
   fields: [
     defineField({

@@ -1,15 +1,15 @@
-import { cta } from "./cta";
-import { faqAccordion } from "./faq-accordion";
-import { featureCardsIcon } from "./feature-cards-icon";
-import { hero } from "./hero";
-import { imageLinkCards } from "./image-link-cards";
-import { subscribeNewsletter } from "./subscribe-newsletter";
+import { collectionListing } from "./collection-listing";
+import { gridLayout } from "./grid-layout";
+import { imageGallery } from "./image-gallery";
+import { imageSection } from "./image-section";
+import { textSection } from "./text-section";
+import { videoSection } from "./video-section";
 
 export const pageBuilderBlocks = [
-  hero,
-  cta,
-  featureCardsIcon,
-  faqAccordion,
-  imageLinkCards,
-  subscribeNewsletter,
+  gridLayout,
+  imageSection,
+  videoSection,
+  imageGallery,
+  textSection,
+  collectionListing,
 ];

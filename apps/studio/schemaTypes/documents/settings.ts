@@ -1,5 +1,6 @@
-import { CogIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
+
+import { getDocumentIcon } from "../../utils/document-icons";
 
 const socialLinks = defineField({
   name: "socialLinks",
@@ -45,7 +46,7 @@ export const settings = defineType({
   type: "document",
   title: "Settings",
   description: "Global settings and configuration for your website",
-  icon: CogIcon,
+  icon: getDocumentIcon("settings"),
   fields: [
     defineField({
       name: "label",
@@ -94,7 +95,7 @@ export const settings = defineType({
     },
     prepare: ({ title }) => ({
       title: title || "Untitled Settings",
-      media: CogIcon,
+      media: getDocumentIcon("settings"),
     }),
   },
 });

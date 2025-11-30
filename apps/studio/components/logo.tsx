@@ -1,46 +1,16 @@
+import { AutoViewBoxSvg } from "@workspace/svg-wrapper/components/auto-viewbox-svg";
+
 export function Logo() {
   return (
-    <svg
-      fill="none"
-      height="32"
-      viewBox="0 0 32 32"
-      width="32"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <title>Turbo Start</title>
-      <rect fill="var(--card-fg-color)" height="32" rx="16" width="32" />
-      <path
-        d="M4.68629 21.159C2.98673 19.4595 2.98673 16.704 4.68629 15.0044L12.1081 7.5826L18.2627 13.7373L10.841 21.159C9.14139 22.8586 6.38585 22.8586 4.68629 21.159Z"
-        fill="url(#paint0_linear_2_18)"
-      />
-      <path
-        d="M27.3137 10.841C25.6142 9.14139 22.8586 9.14139 21.1591 10.841L13.7373 18.2627L19.8919 24.4174L27.3137 16.9956C29.0133 15.2961 29.0133 12.5405 27.3137 10.841Z"
-        fill="url(#paint1_linear_2_18)"
-      />
-      <defs>
-        <linearGradient
-          gradientUnits="userSpaceOnUse"
-          id="paint0_linear_2_18"
-          x1="14.9316"
-          x2="4.68629"
-          y1="10.9137"
-          y2="21.159"
-        >
-          <stop stopColor="var(--card-fg-color)" />
-          <stop offset="1" stopColor="var(--card-bg-color)" />
-        </linearGradient>
-        <linearGradient
-          gradientUnits="userSpaceOnUse"
-          id="paint1_linear_2_18"
-          x1="17.0684"
-          x2="27.3137"
-          y1="21.0863"
-          y2="10.841"
-        >
-          <stop stopColor="var(--card-fg-color)" />
-          <stop offset="1" stopColor="var(--card-bg-color)" />
-        </linearGradient>
-      </defs>
-    </svg>
+    <AutoViewBoxSvg padding={0}>
+      <svg
+        aria-label="Logo"
+        fill="currentColor"
+        role="img"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M320,222c-5,4-8,22-8,92c-1,50-3,94-4,100c-4,16-15,14-24-6c-7-17-98-104-115-112c-8-3-16,1-53,39c-42,42-43,42-36,54c4,8,32,41,65,73c33,34,56,62,56,67c0,6-1,9-1,10l-89,4c-79,2-90,4-95,11c-7,10-7,106,0,107c-2,18,18,26,24,25c34-2,160-6,166,0c9,10,2,19-25,46c-41,38-102,104-102,109c0,2,12,17,25,33l35,41c18,23,30,22,52-2c40-46,76-84,88-92c15-12,25-9,40,12c10,15,11,17,4,36c-8,28-12,63-7,94l2,26l25,4c45,7,109,5,118-4c17-7,2-75,0-119c0-88,0-87,5-87c2,0,16,12,28,26c53,58,111,116,115,116c8,0,36-25,70-61c19-22,23-29,20-37c-1-6-28-36-59-68c-39-38-56-57-55-63c1-8,9-9,95-9c103,0,97,2,100-30c1-25-8-110-12-113c-4-1-46-1-94-1c-77,0-91,0-92-8c-5-11,9-27,70-90c31-31,55-58,55-63c0-6-68-74-88-87c-12-8-13-7-38,19l-64,70c-35,38-53,51-56,36l-1-100c0-50-2-94-4-97c-6-5-128-6-136-1ZM9,655c0,4,2,6,2,3c1-4,1-8,0-10c-1-1-2,2-2,7Z" />
+      </svg>
+    </AutoViewBoxSvg>
   );
 }

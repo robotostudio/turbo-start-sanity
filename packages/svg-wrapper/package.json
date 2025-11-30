@@ -1,0 +1,24 @@
+{
+  "name": "@workspace/svg-wrapper",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint": "npx ultracite lint",
+    "format": "npx ultracite fix"
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.9",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@workspace/typescript-config": "workspace:*"
+  },
+  "exports": {
+    "./components/auto-viewbox-svg": "./src/components/auto-viewbox-svg.tsx"
+  }
+}
+

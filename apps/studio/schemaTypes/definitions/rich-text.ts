@@ -4,7 +4,95 @@ import {
   defineArrayMember,
   defineField,
   defineType,
+  type InitialValueProperty,
 } from "sanity";
+
+import { schemaIcon } from "../../utils/icon-wrapper";
+
+const limitedRichTextMembers = [
+  defineArrayMember({
+    name: "block",
+    type: "block",
+    styles: [{ title: "Normal", value: "normal" }],
+    marks: {
+      annotations: [
+        {
+          name: "customLink",
+          type: "object",
+          title: "Internal/External Link",
+          icon: schemaIcon(LinkIcon),
+          fields: [
+            defineField({
+              name: "customLink",
+              type: "customUrl",
+            }),
+          ],
+        },
+      ],
+      decorators: [
+        { title: "Strong", value: "strong" },
+        { title: "Emphasis", value: "em" },
+        { title: "Underline", value: "underline" },
+      ],
+    },
+  }),
+];
+
+export const limitedRichText = (options?: {
+  initialValue?: string | undefined;
+  name?: string;
+  title?: string;
+  group?: string[] | string;
+  description?: string;
+  hidden?: ConditionalProperty;
+}) => {
+  const { name, description, hidden, initialValue } = options ?? {};
+  return defineField({
+    ...options,
+    name: name ?? "caption",
+    type: "array",
+    description:
+      description ??
+      "Caption text with basic formatting (bold, italic, underline, links)",
+    hidden,
+    of: limitedRichTextMembers,
+    initialValue: (initialValue ?? "") as unknown as InitialValueProperty<
+      string,
+      unknown[]
+    >,
+  });
+};
+
+export const inlineImage = defineArrayMember({
+  name: "image",
+  title: "Image",
+  type: "image",
+  icon: ImageIcon,
+  options: {
+    hotspot: true,
+  },
+  fields: [
+    limitedRichText({
+      name: "caption",
+      title: "Caption Text",
+    }),
+    defineField({
+      name: "variant",
+      type: "string",
+      title: "Variant",
+      initialValue: () => "default",
+      options: {
+        layout: "radio",
+        list: [
+          { title: "Default", value: "default" },
+          { title: "Full Bleed", value: "full-bleed" },
+          { title: "Fit to Container", value: "fit-to-container" },
+          { title: "Inset", value: "inset" },
+        ],
+      },
+    }),
+  ],
+});
 
 const richTextMembers = [
   defineArrayMember({
@@ -29,7 +117,7 @@ const richTextMembers = [
           name: "customLink",
           type: "object",
           title: "Internal/External Link",
-          icon: LinkIcon,
+          icon: schemaIcon(LinkIcon),
           fields: [
             defineField({
               name: "customLink",
@@ -45,21 +133,11 @@ const richTextMembers = [
       ],
     },
   }),
+  inlineImage,
   defineArrayMember({
-    name: "image",
-    title: "Image",
-    type: "image",
-    icon: ImageIcon,
-    options: {
-      hotspot: true,
-    },
-    fields: [
-      defineField({
-        name: "caption",
-        type: "string",
-        title: "Caption Text",
-      }),
-    ],
+    name: "imageGallery",
+    type: "imageGallery",
+    title: "Image Gallery",
   }),
 ];
 
