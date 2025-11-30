@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/performance/noImgElement: this is a edge runtime function */
 import { ImageResponse } from "next/og";
 import type { ImageResponseOptions } from "next/server";
 
@@ -7,7 +6,6 @@ import { getTitleCase } from "@/utils";
 
 import { getOgMetaData } from "./og-config";
 import {
-  getBlogPageOGData,
   getGenericPageOGData,
   getHomePageOGData,
   getSlugPageOGData,
@@ -45,27 +43,6 @@ const seoImageRender = ({ seoImage }: SeoImageRenderProps) => (
   </div>
 );
 
-const FallbackImage = ({ logo }: { logo: Maybe<string> }) => {
-  if (logo) {
-    return (
-      <div tw="flex items-center justify-center h-full w-full">
-        <img alt="Logo" height={400} src={logo} width={400} />
-      </div>
-    );
-  }
-
-  return (
-    <div tw="flex items-center justify-center h-full w-full">
-      <img
-        alt="Logo"
-        height={400}
-        src={"https://picsum.photos/566/566"}
-        width={400}
-      />
-    </div>
-  );
-};
-
 const dominantColorSeoImageRender = ({
   image,
   title,
@@ -98,7 +75,7 @@ const dominantColorSeoImageRender = ({
 
     <div tw="flex-1 p-10 flex flex-col justify-between relative z-10">
       <div tw="flex justify-between items-start w-full">
-        {logo && <img alt="Logo" height={48} src={logo} width={48} />}
+        {logo && <img alt="Logo" height={48} src={logo} />}
         <div tw="bg-white flex bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-medium">
           {new Date(date ?? new Date()).toLocaleDateString("en-US", {
             month: "long",
@@ -137,16 +114,25 @@ const dominantColorSeoImageRender = ({
               tw="w-full h-full rounded-3xl shadow-2xl"
               width={566}
             />
+          ) : logo ? (
+            <div tw="flex items-center justify-center h-full w-full">
+              <img alt="Logo" height={400} src={logo} width={400} />
+            </div>
           ) : (
-            <FallbackImage logo={logo} />
+            <div tw="flex items-center justify-center h-full w-full">
+              <img
+                alt="Logo"
+                height={400}
+                src={"https://picsum.photos/566/566"}
+                width={400}
+              />
+            </div>
           )}
         </div>
       </div>
     </div>
   </div>
 );
-
-const FONT_REGEX = /url\(([^)]+)\)/;
 
 async function getTtfFont(
   family: string,
@@ -166,7 +152,7 @@ async function getTtfFont(
   );
 
   const css = await cssCall.text();
-  const ttfUrl = css.match(FONT_REGEX)?.[1];
+  const ttfUrl = css.match(/url\(([^)]+)\)/)?.[1];
 
   if (!ttfUrl) {
     throw new Error("Failed to extract font URL from CSS");
@@ -240,20 +226,6 @@ const getSlugPageContent = async ({ id }: ContentProps) => {
   return dominantColorSeoImageRender(result);
 };
 
-const getBlogPageContent = async ({ id }: ContentProps) => {
-  if (!id) {
-    return;
-  }
-  const [result, err] = await getBlogPageOGData(id);
-  if (err || !result) {
-    return;
-  }
-  if (result?.seoImage) {
-    return seoImageRender({ seoImage: result.seoImage });
-  }
-  return dominantColorSeoImageRender(result);
-};
-
 const getGenericPageContent = async ({ id }: ContentProps) => {
   if (!id) {
     return;
@@ -271,7 +243,6 @@ const getGenericPageContent = async ({ id }: ContentProps) => {
 const block = {
   homePage: getHomePageContent,
   page: getSlugPageContent,
-  blog: getBlogPageContent,
 } as const;
 
 export async function GET({ url }: Request): Promise<ImageResponse> {

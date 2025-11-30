@@ -2,5 +2,14 @@
   "extends": "@workspace/typescript-config/base.json",
   "compilerOptions": {
     "strictNullChecks": true
-  }
+  },
+  "include": [],
+  "exclude": [
+    "**/node_modules",
+    "**/dist",
+    "**/.next",
+    "**/templates",
+    "apps/**",
+    "packages/**"
+  ]
 }

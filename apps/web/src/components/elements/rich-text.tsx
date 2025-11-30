@@ -5,10 +5,12 @@ import {
   PortableText,
   type PortableTextBlock,
   type PortableTextReactComponents,
+  stegaClean,
 } from "next-sanity";
 
 import { parseChildrenToSlug } from "@/utils";
 
+import { ImageGallery } from "../sections/image-gallery";
 import { SanityImage } from "./sanity-image";
 
 const components: Partial<PortableTextReactComponents> = {
@@ -63,6 +65,7 @@ const components: Partial<PortableTextReactComponents> = {
         {children}
       </code>
     ),
+    underline: ({ children }) => <u>{children}</u>,
     customLink: ({ children, value }) => {
       if (!value.href || value.href === "#") {
         return (
@@ -89,8 +92,71 @@ const components: Partial<PortableTextReactComponents> = {
       if (!value?.id) {
         return null;
       }
+
+      const { variant } = value;
+      const cleanVariant = stegaClean(variant);
+      if (cleanVariant === "full-bleed") {
+        return (
+          <figure className="my-8">
+            <SanityImage
+              className="h-full max-h-[75dvh] w-full object-cover"
+              height={900}
+              image={value}
+              width={1600}
+            />
+            {value?.caption && (
+              <figcaption className="mt-2 text-center text-sm">
+                <PortableText
+                  components={components}
+                  value={value.caption as unknown as PortableTextBlock[]}
+                />
+              </figcaption>
+            )}
+          </figure>
+        );
+      }
+      if (cleanVariant === "fit-to-container") {
+        return (
+          <figure className="mx-auto max-w-full">
+            <SanityImage
+              className="h-auto w-full rounded-lg"
+              height={900}
+              image={value}
+              width={1600}
+            />
+            {value?.caption && (
+              <figcaption className="mt-2 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                <PortableText
+                  components={components}
+                  value={value.caption as unknown as PortableTextBlock[]}
+                />
+              </figcaption>
+            )}
+          </figure>
+        );
+      }
+      if (cleanVariant === "inset") {
+        return (
+          <figure className="mx-auto max-w-screen-sm">
+            <SanityImage
+              className="h-auto w-full rounded-lg"
+              height={900}
+              image={value}
+              width={1600}
+            />
+            {value?.caption && (
+              <figcaption className="mt-2 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                <PortableText
+                  components={components}
+                  value={value.caption as unknown as PortableTextBlock[]}
+                />
+              </figcaption>
+            )}
+          </figure>
+        );
+      }
       return (
-        <figure className="my-4">
+        <figure className="my-8">
           <SanityImage
             className="h-auto w-full rounded-lg"
             height={900}
@@ -99,10 +165,27 @@ const components: Partial<PortableTextReactComponents> = {
           />
           {value?.caption && (
             <figcaption className="mt-2 text-center text-sm text-zinc-500 dark:text-zinc-400">
-              {value.caption}
+              <PortableText
+                components={components}
+                value={value.caption as unknown as PortableTextBlock[]}
+              />
             </figcaption>
           )}
         </figure>
+      );
+    },
+    imageGallery: ({ value }) => {
+      const cleanColumnVariant = stegaClean(value?.columnVariant);
+      if (!value?.images || value.images.length === 0) {
+        return null;
+      }
+      return (
+        <ImageGallery
+          _key={value._key || "gallery"}
+          _type="imageGallery"
+          columnVariant={cleanColumnVariant}
+          images={value.images}
+        />
       );
     },
   },
@@ -123,7 +206,8 @@ export function RichText<T>({
   return (
     <div
       className={cn(
-        "prose prose-zinc dark:prose-invert max-w-none prose-headings:scroll-m-24 prose-h2:border-b prose-h2:pb-2 prose-h2:font-semibold prose-h2:text-3xl prose-headings:text-opacity-90 prose-ol:text-opacity-80 prose-p:text-opacity-80 prose-ul:text-opacity-80 prose-a:decoration-dotted prose-h2:first:mt-0",
+        "prose dark:prose-invert prose-p:my-24 max-w-none prose-headings:scroll-m-24 prose-h2:border-b prose-h2:pb-2 prose-h2:font-semibold prose-h2:text-3xl prose-headings:text-opacity-90 prose-ol:text-opacity-80 prose-ul:text-opacity-80 prose-a:decoration-dotted prose-h2:first:mt-0",
+        "max-w-prose",
         className
       )}
     >

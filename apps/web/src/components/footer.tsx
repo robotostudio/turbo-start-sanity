@@ -21,6 +21,7 @@ type SocialLinksProps = {
 };
 
 type FooterProps = {
+  year: number;
   data: NonNullable<QueryFooterDataResult>;
   settingsData: NonNullable<QueryGlobalSeoSettingsResult>;
 };
@@ -35,10 +36,22 @@ export async function FooterServer() {
     }),
   ]);
 
+  const year = new Date().getFullYear();
+
   if (!(response?.data && settingsResponse?.data)) {
-    return <FooterSkeleton />;
+    return (
+      <FooterSkeleton>
+        <p>&copy; {year}. All rights reserved.</p>
+      </FooterSkeleton>
+    );
   }
-  return <Footer data={response.data} settingsData={settingsResponse.data} />;
+  return (
+    <Footer
+      data={response.data}
+      settingsData={settingsResponse.data}
+      year={year}
+    />
+  );
 }
 
 function SocialLinks({ data }: SocialLinksProps) {
@@ -95,61 +108,20 @@ function SocialLinks({ data }: SocialLinksProps) {
   );
 }
 
-export function FooterSkeleton() {
+export function FooterSkeleton({ children }: { children: React.ReactNode }) {
   return (
-    <footer className="mt-16 pb-8">
-      <section className="container mx-auto px-4 md:px-6">
-        <div className="h-[500px] lg:h-auto">
-          <div className="flex flex-col items-center justify-between gap-10 text-center lg:flex-row lg:text-left">
-            <div className="flex w-full max-w-96 shrink flex-col items-center justify-between gap-6 lg:items-start">
-              <div>
-                <span className="flex items-center justify-center gap-4 lg:justify-start">
-                  <div className="h-[40px] w-[80px] animate-pulse rounded bg-muted" />
-                </span>
-                <div className="mt-6 h-16 w-full animate-pulse rounded bg-muted" />
-              </div>
-              <div className="flex items-center space-x-6">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <div
-                    className="h-6 w-6 animate-pulse rounded bg-muted"
-                    key={i}
-                  />
-                ))}
-              </div>
-            </div>
-            <div className="grid grid-cols-3 gap-6 lg:gap-20">
-              {[1, 2, 3].map((col) => (
-                <div key={col}>
-                  <div className="mb-6 h-6 w-24 animate-pulse rounded bg-muted" />
-                  <div className="space-y-4">
-                    {[1, 2, 3, 4].map((item) => (
-                      <div
-                        className="h-4 w-full animate-pulse rounded bg-muted"
-                        key={item}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="mt-20 flex flex-col justify-between gap-4 border-t pt-8 text-center lg:flex-row lg:items-center lg:text-left">
-            <div className="h-4 w-48 animate-pulse rounded bg-muted" />
-            <div className="flex justify-center gap-4 lg:justify-start">
-              <div className="h-4 w-32 animate-pulse rounded bg-muted" />
-              <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-            </div>
-          </div>
-        </div>
+    <footer className="pt-16 pb-8">
+      <section className="borer-t-2 container mx-auto border-accent border-t-2 border-dotted py-8">
+        {" "}
+        {children}
       </section>
     </footer>
   );
 }
 
-function Footer({ data, settingsData }: FooterProps) {
+function Footer({ year, data, settingsData }: FooterProps) {
   const { subtitle, columns } = data;
   const { siteTitle, logo, socialLinks } = settingsData;
-  const year = new Date().getFullYear();
 
   return (
     <footer className="mt-20 pb-8">

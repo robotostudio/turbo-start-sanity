@@ -1,4 +1,3 @@
-import { env } from "env";
 import type { PortableTextBlock } from "next-sanity";
 import slugify from "slugify";
 
@@ -11,12 +10,11 @@ export function assertValue<T>(v: T | undefined, errorMessage: string): T {
 }
 
 export const getBaseUrl = () => {
-  if (env.VERCEL_ENV === "production") {
-    return `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  if (process.env.VERCEL_ENV === "production") {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
   }
-
-  if (env.VERCEL_ENV === "preview") {
-    return `https://${env.VERCEL_URL}`;
+  if (process.env.VERCEL_ENV === "preview") {
+    return `https://${process.env.VERCEL_URL}`;
   }
 
   return "http://localhost:3000";
@@ -76,43 +74,4 @@ export function parseChildrenToSlug(children: PortableTextBlock["children"]) {
     return "";
   }
   return convertToSlug(children.map((child) => child.text).join(""));
-}
-
-const BLOG_ITEMS_PER_PAGE = 10;
-
-export function getBlogPaginationStartEnd(page: number): {
-  start: number;
-  end: number;
-} {
-  const start = (page - 1) * BLOG_ITEMS_PER_PAGE;
-  const end = start + BLOG_ITEMS_PER_PAGE;
-  return { start, end };
-}
-
-export type PaginationMetadata = {
-  currentPage: number;
-  totalPages: number;
-  totalItems: number;
-  itemsPerPage: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-};
-
-export function calculatePaginationMetadata(
-  totalItems: number,
-  currentPage = 1,
-  itemsPerPage = BLOG_ITEMS_PER_PAGE
-): PaginationMetadata {
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const hasNextPage = currentPage < totalPages;
-  const hasPreviousPage = currentPage > 1;
-
-  return {
-    currentPage,
-    totalPages,
-    totalItems,
-    itemsPerPage,
-    hasNextPage,
-    hasPreviousPage,
-  };
 }

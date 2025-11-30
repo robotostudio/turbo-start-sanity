@@ -1,5 +1,5 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-
 import { PageBuilder } from "@/components/pagebuilder";
 import { client } from "@/lib/sanity/client";
 import { sanityFetch } from "@/lib/sanity/live";
@@ -43,21 +43,32 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string[] }>;
-}) {
+}): Promise<Metadata | undefined> {
   const { slug } = await params;
   const slugString = slug.join("/");
   const { data: pageData } = await fetchSlugPageData(slugString, false);
-  return getSEOMetadata(
-    pageData
-      ? {
-          title: pageData?.title ?? pageData?.seoTitle ?? "",
-          description: pageData?.description ?? pageData?.seoDescription ?? "",
-          slug: pageData?.slug,
-          contentId: pageData?._id,
-          contentType: pageData?._type,
-        }
-      : {}
-  );
+
+  if (!pageData) {
+    return getSEOMetadata({
+      title: "Page Not Found",
+      description: "The page you are looking for does not exist.",
+      slug: slugString,
+      contentId: undefined,
+      contentType: undefined,
+      seoNoIndex: true,
+    }); // Return empty metadata for not found pages
+  }
+
+  // Type guard: check if pageData is a "page" type (has title)
+  if (pageData._type === "page" || pageData._type === "collection") {
+    return getSEOMetadata({
+      title: pageData.title ?? "",
+      description: pageData.description ?? "",
+      slug: pageData.slug,
+      contentId: pageData._id,
+      contentType: pageData._type,
+    });
+  }
 }
 
 export async function generateStaticParams() {
@@ -81,11 +92,15 @@ export default async function SlugPage({
     return notFound();
   }
 
-  const { title, pageBuilder, _id, _type } = pageData ?? {};
+  const { pageBuilder, _id, _type } = pageData;
+  // Type guard: only access title if it's a "page" type
+  const title = pageData._type === "page" ? pageData.title : undefined;
 
   return !Array.isArray(pageBuilder) || pageBuilder?.length === 0 ? (
     <div className="flex min-h-[50vh] flex-col items-center justify-center p-4 text-center">
-      <h1 className="mb-4 font-semibold text-2xl capitalize">{title}</h1>
+      <h1 className="mb-4 font-semibold text-2xl capitalize">
+        {title ?? "Page"}
+      </h1>
       <p className="mb-6 text-muted-foreground">
         This page has no content blocks yet.
       </p>

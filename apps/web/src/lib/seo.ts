@@ -1,13 +1,12 @@
-import type { Metadata } from "next";
+import type {Metadata} from "next";
 
-import type { Maybe } from "@/types";
-import { capitalize, getBaseUrl } from "@/utils";
+import type {Maybe} from "@/types";
+import {capitalize, getBaseUrl} from "@/utils";
 
 // Site-wide configuration interface
 type SiteConfig = {
   title: string;
   description: string;
-  twitterHandle: string;
   keywords: string[];
 };
 
@@ -20,7 +19,7 @@ interface PageSeoData extends Metadata {
   contentType?: string;
   keywords?: string[];
   seoNoIndex?: boolean;
-  pageType?: Extract<Metadata["openGraph"], { type: string }>["type"];
+  pageType?: Extract<Metadata["openGraph"], {type: string}>["type"];
 }
 
 // OpenGraph image generation parameters
@@ -31,14 +30,13 @@ type OgImageParams = {
 
 // Default site configuration
 const siteConfig: SiteConfig = {
-  title: "Roboto Studio Demo",
-  description: "Roboto Studio Demo",
-  twitterHandle: "@studioroboto",
-  keywords: ["roboto", "studio", "demo", "sanity", "next", "react", "template"],
+  title: "JPEG Heaven",
+  description: "",
+  keywords: ["portfolio", "studio", "website"],
 };
 
 function generateOgImageUrl(params: OgImageParams = {}): string {
-  const { type, id } = params;
+  const {type, id} = params;
   const searchParams = new URLSearchParams();
 
   if (id) {
@@ -63,6 +61,8 @@ function buildPageUrl({
   return `${baseUrl}${normalizedSlug}`;
 }
 
+const START_SLASH_REGEX = /^\//;
+
 function extractTitle({
   pageTitle,
   slug,
@@ -75,8 +75,11 @@ function extractTitle({
   if (pageTitle) {
     return pageTitle;
   }
+
+  console.log({pageTitle, slug, siteTitle});
+
   if (slug && slug !== "/") {
-    return capitalize(slug.replace(/^\//, ""));
+    return capitalize(slug.replace(START_SLASH_REGEX, ""));
   }
   return siteTitle;
 }
@@ -95,7 +98,7 @@ export function getSEOMetadata(page: PageSeoData = {}): Metadata {
   } = page;
 
   const baseUrl = getBaseUrl();
-  const pageUrl = buildPageUrl({ baseUrl, slug });
+  const pageUrl = buildPageUrl({baseUrl, slug});
 
   // Build default metadata values
   const defaultTitle = extractTitle({
@@ -111,18 +114,25 @@ export function getSEOMetadata(page: PageSeoData = {}): Metadata {
     id: contentId,
   });
 
-  const fullTitle =
-    defaultTitle === siteConfig.title
-      ? defaultTitle
-      : `${defaultTitle} | ${siteConfig.title}`;
+  const titlesMatch =
+    String(defaultTitle).toLowerCase() ===
+    String(siteConfig.title).toLowerCase();
 
+  let fullTitle = defaultTitle;
+  if (titlesMatch) {
+    fullTitle = `${siteConfig.title}`;
+  } else if (slug === "/") {
+    fullTitle = `${siteConfig.title} 𝌁`;
+  } else {
+    fullTitle = `${defaultTitle} 𝌁 ${siteConfig.title}`;
+  }
   // Build default metadata object
   const defaultMetadata: Metadata = {
     title: fullTitle,
     description: defaultDescription,
     metadataBase: new URL(baseUrl),
     creator: siteConfig.title,
-    authors: [{ name: siteConfig.title }],
+    authors: [{name: siteConfig.title}],
     icons: {
       icon: `${baseUrl}/favicon.ico`,
     },
@@ -131,7 +141,7 @@ export function getSEOMetadata(page: PageSeoData = {}): Metadata {
     twitter: {
       card: "summary_large_image",
       images: [ogImage],
-      creator: siteConfig.twitterHandle,
+      creator: siteConfig.title,
       title: defaultTitle,
       description: defaultDescription,
     },

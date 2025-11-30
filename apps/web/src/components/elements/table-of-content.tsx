@@ -5,6 +5,7 @@ import Link from "next/link";
 import { type FC, useCallback, useMemo } from "react";
 import slugify from "slugify";
 
+import { LucideIcon } from "./lucide-icon";
 import type { SanityRichTextBlock, SanityRichTextProps } from "@/types";
 
 // ============================================================================
@@ -481,12 +482,13 @@ export const TableOfContent: FC<TableOfContentProps> = ({
           id="toc-heading"
         >
           <span>Table of Contents</span>
-          <ChevronDown
+          <LucideIcon
             aria-hidden="true"
             className={cn(
-              "h-5 w-5 transform transition-transform duration-200",
+              "transform transition-transform duration-200",
               "group-open:rotate-180"
             )}
+            icon={ChevronDown}
           />
         </summary>
 

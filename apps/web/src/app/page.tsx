@@ -1,4 +1,6 @@
 // import { PageBuilder } from "@/components/pagebuilder";
+import type { Metadata } from "next";
+
 import { PageBuilder } from "@/components/pagebuilder";
 import { sanityFetch } from "@/lib/sanity/live";
 import { queryHomePageData } from "@/lib/sanity/query";
@@ -10,7 +12,7 @@ async function fetchHomePageData() {
   });
 }
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   const { data: homePageData } = await fetchHomePageData();
   return getSEOMetadata(
     homePageData

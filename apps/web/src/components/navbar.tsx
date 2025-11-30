@@ -2,19 +2,18 @@
 
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
-import { env } from "env";
 import { ChevronDown, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-import useSWR from "swr";
+
 import type {
   QueryGlobalSeoSettingsResult,
   QueryNavbarDataResult,
 } from "@/lib/sanity/sanity.types";
-import { SanityButtons } from "./elements/sanity-buttons";
+
+import { LucideIcon } from "./elements/lucide-icon";
 import { SanityIcon } from "./elements/sanity-icon";
 import { Logo } from "./logo";
-import { ModeToggle } from "./mode-toggle";
 
 // Type helpers using utility types
 type NavigationData = {
@@ -26,32 +25,30 @@ type NavColumn = NonNullable<
   NonNullable<QueryNavbarDataResult>["columns"]
 >[number];
 
-type ColumnLink =
-  Extract<NavColumn, { type: "column" }>["links"] extends Array<infer T>
-    ? T
-    : never;
+type ColumnLink = Extract<NavColumn, { type: "column" }>["links"] extends Array<
+  infer T
+>
+  ? T
+  : never;
 
 type MenuLinkProps = {
   name: string;
   href: string;
   description?: string;
-  icon?: any;
+  icon?:
+    | {
+        svg?: string | null;
+        name?: string | null;
+      }
+    | string
+    | null;
   onClick?: () => void;
-};
-
-// Fetcher function
-const fetcher = async (url: string): Promise<NavigationData> => {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error("Failed to fetch navigation data");
-  }
-  return response.json();
 };
 
 function MenuLink({ name, href, description, icon, onClick }: MenuLinkProps) {
   return (
     <Link
-      className="group flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-accent"
+      className="group flex items-start gap-3 transition-colors hover:bg-accent"
       href={href || "#"}
       onClick={onClick}
     >
@@ -95,13 +92,16 @@ function DesktopColumnDropdown({
       <button
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        className="flex items-center gap-1 px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
+        className="flex items-center gap-1 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         type="button"
       >
         {column.title}
-        <ChevronDown className="size-3 transition-transform group-hover:rotate-180" />
+        <LucideIcon
+          className="transition-transform group-hover:rotate-180"
+          icon={ChevronDown}
+        />
       </button>
       {isOpen ? (
         <div
@@ -134,7 +134,7 @@ function DesktopColumnLink({
 }) {
   return (
     <Link
-      className="px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
+      className="px-3 py-2 font-medium text-base text-muted-foreground transition-colors hover:text-foreground"
       href={column.href || "#"}
     >
       {column.name}
@@ -155,7 +155,7 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
     setOpenDropdown(null);
   }
 
-  const { columns, buttons } = navbarData || {};
+  const { columns } = navbarData || {};
   const { logo, siteTitle } = settingsData || {};
 
   return (
@@ -167,13 +167,13 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
         size="icon"
         variant="ghost"
       >
-        {isOpen ? <X className="size-4" /> : <Menu className="size-4" />}
+        {isOpen ? <LucideIcon icon={X} /> : <LucideIcon icon={Menu} />}
         <span className="sr-only">Toggle menu</span>
       </Button>
 
       {/* Mobile menu overlay */}
       {isOpen && (
-        <div className="fixed inset-0 top-16 z-50 bg-background/80 backdrop-blur-sm md:hidden">
+        <div className="fixed inset-0 top-16 z-50 md:hidden">
           <div className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-full border-r bg-background p-6 shadow-lg">
             <div className="grid gap-6">
               {/* Logo for mobile */}
@@ -214,11 +214,12 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
                           type="button"
                         >
                           {column.title}
-                          <ChevronDown
+                          <LucideIcon
                             className={cn(
-                              "size-3 transition-transform",
+                              "transition-transform",
                               isDropdownOpen && "rotate-180"
                             )}
+                            icon={ChevronDown}
                           />
                         </button>
                         {isDropdownOpen && (
@@ -242,18 +243,6 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
                   return null;
                 })}
               </div>
-
-              {/* Action buttons */}
-              <div className="grid gap-3 border-t pt-4">
-                <div className="flex justify-center">
-                  <ModeToggle />
-                </div>
-                <SanityButtons
-                  buttonClassName="w-full justify-center"
-                  buttons={buttons || []}
-                  className="grid gap-3"
-                />
-              </div>
             </div>
           </div>
         </div>
@@ -262,84 +251,17 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
   );
 }
 
-function NavbarSkeleton() {
-  return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo skeleton - matches Logo component dimensions: width={120} height={40} */}
-          {/* <div className="flex items-center">
-            <div className="h-10 w-[120px] rounded bg-muted/50 animate-pulse" />
-          </div> */}
-          <div className="flex h-[40px] w-[120px] items-center">
-            <div className="h-10 w-[120px] animate-pulse rounded bg-muted/50" />
-          </div>
-
-          {/* Desktop nav skeleton - matches nav gap-1 and px-3 py-2 buttons */}
-          {/* <nav className="hidden md:flex items-center gap-1">
-            {Array.from({ length: 2 }).map((_, i) => (
-              <div
-                key={`nav-${i}`}
-                className="h-9 px-3 py-2 rounded bg-muted/50 animate-pulse min-w-[60px]"
-              />
-            ))}
-          </nav> */}
-
-          {/* Desktop actions skeleton - matches gap-4, ModeToggle (icon button) + SanityButtons */}
-          {/* <div className="hidden md:flex items-center gap-4">
-            <div className="h-9 w-9 rounded bg-muted/50 animate-pulse" />
-            <div className="h-9 px-4 rounded-lg bg-muted/50 animate-pulse min-w-[80px]" />
-          </div> */}
-
-          {/* Mobile menu button skeleton - matches Button size="icon" */}
-          <div className="h-10 w-10 animate-pulse rounded bg-muted/50 md:hidden" />
-        </div>
-      </div>
-    </header>
-  );
-}
-
-export function Navbar({
-  navbarData: initialNavbarData,
-  settingsData: initialSettingsData,
-}: NavigationData) {
-  const { data, error, isLoading } = useSWR<NavigationData>(
-    "/api/navigation",
-    fetcher,
-    {
-      fallbackData: {
-        navbarData: initialNavbarData,
-        settingsData: initialSettingsData,
-      },
-      revalidateOnFocus: false,
-      revalidateOnMount: false,
-      revalidateOnReconnect: true,
-      refreshInterval: 30_000,
-      errorRetryCount: 3,
-      errorRetryInterval: 5000,
-    }
-  );
-
-  const navigationData = data || {
-    navbarData: initialNavbarData,
-    settingsData: initialSettingsData,
-  };
-  const { navbarData, settingsData } = navigationData;
-  const { columns, buttons } = navbarData || {};
+export function Navbar({ navbarData, settingsData }: NavigationData) {
+  const { columns } = navbarData || {};
   const { logo, siteTitle } = settingsData || {};
 
-  // Show skeleton only on initial mount when no fallback data is available
-  if (isLoading && !data && !(initialNavbarData && initialSettingsData)) {
-    return <NavbarSkeleton />;
-  }
-
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 w-full">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-16 max-w-prose items-center justify-between">
           {/* Logo */}
           <div className="flex h-[40px] w-[120px] items-center">
-            {logo && (
+            {logo ? (
               <Logo
                 alt={siteTitle || ""}
                 height={40}
@@ -347,11 +269,20 @@ export function Navbar({
                 priority
                 width={120}
               />
+            ) : (
+              <div>
+                <Link
+                  className="font-medium font-twelve-serif text-xl"
+                  href={"/"}
+                >
+                  {siteTitle}
+                </Link>
+              </div>
             )}
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav className="hidden items-center justify-between gap-16 md:flex">
             {columns?.map((column) => {
               if (column.type === "column") {
                 return (
@@ -365,27 +296,10 @@ export function Navbar({
             })}
           </nav>
 
-          {/* Desktop Actions */}
-          <div className="hidden items-center gap-4 md:flex">
-            <ModeToggle />
-            <SanityButtons
-              buttonClassName="rounded-lg"
-              buttons={buttons || []}
-              className="flex items-center gap-2"
-            />
-          </div>
-
           {/* Mobile Menu */}
           <MobileMenu navbarData={navbarData} settingsData={settingsData} />
         </div>
       </div>
-
-      {/* Error boundary for SWR */}
-      {error && env.NODE_ENV === "development" && (
-        <div className="border-destructive/20 border-b bg-destructive/10 px-4 py-2 text-destructive text-xs">
-          Navigation data fetch error: {error.message}
-        </div>
-      )}
     </header>
   );
 }

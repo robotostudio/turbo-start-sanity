@@ -1,5 +1,6 @@
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
+import { stegaClean } from "next-sanity";
 import Link from "next/link";
 import type { ComponentProps } from "react";
 
@@ -24,9 +25,11 @@ function SanityButton({
     return <Button>Link Broken</Button>;
   }
 
+  const cleanVariant = stegaClean(variant) || "default";
+
   return (
     <Button
-      variant={variant}
+      variant={cleanVariant}
       {...props}
       asChild
       className={cn("rounded-[10px]", className)}

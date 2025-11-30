@@ -1,8 +1,8 @@
 import type {
-  QueryBlogIndexPageBlogsResult,
-  QueryBlogSlugPageDataResult,
   QueryHomePageDataResult,
   QueryImageTypeResult,
+  QueryNavbarDataResult,
+  RichText,
 } from "@/lib/sanity/sanity.types";
 
 export type PageBuilderBlockTypes = NonNullable<
@@ -15,19 +15,16 @@ export type PagebuilderType<T extends PageBuilderBlockTypes> = Extract<
 >;
 
 export type SanityButtonProps = NonNullable<
-  NonNullable<PagebuilderType<"hero">>["buttons"]
+  NonNullable<QueryNavbarDataResult>["buttons"]
 >[number];
 
 export type SanityImageProps = NonNullable<QueryImageTypeResult>;
 
-export type SanityRichTextProps =
-  NonNullable<QueryBlogSlugPageDataResult>["richText"];
+export type SanityRichTextProps = RichText;
 
 export type SanityRichTextBlock = Extract<
   NonNullable<NonNullable<SanityRichTextProps>[number]>,
   { _type: "block" }
 >;
-
-export type Blog = NonNullable<QueryBlogIndexPageBlogsResult>[number];
 
 export type Maybe<T> = T | null | undefined;

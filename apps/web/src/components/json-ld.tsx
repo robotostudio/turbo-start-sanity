@@ -16,7 +16,6 @@ import type {
 import { client, urlFor } from "@/lib/sanity/client";
 import { querySettingsData } from "@/lib/sanity/query";
 import type {
-  QueryBlogSlugPageDataResult,
   QuerySettingsDataResult,
 } from "@/lib/sanity/sanity.types";
 import { getBaseUrl, handleErrors } from "@/utils";
@@ -126,7 +125,22 @@ function buildSafeImageUrl(image?: { id?: string | null }) {
 
 // Article JSON-LD Component
 type ArticleJsonLdProps = {
-  article: QueryBlogSlugPageDataResult;
+  article: {
+    _id: string;
+    _type: string;
+    _createdAt: string;
+    _updatedAt: string;
+    title: string;
+    description?: string | null;
+    slug: string;
+    image?: { id?: string | null } | null;
+    publishedAt?: string | null;
+    authors?: {
+      _id: string;
+      name: string;
+      image?: { id?: string | null } | null;
+    } | null;
+  };
   settings?: QuerySettingsDataResult;
 };
 export function ArticleJsonLd({
@@ -140,7 +154,7 @@ export function ArticleJsonLd({
 
   const baseUrl = getBaseUrl();
   const articleUrl = `${baseUrl}${article.slug}`;
-  const imageUrl = buildSafeImageUrl(article.image);
+  const imageUrl = article.image ? buildSafeImageUrl(article.image) : undefined;
 
   const articleJsonLd: WithContext<Article> = {
     "@context": "https://schema.org",
@@ -262,7 +276,7 @@ export function WebSiteJsonLd({ settings }: WebSiteJsonLdProps) {
 // Combined JSON-LD Component for pages with multiple structured data
 type CombinedJsonLdProps = {
   settings?: QuerySettingsDataResult;
-  article?: QueryBlogSlugPageDataResult;
+  article?: ArticleJsonLdProps["article"];
   faqs?: FlexibleFaq[];
   includeWebsite?: boolean;
   includeOrganization?: boolean;

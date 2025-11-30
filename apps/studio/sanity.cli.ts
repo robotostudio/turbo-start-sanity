@@ -28,19 +28,11 @@ function getStudioHost(): string | undefined {
   return;
 }
 
-const studioHost = getStudioHost();
-
-if (studioHost) {
-  console.log(`🪩 Sanity Studio Host: https://${studioHost}.sanity.studio`);
-}
-
 export default defineCliConfig({
   api: {
     projectId,
     dataset,
   },
   studioHost: getStudioHost(),
-  deployment: {
-    autoUpdates: false,
-  },
+  autoUpdates: false,
 });

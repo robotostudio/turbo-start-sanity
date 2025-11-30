@@ -3,13 +3,6 @@ import { defineQuery } from "next-sanity";
 const imageFields = /* groq */ `
   "id": asset._ref,
   "preview": asset->metadata.lqip,
-  "alt": coalesce(
-    alt,
-    asset->altText,
-    caption,
-    asset->originalFilename,
-    "untitled"
-  ),
   hotspot {
     x,
     y
@@ -46,39 +39,15 @@ const markDefsFragment = /* groq */ `
   }
 `;
 
-const richTextFragment = /* groq */ `
-  richText[]{
-    ...,
-    _type == "block" => {
-      ...,
-      ${markDefsFragment}
-    },
-    _type == "image" => {
-      ${imageFields},
-      "caption": caption
-    }
-  }
-`;
-
-const blogAuthorFragment = /* groq */ `
-  authors[0]->{
-    _id,
-    name,
-    position,
-    ${imageFragment}
-  }
-`;
-
-const blogCardFragment = /* groq */ `
+const collectionCardFragment = /* groq */ `
+  ...,
   _type,
   _id,
   title,
   description,
   "slug":slug.current,
   orderRank,
-  ${imageFragment},
-  publishedAt,
-  ${blogAuthorFragment}
+  ${imageFragment}
 `;
 
 const buttonsFragment = /* groq */ `
@@ -97,87 +66,97 @@ const buttonsFragment = /* groq */ `
 `;
 
 // Page builder block fragments
-const ctaBlock = /* groq */ `
-  _type == "cta" => {
+
+const imageSectionBlock = /* groq */ `
+  _type == "imageSection" => {
     ...,
-    ${richTextFragment},
-    ${buttonsFragment},
-  }
-`;
-const imageLinkCardsBlock = /* groq */ `
-  _type == "imageLinkCards" => {
-    ...,
-    ${richTextFragment},
-    ${buttonsFragment},
-    "cards": array::compact(cards[]{
-      ...,
-      "openInNewTab": url.openInNewTab,
-      "href": select(
-        url.type == "internal" => url.internal->slug.current,
-        url.type == "external" => url.external,
-        url.href
-      ),
-      ${imageFragment},
-    })
+    ${imageFragment}
   }
 `;
 
-const heroBlock = /* groq */ `
-  _type == "hero" => {
+const videoSectionBlock = /* groq */ `
+  _type == "videoSection" => {
     ...,
-    ${imageFragment},
-    ${buttonsFragment},
-    ${richTextFragment}
-  }
-`;
-
-const faqFragment = /* groq */ `
-  "faqs": array::compact(faqs[]->{
-    title,
-    _id,
-    _type,
-    ${richTextFragment}
-  })
-`;
-
-const faqAccordionBlock = /* groq */ `
-  _type == "faqAccordion" => {
-    ...,
-    ${faqFragment},
-    link{
-      ...,
-      "openInNewTab": url.openInNewTab,
-      "href": select(
-        url.type == "internal" => url.internal->slug.current,
-        url.type == "external" => url.external,
-        url.href
-      )
+    video{
+      asset->{
+        playbackId,
+        status
+      }
     }
   }
 `;
 
-const subscribeNewsletterBlock = /* groq */ `
-  _type == "subscribeNewsletter" => {
+const imageGalleryBlock = /* groq */ `
+  _type == "imageGallery" => {
     ...,
-    "subTitle": subTitle[]{
+    "images": images[]{
+      ...,
+      "image": {
+        ${imageFields}
+      },
+      "caption": caption[]{
+        ...,
+        _type == "block" => {
+          ...,
+          ${markDefsFragment}
+        }
+      }
+    }
+  }
+`;
+const richTextFragment = /* groq */ `
+  richText[]{
+    ...,
+    _type == "block" => {
       ...,
       ${markDefsFragment}
     },
-    "helperText": helperText[]{
+    _type == "image" => {
       ...,
-      ${markDefsFragment}
+      ${imageFields},
+      "caption": caption[]{
+        ...,
+        _type == "block" => {
+          ...,
+          ${markDefsFragment}
+        }
+      },
+      variant
+    },
+    _type == "imageGallery" => {
+      ...,
+      ${imageGalleryBlock}
+    }
+  }
+`;
+const textSectionBlock = /* groq */ `
+  _type == "textSection" => {
+    ...,
+    ${richTextFragment}
+  }
+`;
+
+const collectionListingBlock = /* groq */ `
+  _type == "collectionListing" => {
+    ...,
+    "collections": *[_type == "collection"] | order(orderRank asc){
+      ${collectionCardFragment}
     }
   }
 `;
 
-const featureCardsIconBlock = /* groq */ `
-  _type == "featureCardsIcon" => {
+const gridLayoutBlock = /* groq */ `
+  _type == "gridLayout" => {
     ...,
-    ${richTextFragment},
-    "cards": array::compact(cards[]{
+    pageBuilder[]{
       ...,
-      ${richTextFragment},
-    })
+      _type,
+      ${imageSectionBlock},
+      ${videoSectionBlock},
+      ${imageGalleryBlock},
+      ${textSectionBlock},
+      ${collectionListingBlock}
+    }
   }
 `;
 
@@ -185,12 +164,12 @@ const pageBuilderFragment = /* groq */ `
   pageBuilder[]{
     ...,
     _type,
-    ${ctaBlock},
-    ${heroBlock},
-    ${faqAccordionBlock},
-    ${featureCardsIconBlock},
-    ${subscribeNewsletterBlock},
-    ${imageLinkCardsBlock}
+    ${gridLayoutBlock},
+    ${imageSectionBlock},
+    ${videoSectionBlock},
+    ${imageGalleryBlock},
+    ${textSectionBlock},
+    ${collectionListingBlock}
   }
 `;
 
@@ -217,7 +196,7 @@ export const queryHomePageData =
   }`);
 
 export const querySlugPageData = defineQuery(`
-  *[_type == "page" && slug.current == $slug][0]{
+  *[(_type == "page" || _type == "collection" || _type == "collectionIndex") && slug.current == $slug][0]{
     ...,
     "slug": slug.current,
     ${pageBuilderFragment}
@@ -225,51 +204,19 @@ export const querySlugPageData = defineQuery(`
   `);
 
 export const querySlugPagePaths = defineQuery(`
-  *[_type == "page" && defined(slug.current)].slug.current
+  *[(_type == "page" || _type == "collection") && defined(slug.current)].slug.current
 `);
 
-export const queryBlogIndexPageData = defineQuery(`
-  *[_type == "blogIndex"][0]{
+export const queryCollectionIndexPageData = defineQuery(`
+  *[_type == "collectionIndex" && _id == "collectionIndex"][0]{
     ...,
     _id,
     _type,
     title,
     description,
-    "displayFeaturedBlogs" : displayFeaturedBlogs == "yes",
-    "featuredBlogsCount" : featuredBlogsCount,
     ${pageBuilderFragment},
     "slug": slug.current
   }
-`);
-
-export const queryBlogIndexPageBlogs = defineQuery(`
-  *[_type == "blog" && (seoHideFromLists != true)] | order(orderRank asc) [$start...$end]{
-    ${blogCardFragment}
-  }
-`);
-
-export const queryAllBlogDataForSearch = defineQuery(`
-  *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true)]{
-    ${blogCardFragment}
-  }
-`);
-
-export const queryBlogIndexPageBlogsCount = defineQuery(`
-  count(*[_type == "blog" && (seoHideFromLists != true)])
-`);
-export const queryBlogSlugPageData = defineQuery(`
-  *[_type == "blog" && slug.current == $slug][0]{
-    ...,
-    "slug": slug.current,
-    ${blogAuthorFragment},
-    ${imageFragment},
-    ${richTextFragment},
-    ${pageBuilderFragment}
-  }
-`);
-
-export const queryBlogPaths = defineQuery(`
-  *[_type == "blog" && defined(slug.current)].slug.current
 `);
 
 const ogFieldsFragment = /* groq */ `
@@ -299,13 +246,7 @@ export const queryHomePageOGData = defineQuery(`
   `);
 
 export const querySlugPageOGData = defineQuery(`
-  *[_type == "page" && _id == $id][0]{
-    ${ogFieldsFragment}
-  }
-`);
-
-export const queryBlogPageOGData = defineQuery(`
-  *[_type == "blog" && _id == $id][0]{
+  *[(_type == "page" || _type == "collection") && _id == $id][0]{
     ${ogFieldsFragment}
   }
 `);
@@ -379,7 +320,7 @@ export const querySitemapData = defineQuery(`{
     "slug": slug.current,
     "lastModified": _updatedAt
   },
-  "blogPages": *[_type == "blog" && defined(slug.current)]{
+  "collectionPages": *[_type == "collection" && defined(slug.current)]{
     "slug": slug.current,
     "lastModified": _updatedAt
   }

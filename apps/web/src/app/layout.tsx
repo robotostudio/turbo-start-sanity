@@ -1,6 +1,6 @@
 import "@workspace/ui/globals.css";
 
-import { Geist, Geist_Mono } from "next/font/google";
+import { cn } from "@workspace/ui/lib/utils";
 import { draftMode } from "next/headers";
 import { VisualEditing } from "next-sanity/visual-editing";
 import { Suspense } from "react";
@@ -10,18 +10,13 @@ import { CombinedJsonLd } from "@/components/json-ld";
 import { Navbar } from "@/components/navbar";
 import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
+import {
+  akzidenzGrotesk,
+  baseTwelveSerif,
+  baseTwelveSerifSmallCaps,
+} from "@/fonts";
 import { getNavigationData } from "@/lib/navigation";
 import { SanityLive } from "@/lib/sanity/live";
-
-const fontSans = Geist({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-});
 
 export default async function RootLayout({
   children,
@@ -33,12 +28,23 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
+        className={cn(
+          baseTwelveSerif.variable,
+          baseTwelveSerifSmallCaps.variable,
+          akzidenzGrotesk.variable,
+          "font-sans antialiased"
+        )}
       >
         <Providers>
           <Navbar navbarData={nav.navbarData} settingsData={nav.settingsData} />
           {children}
-          <Suspense fallback={<FooterSkeleton />}>
+          <Suspense
+            fallback={
+              <FooterSkeleton>
+                <p>&copy; {new Date().getFullYear()}. All rights reserved.</p>
+              </FooterSkeleton>
+            }
+          >
             <FooterServer />
           </Suspense>
           <SanityLive />

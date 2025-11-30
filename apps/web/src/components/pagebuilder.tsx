@@ -1,17 +1,18 @@
 "use client";
 
 import { useOptimistic } from "@sanity/visual-editing/react";
-import { env } from "env";
 import { createDataAttribute } from "next-sanity";
 import { useCallback, useMemo } from "react";
+
+import { dataset, projectId, studioUrl } from "@/config";
 import type { QueryHomePageDataResult } from "@/lib/sanity/sanity.types";
 import type { PageBuilderBlockTypes, PagebuilderType } from "@/types";
-import { CTABlock } from "./sections/cta";
-import { FaqAccordion } from "./sections/faq-accordion";
-import { FeatureCardsWithIcon } from "./sections/feature-cards-with-icon";
-import { HeroBlock } from "./sections/hero";
-import { ImageLinkCards } from "./sections/image-link-cards";
-import { SubscribeNewsletter } from "./sections/subscribe-newsletter";
+import { CollectionListing } from "./sections/collection-listing";
+import { GridLayout } from "./sections/grid-layout";
+import { ImageGallery } from "./sections/image-gallery";
+import { ImageSection } from "./sections/image-section";
+import { TextSection } from "./sections/text-section";
+import { VideoSection } from "./sections/video-section";
 
 // More specific and descriptive type aliases
 type PageBuilderBlock = NonNullable<
@@ -32,19 +33,21 @@ type SanityDataAttributeConfig = {
 
 // Strongly typed component mapping with proper component signatures
 const BLOCK_COMPONENTS = {
-  cta: CTABlock as React.ComponentType<PagebuilderType<"cta">>,
-  faqAccordion: FaqAccordion as React.ComponentType<
-    PagebuilderType<"faqAccordion">
+  gridLayout: GridLayout as React.ComponentType<PagebuilderType<"gridLayout">>,
+  imageSection: ImageSection as React.ComponentType<
+    PagebuilderType<"imageSection">
   >,
-  hero: HeroBlock as React.ComponentType<PagebuilderType<"hero">>,
-  featureCardsIcon: FeatureCardsWithIcon as React.ComponentType<
-    PagebuilderType<"featureCardsIcon">
+  videoSection: VideoSection as React.ComponentType<
+    PagebuilderType<"videoSection">
   >,
-  subscribeNewsletter: SubscribeNewsletter as React.ComponentType<
-    PagebuilderType<"subscribeNewsletter">
+  imageGallery: ImageGallery as React.ComponentType<
+    PagebuilderType<"imageGallery">
   >,
-  imageLinkCards: ImageLinkCards as React.ComponentType<
-    PagebuilderType<"imageLinkCards">
+  textSection: TextSection as React.ComponentType<
+    PagebuilderType<"textSection">
+  >,
+  collectionListing: CollectionListing as React.ComponentType<
+    PagebuilderType<"collectionListing">
   >,
 } as const satisfies Record<PageBuilderBlockTypes, React.ComponentType<any>>;
 
@@ -54,9 +57,9 @@ const BLOCK_COMPONENTS = {
 function createSanityDataAttribute(config: SanityDataAttributeConfig): string {
   return createDataAttribute({
     id: config.id,
-    baseUrl: env.NEXT_PUBLIC_SANITY_STUDIO_URL,
-    projectId: env.NEXT_PUBLIC_SANITY_PROJECT_ID,
-    dataset: env.NEXT_PUBLIC_SANITY_DATASET,
+    baseUrl: studioUrl,
+    projectId,
+    dataset,
     type: config.type,
     path: config.path,
   }).toString();
@@ -172,11 +175,12 @@ export function PageBuilder({
   }
 
   return (
-    <main
-      className="mx-auto my-16 flex max-w-7xl flex-col gap-16"
+    <section
+      aria-label="Page content"
+      className="mx-auto my-16 flex flex-col gap-16"
       data-sanity={containerDataAttribute}
     >
       {blocks.map(renderBlock)}
-    </main>
+    </section>
   );
 }
