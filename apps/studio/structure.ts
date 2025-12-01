@@ -1,7 +1,5 @@
 import { createSlugBasedStructure } from "@components/nested-pages-structure";
 import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
-import type { SchemaType, SingletonType } from "@schemaTypes/index";
-import { getTitleCase } from "@utils/helper";
 import {
   BookMarked,
   CogIcon,
@@ -20,6 +18,9 @@ import type {
   StructureBuilder,
   StructureResolverContext,
 } from "sanity/structure";
+
+import type { SchemaType, SingletonType } from "@schemaTypes/index";
+import { getTitleCase } from "@utils/helper";
 
 type Base<T = SchemaType> = {
   id?: string;
