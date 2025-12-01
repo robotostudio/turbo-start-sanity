@@ -122,15 +122,15 @@
 
 @layer components {
   .container {
-    @apply mx-auto px-4 !max-w-screen-xl;
+    @apply mx-auto px-4 !max-w-screen-lg;
   }
 
   .container-narrow {
-    @apply mx-auto px-4 md:px-0 max-w-lg;
+    @apply mx-auto px-4 md:px-0 max-w-2xl;
   }
 
   .conatiner-inset {
-    @apply mx-auto px-4 max-w-screen-xl;
+    @apply mx-auto px-4 max-w-screen-lg;
   }
 
   .container-wide {

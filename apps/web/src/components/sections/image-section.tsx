@@ -20,7 +20,7 @@ export function ImageSection({ image, styleVariant, alt }: ImageSectionProps) {
     <section
       className={
         isFullBleed
-          ? "-mx-4 md:-mx-8 relative w-full max-w-screen"
+          ? "relative w-full max-w-screen"
           : "container mx-auto px-4"
       }
     >
