@@ -14,8 +14,8 @@ export interface GridLayoutProps {
 const GridLayout: React.FC<GridLayoutProps> = React.memo(({ 
   children, 
   columns,
-  minColumns = 2,
-  maxColumns = 7,
+  minColumns = 4,
+  maxColumns = 9,
   gap = 1,
   showDebug = false,
 }) => {

@@ -12,13 +12,13 @@ import MasonryLayout from "@/components/layouts/MasonryLayout";
 const imageDimensions = [
   // 2:3 aspect ratio (portrait)
   {
-    width: 1000,
-    height: 1500,
+    width: 2000,
+    height: 3000,
   },
   // 3:2 aspect ratio (landscape)
   {
-    width: 1500,
-    height: 1000,
+    width: 3000,
+    height: 2000,
   },
 
 ];
@@ -82,18 +82,18 @@ export default function SandboxRoute() {
 
   const gridImages = React.useMemo(() => {
     const seed = 12378373;
-    return Array.from({ length: 31 }).map((_, index) => {
-      const dimensions = imageDimensions[0];
+    return Array.from({ length: 27 }).map((_, index) => {
+      const dimensions = imageDimensions[1];
       return {
         dimensions: dimensions as { width: number; height: number },
         seed: seed + index,
       };
     });
-  }, [getRandomImageDimensionsFromSeed]);
+  }, []);
 
   const masonryImages = React.useMemo(() => {
     const seed = 123612361;
-    return Array.from({ length: 50 }).map((_, index) => {
+    return Array.from({ length: 14 }).map((_, index) => {
       const dimensions = getRandomImageDimensionsFromSeed(
         (seed + index) % imageDimensions.length
       );
@@ -106,9 +106,9 @@ export default function SandboxRoute() {
 
   return (
     <Tabs defaultValue="grid" className="w-full">
-      <main className="my-64 container pb-24">
+      <main className="my-12 container pb-24">
         <TabsContent value="grid">
-          <GridLayout minColumns={5} maxColumns={9} showDebug>
+          <GridLayout minColumns={3} maxColumns={6} showDebug>
             {gridImages.map((item) => (
               <ImageItem
                 key={`grid-${item.seed}`}
