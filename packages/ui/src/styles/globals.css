@@ -136,6 +136,13 @@
   .container-wide {
     @apply mx-auto px-4 !max-w-screen-xl;
   }
+
+  button[data-state="active"][data-slot="tabs-trigger"],
+  [data-state="active"][data-slot="tabs-trigger"] {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
 }
 
 img {
@@ -149,4 +156,14 @@ img {
 
 a {
   @apply text-primary underline-offset-4 hover:underline;
+}
+
+/* Tabs Content Visibility */
+[data-slot="tabs-content"][data-state="active"] {
+  display: block !important;
+}
+
+[data-slot="tabs-content"][data-state="inactive"],
+[data-slot="tabs-content"][hidden] {
+  display: none !important;
 }

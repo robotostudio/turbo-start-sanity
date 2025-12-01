@@ -13,6 +13,7 @@
     "check": "npm run lint && npm run typecheck"
   },
   "dependencies": {
+    "@mux/mux-player-react": "^3.5.3",
     "@sanity/asset-utils": "^2.3.0",
     "@sanity/client": "catalog:",
     "@sanity/image-url": "^2.0.1",
@@ -21,7 +22,6 @@
     "@t3-oss/env-nextjs": "^0.13.8",
     "@tanstack/react-query": "^5.90.11",
     "@workspace/ui": "workspace:*",
-    "@mux/mux-player-react": "^3.5.3",
     "babel-plugin-react-compiler": "19.1.0-rc.2",
     "fuse.js": "^7.1.0",
     "lucide-react": "catalog:",
@@ -38,11 +38,12 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@faker-js/faker": "^10.1.0",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@workspace/typescript-config": "workspace:*",
-    "baseline-browser-mapping": "^2.8.32",
-    "@workspace/ui": "workspace:*"
+    "@workspace/ui": "workspace:*",
+    "baseline-browser-mapping": "^2.8.32"
   }
 }
