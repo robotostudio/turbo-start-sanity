@@ -47,6 +47,7 @@ export const collection = defineType({
     }),
     documentSlugField("collection", {
       group: GROUP.MAIN_CONTENT,
+      prefix: "collections",
     }),
     defineField({
       name: "image",

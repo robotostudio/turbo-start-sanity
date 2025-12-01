@@ -508,85 +508,15 @@ export function cleanSlug(slug: string): string {
  */
 export function generateSlugFromTitle(
   title: string,
-  documentType: string,
-  currentSlug?: string
+  prefix?: string,
 ): string {
-  if (!title?.trim()) {
-    return "";
-  }
-
-  const config = getDocumentTypeConfig(documentType);
+  // construct a clean URL whether the prefix is provided or not
+  // and whether or not the prefix has a leading or trailing slash
+  const cleanPrefix = prefix?.startsWith("/") ? prefix : `/${prefix}`;
   const cleanTitle = cleanSlug(title);
+  const cleanUrl = `${cleanPrefix}/${cleanTitle}`;
 
-  if (!cleanTitle) {
-    return "";
-  }
-
-  // Handle different document types with their specific requirements
-  switch (documentType) {
-    case "homePage":
-      return "/";
-
-    case "blogIndex":
-      return "/blog";
-
-    case "author":
-      return `/author/${cleanTitle}`;
-
-    case "blog":
-      return `/blog/${cleanTitle}`;
-
-    case "page":
-      // For pages, preserve existing path structure if it exists
-      if (currentSlug?.includes("/")) {
-        const segments = currentSlug.split("/").filter(Boolean);
-        if (segments.length > 1) {
-          const basePath = segments.slice(0, -1).join("/");
-          return `/${basePath}/${cleanTitle}`;
-        }
-      }
-      return `/${cleanTitle}`;
-
-    default:
-      // Use required prefix if specified in config
-      if (config.requiredPrefix) {
-        return config.requiredPrefix.endsWith("/")
-          ? `${config.requiredPrefix}${cleanTitle}`
-          : `${config.requiredPrefix}/${cleanTitle}`;
-      }
-      return `/${cleanTitle}`;
-  }
-}
-
-/**
- * Comprehensive validation function that returns structured validation results
- * This is the preferred validation function for components
- */
-export function validateSlugComprehensive(
-  slug: string | undefined | null,
-  options: SlugValidationOptions = {}
-): {
-  isValid: boolean;
-  hasErrors: boolean;
-  hasWarnings: boolean;
-  validation: SlugValidationResult;
-  segments: string[];
-  segmentValidations: SlugValidationResult[];
-} {
-  const validation = validateSlug(slug, options);
-  const segments = slug ? slug.split("/").filter(Boolean) : [];
-  const segmentValidations = segments.map((segment) =>
-    validateSlugSegment(segment)
-  );
-
-  return {
-    isValid: validation.errors.length === 0,
-    hasErrors: validation.errors.length > 0,
-    hasWarnings: validation.warnings.length > 0,
-    validation,
-    segments,
-    segmentValidations,
-  };
+  return cleanUrl;
 }
 
 /**

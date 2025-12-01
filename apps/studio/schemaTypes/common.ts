@@ -2,6 +2,7 @@ import {
   defineField,
   type ImageRule,
   type ImageValue,
+  type SlugOptions,
   type ValidationBuilder,
 } from "sanity";
 
@@ -53,12 +54,14 @@ export const documentSlugField = (
     group?: string;
     description?: string;
     title?: string;
+    prefix?: string;
   } = {}
 ) => {
   const {
     group,
     description = `The web address where people can find your ${documentType} (automatically created from title)`,
     title = "URL",
+    prefix,
   } = options;
 
   return defineField({
@@ -67,6 +70,9 @@ export const documentSlugField = (
     title,
     description,
     group,
+    options: {
+      prefix,
+    } as SlugOptions,
     components: {
       field: PathnameFieldComponent,
     },

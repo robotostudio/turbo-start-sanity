@@ -19,7 +19,7 @@ const components: Partial<PortableTextReactComponents> = {
       const slug = parseChildrenToSlug(value.children);
       return (
         <h2
-          className="scroll-m-20 border-b pb-2 font-semibold text-3xl first:mt-0"
+          className="scroll-m-20 pb-4 font-semibold text-3xl first:mt-0"
           id={slug}
         >
           {children}
@@ -29,7 +29,7 @@ const components: Partial<PortableTextReactComponents> = {
     h3: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h3 className="scroll-m-20 font-semibold text-2xl" id={slug}>
+        <h3 className="scroll-m-20 pb-4 font-semibold text-2xl" id={slug}>
           {children}
         </h3>
       );
@@ -37,7 +37,7 @@ const components: Partial<PortableTextReactComponents> = {
     h4: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h4 className="scroll-m-20 font-semibold text-xl" id={slug}>
+        <h4 className="scroll-m-20 pb-4 font-semibold text-xl" id={slug}>
           {children}
         </h4>
       );
@@ -45,7 +45,7 @@ const components: Partial<PortableTextReactComponents> = {
     h5: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h5 className="scroll-m-20 font-semibold text-lg" id={slug}>
+        <h5 className="scroll-m-20 pb-4 font-semibold text-lg" id={slug}>
           {children}
         </h5>
       );
@@ -53,10 +53,13 @@ const components: Partial<PortableTextReactComponents> = {
     h6: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h6 className="scroll-m-20 font-semibold text-base" id={slug}>
+        <h6 className="scroll-m-20 pb-4 font-semibold text-base" id={slug}>
           {children}
         </h6>
       );
+    },
+    normal: ({ children }) => {
+      return <p className="mb-4">{children}</p>;
     },
   },
   marks: {
@@ -206,7 +209,7 @@ export function RichText<T>({
   return (
     <div
       className={cn(
-        "prose dark:prose-invert prose-p:my-24 max-w-none prose-headings:scroll-m-24 prose-h2:border-b prose-h2:pb-2 prose-h2:font-semibold prose-h2:text-3xl prose-headings:text-opacity-90 prose-ol:text-opacity-80 prose-ul:text-opacity-80 prose-a:decoration-dotted prose-h2:first:mt-0",
+        "prose dark:prose-invert prose-p:my-8 max-w-none prose-headings:scroll-m-24 prose-h2:border-b prose-h2:pb-2 prose-h2:font-semibold prose-h2:text-3xl prose-headings:text-opacity-90 prose-ol:text-opacity-80 prose-ul:text-opacity-80 prose-a:decoration-dotted prose-h2:first:mt-0",
         "max-w-prose",
         className
       )}
@@ -214,7 +217,11 @@ export function RichText<T>({
       <PortableText
         components={components}
         onMissingComponent={(_, { nodeType, type }) => {
-          console.warn(`Missing component: ${nodeType} for type: ${type}`);
+          if (process.env.NODE_ENV === "development") {
+            // biome-ignore lint/suspicious/noConsole: only in development
+            console.warn(`Missing component: ${nodeType} for type: ${type}`);
+          }
+          return null;
         }}
         value={richText as unknown as PortableTextBlock[]}
       />

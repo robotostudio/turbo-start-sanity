@@ -6,6 +6,7 @@ const allLinkableTypes = [
   { type: "page" },
   { type: "collection" },
   { type: "collectionIndex" },
+  { type: "homePage" },
 ];
 
 export const customUrl = defineType({
