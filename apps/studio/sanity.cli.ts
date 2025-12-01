@@ -3,6 +3,9 @@ import { defineCliConfig } from "sanity/cli";
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID;
 const dataset = process.env.SANITY_STUDIO_DATASET;
 
+if (!projectId || projectId === 'project_id') throw new Error('Missing required environment variable: SANITY_STUDIO_PROJECT_ID')
+if (!dataset || dataset === 'dataset') throw new Error('Missing required environment variable: SANITY_STUDIO_DATASET')
+
 /**
  * Returns the correct studio host based on environment variables.
  * - If HOST_NAME is set and not "main", returns `${HOST_NAME}-${PRODUCTION_HOSTNAME}`
