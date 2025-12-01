@@ -1,6 +1,5 @@
-import { cn } from "@workspace/ui/lib/utils";
 import React from "react";
-import LayoutDebugHUD from "./LayoutDebugHUD";
+import { cn } from "../utils/cn.js";
 
 export interface GridLayoutProps {
   children: React.ReactNode;
@@ -8,7 +7,6 @@ export interface GridLayoutProps {
   minColumns?: number;
   maxColumns?: number;
   gap?: number;
-  showDebug?: boolean;
 }
 
 const GridLayout: React.FC<GridLayoutProps> = React.memo(({ 
@@ -17,7 +15,6 @@ const GridLayout: React.FC<GridLayoutProps> = React.memo(({
   minColumns = 4,
   maxColumns = 9,
   gap = 1,
-  showDebug = false,
 }) => {
   const childrenArray = React.Children.toArray(children);
   const childCount = childrenArray.length;
@@ -58,42 +55,22 @@ const GridLayout: React.FC<GridLayoutProps> = React.memo(({
     return Math.max(minColumns, Math.min(maxColumns, bestColumns));
   }, [childCount, columns, minColumns, maxColumns]);
 
-  const totalRows = Math.ceil(childCount / calculatedColumns);
-  const itemsPerRow = calculatedColumns;
-
   return (
-    <>
-      {showDebug && (
-        <LayoutDebugHUD
-          title="Grid Layout"
-          props={{
-            columns: columns ?? "auto",
-            gap,
-          }}
-          calculated={{
-            childrenCount: childCount,
-            calculatedColumns,
-            totalRows,
-            itemsPerRow,
-            itemsInLastRow: childCount % calculatedColumns || calculatedColumns,
-          }}
-        />
-      )}
-      <div
-        className={cn("w-full grid")}
-        style={{
-          gridTemplateColumns: `repeat(${calculatedColumns}, 1fr)`,
-          gap: `${gap}rem`,
-        }}
-      >
-        {React.Children.map(children, (child) => {
-          return child;
-        })}
-      </div>
-    </>
+    <div
+      className={cn("w-full grid")}
+      style={{
+        gridTemplateColumns: `repeat(${calculatedColumns}, 1fr)`,
+        gap: `${gap}rem`,
+      }}
+    >
+      {React.Children.map(children, (child) => {
+        return child;
+      })}
+    </div>
   );
 });
 
 GridLayout.displayName = "GridLayout";
 
 export default GridLayout;
+

@@ -1,3 +1,4 @@
+import { GridLayout, MasonryLayout } from "@workspace/layouts";
 import {
   Tabs,
   TabsContent,
@@ -6,8 +7,6 @@ import {
 } from "@workspace/ui/components/tabs";
 import Image from "next/image";
 import React from "react";
-import GridLayout from "@/components/layouts/GridLayout";
-import MasonryLayout from "@/components/layouts/MasonryLayout";
 
 const imageDimensions = [
   // 2:3 aspect ratio (portrait)
@@ -20,7 +19,6 @@ const imageDimensions = [
     width: 3000,
     height: 2000,
   },
-
 ];
 
 const placeholderUrl = ({ width, height }: { width: number; height: number }) =>
@@ -108,7 +106,7 @@ export default function SandboxRoute() {
     <Tabs defaultValue="grid" className="w-full">
       <main className="my-12 container pb-24">
         <TabsContent value="grid">
-          <GridLayout minColumns={3} maxColumns={6} showDebug>
+          <GridLayout minColumns={3} maxColumns={6}>
             {gridImages.map((item) => (
               <ImageItem
                 key={`grid-${item.seed}`}
@@ -120,10 +118,9 @@ export default function SandboxRoute() {
           </GridLayout>
         </TabsContent>
         <TabsContent value="masonry">
-          <MasonryLayout 
-            gap={1} 
-            showDebug
-            imageDimensions={masonryImages.map(item => item.dimensions)}
+          <MasonryLayout
+            gap={1}
+            imageDimensions={masonryImages.map((item) => item.dimensions)}
           >
             {masonryImages.map((item) => (
               <ImageItem

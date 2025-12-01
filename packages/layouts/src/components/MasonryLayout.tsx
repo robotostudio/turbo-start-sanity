@@ -1,6 +1,5 @@
-import { cn } from "@workspace/ui/lib/utils";
 import React from "react";
-import LayoutDebugHUD from "./LayoutDebugHUD";
+import { cn } from "../utils/cn.js";
 
 export interface ImageDimensions {
   width: number;
@@ -12,7 +11,6 @@ export interface MasonryLayoutProps {
   children: React.ReactNode;
   columns?: number;
   gap?: number;
-  showDebug?: boolean;
   imageDimensions?: ImageDimensions[];
 }
 
@@ -20,7 +18,6 @@ const MasonryLayout: React.FC<MasonryLayoutProps> = React.memo(({
   children, 
   columns,
   gap = 0,
-  showDebug = false,
   imageDimensions,
 }) => {
   const childrenArray = React.Children.toArray(children);
@@ -150,54 +147,14 @@ const MasonryLayout: React.FC<MasonryLayoutProps> = React.memo(({
     
     return rows;
   }, [childrenArray, calculatedColumns, aspectRatios, gap, childCount]);
-
-  // Calculate debug stats
-  const rowStats = React.useMemo(() => {
-    if (rows.length === 0) return null;
-    
-    const itemsPerRow = rows.map(row => row.children.length);
-    const minItems = Math.min(...itemsPerRow);
-    const maxItems = Math.max(...itemsPerRow);
-    const avgItems = (childCount / rows.length).toFixed(2);
-    
-    return {
-      minItemsPerRow: minItems,
-      maxItemsPerRow: maxItems,
-      avgItemsPerRow: avgItems,
-      firstRowItems: rows[0]?.children.length ?? 0,
-      lastRowItems: rows[rows.length - 1]?.children.length ?? 0,
-    };
-  }, [rows, childCount]);
   
   return (
-    <>
-      {showDebug && (
-        <LayoutDebugHUD
-          title="Masonry Layout"
-          props={{
-            columns: columns ?? "auto",
-            gap,
-          }}
-          calculated={{
-            childrenCount: childCount,
-            calculatedColumns,
-            totalRows: rows.length,
-            ...(rowStats ? {
-              minItemsPerRow: rowStats.minItemsPerRow,
-              maxItemsPerRow: rowStats.maxItemsPerRow,
-              avgItemsPerRow: rowStats.avgItemsPerRow,
-              firstRowItems: rowStats.firstRowItems,
-              lastRowItems: rowStats.lastRowItems,
-            } : {}),
-          }}
-        />
-      )}
-      <div
-        className={cn("w-full flex flex-col")}
-        style={{
-          gap: `${gap}rem`,
-        }}
-      >
+    <div
+      className={cn("w-full flex flex-col")}
+      style={{
+        gap: `${gap}rem`,
+      }}
+    >
       {rows.map((row, rowIndex) => (
         <div
           key={rowIndex}
@@ -224,11 +181,11 @@ const MasonryLayout: React.FC<MasonryLayoutProps> = React.memo(({
           })}
         </div>
       ))}
-      </div>
-    </>
+    </div>
   );
 });
 
 MasonryLayout.displayName = "MasonryLayout";
 
 export default MasonryLayout;
+
