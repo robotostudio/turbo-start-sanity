@@ -6,10 +6,14 @@ import { textSection } from "./text-section";
 import { videoSection } from "./video-section";
 
 export const pageBuilderBlocks = [
-  gridLayout,
-  imageSection,
-  videoSection,
-  imageGallery,
+  // basic
   textSection,
+  // media
+  imageSection,
+  imageGallery,
+  videoSection,
+  // dynamic content
   collectionListing,
+  // freeform
+  gridLayout,
 ];

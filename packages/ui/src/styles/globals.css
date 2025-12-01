@@ -14,7 +14,7 @@
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent: oklch(0.2 50 220);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
@@ -126,5 +126,14 @@ img {
   width: 100%;
   height: auto;
   object-fit: cover;
-  border-radius: var(--radius-md);
+  border-radius: 0;
+}
+
+a {
+  @apply text-primary underline-offset-4 hover:underline;
+
+  &:hover {
+    @apply text-accent;
+  }
+
 }

@@ -19,13 +19,20 @@ export function CollectionCard({
 
   const { title, slug, image } = collection;
 
+  // Normalize slug to ensure it starts with /
+  const normalizedSlug = slug?.startsWith("/") ? slug : slug ? `/${slug}` : "";
+  const href = normalizedSlug || "#";
+
+  // Check if we have a valid image with an id
+  const hasValidImage = image && typeof image.id === "string" && image.id.length > 0;
+
   return (
     <article className="flex w-full flex-col gap-3">
       <Link
         className="peer relative block w-full overflow-hidden"
-        href={slug ?? "#"}
+        href={href}
       >
-        {image?.id ? (
+        {hasValidImage ? (
           <SanityImage
             alt={title ?? "Collection image"}
             className="peer aspect-[4/5] w-full object-cover"
@@ -40,7 +47,7 @@ export function CollectionCard({
       {title && (
         <Link
           className="peer-hover:!underline peer-hover:!text-accent font-normal text-base decoration-dotted underline-offset-8"
-          href={slug ?? "#"}
+          href={href}
         >
           {title}
         </Link>

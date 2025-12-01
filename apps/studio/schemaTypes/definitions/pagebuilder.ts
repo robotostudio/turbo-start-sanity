@@ -9,5 +9,16 @@ export const pagebuilderBlockTypes = pageBuilderBlocks.map(({ name }) => ({
 export const pageBuilder = defineType({
   name: "pageBuilder",
   type: "array",
+  options: {
+    insertMenu: {
+      showIcons: true,
+      views: [
+        {
+          name: "grid", 
+          previewImageUrl: (schemaTypeName) => `/blocks/${schemaTypeName}.png`,
+        },
+      ],
+    },
+  },
   of: pagebuilderBlockTypes.map((block) => defineArrayMember(block)),
 });
