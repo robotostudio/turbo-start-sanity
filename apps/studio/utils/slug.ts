@@ -8,7 +8,7 @@ import {
 } from "sanity";
 import slugify from "slugify";
 
-import type { PathnameParams } from "./types";
+import type { PathnameParams } from "@utils/types";
 
 export function defineSlug(
   schema: PathnameParams = { name: "slug" }

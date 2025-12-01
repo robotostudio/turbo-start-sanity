@@ -1,13 +1,13 @@
-import { author } from "./author";
-import { blog } from "./blog";
-import { blogIndex } from "./blog-index";
-import { faq } from "./faq";
-import { footer } from "./footer";
-import { homePage } from "./home-page";
-import { navbar } from "./navbar";
-import { page } from "./page";
-import { redirect } from "./redirect";
-import { settings } from "./settings";
+import { author } from "@documents/author";
+import { blog } from "@documents/blog";
+import { blogIndex } from "@documents/blog-index";
+import { faq } from "@documents/faq";
+import { footer } from "@documents/footer";
+import { homePage } from "@documents/home-page";
+import { navbar } from "@documents/navbar";
+import { page } from "@documents/page";
+import { redirect } from "@documents/redirect";
+import { settings } from "@documents/settings";
 
 export const singletons = [homePage, blogIndex, settings, footer, navbar];
 

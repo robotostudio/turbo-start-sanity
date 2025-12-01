@@ -43,6 +43,9 @@
   },
   "devDependencies": {
     "@sanity/blueprints": "0.7.0",
-    "@types/react": "catalog:"
+    "@types/react": "catalog:",
+    "typescript": "catalog:",
+    "vite": "^7.2.6",
+    "vite-plugin-tsconfig-paths": "^1.4.1"
   }
 }

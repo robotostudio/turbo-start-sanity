@@ -28,4 +28,4 @@ If you have questions or need help, please open an issue.
 
 ---
 
-Thank you for contributing! 
+Thank you for contributing!

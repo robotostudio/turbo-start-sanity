@@ -1,8 +1,8 @@
 import { PhoneIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { buttonsField } from "../common";
-import { customRichText } from "../definitions/rich-text";
+import { customRichText } from "@definitions/rich-text";
+import { buttonsField } from "@schemaTypes/common";
 
 export const cta = defineType({
   name: "cta",

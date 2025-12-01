@@ -1,8 +1,8 @@
 import { ImageIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { buttonsField, imageWithAltField } from "../common";
-import { customRichText } from "../definitions/rich-text";
+import { customRichText } from "@definitions/rich-text";
+import { buttonsField, imageWithAltField } from "@schemaTypes/common";
 
 const imageLinkCard = defineField({
   name: "imageLinkCard",

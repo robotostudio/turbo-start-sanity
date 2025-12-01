@@ -1,7 +1,7 @@
 import { LayoutPanelLeft, Link, PanelTop } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { buttonsField, iconField } from "../common";
+import { buttonsField, iconField } from "@schemaTypes/common";
 
 const navbarLink = defineField({
   name: "navbarLink",

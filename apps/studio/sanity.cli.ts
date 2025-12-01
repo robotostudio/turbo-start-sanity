@@ -1,4 +1,5 @@
 import { defineCliConfig } from "sanity/cli";
+import tsconfigPaths from 'vite-plugin-tsconfig-paths'
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID;
 const dataset = process.env.SANITY_STUDIO_DATASET;
@@ -34,6 +35,7 @@ function getStudioHost(): string | undefined {
 const studioHost = getStudioHost();
 
 if (studioHost) {
+  // biome-ignore lint/suspicious/noConsole: intentional logging
   console.log(`🪩 Sanity Studio Host: https://${studioHost}.sanity.studio`);
 }
 
@@ -45,5 +47,8 @@ export default defineCliConfig({
   studioHost: getStudioHost(),
   deployment: {
     autoUpdates: false,
+  },
+  vite: {
+    plugins: [tsconfigPaths()],
   },
 });

@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noConsole: intentional logging */
 import { createClient } from "@sanity/client";
 import { documentEventHandler } from "@sanity/functions";
 

@@ -55,6 +55,7 @@ function printSeedDataImportInstructions() {
   ];
 
   for (const line of lines) {
+    // biome-ignore lint/suspicious/noConsole: intentional logging
     console.log(line);
   }
 }
