@@ -1,7 +1,7 @@
 import { Mail } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { customRichText } from "../definitions/rich-text";
+import { customRichText } from "@definitions/rich-text";
 
 export const subscribeNewsletter = defineType({
   name: "subscribeNewsletter",

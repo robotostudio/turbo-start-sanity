@@ -81,5 +81,29 @@
         "enabled": false
       }
     }
-  ]
+  ],
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              [":URL:", ":PACKAGE_WITH_PROTOCOL:", ":NODE:"],
+              [":PACKAGE:",
+              "!@definitions/**",
+              "!@hooks/**",
+              "!@schemaTypes/**",
+              "!@utils/**"],
+              ":BLANK_LINE:",
+              ["@definitions/**", "@hooks/**", "@schemaTypes/**", "@utils/**"],
+              ":BLANK_LINE:",
+              [":ALIAS:", ":PATH:"]
+            ]
+          }
+        }
+      }
+    }
+  }
 }

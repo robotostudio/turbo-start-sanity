@@ -10,8 +10,24 @@
     "moduleDetection": "force",
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    "types": [],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@actions/*": ["actions/*"],
+      "@blocks/*": ["schemaTypes/blocks/*"],
+      "@components/*": ["components/*"],
+      "@definitions/*": ["schemaTypes/definitions/*"],
+      "@documents/*": ["schemaTypes/documents/*"],
+      "@functions/*": ["functions/*"],
+      "@hooks/*": ["hooks/*"],
+      "@plugins/*": ["plugins/*"],
+      "@schemaTypes/*": ["schemaTypes/*"],
+      "@structure/*": ["structure/*"],
+      "@utils/*": ["utils/*"]
+    }
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist", ".next", ".sanity"]
 }

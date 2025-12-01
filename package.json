@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "build:studio": "turbo run build --filter=studio",
+    "build:web": "turbo run build --filter=web",
     "dev": "turbo dev",
+    "dev:studio": "turbo run dev --filter=studio",
+    "dev:web": "turbo run dev --filter=web",
     "lint": "npx ultracite check",
     "format": "npx ultracite fix",
     "check-types": "turbo check-types"
@@ -18,6 +22,6 @@
   },
   "packageManager": "pnpm@10.24.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }

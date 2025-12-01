@@ -1,6 +1,5 @@
+import { pageBuilderBlocks } from "@blocks/index";
 import { defineArrayMember, defineType } from "sanity";
-
-import { pageBuilderBlocks } from "../blocks";
 
 export const pagebuilderBlockTypes = pageBuilderBlocks.map(({ name }) => ({
   type: name,
