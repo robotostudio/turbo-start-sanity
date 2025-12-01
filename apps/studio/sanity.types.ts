@@ -13,15 +13,23 @@
  */
 
 // Source: schema.json
+export type GridLayout = {
+  _type: "gridLayout";
+  pageBuilder?: PageBuilder;
+  columnVariant?: "auto" | "single" | "two" | "three";
+};
+
 export type CollectionListing = {
   _type: "collectionListing";
   columnVariant?: "auto" | "two" | "three" | "four";
 };
 
-export type TextSection = {
-  _type: "textSection";
-  richText?: RichText;
-  columnVariant?: "single" | "two" | "three";
+export type VideoSection = {
+  _type: "videoSection";
+  video?: MuxVideo;
+  styleVariant?: "fullBleed" | "fitToContainer";
+  title?: string;
+  description?: string;
 };
 
 export type ImageGallery = {
@@ -61,14 +69,6 @@ export type ImageGallery = {
   columnVariant?: "single" | "two" | "three";
 };
 
-export type VideoSection = {
-  _type: "videoSection";
-  video?: MuxVideo;
-  styleVariant?: "fullBleed" | "fitToContainer";
-  title?: string;
-  description?: string;
-};
-
 export type ImageSection = {
   _type: "imageSection";
   image?: {
@@ -87,25 +87,25 @@ export type ImageSection = {
   alt?: string;
 };
 
-export type GridLayout = {
-  _type: "gridLayout";
-  pageBuilder?: PageBuilder;
-  columnVariant?: "auto" | "single" | "two" | "three";
+export type TextSection = {
+  _type: "textSection";
+  richText?: RichText;
+  columnVariant?: "single" | "two" | "three";
 };
 
 export type PageBuilder = Array<{
   _key: string;
-} & GridLayout | {
+} & TextSection | {
   _key: string;
 } & ImageSection | {
   _key: string;
-} & VideoSection | {
-  _key: string;
 } & ImageGallery | {
   _key: string;
-} & TextSection | {
+} & VideoSection | {
   _key: string;
-} & CollectionListing>;
+} & CollectionListing | {
+  _key: string;
+} & GridLayout>;
 
 export type Button = {
   _type: "button";
@@ -187,6 +187,11 @@ export type CustomUrl = {
     _type: "reference";
     _weak?: boolean;
     [internalGroqTypeReferenceTo]?: "collectionIndex";
+  } | {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "homePage";
   };
 };
 
@@ -780,5 +785,5 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type AllSanitySchemaTypes = CollectionListing | TextSection | ImageGallery | VideoSection | ImageSection | GridLayout | PageBuilder | Button | RichText | CustomUrl | Redirect | Slug | Navbar | IconPicker | Footer | Settings | SanityImageCrop | SanityImageHotspot | CollectionIndex | HomePage | Collection | Page | MuxVideo | SanityPreviewUrlSecret | SanityAssistInstructionTask | SanityAssistTaskStatus | SanityAssistSchemaTypeAnnotations | SanityAssistOutputType | SanityAssistOutputField | SanityAssistInstructionContext | AssistInstructionContext | SanityAssistInstructionUserInput | SanityAssistInstructionPrompt | SanityAssistInstructionFieldRef | SanityAssistInstruction | SanityAssistSchemaTypeField | MuxVideoAsset | MuxAssetData | MuxStaticRenditions | MuxStaticRenditionFile | MuxPlaybackId | MuxTrack | MediaTag | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
+export type AllSanitySchemaTypes = GridLayout | CollectionListing | VideoSection | ImageGallery | ImageSection | TextSection | PageBuilder | Button | RichText | CustomUrl | Redirect | Slug | Navbar | IconPicker | Footer | Settings | SanityImageCrop | SanityImageHotspot | CollectionIndex | HomePage | Collection | Page | MuxVideo | SanityPreviewUrlSecret | SanityAssistInstructionTask | SanityAssistTaskStatus | SanityAssistSchemaTypeAnnotations | SanityAssistOutputType | SanityAssistOutputField | SanityAssistInstructionContext | AssistInstructionContext | SanityAssistInstructionUserInput | SanityAssistInstructionPrompt | SanityAssistInstructionFieldRef | SanityAssistInstruction | SanityAssistSchemaTypeField | MuxVideoAsset | MuxAssetData | MuxStaticRenditions | MuxStaticRenditionFile | MuxPlaybackId | MuxTrack | MediaTag | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
 export declare const internalGroqTypeReferenceTo: unique symbol;
