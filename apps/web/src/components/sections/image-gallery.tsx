@@ -13,17 +13,19 @@ export function ImageGallery({ images, columnVariant }: ImageGalleryProps) {
     return null;
   }
 
+  const cleanColumnVariant = stegaClean(columnVariant);
+
   return (
-    <section className="container mx-auto">
+    <section className="container">
       <div
         className={cn(
-          "grid grid-cols-1 gap-16",
+          "grid grid-cols-1 md:auto-fit gap-16",
           {
-            "md:grid-cols-1": columnVariant === "single",
-            "md:grid-cols-2": columnVariant === "two",
-            "md:grid-cols-3": columnVariant === "three",
+            "md:grid-cols-1 container-narrow": cleanColumnVariant === "single",
+            "md:grid-cols-2 container-inset": cleanColumnVariant === "two",
+            "md:grid-cols-3 container-wide": cleanColumnVariant === "three",
           },
-          columnVariant
+          cleanColumnVariant
         )}
       >
         {images.map(

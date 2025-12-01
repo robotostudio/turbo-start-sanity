@@ -120,6 +120,24 @@
   }
 }
 
+@layer components {
+  .container {
+    @apply mx-auto px-4 !max-w-screen-xl;
+  }
+
+  .container-narrow {
+    @apply mx-auto px-4 md:px-0 max-w-lg;
+  }
+
+  .conatiner-inset {
+    @apply mx-auto px-4 max-w-screen-xl;
+  }
+
+  .container-wide {
+    @apply mx-auto px-4 !max-w-screen-xl;
+  }
+}
+
 img {
   display: block;
   max-width: 100%;
@@ -131,9 +149,4 @@ img {
 
 a {
   @apply text-primary underline-offset-4 hover:underline;
-
-  &:hover {
-    @apply text-accent;
-  }
-
 }

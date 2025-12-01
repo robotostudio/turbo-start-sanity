@@ -37,7 +37,7 @@ export const imageGallery = defineType({
         Object.keys(images).length > 0
           ? `${Object.keys(images).length} images`
           : "Image Gallery",
-      subtitle: `${columnVariant} Column${columnVariant === "single" ? "" : "s"}`,
+      subtitle: `${columnVariant.slice(0, 1).toUpperCase() + columnVariant.slice(1)} column${columnVariant === "single" ? "" : "s"}`,
       media: firstImage,
     }),
   },

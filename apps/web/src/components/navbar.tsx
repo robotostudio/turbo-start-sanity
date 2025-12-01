@@ -4,7 +4,7 @@ import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 import { ChevronDown, Menu, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type {
   QueryGlobalSeoSettingsResult,
@@ -72,10 +72,12 @@ function MenuLink({ name, href, description, icon, onClick }: MenuLinkProps) {
   );
 }
 
-function DesktopColumnDropdown({
+function ColumnDropdown({
   column,
+  onLinkClick,
 }: {
   column: Extract<NavColumn, { type: "column" }>;
+  onLinkClick?: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -87,25 +89,34 @@ function DesktopColumnDropdown({
     setIsOpen(false);
   };
 
+  const handleClick = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
     <div className="group relative">
       <button
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        className="flex items-center gap-1 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
+        className="flex w-full items-center justify-between gap-1 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground md:w-auto md:justify-start md:py-0"
+        onClick={handleClick}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         type="button"
       >
         {column.title}
         <LucideIcon
-          className="transition-transform group-hover:rotate-180"
+          className={cn(
+            "transition-transform",
+            isOpen && "rotate-180",
+            "md:group-hover:rotate-180"
+          )}
           icon={ChevronDown}
         />
       </button>
       {isOpen ? (
         <div
-          className="fade-in-0 zoom-in-95 absolute top-full left-0 z-50 min-w-[280px] animate-in rounded-lg border bg-popover p-2 shadow-lg"
+          className="fade-in-0 zoom-in-95 z-50 min-w-[280px] animate-in rounded-lg border bg-popover p-2 shadow-lg md:absolute md:left-0 md:top-full"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           role="menu"
@@ -118,6 +129,7 @@ function DesktopColumnDropdown({
                 icon={link.icon}
                 key={link._key}
                 name={link.name || ""}
+                onClick={onLinkClick}
               />
             ))}
           </div>
@@ -127,133 +139,51 @@ function DesktopColumnDropdown({
   );
 }
 
-function DesktopColumnLink({
+function ColumnLink({
   column,
+  onLinkClick,
 }: {
   column: Extract<NavColumn, { type: "link" }>;
+  onLinkClick?: () => void;
 }) {
   return (
     <Link
-      className="px-3 py-2 font-medium text-base text-muted-foreground transition-colors hover:text-foreground"
+      className="px-3 py-2 font-medium text-base text-muted-foreground transition-colors hover:text-foreground md:px-3 md:py-2"
       href={column.href || "#"}
+      onClick={onLinkClick}
     >
       {column.name}
     </Link>
   );
 }
 
-function MobileMenu({ navbarData, settingsData }: NavigationData) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-
-  function toggleDropdown(key: string) {
-    setOpenDropdown(openDropdown === key ? null : key);
-  }
-
-  function closeMenu() {
-    setIsOpen(false);
-    setOpenDropdown(null);
-  }
-
-  const { columns } = navbarData || {};
-  const { logo, siteTitle } = settingsData || {};
-
-  return (
-    <>
-      {/* Mobile menu button */}
-      <Button
-        className="md:hidden"
-        onClick={() => setIsOpen(!isOpen)}
-        size="icon"
-        variant="ghost"
-      >
-        {isOpen ? <LucideIcon icon={X} /> : <LucideIcon icon={Menu} />}
-        <span className="sr-only">Toggle menu</span>
-      </Button>
-
-      {/* Mobile menu overlay */}
-      {isOpen && (
-        <div className="fixed inset-0 top-16 z-50 md:hidden">
-          <div className="fixed top-16 left-0 h-[calc(100vh-4rem)] w-full border-r bg-background p-6 shadow-lg">
-            <div className="grid gap-6">
-              {/* Logo for mobile */}
-              {logo && (
-                <div className="flex justify-center border-b pb-4">
-                  <Logo
-                    alt={siteTitle || ""}
-                    height={40}
-                    image={logo}
-                    width={120}
-                  />
-                </div>
-              )}
-
-              {/* Navigation items */}
-              <div className="grid gap-4">
-                {columns?.map((column) => {
-                  if (column.type === "link") {
-                    return (
-                      <Link
-                        className="flex items-center py-2 font-medium text-sm transition-colors hover:text-primary"
-                        href={column.href || "#"}
-                        key={column._key}
-                        onClick={closeMenu}
-                      >
-                        {column.name}
-                      </Link>
-                    );
-                  }
-
-                  if (column.type === "column") {
-                    const isDropdownOpen = openDropdown === column._key;
-                    return (
-                      <div className="grid gap-2" key={column._key}>
-                        <button
-                          className="flex items-center justify-between py-2 font-medium text-sm transition-colors hover:text-primary"
-                          onClick={() => toggleDropdown(column._key)}
-                          type="button"
-                        >
-                          {column.title}
-                          <LucideIcon
-                            className={cn(
-                              "transition-transform",
-                              isDropdownOpen && "rotate-180"
-                            )}
-                            icon={ChevronDown}
-                          />
-                        </button>
-                        {isDropdownOpen && (
-                          <div className="grid gap-1 border-border border-l-2 pl-4">
-                            {column.links?.map((link: ColumnLink) => (
-                              <MenuLink
-                                description={link.description || ""}
-                                href={link.href || ""}
-                                icon={link.icon}
-                                key={link._key}
-                                name={link.name || ""}
-                                onClick={closeMenu}
-                              />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  }
-
-                  return null;
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
-
 export function Navbar({ navbarData, settingsData }: NavigationData) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { columns } = navbarData || {};
   const { logo, siteTitle } = settingsData || {};
+
+  const closeMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(false);
+  }, []);
+
+  function toggleMobileMenu() {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  }
+
+  useEffect(() => {
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape" && isMobileMenuOpen) {
+        closeMobileMenu();
+      }
+    }
+
+    if (isMobileMenuOpen) {
+      document.addEventListener("keydown", handleEscape);
+      return () => {
+        document.removeEventListener("keydown", handleEscape);
+      };
+    }
+  }, [isMobileMenuOpen, closeMobileMenu]);
 
   return (
     <header className="sticky top-0 z-40 w-full">
@@ -281,23 +211,80 @@ export function Navbar({ navbarData, settingsData }: NavigationData) {
             )}
           </div>
 
+          {/* Mobile menu button */}
+          <Button
+            className="md:hidden"
+            onClick={toggleMobileMenu}
+            size="icon"
+            variant="ghost"
+          >
+            {isMobileMenuOpen ? (
+              <LucideIcon icon={X} />
+            ) : (
+              <LucideIcon icon={Menu} />
+            )}
+            <span className="sr-only">Toggle menu</span>
+          </Button>
+
+          {/* Mobile menu overlay */}
+          {isMobileMenuOpen && (
+            <button
+              className="fixed inset-0 top-16 z-50 bg-black/50 md:hidden"
+              onClick={closeMobileMenu}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  closeMobileMenu();
+                }
+              }}
+              type="button"
+            >
+              <span className="sr-only">Close menu</span>
+            </button>
+          )}
+          {isMobileMenuOpen && (
+            <div className="fixed left-0 top-16 z-50 h-[calc(100vh-4rem)] w-full border-r bg-background p-6 shadow-lg md:hidden">
+              <nav className="flex flex-col gap-4">
+                {columns?.map((column) => {
+                  if (column.type === "column") {
+                    return (
+                      <ColumnDropdown
+                        column={column}
+                        key={column._key}
+                        onLinkClick={closeMobileMenu}
+                      />
+                    );
+                  }
+                  if (column.type === "link") {
+                    return (
+                      <ColumnLink
+                        column={column}
+                        key={column._key}
+                        onLinkClick={closeMobileMenu}
+                      />
+                    );
+                  }
+                  return null;
+                })}
+              </nav>
+            </div>
+          )}
+
           {/* Desktop Navigation */}
           <nav className="hidden items-center justify-between gap-16 md:flex">
             {columns?.map((column) => {
               if (column.type === "column") {
                 return (
-                  <DesktopColumnDropdown column={column} key={column._key} />
+                  <ColumnDropdown column={column} key={column._key} />
                 );
               }
               if (column.type === "link") {
-                return <DesktopColumnLink column={column} key={column._key} />;
+                return (
+                  <ColumnLink column={column} key={column._key} />
+                );
               }
               return null;
             })}
           </nav>
-
-          {/* Mobile Menu */}
-          <MobileMenu navbarData={navbarData} settingsData={settingsData} />
         </div>
       </div>
     </header>
