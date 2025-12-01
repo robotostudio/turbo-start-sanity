@@ -15,7 +15,7 @@ import { structure } from "./structure";
 import { getPresentationUrl } from "./utils/helper";
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
-const dataset = process.env.SANITY_STUDIO_DATASET;
+const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
 const title = process.env.SANITY_STUDIO_TITLE;
 
 export default defineConfig({
@@ -23,7 +23,7 @@ export default defineConfig({
   title,
   icon: Logo,
   projectId,
-  dataset: dataset ?? "production",
+  dataset,
   releases: {
     enabled: true,
   },
@@ -53,7 +53,18 @@ export default defineConfig({
     newDocumentOptions: (prev, { creationContext }) => {
       const { type } = creationContext;
       if (type === "global") {
-        return [];
+        return prev.filter(
+          (template) =>
+            ![
+              'homePage',
+              'navbar',
+              'footer',
+              'settings',
+              'blogIndex',
+              'assist.instruction.context',
+              'media.tag',
+            ].includes(template?.templateId),
+        )
       }
       return prev;
     },
