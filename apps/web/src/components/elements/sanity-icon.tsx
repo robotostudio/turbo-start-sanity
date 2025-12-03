@@ -1,41 +1,43 @@
 import { cn } from "@workspace/ui/lib/utils";
+import { TriangleAlert } from "lucide-react";
+import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import type { ComponentProps } from "react";
 import { memo } from "react";
 
-interface IconProps extends Omit<ComponentProps<"span">, "src"> {
-  icon?:
-    | {
-        svg?: string | null;
-        name?: string | null;
-      }
-    | string
-    | null;
+interface IconProps extends Omit<ComponentProps<"svg">, "src"> {
+  icon?: string | null;
   alt?: string; // Add alt text prop for accessibility
 }
 
 export const SanityIcon = memo(function SanityIconUnmemorized({
   icon,
   className,
-  alt: altText = "sanity-icon",
   ...props
 }: IconProps) {
-  const alt = typeof icon === "object" && icon?.name ? icon?.name : altText;
-  const svg = typeof icon === "object" ? icon?.svg : icon;
-
-  if (!svg) {
+  if (!icon) {
     return null;
   }
 
   return (
-    <span
+    <DynamicIcon
       {...props}
-      className={cn(
-        "sanity-icon flex size-12 items-center justify-center",
-        className
-      )}
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: safe SVG from CMS
-      dangerouslySetInnerHTML={{ __html: svg }}
-      title={alt}
+      name={icon as IconName}
+      className={cn("size-12", className)}
+      fallback={() => <TriangleAlert size={24} />}
+      size={24}
     />
   );
+
+  // return (
+  //   <span
+  //     {...props}
+  //     className={cn(
+  //       "sanity-icon flex size-12 items-center justify-center",
+  //       className
+  //     )}
+  //     // biome-ignore lint/security/noDangerouslySetInnerHtml: safe SVG from CMS
+  //     dangerouslySetInnerHTML={{ __html: svg }}
+  //     title={alt}
+  //   />
+  // );
 });

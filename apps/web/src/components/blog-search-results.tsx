@@ -64,7 +64,8 @@ function ErrorState({ query }: { query: string }) {
           Search failed
         </h3>
         <p className="mb-4 text-muted-foreground">
-          We encountered an error while searching for "{query}". Please try again.
+          We encountered an error while searching for "{query}". Please try
+          again.
         </p>
         <div className="text-muted-foreground text-sm">
           <p>If the problem persists:</p>
