@@ -129,8 +129,8 @@ export function RichText<T>({
     >
       <PortableText
         components={components}
-        onMissingComponent={(_, { nodeType, type }) => {
-          console.warn(`Missing component: ${nodeType} for type: ${type}`);
+        onMissingComponent={() => {
+          // Silently handle missing components
         }}
         value={richText as unknown as PortableTextBlock[]}
       />

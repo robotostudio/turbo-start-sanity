@@ -35,7 +35,7 @@ type MenuLinkProps = {
   name: string;
   href: string;
   description?: string;
-  icon?: any;
+  icon?: string | null;
   onClick?: () => void;
 };
 

@@ -37,8 +37,7 @@ async function fetchBlogPaths() {
       }
     }
     return paths;
-  } catch (error) {
-    console.error("Error fetching blog paths:", error);
+  } catch {
     // Return empty array to allow build to continue
     return [];
   }

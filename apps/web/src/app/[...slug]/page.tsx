@@ -32,8 +32,7 @@ async function fetchSlugPagePaths() {
       paths.push({ slug: parts });
     }
     return paths;
-  } catch (error) {
-    console.error("Error fetching slug paths:", error);
+  } catch {
     // Return empty array to allow build to continue
     return [];
   }

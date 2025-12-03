@@ -11,11 +11,9 @@ export const handler = documentEventHandler(async ({ context, event }) => {
   const { beforeSlug, slug } = event.data;
 
   if (!(slug && beforeSlug)) {
-    console.log("No slug or beforeSlug");
     return;
   }
   if (slug === beforeSlug) {
-    console.log("Slug did not change");
     return;
   }
   // check if redirect already exists
@@ -24,7 +22,6 @@ export const handler = documentEventHandler(async ({ context, event }) => {
     { beforeSlug }
   );
   if (existingRedirect) {
-    console.log(`Redirect already exists for source ${beforeSlug}`);
     return;
   }
   // check for loops
@@ -33,7 +30,6 @@ export const handler = documentEventHandler(async ({ context, event }) => {
     { slug, beforeSlug }
   );
   if (loopRedirect) {
-    console.log("Redirect loop detected");
     return;
   }
   const redirect = {
@@ -49,11 +45,8 @@ export const handler = documentEventHandler(async ({ context, event }) => {
   };
 
   try {
-    const res = await client.create(redirect);
-    console.log(
-      `🔗 Redirect from ${beforeSlug} to ${slug} was created ${JSON.stringify(res)}`
-    );
-  } catch (error) {
-    console.log(error);
+    await client.create(redirect);
+  } catch {
+    // Silently handle errors
   }
 });

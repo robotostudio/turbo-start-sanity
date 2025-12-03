@@ -1,7 +1,27 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "ignoreUnknown": true
+    "ignoreUnknown": true,
+    "maxSize": 20971520,
+    "includes": [
+      "apps/*/src/**",
+      "apps/*/components/**",
+      "apps/*/schemaTypes/**",
+      "apps/*/plugins/**",
+      "apps/*/hooks/**",
+      "apps/*/utils/**",
+      "apps/*/functions/**",
+      "apps/*/*.ts",
+      "apps/*/*.tsx",
+      "apps/*/*.mjs",
+      "packages/*/src/**",
+      "*.ts",
+      "*.tsx",
+      "*.js",
+      "*.mjs",
+      "*.json",
+      "*.jsonc"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -51,9 +71,14 @@
   },
   "css": {
     "parser": {
-      "cssModules": true
+      "cssModules": true,
+      "allowWrongLineComments": true,
+      "tailwindDirectives": true
     },
     "formatter": {
+      "enabled": true
+    },
+    "linter": {
       "enabled": true
     }
   },
@@ -63,7 +88,8 @@
         "**/.turbo/**",
         "**/.next/**",
         "**/node_modules/**",
-        "**/dist/**"
+        "**/dist/**",
+        "**/.sanity/**"
       ],
       "linter": {
         "enabled": false
@@ -73,12 +99,13 @@
       }
     },
     {
-      "includes": ["**/*.css", "**/dist/**", "**/.sanity/**"],
+      "includes": ["**/scripts/**/*.ts", "**/scripts/**/*.js"],
       "linter": {
-        "enabled": false
-      },
-      "formatter": {
-        "enabled": false
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
       }
     }
   ]

@@ -10,7 +10,6 @@ export const PreviewBar: FC = () => {
   const [pending, startTransition] = useTransition();
 
   const disable = () => {
-    console.log("Disabling draft mode");
     startTransition(async () => {
       await disableDraftMode();
       router.refresh();
