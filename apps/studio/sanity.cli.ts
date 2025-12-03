@@ -1,4 +1,7 @@
+import { Logger } from "@workspace/logger";
 import { defineCliConfig } from "sanity/cli";
+
+const logger = new Logger("SanityCLI");
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID;
 const dataset = process.env.SANITY_STUDIO_DATASET;
@@ -40,7 +43,7 @@ function getStudioHost(): string | undefined {
 const studioHost = getStudioHost();
 
 if (studioHost) {
-  console.log(`🪩 Sanity Studio Host: https://${studioHost}.sanity.studio`);
+  logger.info(`Sanity Studio Host: https://${studioHost}.sanity.studio`);
 }
 
 export default defineCliConfig({
@@ -48,7 +51,7 @@ export default defineCliConfig({
     projectId,
     dataset,
   },
-  studioHost: getStudioHost(),
+  studioHost,
   deployment: {
     autoUpdates: false,
   },

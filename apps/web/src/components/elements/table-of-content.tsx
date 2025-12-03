@@ -366,7 +366,7 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
   maxDepth = DEFAULT_MAX_DEPTH,
   currentDepth = 1,
 }) => {
-  const { href, text, children, isChild, style, id } = heading;
+  const { href, text, children, isChild, id } = heading;
 
   const shouldRenderChildren = useCallback(
     () =>
