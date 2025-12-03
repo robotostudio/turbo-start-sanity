@@ -1,6 +1,6 @@
 import { LayoutPanelLeft, Link, PanelTop } from "lucide-react";
 import { defineField, defineType } from "sanity";
-
+import { lucideIconPreview } from "../../components/icon-preview";
 import { buttonsField, iconField } from "../common";
 
 const navbarLink = defineField({
@@ -80,8 +80,9 @@ const navbarColumnLink = defineField({
       urlType: "url.type",
       internalUrl: "url.internal.slug.current",
       openInNewTab: "url.openInNewTab",
+      icon: "icon",
     },
-    prepare({ title, externalUrl, urlType, internalUrl, openInNewTab }) {
+    prepare({ title, icon, externalUrl, urlType, internalUrl, openInNewTab }) {
       const url = urlType === "external" ? externalUrl : internalUrl;
       const newTabIndicator = openInNewTab ? " ↗" : "";
       const truncatedUrl =
@@ -90,7 +91,7 @@ const navbarColumnLink = defineField({
       return {
         title: title || "Untitled Link",
         subtitle: `${urlType === "external" ? "External" : "Internal"} • ${truncatedUrl}${newTabIndicator}`,
-        media: Link,
+        media: lucideIconPreview(icon),
       };
     },
   },

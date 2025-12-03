@@ -5,6 +5,7 @@ import { presentationTool } from "sanity/presentation";
 import { structureTool } from "sanity/structure";
 import { unsplashImageAsset } from "sanity-plugin-asset-source-unsplash";
 import { iconPicker } from "sanity-plugin-icon-picker";
+import { lucideIconPicker } from "sanity-plugin-lucide-icon-picker";
 import { media } from "sanity-plugin-media";
 
 import { Logo } from "./components/logo";
@@ -44,9 +45,9 @@ export default defineConfig({
     }),
     presentationUrl(),
     visionTool(),
+    lucideIconPicker(),
     unsplashImageAsset(),
     media(),
-    iconPicker(),
     assist(),
   ],
   document: {
@@ -56,15 +57,15 @@ export default defineConfig({
         return prev.filter(
           (template) =>
             ![
-              'homePage',
-              'navbar',
-              'footer',
-              'settings',
-              'blogIndex',
-              'assist.instruction.context',
-              'media.tag',
-            ].includes(template?.templateId),
-        )
+              "homePage",
+              "navbar",
+              "footer",
+              "settings",
+              "blogIndex",
+              "assist.instruction.context",
+              "media.tag",
+            ].includes(template?.templateId)
+        );
       }
       return prev;
     },

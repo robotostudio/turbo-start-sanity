@@ -145,7 +145,7 @@ export type FeatureCardsIcon = {
     _key: string;
   }>;
   cards?: Array<{
-    icon?: IconPicker;
+    icon?: LucideIcon;
     title?: string;
     richText?: Array<{
       children?: Array<{
@@ -360,7 +360,7 @@ export type Navbar = {
     | {
         title?: string;
         links: Array<{
-          icon?: IconPicker;
+          icon?: LucideIcon;
           name?: string;
           description?: string;
           url?: CustomUrl;
@@ -384,12 +384,7 @@ export type Navbar = {
   >;
 };
 
-export type IconPicker = {
-  _type: "iconPicker";
-  provider?: string;
-  name?: string;
-  svg?: string;
-};
+export type LucideIcon = string;
 
 export type Footer = {
   _id: string;
@@ -916,7 +911,7 @@ export type AllSanitySchemaTypes =
   | Redirect
   | Slug
   | Navbar
-  | IconPicker
+  | LucideIcon
   | Footer
   | Settings
   | SanityImageCrop
@@ -1099,7 +1094,7 @@ export type QueryHomePageDataResult = {
           _key: string;
         }> | null;
         cards: Array<{
-          icon?: IconPicker;
+          icon?: LucideIcon;
           title?: string;
           richText: Array<{
             children?: Array<{
@@ -1475,7 +1470,7 @@ export type QuerySlugPageDataResult = {
           _key: string;
         }> | null;
         cards: Array<{
-          icon?: IconPicker;
+          icon?: LucideIcon;
           title?: string;
           richText: Array<{
             children?: Array<{
@@ -1844,7 +1839,7 @@ export type QueryBlogIndexPageDataResult = {
           _key: string;
         }> | null;
         cards: Array<{
-          icon?: IconPicker;
+          icon?: LucideIcon;
           title?: string;
           richText: Array<{
             children?: Array<{
@@ -2418,7 +2413,7 @@ export type QueryNavbarDataResult = {
         links: Array<{
           _key: string;
           name: string | null;
-          icon: IconPicker | null;
+          icon: LucideIcon | null;
           description: string | null;
           openInNewTab: boolean | null;
           href: string | null;
