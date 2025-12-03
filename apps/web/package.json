@@ -25,7 +25,7 @@
     "babel-plugin-react-compiler": "19.1.0-rc.2",
     "fuse.js": "^7.1.0",
     "lucide-react": "catalog:",
-    "next": "^16.0.5",
+    "next": "^16.0.6",
     "next-sanity": "^11.6.10",
     "next-themes": "catalog:",
     "react": "catalog:",
