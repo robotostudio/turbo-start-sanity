@@ -1,3 +1,4 @@
+import { Logger } from "@workspace/logger";
 import { notFound } from "next/navigation";
 
 import { RichText } from "@/components/elements/rich-text";
@@ -8,6 +9,8 @@ import { client } from "@/lib/sanity/client";
 import { sanityFetch } from "@/lib/sanity/live";
 import { queryBlogPaths, queryBlogSlugPageData } from "@/lib/sanity/query";
 import { getSEOMetadata } from "@/lib/seo";
+
+const logger = new Logger("BlogSlug");
 
 async function fetchBlogSlugPageData(slug: string, stega = true) {
   return await sanityFetch({
@@ -37,7 +40,8 @@ async function fetchBlogPaths() {
       }
     }
     return paths;
-  } catch {
+  } catch (error) {
+    logger.error("Error fetching blog paths", error);
     // Return empty array to allow build to continue
     return [];
   }

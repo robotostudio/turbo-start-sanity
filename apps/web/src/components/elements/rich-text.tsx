@@ -1,4 +1,5 @@
 "use client";
+import { Logger } from "@workspace/logger";
 import { cn } from "@workspace/ui/lib/utils";
 import Link from "next/link";
 import {
@@ -10,6 +11,8 @@ import {
 import { parseChildrenToSlug } from "@/utils";
 
 import { SanityImage } from "./sanity-image";
+
+const logger = new Logger("RichText");
 
 const components: Partial<PortableTextReactComponents> = {
   block: {
@@ -129,8 +132,8 @@ export function RichText<T>({
     >
       <PortableText
         components={components}
-        onMissingComponent={() => {
-          // Silently handle missing components
+        onMissingComponent={(_, { nodeType, type }) => {
+          logger.warn(`Missing component: ${nodeType} for type: ${type}`);
         }}
         value={richText as unknown as PortableTextBlock[]}
       />

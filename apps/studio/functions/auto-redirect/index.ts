@@ -1,5 +1,8 @@
 import { createClient } from "@sanity/client";
 import { documentEventHandler } from "@sanity/functions";
+import { Logger } from "@workspace/logger";
+
+const logger = new Logger("AutoRedirect");
 
 export const handler = documentEventHandler(async ({ context, event }) => {
   const client = createClient({
@@ -11,9 +14,11 @@ export const handler = documentEventHandler(async ({ context, event }) => {
   const { beforeSlug, slug } = event.data;
 
   if (!(slug && beforeSlug)) {
+    logger.info("No slug or beforeSlug provided");
     return;
   }
   if (slug === beforeSlug) {
+    logger.info("Slug did not change");
     return;
   }
   // check if redirect already exists
@@ -22,6 +27,7 @@ export const handler = documentEventHandler(async ({ context, event }) => {
     { beforeSlug }
   );
   if (existingRedirect) {
+    logger.info(`Redirect already exists for source ${beforeSlug}`);
     return;
   }
   // check for loops
@@ -30,6 +36,7 @@ export const handler = documentEventHandler(async ({ context, event }) => {
     { slug, beforeSlug }
   );
   if (loopRedirect) {
+    logger.warning("Redirect loop detected");
     return;
   }
   const redirect = {
@@ -45,8 +52,12 @@ export const handler = documentEventHandler(async ({ context, event }) => {
   };
 
   try {
-    await client.create(redirect);
-  } catch {
-    // Silently handle errors
+    const res = await client.create(redirect);
+    logger.info(
+      `Redirect from ${beforeSlug} to ${slug} was created`,
+      JSON.stringify(res)
+    );
+  } catch (error) {
+    logger.error("Failed to create redirect", error);
   }
 });

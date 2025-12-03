@@ -83,6 +83,9 @@ importers:
       '@sanity/vision':
         specifier: ^4.19.0
         version: 4.19.0(@babel/runtime@7.28.3)(@codemirror/lint@6.8.5)(@codemirror/theme-one-dark@6.1.2)(@emotion/is-prop-valid@1.2.2)(codemirror@6.0.1)(react-dom@19.1.1(react@19.1.1))(react-is@19.1.1)(react@19.1.1)(styled-components@6.1.19(react-dom@19.1.1(react@19.1.1))(react@19.1.1))
+      '@workspace/logger':
+        specifier: workspace:*
+        version: link:../../packages/logger
       friendlier-words:
         specifier: ^1.1.3
         version: 1.1.3
@@ -147,6 +150,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.90.11
         version: 5.90.11(react@19.1.1)
+      '@workspace/logger':
+        specifier: workspace:*
+        version: link:../../packages/logger
       '@workspace/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -211,6 +217,12 @@ importers:
       jiti:
         specifier: ^2.6.1
         version: 2.6.1
+
+  packages/logger:
+    devDependencies:
+      '@workspace/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
 
   packages/typescript-config: {}
 

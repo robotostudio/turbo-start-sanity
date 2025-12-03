@@ -99,7 +99,11 @@
       }
     },
     {
-      "includes": ["**/scripts/**/*.ts", "**/scripts/**/*.js"],
+      "includes": [
+        "**/scripts/**/*.ts",
+        "**/scripts/**/*.js",
+        "packages/logger/**/*.ts"
+      ],
       "linter": {
         "rules": {
           "suspicious": {
