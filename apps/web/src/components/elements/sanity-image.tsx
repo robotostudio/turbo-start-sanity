@@ -1,3 +1,5 @@
+"use client";
+import { type ElementType, memo } from "react";
 import {
   SanityImage as BaseSanityImage,
   type WrapperProps,
@@ -9,12 +11,12 @@ import {
 } from "@/lib/sanity/image";
 
 // Image wrapper component
-const ImageWrapper = <T extends React.ElementType = "img">(
+const ImageWrapper = <T extends ElementType = "img">(
   props: WrapperProps<T>
 ) => <BaseSanityImage baseUrl={SANITY_BASE_URL} {...props} />;
 
 // Main component
-export function SanityImage({ image, ...props }: SanityImageProps) {
+function SanityImageUnmemorized({ image, ...props }: SanityImageProps) {
   const processedImageData = processImageData(image);
 
   // Early return for invalid image data
@@ -24,3 +26,5 @@ export function SanityImage({ image, ...props }: SanityImageProps) {
 
   return <ImageWrapper {...props} {...processedImageData} />;
 }
+
+export const SanityImage = memo(SanityImageUnmemorized);

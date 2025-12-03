@@ -1,4 +1,3 @@
-"use client";
 import Link from "next/link";
 import type { Blog } from "@/types";
 import { SanityImage } from "./elements/sanity-image";
@@ -16,7 +15,7 @@ function BlogImage({ image, title }: BlogImageProps) {
   return (
     <SanityImage
       alt={title ?? "Blog post image"}
-      className="aspect-[16/9] w-full rounded-2xl bg-gray-100 object-cover sm:aspect-[2/1] lg:aspect-[3/2]"
+      className="aspect-video w-full rounded-2xl bg-gray-100 object-cover sm:aspect-2/1 lg:aspect-3/2"
       height={400}
       image={image}
       width={800}

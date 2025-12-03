@@ -82,13 +82,15 @@ export function BlogPageContent({
               title="Featured Posts"
             />
             <BlogSection blogs={remainingBlogs} title="All Posts" />
-            <BlogPagination
-              className="mt-12 flex justify-center"
-              currentPage={paginationMetadata.currentPage}
-              hasNextPage={paginationMetadata.hasNextPage}
-              hasPreviousPage={paginationMetadata.hasPreviousPage}
-              totalPages={paginationMetadata.totalPages}
-            />
+            {paginationMetadata?.totalPages > 1 && (
+              <BlogPagination
+                className="mt-12 flex justify-center"
+                currentPage={paginationMetadata.currentPage}
+                hasNextPage={paginationMetadata.hasNextPage}
+                hasPreviousPage={paginationMetadata.hasPreviousPage}
+                totalPages={paginationMetadata.totalPages}
+              />
+            )}
           </>
         )}
       </div>

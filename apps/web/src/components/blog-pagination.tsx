@@ -7,6 +7,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@workspace/ui/components/pagination";
+import { useCallback } from "react";
 
 export type PaginationProps = {
   currentPage: number;
@@ -68,18 +69,14 @@ export function BlogPagination({
   basePath = "/blog",
   className,
 }: BlogPaginationProps) {
-  if (totalPages <= 1) {
-    return null;
-  }
-
   const paginationItems = generatePaginationItems(currentPage, totalPages);
 
-  function getPageUrl(page: number): string {
+  const getPageUrl = useCallback((page: number): string => {
     if (page === 1) {
       return basePath;
     }
     return `${basePath}?page=${page}`;
-  }
+  }, [basePath]);
 
   return (
     <div className={className}>

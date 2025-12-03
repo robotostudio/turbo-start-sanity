@@ -12,6 +12,7 @@ interface IconProps extends Omit<ComponentProps<"svg">, "src"> {
 export const SanityIcon = memo(function SanityIconUnmemorized({
   icon,
   className,
+  alt,
   ...props
 }: IconProps) {
   if (!icon) {
@@ -22,22 +23,12 @@ export const SanityIcon = memo(function SanityIconUnmemorized({
     <DynamicIcon
       {...props}
       name={icon as IconName}
-      className={cn("size-12", className)}
+      className={cn(
+        "flex size-12 items-center justify-center",
+        className
+      )}
       fallback={() => <TriangleAlert size={24} />}
       size={24}
     />
   );
-
-  // return (
-  //   <span
-  //     {...props}
-  //     className={cn(
-  //       "sanity-icon flex size-12 items-center justify-center",
-  //       className
-  //     )}
-  //     // biome-ignore lint/security/noDangerouslySetInnerHtml: safe SVG from CMS
-  //     dangerouslySetInnerHTML={{ __html: svg }}
-  //     title={alt}
-  //   />
-  // );
 });

@@ -12,11 +12,10 @@ import { getSEOMetadata } from "@/lib/seo";
 
 const logger = new Logger("BlogSlug");
 
-async function fetchBlogSlugPageData(slug: string, stega = true) {
+async function fetchBlogSlugPageData(slug: string) {
   return await sanityFetch({
     query: queryBlogSlugPageData,
     params: { slug: `/blog/${slug}` },
-    stega,
   });
 }
 
@@ -53,7 +52,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { data } = await fetchBlogSlugPageData(slug, false);
+  const { data } = await fetchBlogSlugPageData(slug);
   return getSEOMetadata(
     data
       ? {
