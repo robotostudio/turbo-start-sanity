@@ -1,12 +1,10 @@
 import { defineField, defineType } from "sanity";
 
 import { createRadioListLayout, isValidUrl } from "../../utils/helper";
+import { documents } from '../documents';
 
 const allLinkableTypes = [
-  { type: "page" },
-  { type: "collection" },
-  { type: "collectionIndex" },
-  { type: "homePage" },
+  ...documents.filter(({name}) => name !== 'settings').map((doc) => ({ type: doc.name })),
 ];
 
 export const customUrl = defineType({
@@ -24,14 +22,15 @@ export const customUrl = defineType({
       initialValue: () => "external",
       validation: (Rule) => Rule.required(),
     }),
-    defineField({
-      name: "openInNewTab",
-      title: "Open in new tab",
-      type: "boolean",
-      description:
-        "When enabled, clicking this link will open the destination in a new browser tab instead of navigating away from the current page",
-      initialValue: () => false,
-    }),
+    // Removing this because he'll handle all external links to open in a new tab
+    // defineField({
+    //   name: "openInNewTab",
+    //   title: "Open in new tab",
+    //   type: "boolean",
+    //   description:
+    //     "When enabled, clicking this link will open the destination in a new browser tab instead of navigating away from the current page",
+    //   initialValue: () => false,
+    // }),
     defineField({
       name: "external",
       type: "string",
@@ -88,14 +87,12 @@ export const customUrl = defineType({
       externalUrl: "external",
       urlType: "type",
       internalUrl: "internal.slug.current",
-      openInNewTab: "openInNewTab",
     },
-    prepare({ externalUrl, urlType, internalUrl, openInNewTab }) {
+    prepare({ externalUrl, urlType, internalUrl }) {
       const url = urlType === "external" ? externalUrl : `${internalUrl}`;
-      const newTabIndicator = openInNewTab ? " ↗" : "";
       return {
         title: `${urlType === "external" ? "External" : "Internal"} Link`,
-        subtitle: `${url}${newTabIndicator}`,
+        subtitle: `→ ${url}`,
       };
     },
   },

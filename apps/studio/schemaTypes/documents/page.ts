@@ -4,7 +4,11 @@ import { GROUP, GROUPS } from "../../utils/constant";
 import { getDocumentIcon } from "../../utils/document-icons";
 import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
-import { documentSlugField, pageBuilderField } from "../common";
+import {
+  createDocumentPreview,
+  documentSlugField,
+  pageBuilderField,
+} from "../common";
 
 export const page = defineType({
   name: "page",
@@ -63,25 +67,7 @@ export const page = defineType({
     ...seoFields.filter((field) => field.name !== "seoHideFromLists"),
     ...ogFields,
   ],
-  preview: {
-    select: {
-      title: "title",
-      slug: "slug.current",
-      media: "image",
-      isPrivate: "seoNoIndex",
-      hasPageBuilder: "pageBuilder",
-    },
-    prepare: ({ title, slug, media, isPrivate, hasPageBuilder }) => {
-      const statusEmoji = isPrivate ? "🔒" : "🌎";
-      const builderEmoji = hasPageBuilder?.length
-        ? `🧱 ${hasPageBuilder.length}`
-        : "🏗️";
-
-      return {
-        title: `${title || "Untitled Page"}`,
-        subtitle: `${statusEmoji} ${builderEmoji} | 🔗 ${slug || "no-slug"}`,
-        media,
-      };
-    },
-  },
+  preview: createDocumentPreview({
+    defaultTitle: "Untitled Page",
+  }),
 });

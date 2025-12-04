@@ -229,6 +229,11 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
         return;
       }
 
+      if (documentType === "homePage") {
+        handleChange("/");
+        return;
+      }
+
       // Use unified slug generation with document type config
       const generatedSlug = generateSlugFromTitle(
         documentTitle,

@@ -55,45 +55,9 @@ type CreateIndexList = {
   context: StructureResolverContext;
 };
 
-const createIndexListWithOrderableItems = ({
-  S,
-  index,
-  list,
-  context,
-}: CreateIndexList) => {
-  const indexTitle = index.title ?? getTitleCase(index.type);
-  const listTitle = list.title ?? getTitleCase(list.type);
-  return S.listItem()
-    .title(listTitle)
-    .icon(index.icon ?? File)
-    .child(
-      S.list()
-        .title(indexTitle)
-        .items([
-          S.listItem()
-            .title(indexTitle)
-            .icon(index.icon ?? File)
-            .child(
-              S.document()
-                .views([S.view.form()])
-                .schemaType(index.type)
-                .documentId(index.type)
-            ),
-          orderableDocumentListDeskItem({
-            type: list.type,
-            S,
-            context,
-            icon: list.icon ?? File,
-            title: `${listTitle}`,
-          }),
-        ])
-    );
-};
 
 export const structure = (
-  S: StructureBuilder,
-  context: StructureResolverContext
-) =>
+  S: StructureBuilder) =>
   S.list()
     .title("Content")
     .items([
@@ -104,19 +68,20 @@ export const structure = (
       }),
       S.divider(),
       createSlugBasedStructure(S, "page"),
-      createIndexListWithOrderableItems({
-        S,
-        index: {
-          type: "collectionIndex",
-          icon: getStructureIcon("collectionIndex"),
-        },
-        list: {
-          type: "collection",
-          title: "Collections",
-          icon: getStructureIcon("collection"),
-        },
-        context,
-      }),
+      createSlugBasedStructure(S, "exhibition"),
+      // createIndexListWithOrderableItems({
+      //   S,
+      //   index: {
+      //     type: "exhibitionIndex",
+      //     icon: getStructureIcon("exhibitionIndex"),
+      //   },
+      //   list: {
+      //     type: "exhibition",
+      //     title: "Exhibitions",
+      //     icon: getStructureIcon("exhibition"),
+      //   },
+      //   context,
+      // }),
       createList({
         S,
         type: "redirect",

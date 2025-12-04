@@ -2,6 +2,7 @@ import {
   defineField,
   type ImageRule,
   type ImageValue,
+  type PreviewConfig,
   type SlugOptions,
   type ValidationBuilder,
 } from "sanity";
@@ -116,3 +117,58 @@ export const imageWithAltField = ({
       }),
     ],
   });
+
+
+export const createDocumentPreview = (options?: {
+  defaultTitle?: string;
+  privateStatusEmoji?: string;
+  publicStatusEmoji?: string;
+  builderEmojiWithCount?: (count: number) => string;
+  builderEmojiEmpty?: string;
+}) => {
+  const {
+    defaultTitle = "...",
+    privateStatusEmoji = "[Private]",
+    publicStatusEmoji = "",
+    builderEmojiWithCount = (count: number) => `(${count})`,
+    builderEmojiEmpty = "...",
+  } = options || {};
+
+  return {
+    select: {
+      title: "title",
+      slug: "slug.current",
+      media: "image",
+      isPrivate: "seoNoIndex",
+      hasPageBuilder: "pageBuilder",
+    },
+    prepare: ({
+      title,
+      slug,
+      media,
+      isPrivate,
+      hasPageBuilder,
+    }: {
+      title?: string;
+      slug?: string;
+      media?: unknown;
+      isPrivate?: boolean;
+      hasPageBuilder?: unknown[];
+    }) => {
+      const statusEmoji = isPrivate ? privateStatusEmoji : publicStatusEmoji;
+      const builderEmoji = hasPageBuilder?.length
+        ? builderEmojiWithCount(hasPageBuilder.length)
+        : builderEmojiEmpty;
+
+      return {
+        title: `${title || defaultTitle}`,
+        subtitle: `${statusEmoji} ${builderEmoji} | 🔗 ${slug || "no-slug"}`,
+        media,
+      } as {
+        title: string;
+        subtitle: string;
+        media: unknown;
+      };
+    },
+  } as PreviewConfig;
+};

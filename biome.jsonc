@@ -1,89 +1,26 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "files": {
-    "ignoreUnknown": true
-  },
-  "formatter": {
-    "enabled": true,
-    "formatWithErrors": false,
-    "indentStyle": "space",
-    "indentWidth": 2,
-    "lineEnding": "lf",
-    "lineWidth": 80
-  },
+  "extends": ["ultracite"],
   "linter": {
-    "enabled": true,
     "rules": {
-      "recommended": true,
       "suspicious": {
+        "noUnknownAtRules": "off",
         "noExplicitAny": "warn",
         "noConsole": "warn"
       },
       "style": {
-        "noMagicNumbers": "off",
-        "useConst": "error",
-        "useTemplate": "error"
+        "noMagicNumbers": "info"
       },
       "performance": {
         "noNamespaceImport": "off"
       },
       "correctness": {
-        "noInvalidPositionAtImportRule": "off",
-        "useExhaustiveDependencies": "warn"
-      },
-      "complexity": {
-        "noExcessiveCognitiveComplexity": "warn"
+        "noInvalidPositionAtImportRule": "off"
       }
     }
   },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "double",
-      "jsxQuoteStyle": "double",
-      "semicolons": "always",
-      "trailingCommas": "es5"
-    }
-  },
-  "json": {
-    "formatter": {
-      "enabled": true
-    }
-  },
-  "css": {
-    "parser": {
-      "cssModules": true,
-      "tailwindDirectives": true
-    },
-    "formatter": {
-      "enabled": true
-    },
-    "linter": {
-      "enabled": false
-    }
-  },
-  "overrides": [
-    {
-      "includes": [
-        "**/.turbo/**",
-        "**/.next/**",
-        "**/node_modules/**",
-        "**/dist/**"
-      ],
-      "linter": {
-        "enabled": false
-      },
-      "formatter": {
-        "enabled": false
-      }
-    },
-    {
-      "includes": ["**/*.css", "**/dist/**", "**/.sanity/**"],
-      "linter": {
-        "enabled": false
-      },
-      "formatter": {
-        "enabled": false
-      }
-    }
-  ]
+  // ignore templates directory
+  "files": {
+    "experimentalScannerIgnores": ["templates/**"]
+  }
 }

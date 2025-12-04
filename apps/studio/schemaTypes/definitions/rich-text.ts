@@ -7,6 +7,7 @@ import {
   type InitialValueProperty,
 } from "sanity";
 
+import { PortableTextEditorInput } from "../../components/portable-text-editor-input";
 import { schemaIcon } from "../../utils/icon-wrapper";
 
 const limitedRichTextMembers = [
@@ -20,7 +21,7 @@ const limitedRichTextMembers = [
           name: "customLink",
           type: "object",
           title: "Internal/External Link",
-          icon: schemaIcon(LinkIcon),
+          icon: LinkIcon,
           fields: [
             defineField({
               name: "customLink",
@@ -159,9 +160,10 @@ export const customRichText = (
     group?: string[] | string;
     description?: string;
     hidden?: ConditionalProperty;
+    useCustomEditor?: boolean;
   }
 ) => {
-  const { name, description, hidden } = options ?? {};
+  const { name, description, hidden, useCustomEditor = false } = options ?? {};
   const customMembers = richTextMembers.filter(
     (member) => member.name && type.includes(member.name)
   );
@@ -172,5 +174,10 @@ export const customRichText = (
     description: description ?? "",
     hidden,
     of: customMembers,
+    ...(useCustomEditor && {
+      components: {
+        input: PortableTextEditorInput,
+      },
+    }),
   });
 };

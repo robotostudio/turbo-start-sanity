@@ -1,7 +1,9 @@
+// @ts-nocheck
 import {assist} from "@sanity/assist";
 import {codeInput} from "@sanity/code-input";
 import {crossDatasetDuplicator} from "@sanity/cross-dataset-duplicator";
 import {debugSecrets} from "@sanity/preview-url-secret/sanity-plugin-debug-secrets";
+import {visionTool} from "@sanity/vision";
 import {type Config, defineConfig} from "sanity";
 import {presentationTool} from "sanity/presentation";
 import {structureTool} from "sanity/structure";
@@ -21,12 +23,13 @@ const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
 const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
 const title = process.env.SANITY_STUDIO_TITLE;
 
-export default defineConfig({
-  name: "default",
-  title,
+const productionConfig: Config = {
+  name: "production",
+  title: title || 'No Place',
   icon: Logo,
   projectId,
   dataset,
+  basePath: "/production",
   releases: {
     enabled: true,
   },
@@ -46,6 +49,7 @@ export default defineConfig({
       structure,
     }),
     presentationUrl(),
+    visionTool(),
     unsplashImageAsset(),
     media(),
     iconPicker(),
@@ -54,7 +58,7 @@ export default defineConfig({
     debugSecrets(),
     codeInput(),
     crossDatasetDuplicator(),
-  ], // push structure tool to first position in the tool navbar
+  ],
   document: {
     newDocumentOptions: (prev, {creationContext}) => {
       const {type} = creationContext;
@@ -95,4 +99,14 @@ export default defineConfig({
       },
     ],
   },
-}) as Config;
+};
+
+const developmentConfig: Config = {
+  ...productionConfig,
+  dataset: "development",
+  basePath: "/development",
+  name: "development",
+  title: 'NP.dev'
+};
+
+export default defineConfig([productionConfig, developmentConfig]);

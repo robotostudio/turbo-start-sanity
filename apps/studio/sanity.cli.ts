@@ -1,10 +1,18 @@
-import { defineCliConfig } from "sanity/cli";
+import {defineCliConfig} from "sanity/cli";
 
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID;
-const dataset = process.env.SANITY_STUDIO_DATASET;
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID || "bt9po7h0";
+const dataset = process.env.SANITY_STUDIO_DATASET || "developmentpn ";
 
-if (!projectId || projectId === 'project_id') throw new Error('Missing required environment variable: SANITY_STUDIO_PROJECT_ID')
-if (!dataset || dataset === 'dataset') throw new Error('Missing required environment variable: SANITY_STUDIO_DATASET')
+if (!projectId || projectId === "project_id") {
+  throw new Error(
+    "Missing required environment variable: SANITY_STUDIO_PROJECT_ID"
+  );
+}
+if (!dataset || dataset === "dataset") {
+  throw new Error(
+    "Missing required environment variable: SANITY_STUDIO_DATASET"
+  );
+}
 
 /**
  * Returns the correct studio host based on environment variables.
@@ -36,6 +44,10 @@ export default defineCliConfig({
     projectId,
     dataset,
   },
+  deployment: {
+    appId: process.env.SANITY_STUDIO_APP_ID || "q9jl15fnjj9omdtj9xi2956a"
+  },
   studioHost: getStudioHost(),
-  autoUpdates: false,
+
+  autoUpdates: true,
 });

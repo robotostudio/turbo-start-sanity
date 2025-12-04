@@ -46,6 +46,13 @@ export const homePage = defineType({
     documentSlugField("homePage", {
       group: GROUP.MAIN_CONTENT,
     }),
+    defineField({
+      name: 'showLatestExhibitions',
+      title: 'Show Latest Exhibition(s) on Homepage?',
+      type: 'boolean',
+      initialValue: true,
+      group: GROUP.MAIN_CONTENT,
+    }),
     pageBuilderField,
     ...seoFields.filter(
       (field) => !["seoNoIndex", "seoHideFromLists"].includes(field.name)

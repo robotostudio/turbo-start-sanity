@@ -192,6 +192,7 @@ export const queryHomePageData =
     "slug": slug.current,
     title,
     description,
+    showLatestExhibitions,
     ${pageBuilderFragment}
   }`);
 

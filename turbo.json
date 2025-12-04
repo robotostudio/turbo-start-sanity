@@ -7,7 +7,9 @@
     "VERCEL_URL",
     "VERCEL_PROJECT_PRODUCTION_URL",
     "VERCEL_ENV",
-    "NODE_ENV"
+    "NODE_ENV",
+    "SANITY_STUDIO_PROJECT_ID",
+    "SANITY_STUDIO_DATASET"
   ],
   "tasks": {
     "build": {
@@ -25,6 +27,15 @@
     "format": {},
     "check-types": {
       "dependsOn": ["^check-types"]
+    },
+    "type": {
+      "dependsOn": ["^type"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["schema.json", "sanity.types.ts"],
+      "env": [
+        "SANITY_STUDIO_PROJECT_ID",
+        "SANITY_STUDIO_DATASET"
+      ]
     },
     "dev": {
       "cache": false,
