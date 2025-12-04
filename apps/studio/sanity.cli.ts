@@ -1,5 +1,5 @@
 import { defineCliConfig } from "sanity/cli";
-import tsconfigPaths from 'vite-plugin-tsconfig-paths'
+import tsconfigPaths from "vite-plugin-tsconfig-paths";
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID;
 const dataset = process.env.SANITY_STUDIO_DATASET;
