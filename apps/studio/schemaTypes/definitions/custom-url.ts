@@ -68,7 +68,6 @@ export const customUrl = defineType({
       type: "reference",
       description:
         "Select which page on your website this link should point to",
-      options: { disableNew: true },
       hidden: ({ parent }) => parent?.type !== "internal",
       to: allLinkableTypes,
       validation: (rule) => [

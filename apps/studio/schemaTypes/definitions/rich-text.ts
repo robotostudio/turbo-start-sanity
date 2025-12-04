@@ -47,7 +47,7 @@ const limitedRichTextMembers = [
     name: "inlineButton",
     type: "inlineButton",
     title: "Inline Button",
-    icon: schemaIcon(LinkedinIcon),
+    icon: LinkIcon,
   }),
 ];
 
