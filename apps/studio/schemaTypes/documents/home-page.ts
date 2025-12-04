@@ -53,6 +53,23 @@ export const homePage = defineType({
       initialValue: true,
       group: GROUP.MAIN_CONTENT,
     }),
+    defineField({
+      group: GROUP.MAIN_CONTENT,
+      name: 'latestExhibitionsOffset',
+      title: 'How many exhibitions are on-view currently?',
+      type: 'number',
+      options: {
+        layout: 'radio',
+        direction: 'horizontal',
+        list: [
+          { title: '1 Exhibition', value: 1 },
+          { title: '2 Exhibitions', value: 2 },
+        ],
+      },
+      initialValue: 1,
+      validation: (Rule) => Rule.min(1).max(2),
+      hidden: ({parent}) => !parent?.showLatestExhibitions,
+    }),
     pageBuilderField,
     ...seoFields.filter(
       (field) => !["seoNoIndex", "seoHideFromLists"].includes(field.name)

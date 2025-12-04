@@ -229,8 +229,14 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
         return;
       }
 
+      // Special handling for singleton pages
       if (documentType === "homePage") {
         handleChange("/");
+        return;
+      }
+
+      if (documentType === "exhibitionIndex") {
+        handleChange("/exhibitions");
         return;
       }
 

@@ -1,4 +1,4 @@
-import { ImageIcon, LinkIcon } from "@sanity/icons";
+import {ImageIcon, LinkedinIcon, LinkIcon} from "@sanity/icons";
 import {
   type ConditionalProperty,
   defineArrayMember,
@@ -7,14 +7,14 @@ import {
   type InitialValueProperty,
 } from "sanity";
 
-import { PortableTextEditorInput } from "../../components/portable-text-editor-input";
-import { schemaIcon } from "../../utils/icon-wrapper";
+import {PortableTextEditorInput} from "../../components/portable-text-editor-input";
+import {schemaIcon} from "../../utils/icon-wrapper";
 
 const limitedRichTextMembers = [
   defineArrayMember({
     name: "block",
     type: "block",
-    styles: [{ title: "Normal", value: "normal" }],
+    styles: [{title: "Normal", value: "normal"}],
     marks: {
       annotations: [
         {
@@ -27,15 +27,27 @@ const limitedRichTextMembers = [
               name: "customLink",
               type: "customUrl",
             }),
+            defineField({
+              name: 'linkVariant',
+              type: 'linkVariant',
+              title: 'Variant',
+              initialValue: 'default',
+            })
           ],
         },
       ],
       decorators: [
-        { title: "Strong", value: "strong" },
-        { title: "Emphasis", value: "em" },
-        { title: "Underline", value: "underline" },
+        {title: "Strong", value: "strong"},
+        {title: "Emphasis", value: "em"},
+        {title: "Underline", value: "underline"},
       ],
     },
+  }),
+  defineArrayMember({
+    name: "inlineButton",
+    type: "inlineButton",
+    title: "Inline Button",
+    icon: schemaIcon(LinkedinIcon),
   }),
 ];
 
@@ -47,7 +59,7 @@ export const limitedRichText = (options?: {
   description?: string;
   hidden?: ConditionalProperty;
 }) => {
-  const { name, description, hidden, initialValue } = options ?? {};
+  const {name, description, hidden, initialValue} = options ?? {};
   return defineField({
     ...options,
     name: name ?? "caption",
@@ -85,10 +97,10 @@ export const inlineImage = defineArrayMember({
       options: {
         layout: "radio",
         list: [
-          { title: "Default", value: "default" },
-          { title: "Full Bleed", value: "full-bleed" },
-          { title: "Fit to Container", value: "fit-to-container" },
-          { title: "Inset", value: "inset" },
+          {title: "Default", value: "default"},
+          {title: "Full Bleed", value: "full-bleed"},
+          {title: "Fit to Container", value: "fit-to-container"},
+          {title: "Inset", value: "inset"},
         ],
       },
     }),
@@ -100,17 +112,17 @@ const richTextMembers = [
     name: "block",
     type: "block",
     styles: [
-      { title: "Normal", value: "normal" },
-      { title: "H2", value: "h2" },
-      { title: "H3", value: "h3" },
-      { title: "H4", value: "h4" },
-      { title: "H5", value: "h5" },
-      { title: "H6", value: "h6" },
-      { title: "Inline", value: "inline" },
+      {title: "Normal", value: "normal"},
+      {title: "H2", value: "h2"},
+      {title: "H3", value: "h3"},
+      {title: "H4", value: "h4"},
+      {title: "H5", value: "h5"},
+      {title: "H6", value: "h6"},
+      {title: "Inline", value: "inline"},
     ],
     lists: [
-      { title: "Numbered", value: "number" },
-      { title: "Bullet", value: "bullet" },
+      {title: "Numbered", value: "number"},
+      {title: "Bullet", value: "bullet"},
     ],
     marks: {
       annotations: [
@@ -118,7 +130,7 @@ const richTextMembers = [
           name: "customLink",
           type: "object",
           title: "Internal/External Link",
-          icon: schemaIcon(LinkIcon),
+          icon: LinkIcon,
           fields: [
             defineField({
               name: "customLink",
@@ -128,18 +140,18 @@ const richTextMembers = [
         },
       ],
       decorators: [
-        { title: "Strong", value: "strong" },
-        { title: "Emphasis", value: "em" },
-        { title: "Code", value: "code" },
+        {title: "Strong", value: "strong"},
+        {title: "Emphasis", value: "em"},
+        {title: "Code", value: "code"},
       ],
     },
   }),
   inlineImage,
-  defineArrayMember({
-    name: "imageGallery",
-    type: "imageGallery",
-    title: "Image Gallery",
-  }),
+  // defineArrayMember({
+  //   name: "imageGallery",
+  //   type: "imageGallery",
+  //   title: "Image Gallery",
+  // }),
 ];
 
 export const richText = defineType({
@@ -163,7 +175,7 @@ export const customRichText = (
     useCustomEditor?: boolean;
   }
 ) => {
-  const { name, description, hidden, useCustomEditor = false } = options ?? {};
+  const {name, description, hidden, useCustomEditor = false} = options ?? {};
   const customMembers = richTextMembers.filter(
     (member) => member.name && type.includes(member.name)
   );

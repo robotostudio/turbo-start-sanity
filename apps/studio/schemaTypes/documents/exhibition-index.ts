@@ -27,6 +27,14 @@ export const exhibitionIndex = defineType({
     }),
     documentSlugField("exhibitionIndex", {
       group: GROUP.MAIN_CONTENT,
+      prefix: "exhibitions",
+    }),
+    defineField({
+      group: GROUP.MAIN_CONTENT,
+      name: 'listExhibitions',
+      title: 'List all exhibitions on this page?',
+      type: 'boolean',
+      initialValue: true,
     }),
     pageBuilderField,
     ...seoFields.filter(
