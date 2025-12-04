@@ -10,7 +10,7 @@ catalog:
   '@types/react-dom': ^19.2.3
 
   # TypeScript
-  typescript: 5.9.2
+  typescript: 5.9.3
   '@types/node': ^20.19.25
 
   # UI Libraries
