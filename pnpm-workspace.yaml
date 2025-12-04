@@ -11,7 +11,7 @@ catalog:
 
   # TypeScript
   typescript: 5.9.2
-  '@types/node': ^20.19.25
+  '@types/node': ^24.10.1
 
   # UI Libraries
   lucide-react: ^0.539.0
