@@ -272,8 +272,8 @@ function NavbarSkeleton() {
           {/* <div className="flex items-center">
             <div className="h-10 w-[120px] rounded bg-muted/50 animate-pulse" />
           </div> */}
-          <div className="flex h-[40px] w-[120px] items-center">
-            <div className="h-10 w-[120px] animate-pulse rounded bg-muted/50" />
+          <div className="flex h-[40px] w-40 items-center">
+            <div className="h-10 w-40 animate-pulse rounded bg-muted/50" />
           </div>
 
           {/* Desktop nav skeleton - matches nav gap-1 and px-3 py-2 buttons */}
@@ -339,7 +339,7 @@ export function Navbar({
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <div className="flex h-[40px] w-[120px] items-center">
+          <div className="flex h-[40px] w-40 items-center">
             {logo && (
               <Logo
                 alt={siteTitle || ""}
