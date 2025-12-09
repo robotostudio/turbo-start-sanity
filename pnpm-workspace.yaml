@@ -4,7 +4,7 @@ packages:
 
 catalog:
   '@sanity/client': ^7.13.1
-  '@types/node': ^20.19.26
+  '@types/node': ^24.10.2
   '@types/react': ^19.2.7
   '@types/react-dom': ^19.2.3
   lucide-react: ^0.556.0
