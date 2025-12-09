@@ -19,7 +19,7 @@
     "@workspace/typescript-config": "workspace:*",
     "turbo": "^2.6.3",
     "typescript": "catalog:",
-    "ultracite": "5.6.2"
+    "ultracite": "6.3.10"
   },
   "packageManager": "pnpm@10.25.0",
   "engines": {
