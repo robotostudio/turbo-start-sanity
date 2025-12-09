@@ -68,7 +68,7 @@ export function FaqAccordion({
                 href={link.href ?? "#"}
                 target={link.openInNewTab ? "_blank" : "_self"}
               >
-                <p className="font-[500] text-[15px] leading-6">
+                <p className="font-medium text-[15px] leading-6">
                   {link?.description}
                 </p>
                 <span className="rounded-full border p-1">
