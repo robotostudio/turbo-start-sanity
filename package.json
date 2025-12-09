@@ -4,10 +4,15 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
+    "build:studio": "turbo run build --filter=studio",
+    "build:web": "turbo run build --filter=web",
     "dev": "turbo dev",
+    "dev:studio": "turbo run dev --filter=studio",
+    "dev:web": "turbo run dev --filter=web",
     "lint": "npx ultracite check",
     "format": "npx ultracite fix",
-    "check-types": "turbo check-types"
+    "check-types": "turbo check-types",
+    "check-biome": "turbo check-biome"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.8",
@@ -18,6 +23,6 @@
   },
   "packageManager": "pnpm@10.25.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }

@@ -1,6 +1,6 @@
-import { button } from "./button";
-import { customUrl } from "./custom-url";
-import { pageBuilder } from "./pagebuilder";
-import { richText } from "./rich-text";
+import { button } from "@/schemaTypes/definitions/button";
+import { customUrl } from "@/schemaTypes/definitions/custom-url";
+import { pageBuilder } from "@/schemaTypes/definitions/pagebuilder";
+import { richText } from "@/schemaTypes/definitions/rich-text";
 
 export const definitions = [customUrl, richText, button, pageBuilder];

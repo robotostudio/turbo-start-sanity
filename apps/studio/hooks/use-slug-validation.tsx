@@ -6,7 +6,7 @@ import {
   getDocumentTypeConfig,
   type SlugValidationResult,
   validateSlug,
-} from "../utils/slug-validation";
+} from "@/utils/slug-validation";
 
 // Helper function to extract Sanity validation errors
 function extractSanityValidationErrors(

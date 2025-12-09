@@ -1,6 +1,6 @@
 import { defineField, defineType } from "sanity";
 
-import { createRadioListLayout, isValidUrl } from "../../utils/helper";
+import { createRadioListLayout, isValidUrl } from "@/utils/helper";
 
 const allLinkableTypes = [
   { type: "blog" },

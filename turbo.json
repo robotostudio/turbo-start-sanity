@@ -26,6 +26,9 @@
     "check-types": {
       "dependsOn": ["^check-types"]
     },
+    "//#check-biome": {
+      "cache": false
+    },
     "dev": {
       "cache": false,
       "persistent": true

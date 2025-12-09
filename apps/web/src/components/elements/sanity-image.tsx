@@ -4,6 +4,7 @@ import {
   SanityImage as BaseSanityImage,
   type WrapperProps,
 } from "sanity-image";
+
 import {
   processImageData,
   SANITY_BASE_URL,

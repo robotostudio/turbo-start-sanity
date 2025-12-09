@@ -5,10 +5,10 @@ import {
 import { FileTextIcon } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
-import { GROUP, GROUPS } from "../../utils/constant";
-import { ogFields } from "../../utils/og-fields";
-import { seoFields } from "../../utils/seo-fields";
-import { documentSlugField, imageWithAltField } from "../common";
+import { documentSlugField, imageWithAltField } from "@/schemaTypes/common";
+import { GROUP, GROUPS } from "@/utils/constant";
+import { ogFields } from "@/utils/og-fields";
+import { seoFields } from "@/utils/seo-fields";
 
 export const blog = defineType({
   name: "blog",

@@ -2,6 +2,7 @@ import { Logger } from "@workspace/logger";
 import { cn } from "@workspace/ui/lib/utils";
 import Link from "next/link";
 import { PortableText, type PortableTextReactComponents } from "next-sanity";
+
 import type { SanityRichTextProps } from "@/types";
 import { parseChildrenToSlug } from "@/utils";
 import { SanityImage } from "./sanity-image";

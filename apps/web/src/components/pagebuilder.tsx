@@ -4,6 +4,7 @@ import { useOptimistic } from "@sanity/visual-editing/react";
 import { env } from "env";
 import { createDataAttribute } from "next-sanity";
 import { useCallback, useMemo } from "react";
+
 import type { QueryHomePageDataResult } from "@/lib/sanity/sanity.types";
 import type { PageBuilderBlockTypes } from "@/types";
 import { CTABlock } from "./sections/cta";

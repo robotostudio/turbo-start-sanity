@@ -1,8 +1,9 @@
 import { LayoutGrid } from "lucide-react";
 import { defineField, defineType } from "sanity";
-import { lucideIconPreview } from "../../components/icon-preview";
-import { iconField } from "../common";
-import { customRichText } from "../definitions/rich-text";
+
+import { lucideIconPreview } from "@/components/icon-preview";
+import { iconField } from "@/schemaTypes/common";
+import { customRichText } from "@/schemaTypes/definitions/rich-text";
 
 const featureCardIcon = defineField({
   name: "featureCardIcon",

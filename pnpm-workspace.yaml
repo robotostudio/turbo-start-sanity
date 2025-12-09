@@ -3,10 +3,10 @@ packages:
   - packages/*
 
 catalog:
-  '@sanity/client': ^7.13.1
-  '@types/node': ^24.10.2
-  '@types/react': ^19.2.7
-  '@types/react-dom': ^19.2.3
+  "@sanity/client": ^7.13.1
+  "@types/node": ^24.10.2
+  "@types/react": ^19.2.7
+  "@types/react-dom": ^19.2.3
   lucide-react: ^0.556.0
   next-themes: ^0.4.6
   react: ^19.2.1
@@ -15,26 +15,26 @@ catalog:
   zod: ^4.1.13
 
 onlyBuiltDependencies:
-  - '@tailwindcss/oxide'
+  - "@tailwindcss/oxide"
   - esbuild
   - sharp
 
 overrides:
-  '@octokit/endpoint@>=9.0.5 <9.0.6': '>=11.0.2'
-  '@octokit/plugin-paginate-rest@>=1.0.0 <9.2.2': '>=14.0.0'
-  '@octokit/request-error@>=1.0.0 <5.1.1': '>=7.1.0'
-  '@octokit/request@>=1.0.0 <8.4.1': '>=10.0.7'
-  brace-expansion@>=1.0.0 <=1.1.11: '>=1.1.12'
-  brace-expansion@>=2.0.0 <=2.0.1: '>=2.0.2'
-  glob@>=10.2.0 <10.5.0: '>=13.0.0'
-  glob@>=11.0.0 <11.1.0: '>=13.0.0'
-  js-yaml@<3.14.2: '>=3.14.2'
-  js-yaml@>=4.0.0 <4.1.1: '>=4.1.1'
-  min-document@<=2.19.0: '>=2.19.1'
-  prismjs@<1.30.0: '>=1.30.0'
-  tar-fs@>=2.0.0 <2.1.4: '>=2.1.4'
-  tar@=7.5.1: '>=7.5.2'
-  tmp@<=0.2.3: '>=0.2.4'
-  undici@<5.29.0: '>=5.29.0'
-  undici@>=4.5.0 <5.28.5: '>=6.22.0'
-  valibot@>=0.31.0 <1.2.0: '>=1.2.0'
+  "@octokit/endpoint@>=9.0.5 <9.0.6": ">=11.0.2"
+  "@octokit/plugin-paginate-rest@>=1.0.0 <9.2.2": ">=14.0.0"
+  "@octokit/request-error@>=1.0.0 <5.1.1": ">=7.1.0"
+  "@octokit/request@>=1.0.0 <8.4.1": ">=10.0.7"
+  brace-expansion@>=1.0.0 <=1.1.11: ">=1.1.12"
+  brace-expansion@>=2.0.0 <=2.0.1: ">=2.0.2"
+  glob@>=10.2.0 <10.5.0: ">=13.0.0"
+  glob@>=11.0.0 <11.1.0: ">=13.0.0"
+  js-yaml@<3.14.2: ">=3.14.2"
+  js-yaml@>=4.0.0 <4.1.1: ">=4.1.1"
+  min-document@<=2.19.0: ">=2.19.1"
+  prismjs@<1.30.0: ">=1.30.0"
+  tar-fs@>=2.0.0 <2.1.4: ">=2.1.4"
+  tar@=7.5.1: ">=7.5.2"
+  tmp@<=0.2.3: ">=0.2.4"
+  undici@<5.29.0: ">=5.29.0"
+  undici@>=4.5.0 <5.28.5: ">=6.22.0"
+  valibot@>=0.31.0 <1.2.0: ">=1.2.0"

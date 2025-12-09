@@ -7,12 +7,12 @@ import { unsplashImageAsset } from "sanity-plugin-asset-source-unsplash";
 import { lucideIconPicker } from "sanity-plugin-lucide-icon-picker";
 import { media } from "sanity-plugin-media";
 
-import { Logo } from "./components/logo";
-import { locations } from "./location";
-import { presentationUrl } from "./plugins/presentation-url";
-import { schemaTypes } from "./schemaTypes";
-import { structure } from "./structure";
-import { getPresentationUrl } from "./utils/helper";
+import { Logo } from "@/components/logo";
+import { locations } from "@/location";
+import { presentationUrl } from "@/plugins/presentation-url";
+import { schemaTypes } from "@/schemaTypes/index";
+import { structure } from "@/structure";
+import { getPresentationUrl } from "@/utils/helper";
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
 const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";

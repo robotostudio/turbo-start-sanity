@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import type { Blog } from "@/types";
 import { SanityImage } from "./elements/sanity-image";
 

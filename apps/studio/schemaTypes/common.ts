@@ -5,12 +5,12 @@ import {
   type ValidationBuilder,
 } from "sanity";
 
-import { PathnameFieldComponent } from "../components/slug-field-component";
-import { GROUP } from "../utils/constant";
+import { PathnameFieldComponent } from "@/components/slug-field-component";
+import { GROUP } from "@/utils/constant";
 import {
   createSlugValidator,
   getDocumentTypeConfig,
-} from "../utils/slug-validation";
+} from "@/utils/slug-validation";
 
 export const richTextField = defineField({
   name: "richText",
