@@ -1,5 +1,6 @@
 import Fuse from "fuse.js";
 import { NextResponse } from "next/server";
+
 import { sanityFetch } from "@/lib/sanity/live";
 import { queryAllBlogDataForSearch } from "@/lib/sanity/query";
 

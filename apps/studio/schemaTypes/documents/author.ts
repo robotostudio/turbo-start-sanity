@@ -1,7 +1,7 @@
 import { UserIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 
-import { imageWithAltField } from "@schemaTypes/common";
+import { imageWithAltField } from "@/schemaTypes/common";
 
 export const author = defineType({
   name: "author",

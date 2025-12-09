@@ -12,10 +12,9 @@ import {
 } from "sanity";
 import { styled } from "styled-components";
 
-import { useSlugValidation } from "@hooks/use-slug-validation";
-import { generateSlugFromTitle } from "@utils/slug-validation";
-
-import { ErrorStates } from "./url-slug/error-states";
+import { ErrorStates } from "@/components/url-slug/error-states";
+import { useSlugValidation } from "@/hooks/use-slug-validation";
+import { generateSlugFromTitle } from "@/utils/slug-validation";
 
 const presentationOriginUrl = process.env.SANITY_STUDIO_PRESENTATION_URL;
 

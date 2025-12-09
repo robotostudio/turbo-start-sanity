@@ -1,8 +1,8 @@
 import { MessageCircle } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { customRichText } from "@definitions/rich-text";
-import { parseRichTextToString } from "@utils/helper";
+import { customRichText } from "@/schemaTypes/definitions/rich-text";
+import { parseRichTextToString } from "@/utils/helper";
 
 export const faq = defineType({
   name: "faq",

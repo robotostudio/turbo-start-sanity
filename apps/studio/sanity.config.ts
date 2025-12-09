@@ -1,20 +1,21 @@
-import { Logo } from "@components/logo";
-import { presentationUrl } from "@plugins/presentation-url";
 import { assist } from "@sanity/assist";
 import { visionTool } from "@sanity/vision";
-import { schemaTypes } from "@schemaTypes/index";
-import { getPresentationUrl } from "@utils/helper";
 import { defineConfig } from "sanity";
 import { presentationTool } from "sanity/presentation";
 import { structureTool } from "sanity/structure";
 import { unsplashImageAsset } from "sanity-plugin-asset-source-unsplash";
-import { iconPicker } from "sanity-plugin-icon-picker";
+import { lucideIconPicker } from "sanity-plugin-lucide-icon-picker";
 import { media } from "sanity-plugin-media";
-import { locations } from "./location";
-import { structure } from "./structure";
+
+import { Logo } from "@/components/logo";
+import { locations } from "@/location";
+import { presentationUrl } from "@/plugins/presentation-url";
+import { schemaTypes } from "@/schemaTypes/index";
+import { structure } from "@/structure";
+import { getPresentationUrl } from "@/utils/helper";
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
-const dataset = process.env.SANITY_STUDIO_DATASET;
+const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
 const title = process.env.SANITY_STUDIO_TITLE;
 
 export default defineConfig({
@@ -22,7 +23,7 @@ export default defineConfig({
   title,
   icon: Logo,
   projectId,
-  dataset: dataset ?? "production",
+  dataset,
   releases: {
     enabled: true,
   },
@@ -43,16 +44,27 @@ export default defineConfig({
     }),
     presentationUrl(),
     visionTool(),
+    lucideIconPicker(),
     unsplashImageAsset(),
     media(),
-    iconPicker(),
     assist(),
   ],
   document: {
     newDocumentOptions: (prev, { creationContext }) => {
       const { type } = creationContext;
       if (type === "global") {
-        return [];
+        return prev.filter(
+          (template) =>
+            ![
+              "homePage",
+              "navbar",
+              "footer",
+              "settings",
+              "blogIndex",
+              "assist.instruction.context",
+              "media.tag",
+            ].includes(template?.templateId)
+        );
       }
       return prev;
     },

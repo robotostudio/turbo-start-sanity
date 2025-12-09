@@ -1,5 +1,6 @@
 import { env } from "env";
 import type { WrapperProps } from "sanity-image";
+
 import type { SanityImageProps as SanityImageData } from "@/types";
 
 // Types

@@ -1,9 +1,9 @@
 import { defineField, defineType } from "sanity";
 
-import { documentSlugField, pageBuilderField } from "@schemaTypes/common";
-import { GROUP, GROUPS } from "@utils/constant";
-import { ogFields } from "@utils/og-fields";
-import { seoFields } from "@utils/seo-fields";
+import { documentSlugField, pageBuilderField } from "@/schemaTypes/common";
+import { GROUP, GROUPS } from "@/utils/constant";
+import { ogFields } from "@/utils/og-fields";
+import { seoFields } from "@/utils/seo-fields";
 
 export const blogIndex = defineType({
   name: "blogIndex",

@@ -7,6 +7,7 @@ import {
 import { Badge } from "@workspace/ui/components/badge";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+
 import type { PagebuilderType } from "@/types";
 import { RichText } from "../elements/rich-text";
 import { FaqJsonLd } from "../json-ld";

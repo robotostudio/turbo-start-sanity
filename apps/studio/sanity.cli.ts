@@ -1,8 +1,20 @@
+import { Logger } from "@workspace/logger";
 import { defineCliConfig } from "sanity/cli";
 import tsconfigPaths from "vite-plugin-tsconfig-paths";
 
+const logger = new Logger("SanityCLI");
+
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID;
 const dataset = process.env.SANITY_STUDIO_DATASET;
+
+if (!projectId || projectId === "project_id")
+  throw new Error(
+    "Missing required environment variable: SANITY_STUDIO_PROJECT_ID"
+  );
+if (!dataset || dataset === "dataset")
+  throw new Error(
+    "Missing required environment variable: SANITY_STUDIO_DATASET"
+  );
 
 /**
  * Returns the correct studio host based on environment variables.
@@ -32,8 +44,7 @@ function getStudioHost(): string | undefined {
 const studioHost = getStudioHost();
 
 if (studioHost) {
-  // biome-ignore lint/suspicious/noConsole: intentional logging
-  console.log(`🪩 Sanity Studio Host: https://${studioHost}.sanity.studio`);
+  logger.info(`Sanity Studio Host: https://${studioHost}.sanity.studio`);
 }
 
 export default defineCliConfig({
@@ -41,7 +52,7 @@ export default defineCliConfig({
     projectId,
     dataset,
   },
-  studioHost: getStudioHost(),
+  studioHost,
   deployment: {
     autoUpdates: false,
   },

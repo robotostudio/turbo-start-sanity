@@ -1,7 +1,7 @@
 import { Command } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { capitalize, createRadioListLayout } from "@utils/helper";
+import { capitalize, createRadioListLayout } from "@/utils/helper";
 
 const buttonVariants = ["default", "secondary", "outline", "link"];
 

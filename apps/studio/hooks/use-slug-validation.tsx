@@ -1,11 +1,12 @@
+import { useMemo } from "react";
+import type { SanityDocument } from "sanity";
+import { getPublishedId, useFormValue, useValidationStatus } from "sanity";
+
 import {
   getDocumentTypeConfig,
   type SlugValidationResult,
   validateSlug,
-} from "@utils/slug-validation";
-import { useMemo } from "react";
-import type { SanityDocument } from "sanity";
-import { getPublishedId, useFormValue, useValidationStatus } from "sanity";
+} from "@/utils/slug-validation";
 
 // Helper function to extract Sanity validation errors
 function extractSanityValidationErrors(

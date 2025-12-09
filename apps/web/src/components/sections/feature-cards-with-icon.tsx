@@ -1,7 +1,6 @@
 import { Badge } from "@workspace/ui/components/badge";
 
 import type { PagebuilderType } from "@/types";
-
 import { RichText } from "../elements/rich-text";
 import { SanityIcon } from "../elements/sanity-icon";
 

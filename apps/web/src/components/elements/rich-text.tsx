@@ -1,15 +1,13 @@
-"use client";
+import { Logger } from "@workspace/logger";
 import { cn } from "@workspace/ui/lib/utils";
 import Link from "next/link";
-import {
-  PortableText,
-  type PortableTextBlock,
-  type PortableTextReactComponents,
-} from "next-sanity";
+import { PortableText, type PortableTextReactComponents } from "next-sanity";
 
+import type { SanityRichTextProps } from "@/types";
 import { parseChildrenToSlug } from "@/utils";
-
 import { SanityImage } from "./sanity-image";
+
+const logger = new Logger("RichText");
 
 const components: Partial<PortableTextReactComponents> = {
   block: {
@@ -109,7 +107,7 @@ const components: Partial<PortableTextReactComponents> = {
   hardBreak: () => <br />,
 };
 
-export function RichText<T>({
+export function RichText<T extends SanityRichTextProps>({
   richText,
   className,
 }: {
@@ -130,9 +128,9 @@ export function RichText<T>({
       <PortableText
         components={components}
         onMissingComponent={(_, { nodeType, type }) => {
-          console.warn(`Missing component: ${nodeType} for type: ${type}`);
+          logger.warn(`Missing component: ${nodeType} for type: ${type}`);
         }}
-        value={richText as unknown as PortableTextBlock[]}
+        value={richText}
       />
     </div>
   );

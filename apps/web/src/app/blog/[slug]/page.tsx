@@ -1,3 +1,4 @@
+import { Logger } from "@workspace/logger";
 import { notFound } from "next/navigation";
 
 import { RichText } from "@/components/elements/rich-text";
@@ -9,11 +10,12 @@ import { sanityFetch } from "@/lib/sanity/live";
 import { queryBlogPaths, queryBlogSlugPageData } from "@/lib/sanity/query";
 import { getSEOMetadata } from "@/lib/seo";
 
-async function fetchBlogSlugPageData(slug: string, stega = true) {
+const logger = new Logger("BlogSlug");
+
+async function fetchBlogSlugPageData(slug: string) {
   return await sanityFetch({
     query: queryBlogSlugPageData,
     params: { slug: `/blog/${slug}` },
-    stega,
   });
 }
 
@@ -38,7 +40,7 @@ async function fetchBlogPaths() {
     }
     return paths;
   } catch (error) {
-    console.error("Error fetching blog paths:", error);
+    logger.error("Error fetching blog paths", error);
     // Return empty array to allow build to continue
     return [];
   }
@@ -50,7 +52,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { data } = await fetchBlogSlugPageData(slug, false);
+  const { data } = await fetchBlogSlugPageData(slug);
   return getSEOMetadata(
     data
       ? {

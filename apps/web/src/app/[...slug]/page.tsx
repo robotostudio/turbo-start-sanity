@@ -1,3 +1,4 @@
+import { Logger } from "@workspace/logger";
 import { notFound } from "next/navigation";
 
 import { PageBuilder } from "@/components/pagebuilder";
@@ -5,6 +6,8 @@ import { client } from "@/lib/sanity/client";
 import { sanityFetch } from "@/lib/sanity/live";
 import { querySlugPageData, querySlugPagePaths } from "@/lib/sanity/query";
 import { getSEOMetadata } from "@/lib/seo";
+
+const logger = new Logger("PageSlug");
 
 async function fetchSlugPageData(slug: string, stega = true) {
   return await sanityFetch({
@@ -33,7 +36,7 @@ async function fetchSlugPagePaths() {
     }
     return paths;
   } catch (error) {
-    console.error("Error fetching slug paths:", error);
+    logger.error("Error fetching slug paths", error);
     // Return empty array to allow build to continue
     return [];
   }

@@ -4,8 +4,9 @@ import { useOptimistic } from "@sanity/visual-editing/react";
 import { env } from "env";
 import { createDataAttribute } from "next-sanity";
 import { useCallback, useMemo } from "react";
+
 import type { QueryHomePageDataResult } from "@/lib/sanity/sanity.types";
-import type { PageBuilderBlockTypes, PagebuilderType } from "@/types";
+import type { PageBuilderBlockTypes } from "@/types";
 import { CTABlock } from "./sections/cta";
 import { FaqAccordion } from "./sections/faq-accordion";
 import { FeatureCardsWithIcon } from "./sections/feature-cards-with-icon";
@@ -32,20 +33,13 @@ type SanityDataAttributeConfig = {
 
 // Strongly typed component mapping with proper component signatures
 const BLOCK_COMPONENTS = {
-  cta: CTABlock as React.ComponentType<PagebuilderType<"cta">>,
-  faqAccordion: FaqAccordion as React.ComponentType<
-    PagebuilderType<"faqAccordion">
-  >,
-  hero: HeroBlock as React.ComponentType<PagebuilderType<"hero">>,
-  featureCardsIcon: FeatureCardsWithIcon as React.ComponentType<
-    PagebuilderType<"featureCardsIcon">
-  >,
-  subscribeNewsletter: SubscribeNewsletter as React.ComponentType<
-    PagebuilderType<"subscribeNewsletter">
-  >,
-  imageLinkCards: ImageLinkCards as React.ComponentType<
-    PagebuilderType<"imageLinkCards">
-  >,
+  cta: CTABlock,
+  faqAccordion: FaqAccordion,
+  hero: HeroBlock,
+  featureCardsIcon: FeatureCardsWithIcon,
+  subscribeNewsletter: SubscribeNewsletter,
+  imageLinkCards: ImageLinkCards,
+  // biome-ignore lint/suspicious/noExplicitAny: <any is used to allow for dynamic component rendering>
 } as const satisfies Record<PageBuilderBlockTypes, React.ComponentType<any>>;
 
 /**
@@ -96,6 +90,7 @@ function useOptimisticPageBuilder(
   initialBlocks: PageBuilderBlock[],
   documentId: string
 ) {
+  // biome-ignore lint/suspicious/noExplicitAny: <any is used to allow for dynamic component rendering>
   return useOptimistic<PageBuilderBlock[], any>(
     initialBlocks,
     (currentBlocks, action) => {
@@ -141,6 +136,7 @@ function useBlockRenderer(id: string, type: string) {
           data-sanity={createBlockDataAttribute(block._key)}
           key={`${block._type}-${block._key}`}
         >
+          {/** biome-ignore lint/suspicious/noExplicitAny: <any is used to allow for dynamic component rendering> */}
           <Component {...(block as any)} />
         </div>
       );

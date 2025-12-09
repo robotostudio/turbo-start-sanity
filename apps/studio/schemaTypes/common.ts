@@ -1,4 +1,3 @@
-import { PathnameFieldComponent } from "@components/slug-field-component";
 import {
   defineField,
   type ImageRule,
@@ -6,11 +5,12 @@ import {
   type ValidationBuilder,
 } from "sanity";
 
-import { GROUP } from "@utils/constant";
+import { PathnameFieldComponent } from "@/components/slug-field-component";
+import { GROUP } from "@/utils/constant";
 import {
   createSlugValidator,
   getDocumentTypeConfig,
-} from "@utils/slug-validation";
+} from "@/utils/slug-validation";
 
 export const richTextField = defineField({
   name: "richText",
@@ -39,10 +39,11 @@ export const iconField = defineField({
   name: "icon",
   title: "Icon",
   options: {
-    storeSvg: true,
-    providers: ["fi"],
+    // storeSvg: true,
+    // providers: ["fi"],
   },
-  type: "iconPicker",
+  // type: "iconPicker",
+  type: "lucide-icon",
   description:
     "Choose a small picture symbol to represent this item, like a home icon or shopping cart",
 });

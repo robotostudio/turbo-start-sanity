@@ -7,6 +7,7 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
+
 import type {
   QueryGlobalSeoSettingsResult,
   QueryNavbarDataResult,
@@ -35,7 +36,7 @@ type MenuLinkProps = {
   name: string;
   href: string;
   description?: string;
-  icon?: any;
+  icon?: string | null;
   onClick?: () => void;
 };
 

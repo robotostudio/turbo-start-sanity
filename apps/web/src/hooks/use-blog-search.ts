@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+
 import type { Blog } from "@/types";
 import { useDebounce } from "./use-debounce";
 
@@ -10,8 +11,6 @@ async function searchBlog(query: string, signal: AbortSignal) {
   if (!query.trim()) {
     return [];
   }
-
-
 
   const response = await fetch(
     `/api/blog/search?q=${encodeURIComponent(query)}`,

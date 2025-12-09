@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+
 import { BlogHeader } from "@/components/blog-card";
 import { BlogPageContent } from "@/components/blog-page-content";
 import { PageBuilder } from "@/components/pagebuilder";
