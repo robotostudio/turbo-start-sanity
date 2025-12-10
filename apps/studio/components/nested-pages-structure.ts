@@ -4,6 +4,7 @@ import { friendlyWords } from "friendlier-words";
 import { getPublishedId } from "sanity";
 import type { ListItemBuilder, StructureBuilder } from "sanity/structure";
 
+import { API_VERSION } from "@/utils/constant";
 import { getTitleCase } from "@/utils/helper";
 
 // Types for better type safety
@@ -359,7 +360,7 @@ export const createSlugBasedStructure = (
     .child(async () => {
       try {
         // 1. Get client from context with error handling
-        const client = S.context.getClient({ apiVersion: "2023-06-21" });
+        const client = S.context.getClient({ apiVersion: API_VERSION });
         if (!client) {
           throw new Error("Unable to get Sanity client");
         }
