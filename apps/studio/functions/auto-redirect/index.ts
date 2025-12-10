@@ -2,13 +2,15 @@ import { createClient } from "@sanity/client";
 import { documentEventHandler } from "@sanity/functions";
 import { Logger } from "@workspace/logger";
 
+import { API_VERSION } from "@/utils/constant";
+
 const logger = new Logger("AutoRedirect");
 
 export const handler = documentEventHandler(async ({ context, event }) => {
   const client = createClient({
     ...context.clientOptions,
     useCdn: false,
-    apiVersion: "2025-05-08",
+    apiVersion: API_VERSION,
   });
 
   const { beforeSlug, slug } = event.data;
