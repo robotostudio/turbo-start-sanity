@@ -3,7 +3,7 @@ packages:
   - packages/*
 
 catalog:
-  "@sanity/client": ^7.13.1
+  "@sanity/client": ^7.13.2
   "@types/node": ^24.10.2
   "@types/react": ^19.2.7
   "@types/react-dom": ^19.2.3
