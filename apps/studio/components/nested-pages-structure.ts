@@ -363,7 +363,7 @@ export const createSlugBasedStructure = (
           throw new Error("Unable to get Sanity client");
         }
         // 2. Fetch and process documents
-        const documents = await fetchDocuments(client, schemaType);
+        const documents = await fetchDocuments(client as unknown as SanityClient, schemaType);
         const uniqueDocuments = deduplicateDocuments(documents);
 
         // 3. Build folder structure
