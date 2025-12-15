@@ -45,9 +45,9 @@ export default defineCliConfig({
     dataset,
   },
   deployment: {
-    appId: process.env.SANITY_STUDIO_APP_ID || "q9jl15fnjj9omdtj9xi2956a"
+    appId: process.env.SANITY_STUDIO_APP_ID || "",
+    autoUpdates: true,
   },
   studioHost: getStudioHost(),
 
-  autoUpdates: true,
 });

@@ -68,17 +68,17 @@ export const structure = (
       }),
       S.divider(),
       createSlugBasedStructure(S, "page"),
-      createSlugBasedStructure(S, "exhibition"),
+      createSlugBasedStructure(S, "collection"),
       // createIndexListWithOrderableItems({
       //   S,
       //   index: {
-      //     type: "exhibitionIndex",
-      //     icon: getStructureIcon("exhibitionIndex"),
+      //     type: "collectionIndex",
+      //     icon: getStructureIcon("collectionIndex"),
       //   },
       //   list: {
-      //     type: "exhibition",
-      //     title: "Exhibitions",
-      //     icon: getStructureIcon("exhibition"),
+      //     type: "collection",
+      //     title: "collections",
+      //     icon: getStructureIcon("collection"),
       //   },
       //   context,
       // }),

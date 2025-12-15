@@ -5,34 +5,34 @@ import { ogFields } from "../../utils/og-fields";
 import { seoFields } from "../../utils/seo-fields";
 import { documentSlugField, pageBuilderField } from "../common";
 
-export const exhibitionIndex = defineType({
-  name: "exhibitionIndex",
+export const collectionIndex = defineType({
+  name: "collectionIndex",
   type: "document",
-  title: "Exhibition Listing Page",
+  title: "collection Listing Page",
   groups: GROUPS,
   fields: [
     defineField({
       name: "title",
       type: "string",
       description:
-        "The main heading that will appear at the top of your exhibitions listing page",
+        "The main heading that will appear at the top of your collections listing page",
       group: GROUP.MAIN_CONTENT,
     }),
     defineField({
       name: "description",
       type: "text",
       description:
-        "A short summary of what visitors can find in your exhibitions. This helps people understand what your exhibitions are about.",
+        "A short summary of what visitors can find in your collections. This helps people understand what your collections are about.",
       group: GROUP.MAIN_CONTENT,
     }),
-    documentSlugField("exhibitionIndex", {
+    documentSlugField("collectionIndex", {
       group: GROUP.MAIN_CONTENT,
-      prefix: "exhibitions",
+      prefix: "collections",
     }),
     defineField({
       group: GROUP.MAIN_CONTENT,
-      name: 'listExhibitions',
-      title: 'List all exhibitions on this page?',
+      name: 'listcollections',
+      title: 'List all collections on this page?',
       type: 'boolean',
       initialValue: true,
     }),
@@ -50,7 +50,7 @@ export const exhibitionIndex = defineType({
     },
     prepare: ({ title, description, slug }) => ({
       title: title || "[No Title]",
-      subtitle: description || slug || "Exhibitions Index",
+      subtitle: description || slug || "collections Index",
     }),
   },
 });

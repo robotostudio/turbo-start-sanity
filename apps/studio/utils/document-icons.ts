@@ -33,14 +33,14 @@ export const DOCUMENT_ICONS: Record<
 > = {
   // Document types
   author: UserIcon,
-  exhibition: ImagesIcon,
+  collection: ImagesIcon,
   faq: schemaIcon(MessageCircle),
   page: DocumentIcon,
   redirect: schemaIcon(TrendingUpDown),
 
   // Singleton types
   homePage: HomeIcon, // From @sanity/icons
-  exhibitionIndex: ListIcon,
+  collectionIndex: ListIcon,
   settings: CogIcon, // From lucide-react (matches schema)
   navbar: PanelTop, // From lucide-react (matches schema)
   footer: PanelBottom, // From lucide-react (matches preview in schema)

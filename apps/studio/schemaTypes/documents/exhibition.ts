@@ -8,11 +8,11 @@ import {createDocumentPreview, documentSlugField} from "../common";
 import {imageWithCaption} from "../definitions/image-with-caption";
 import { limitedRichText } from '../definitions/rich-text';
 
-export const exhibition = defineType({
-  name: "exhibition",
-  title: "Exhibition",
+export const collection = defineType({
+  name: "collection",
+  title: "collection",
   type: "document",
-  icon: getDocumentIcon("exhibition"),
+  icon: getDocumentIcon("collection"),
   groups: GROUPS,
   orderings: [
     {
@@ -44,7 +44,7 @@ export const exhibition = defineType({
     },
   ],
   fields: [
-    orderRankField({type: "exhibition"}),
+    orderRankField({type: "collection"}),
     defineField({
       name: "title",
       type: "string",
@@ -75,16 +75,16 @@ export const exhibition = defineType({
           ),
       ],
     }),
-    documentSlugField("exhibition", {
+    documentSlugField("collection", {
       group: GROUP.MAIN_CONTENT,
-      prefix: "exhibitions",
+      prefix: "collections",
     }),
     defineField({
       name: "image",
       type: "image",
       title: "Image",
       description:
-        "A main picture for this exhibition that can be used when sharing on social media or in search results",
+        "A main picture for this collection that can be used when sharing on social media or in search results",
       group: GROUP.MAIN_CONTENT,
       options: {
         hotspot: true,
@@ -95,7 +95,7 @@ export const exhibition = defineType({
       name: "startDate",
       type: "date",
       title: "Start Date",
-      description: "The starting date of the exhibition",
+      description: "The starting date of the collection",
       group: GROUP.MAIN_CONTENT,
     }),
     defineField({
@@ -103,14 +103,14 @@ export const exhibition = defineType({
       name: "endDate",
       type: "date",
       title: "End Date",
-      description: "The ending date of the exhibition",
+      description: "The ending date of the collection",
       group: GROUP.MAIN_CONTENT,
     }),
     defineField({
       group: GROUP.MAIN_CONTENT,
       name: "gallery",
       title: "Gallery",
-      description: "Leave this blank if the exhibition is in both galleries",
+      description: "Leave this blank if the collection is in both galleries",
       type: "string",
       options: {
         layout: "radio",
@@ -137,7 +137,7 @@ export const exhibition = defineType({
       name: "pressRelease",
       title: "Press Release",
       description:
-        "The press release for this exhibition. If provided, it will replace the body content on the exhibition page.",
+        "The press release for this collection. If provided, it will replace the body content on the collection page.",
       group: GROUP.MAIN_CONTENT,
     }),
     defineField({

@@ -147,37 +147,37 @@ const DOCUMENT_TYPE_CONFIGS: Record<string, SlugValidationOptions> = {
       },
     ],
   },
-  exhibition: {
-    documentType: "Exhibition",
-    sanityDocumentType: "exhibition",
-    requiredPrefix: "/exhibitions/",
+  collection: {
+    documentType: "collection",
+    sanityDocumentType: "collection",
+    requiredPrefix: "/collections/",
     requireSlash: true,
     segmentCount: 2,
     forbiddenPatterns: [FORBIDDEN_ADMIN_PATTERN, FORBIDDEN_API_PATTERN],
     customValidators: [
       (slug: string) => {
         const errors: string[] = [];
-        if (slug === "/exhibitions") {
-          errors.push("Exhibition URLs must include a unique slug after /exhibitions/");
+        if (slug === "/collections") {
+          errors.push("collection URLs must include a unique slug after /collections/");
         }
         const segments = slug.split("/").filter(Boolean);
         if (segments.length === 2 && segments[1].length < MIN_SLUG_LENGTH) {
-          errors.push("Exhibition slug must be at least 3 characters");
+          errors.push("collection slug must be at least 3 characters");
         }
         return errors;
       },
     ],
   },
-  exhibitionIndex: {
-    documentType: "Exhibition Index",
-    sanityDocumentType: "exhibitionIndex",
-    requiredPrefix: "/exhibitions",
+  collectionIndex: {
+    documentType: "collection Index",
+    sanityDocumentType: "collectionIndex",
+    requiredPrefix: "/collections",
     requireSlash: true,
     segmentCount: 1,
     customValidators: [
       (slug: string) => {
-        if (slug !== "/exhibitions") {
-          return ["Exhibition index must be exactly '/exhibitions'"];
+        if (slug !== "/collections") {
+          return ["collection index must be exactly '/collections'"];
         }
         return [];
       },

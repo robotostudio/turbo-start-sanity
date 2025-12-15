@@ -235,8 +235,8 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
         return;
       }
 
-      if (documentType === "exhibitionIndex") {
-        handleChange("/exhibitions");
+      if (documentType === "collectionIndex") {
+        handleChange("/collections");
         return;
       }
 
