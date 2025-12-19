@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     const redirects = await client.fetch(queryRedirects);
-    return redirects.map((redirect) => ({
+    return redirects.map((redirect: any) => ({
       ...redirect,
       permanent: redirect.permanent ?? false,
     }));

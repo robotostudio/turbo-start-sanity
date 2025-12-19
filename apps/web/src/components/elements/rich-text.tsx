@@ -1,4 +1,3 @@
-import { Logger } from "@workspace/logger";
 import { cn } from "@workspace/ui/lib/utils";
 import Link from "next/link";
 import {
@@ -12,8 +11,6 @@ import type { SanityRichTextProps } from "@/types";
 import { parseChildrenToSlug } from "@/utils";
 import { ImageGallery } from "../sections/image-gallery";
 import { SanityImage } from "./sanity-image";
-
-const logger = new Logger("RichText");
 
 const components: Partial<PortableTextReactComponents> = {
   block: {

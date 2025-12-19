@@ -1,18 +1,17 @@
 "use client";
 
-import { Button } from "@workspace/ui/components/button";
-import { cn } from "@workspace/ui/lib/utils";
-import { ChevronDown, Menu, X } from "lucide-react";
+import {Button} from "@workspace/ui/components/button";
+import {cn} from "@workspace/ui/lib/utils";
+import {ChevronDown, Menu, X} from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import {useCallback, useEffect, useState} from "react";
 
 import type {
   QueryGlobalSeoSettingsResult,
   QueryNavbarDataResult,
 } from "@/lib/sanity/sanity.types";
-import { LucideIcon } from "./elements/lucide-icon";
-import { SanityIcon } from "./elements/sanity-icon";
-import { Logo } from "./logo";
+import {LucideIcon} from "./elements/lucide-icon";
+import {Logo} from "./logo";
 
 // Type helpers using utility types
 type NavigationData = {
@@ -24,10 +23,11 @@ type NavColumn = NonNullable<
   NonNullable<QueryNavbarDataResult>["columns"]
 >[number];
 
-type ColumnLink =
-  Extract<NavColumn, { type: "column" }>["links"] extends Array<infer T>
-    ? T
-    : never;
+type ColumnLink = Extract<NavColumn, {type: "column"}>["links"] extends Array<
+  infer T
+>
+  ? T
+  : never;
 
 type MenuLinkProps = {
   name: string;
@@ -43,19 +43,13 @@ type MenuLinkProps = {
   onClick?: () => void;
 };
 
-function MenuLink({ name, href, description, icon, onClick }: MenuLinkProps) {
+function MenuLink({name, href, description, onClick}: MenuLinkProps) {
   return (
     <Link
       className="group flex items-start gap-3 transition-colors hover:bg-accent"
       href={href || "#"}
       onClick={onClick}
     >
-      {icon && (
-        <SanityIcon
-          className="mt-0.5 size-4 shrink-0 text-muted-foreground"
-          icon={icon}
-        />
-      )}
       <div className="grid gap-1">
         <div className="font-medium leading-none group-hover:text-accent-foreground">
           {name}
@@ -74,7 +68,7 @@ function ColumnDropdown({
   column,
   onLinkClick,
 }: {
-  column: Extract<NavColumn, { type: "column" }>;
+  column: Extract<NavColumn, {type: "column"}>;
   onLinkClick?: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -141,7 +135,7 @@ function ColumnLink({
   column,
   onLinkClick,
 }: {
-  column: Extract<NavColumn, { type: "link" }>;
+  column: Extract<NavColumn, {type: "link"}>;
   onLinkClick?: () => void;
 }) {
   return (
@@ -155,10 +149,10 @@ function ColumnLink({
   );
 }
 
-export function Navbar({ navbarData, settingsData }: NavigationData) {
+export function Navbar({navbarData, settingsData}: NavigationData) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { columns } = navbarData || {};
-  const { logo, siteTitle } = settingsData || {};
+  const {columns} = navbarData || {};
+  const {logo, siteTitle} = settingsData || {};
 
   const closeMobileMenu = useCallback(() => {
     setIsMobileMenuOpen(false);
@@ -188,7 +182,7 @@ export function Navbar({ navbarData, settingsData }: NavigationData) {
       <div className="container mx-auto px-4">
         <div className="flex h-16 max-w-prose items-center justify-between">
           {/* Logo */}
-          <div className="flex h-[40px] w-[120px] items-center">
+          <div className="flex h-10 w-[120px] items-center">
             {logo ? (
               <Logo
                 alt={siteTitle || ""}

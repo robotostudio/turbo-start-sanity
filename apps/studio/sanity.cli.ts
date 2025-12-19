@@ -1,5 +1,5 @@
-import { Logger } from "@workspace/logger";
-import { defineCliConfig } from "sanity/cli";
+import {Logger} from "@workspace/logger";
+import {defineCliConfig} from "sanity/cli";
 import tsconfigPaths from "vite-plugin-tsconfig-paths";
 
 const logger = new Logger("SanityCLI");
@@ -59,5 +59,11 @@ export default defineCliConfig({
   },
   vite: {
     plugins: [tsconfigPaths()],
+  },
+  typegen: {
+    generates: "../web/src/lib/sanity/sanity.types.ts",
+    path: "../web/src/**/*.{ts,tsx,js,jsx}",
+    schema: "schema.json",
+    overloadClientMethods: true,
   },
 });
