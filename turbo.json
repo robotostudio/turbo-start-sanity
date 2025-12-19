@@ -32,12 +32,7 @@
       "dependsOn": ["^type"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["schema.json", "sanity.types.ts"],
-      "env": [
-        "SANITY_STUDIO_PROJECT_ID",
-        "SANITY_STUDIO_DATASET"
-      ],
-    "//#check-biome": {
-      "cache": false
+      "env": ["SANITY_STUDIO_PROJECT_ID", "SANITY_STUDIO_DATASET"]
     },
     "dev": {
       "cache": false,
