@@ -1,4 +1,4 @@
-import {ImageIcon, LinkedinIcon, LinkIcon} from "@sanity/icons";
+import {ImageIcon, LinkIcon} from "@sanity/icons";
 import {
   type ConditionalProperty,
   defineArrayMember,
@@ -8,7 +8,6 @@ import {
 } from "sanity";
 
 import {PortableTextEditorInput} from "../../components/portable-text-editor-input";
-import {schemaIcon} from "../../utils/icon-wrapper";
 
 const limitedRichTextMembers = [
   defineArrayMember({

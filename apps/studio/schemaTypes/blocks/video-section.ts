@@ -2,13 +2,13 @@ import { Video } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
 import { createRadioListLayout } from "../../utils/helper";
-import { schemaIcon } from '../../utils/icon-wrapper';
+import { iconWrapper } from '../../utils/icon-wrapper';
 
 export const videoSection = defineType({
   name: "videoSection",
   title: "Video Section",
   type: "object",
-  icon: schemaIcon(Video),
+  icon: iconWrapper(Video),
   fields: [
     defineField({
       name: "video",

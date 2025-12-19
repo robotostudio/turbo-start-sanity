@@ -16,14 +16,15 @@ import {
   TrendingUpDown,
 } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
-import { schemaIcon } from "./icon-wrapper";
+
+import { iconWrapper } from "./icon-wrapper";
 
 /**
  * Document type icons configuration.
  * Maps document type names to their corresponding icon components.
  * Icons can be from @sanity/icons or lucide-react.
  *
- * For lucide-react icons used in schemas, use schemaIcon() wrapper.
+ * For lucide-react icons used in schemas, use iconWrapper() wrapper.
  * For @sanity/icons, use directly.
  * For structure.ts, use LucideIcon type directly.
  */
@@ -34,9 +35,9 @@ export const DOCUMENT_ICONS: Record<
   // Document types
   author: UserIcon,
   collection: ImagesIcon,
-  faq: schemaIcon(MessageCircle),
+  faq: iconWrapper(MessageCircle),
   page: DocumentIcon,
-  redirect: schemaIcon(TrendingUpDown),
+  redirect: iconWrapper(TrendingUpDown),
 
   // Singleton types
   homePage: HomeIcon, // From @sanity/icons

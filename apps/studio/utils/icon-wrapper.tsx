@@ -105,7 +105,7 @@ export function withLucideIconSize(
  * icon: schemaIcon(FileText, 18)
  * ```
  */
-export function schemaIcon(
+export function iconWrapper(
   Icon: ComponentType<SVGProps<SVGSVGElement>>,
   size: IconSize = "md"
   // thinner lines

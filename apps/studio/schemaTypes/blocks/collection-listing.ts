@@ -1,13 +1,14 @@
 import { FolderIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
+
 import { createRadioListLayout } from "../../utils/helper";
-import { schemaIcon } from "../../utils/icon-wrapper";
+import { iconWrapper } from "../../utils/icon-wrapper";
 
 export const collectionListing = defineType({
   name: "collectionListing",
   title: "Collection Listing",
   type: "object",
-  icon: schemaIcon(FolderIcon),
+  icon: iconWrapper(FolderIcon),
   description:
     "Display a grid of collection documents ordered by their rank. Collections will be automatically fetched and displayed in a responsive grid layout.",
   fields: [
@@ -50,4 +51,3 @@ export const collectionListing = defineType({
     },
   },
 });
-

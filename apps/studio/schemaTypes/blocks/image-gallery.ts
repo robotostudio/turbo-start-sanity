@@ -1,14 +1,15 @@
 import { ImagesIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
+
 import { createRadioListLayout } from "../../utils/helper";
-import { schemaIcon } from "../../utils/icon-wrapper";
+import { iconWrapper } from "../../utils/icon-wrapper";
 import { imageWithCaption } from "../definitions/image-with-caption";
 
 export const imageGallery = defineType({
   name: "imageGallery",
   title: "Image Gallery",
   type: "object",
-  icon: schemaIcon(ImagesIcon),
+  icon: iconWrapper(ImagesIcon),
   fields: [
     defineField({
       name: "images",

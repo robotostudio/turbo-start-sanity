@@ -2,13 +2,13 @@ import { LayoutGridIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
 import { createRadioListLayout } from "../../utils/helper";
-import { schemaIcon } from "../../utils/icon-wrapper";
+import { iconWrapper } from "../../utils/icon-wrapper";
 
 export const gridLayout = defineType({
   name: "gridLayout",
   title: "Grid Layout",
   type: "object",
-  icon: schemaIcon(LayoutGridIcon),
+  icon: iconWrapper(LayoutGridIcon),
   fields: [
     defineField({
       name: "pageBuilder",
