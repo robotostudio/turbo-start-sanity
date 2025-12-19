@@ -2,7 +2,7 @@ import { LayoutPanelLeft, Link } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
 import { getDocumentIcon } from "../../utils/document-icons";
-import { buttonsField, iconField } from "../common";
+import { buttonsField} from "../common";
 
 const navbarLink = defineField({
   name: "navbarLink",
@@ -54,7 +54,6 @@ const navbarColumnLink = defineField({
   title: "Navigation Column Link",
   description: "A link within a navigation column",
   fields: [
-    iconField,
     defineField({
       name: "name",
       type: "string",
@@ -92,7 +91,7 @@ const navbarColumnLink = defineField({
       return {
         title: title || "Untitled Link",
         subtitle: `${urlType === "external" ? "External" : "Internal"} • ${truncatedUrl}${newTabIndicator}`,
-        media: lucideIconPreview(icon),
+        media: icon,
       };
     },
   },
