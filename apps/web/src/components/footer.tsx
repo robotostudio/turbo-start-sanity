@@ -6,7 +6,6 @@ import type {
   QueryFooterDataResult,
   QueryGlobalSeoSettingsResult,
 } from "@/lib/sanity/sanity.types";
-
 import { Logo } from "./logo";
 import {
   FacebookIcon,

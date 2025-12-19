@@ -1,4 +1,4 @@
-"use client";
+import { Logger } from "@workspace/logger";
 import { cn } from "@workspace/ui/lib/utils";
 import Link from "next/link";
 import {
@@ -8,10 +8,12 @@ import {
   stegaClean,
 } from "next-sanity";
 
+import type { SanityRichTextProps } from "@/types";
 import { parseChildrenToSlug } from "@/utils";
-
 import { ImageGallery } from "../sections/image-gallery";
 import { SanityImage } from "./sanity-image";
+
+const logger = new Logger("RichText");
 
 const components: Partial<PortableTextReactComponents> = {
   block: {
@@ -195,7 +197,7 @@ const components: Partial<PortableTextReactComponents> = {
   hardBreak: () => <br />,
 };
 
-export function RichText<T>({
+export function RichText<T extends SanityRichTextProps>({
   richText,
   className,
 }: {
@@ -223,7 +225,7 @@ export function RichText<T>({
           }
           return null;
         }}
-        value={richText as unknown as PortableTextBlock[]}
+        value={richText}
       />
     </div>
   );

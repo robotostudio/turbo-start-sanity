@@ -1,6 +1,36 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["ultracite"],
+  "files": {
+    "ignoreUnknown": true,
+    "maxSize": 20971520,
+    "includes": [
+      "apps/*/src/**",
+      "apps/*/components/**",
+      "apps/*/schemaTypes/**",
+      "apps/*/plugins/**",
+      "apps/*/hooks/**",
+      "apps/*/utils/**",
+      "apps/*/functions/**",
+      "apps/*/*.ts",
+      "apps/*/*.tsx",
+      "apps/*/*.mjs",
+      "packages/*/src/**",
+      "*.ts",
+      "*.tsx",
+      "*.js",
+      "*.mjs",
+      "*.json",
+      "*.jsonc"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 80
+  },
   "linter": {
     "rules": {
       "suspicious": {
@@ -15,12 +45,87 @@
         "noNamespaceImport": "off"
       },
       "correctness": {
-        "noInvalidPositionAtImportRule": "off"
+        "noInvalidPositionAtImportRule": "off",
+        "useExhaustiveDependencies": "warn"
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": "warn"
       }
     }
   },
-  // ignore templates directory
-  "files": {
-    "experimentalScannerIgnores": ["templates/**"]
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "jsxQuoteStyle": "double",
+      "semicolons": "always",
+      "trailingCommas": "es5"
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": true
+    }
+  },
+  "css": {
+    "parser": {
+      "cssModules": true,
+      "allowWrongLineComments": true,
+      "tailwindDirectives": true
+    },
+    "formatter": {
+      "enabled": true
+    },
+    "linter": {
+      "enabled": true
+    }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "**/.turbo/**",
+        "**/.next/**",
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/.sanity/**"
+      ],
+      "linter": {
+        "enabled": false
+      },
+      "formatter": {
+        "enabled": false
+      }
+    },
+    {
+      "includes": [
+        "**/scripts/**/*.ts",
+        "**/scripts/**/*.js",
+        "packages/logger/**/*.ts"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    }
+  ],
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              [":URL:", ":PACKAGE_WITH_PROTOCOL:", ":NODE:"],
+              [":PACKAGE:"],
+              ":BLANK_LINE:",
+              [":ALIAS:", ":PATH:"]
+            ]
+          }
+        }
+      }
+    }
   }
 }

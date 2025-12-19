@@ -10,7 +10,6 @@ import type {
   QueryGlobalSeoSettingsResult,
   QueryNavbarDataResult,
 } from "@/lib/sanity/sanity.types";
-
 import { LucideIcon } from "./elements/lucide-icon";
 import { SanityIcon } from "./elements/sanity-icon";
 import { Logo } from "./logo";
@@ -25,11 +24,10 @@ type NavColumn = NonNullable<
   NonNullable<QueryNavbarDataResult>["columns"]
 >[number];
 
-type ColumnLink = Extract<NavColumn, { type: "column" }>["links"] extends Array<
-  infer T
->
-  ? T
-  : never;
+type ColumnLink =
+  Extract<NavColumn, { type: "column" }>["links"] extends Array<infer T>
+    ? T
+    : never;
 
 type MenuLinkProps = {
   name: string;
@@ -273,14 +271,10 @@ export function Navbar({ navbarData, settingsData }: NavigationData) {
           <nav className="hidden items-center justify-between gap-16 md:flex">
             {columns?.map((column) => {
               if (column.type === "column") {
-                return (
-                  <ColumnDropdown column={column} key={column._key} />
-                );
+                return <ColumnDropdown column={column} key={column._key} />;
               }
               if (column.type === "link") {
-                return (
-                  <ColumnLink column={column} key={column._key} />
-                );
+                return <ColumnLink column={column} key={column._key} />;
               }
               return null;
             })}

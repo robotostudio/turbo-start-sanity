@@ -1,8 +1,13 @@
 import { defineField, defineType } from "sanity";
 
+<<<<<<< HEAD
 import { getDocumentIcon } from "../../utils/document-icons";
 import { parseRichTextToString } from "../../utils/helper";
 import { customRichText } from "../definitions/rich-text";
+=======
+import { customRichText } from "@/schemaTypes/definitions/rich-text";
+import { parseRichTextToString } from "@/utils/helper";
+>>>>>>> upstream/main
 
 export const faq = defineType({
   name: "faq",

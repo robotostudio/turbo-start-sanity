@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { Maybe, SanityImageProps } from "@/types";
-
 import { SanityImage } from "./elements/sanity-image";
 
 const LOGO_URL =

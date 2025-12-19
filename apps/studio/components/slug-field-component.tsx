@@ -1,7 +1,7 @@
-import {CopyIcon} from "@sanity/icons";
-import {Box, Button, Flex, Stack, Text, TextInput} from "@sanity/ui";
-import type {ChangeEvent} from "react";
-import {useCallback, useMemo} from "react";
+import { CopyIcon } from "@sanity/icons";
+import { Box, Button, Flex, Stack, Text, TextInput } from "@sanity/ui";
+import type { ChangeEvent } from "react";
+import { useCallback, useMemo } from "react";
 import {
   type ObjectFieldProps,
   type SanityDocument,
@@ -10,10 +10,11 @@ import {
   unset,
   useFormValue,
 } from "sanity";
-import {styled} from "styled-components";
-import {useSlugValidation} from "../hooks/use-slug-validation";
-import {generateSlugFromTitle} from "../utils/slug-validation";
-import {ErrorStates} from "./url-slug/error-states";
+import { styled } from "styled-components";
+
+import { useSlugValidation } from "../hooks/use-slug-validation";
+import { generateSlugFromTitle } from "../utils/slug-validation";
+import { ErrorStates } from "./url-slug/error-states";
 
 const presentationOriginUrl = process.env.SANITY_STUDIO_PRESENTATION_URL;
 
@@ -67,7 +68,7 @@ type FieldHeaderProps = {
 };
 
 // Focused sub-components
-function FieldHeader({title, description}: FieldHeaderProps) {
+function FieldHeader({ title, description }: FieldHeaderProps) {
   if (!(title || description)) {
     return null;
   }
@@ -111,7 +112,7 @@ function SlugInputField({
   );
 }
 
-function SlugGenerateButton({onGenerate, disabled}: GenerateButtonProps) {
+function SlugGenerateButton({ onGenerate, disabled }: GenerateButtonProps) {
   return (
     <GenerateButton
       disabled={disabled}
@@ -124,14 +125,14 @@ function SlugGenerateButton({onGenerate, disabled}: GenerateButtonProps) {
   );
 }
 
-function UrlPreviewSection({url, onCopy}: UrlPreviewProps) {
+function UrlPreviewSection({ url, onCopy }: UrlPreviewProps) {
   return (
     <Stack space={2}>
       <Text size={1} weight="medium">
         Preview
       </Text>
       <Flex align="center" gap={2}>
-        <UrlPreview style={{flex: 1}}>
+        <UrlPreview style={{ flex: 1 }}>
           <Flex align="center" gap={2}>
             <span>{url}</span>
           </Flex>
@@ -159,19 +160,19 @@ function HelpText() {
 
 export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
   const {
-    inputProps: {onChange, value, readOnly},
+    inputProps: { onChange, value, readOnly },
     title,
     description,
   } = props;
 
-  const {prefix} = props.schemaType.options;
+  const { prefix } = props.schemaType.options;
 
   // Get document context for title and path generation
   const document = useFormValue([]) as SanityDocument;
   const currentSlug = value?.current || "";
 
   // Use centralized validation hook with document type for unified config
-  const {allErrors, allWarnings} = useSlugValidation({
+  const { allErrors, allWarnings } = useSlugValidation({
     slug: currentSlug,
     documentType: document?._type,
     includeSanityValidation: true,
@@ -241,10 +242,7 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
       }
 
       // Use unified slug generation with document type config
-      const generatedSlug = generateSlugFromTitle(
-        documentTitle,
-        prefix,
-      );
+      const generatedSlug = generateSlugFromTitle(documentTitle, prefix);
 
       if (generatedSlug) {
         handleChange(generatedSlug);

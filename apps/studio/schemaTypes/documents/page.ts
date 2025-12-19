@@ -1,14 +1,17 @@
 import { defineField, defineType } from "sanity";
 
-import { GROUP, GROUPS } from "../../utils/constant";
-import { getDocumentIcon } from "../../utils/document-icons";
-import { ogFields } from "../../utils/og-fields";
-import { seoFields } from "../../utils/seo-fields";
 import {
   createDocumentPreview,
   documentSlugField,
   pageBuilderField,
-} from "../common";
+} from "@/schemaTypes/common";
+import { GROUP, GROUPS } from "@/utils/constant";
+import { ogFields } from "@/utils/og-fields";
+import { seoFields } from "@/utils/seo-fields";
+import { GROUP, GROUPS } from "../../utils/constant";
+import { getDocumentIcon } from "../../utils/document-icons";
+import { ogFields } from "../../utils/og-fields";
+import { seoFields } from "../../utils/seo-fields";
 
 export const page = defineType({
   name: "page",

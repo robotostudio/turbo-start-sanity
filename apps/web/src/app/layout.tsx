@@ -4,7 +4,8 @@ import { cn } from "@workspace/ui/lib/utils";
 import { draftMode } from "next/headers";
 import { VisualEditing } from "next-sanity/visual-editing";
 import { Suspense } from "react";
-import { preconnect } from "react-dom";
+import { preconnect, prefetchDNS } from "react-dom";
+
 import { FooterServer, FooterSkeleton } from "@/components/footer";
 import { CombinedJsonLd } from "@/components/json-ld";
 import { Navbar } from "@/components/navbar";
@@ -24,6 +25,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   preconnect("https://cdn.sanity.io");
+  prefetchDNS("https://cdn.sanity.io");
   const nav = await getNavigationData();
   return (
     <html lang="en" suppressHydrationWarning>

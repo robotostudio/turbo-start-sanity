@@ -1,6 +1,6 @@
 import { defineField } from "sanity";
 
-import { GROUP } from "./constant";
+import { GROUP } from "@/utils/constant";
 
 export const ogFields = [
   defineField({

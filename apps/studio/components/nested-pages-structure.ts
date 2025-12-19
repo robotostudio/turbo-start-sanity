@@ -3,7 +3,8 @@ import { DocumentIcon, FolderIcon } from "@sanity/icons";
 import { friendlyWords } from "friendlier-words";
 import { getPublishedId } from "sanity";
 import type { ListItemBuilder, StructureBuilder } from "sanity/structure";
-import { getTitleCase } from "../utils/helper";
+
+import { getTitleCase } from "@/utils/helper";
 
 // Types for better type safety
 type DocumentData = {

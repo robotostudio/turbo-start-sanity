@@ -6,6 +6,7 @@ import type {
   StructureBuilder,
   StructureResolverContext,
 } from "sanity/structure";
+
 import { createSlugBasedStructure } from "./components/nested-pages-structure";
 import type { SchemaType, SingletonType } from "./schemaTypes";
 import { getStructureIcon } from "./utils/document-icons";
@@ -55,9 +56,7 @@ type CreateIndexList = {
   context: StructureResolverContext;
 };
 
-
-export const structure = (
-  S: StructureBuilder) =>
+export const structure = (S: StructureBuilder) =>
   S.list()
     .title("Content")
     .items([

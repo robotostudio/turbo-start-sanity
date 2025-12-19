@@ -13,38 +13,149 @@
  */
 
 // Source: schema.json
-export type CollectionListing = {
-  _type: "collectionListing";
-  columnVariant?: "auto" | "two" | "three" | "four";
+export type SubscribeNewsletter = {
+  _type: "subscribeNewsletter";
+  title?: string;
+  subTitle?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "h5" | "h6" | "inline";
+    listItem?: "number" | "bullet";
+    markDefs?: Array<{
+      customLink?: CustomUrl;
+      _type: "customLink";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  helperText?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "h5" | "h6" | "inline";
+    listItem?: "number" | "bullet";
+    markDefs?: Array<{
+      customLink?: CustomUrl;
+      _type: "customLink";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
 };
 
-export type TextSection = {
-  _type: "textSection";
-  richText?: RichText;
-  columnVariant?: "single" | "two" | "three";
-};
-
-export type ImageGallery = {
-  _type: "imageGallery";
-  images?: Array<{
-    asset?: {
-      _ref: string;
-      _type: "reference";
-      _weak?: boolean;
-      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+export type ImageLinkCards = {
+  _type: "imageLinkCards";
+  eyebrow?: string;
+  title: string;
+  richText?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "h5" | "h6" | "inline";
+    listItem?: "number" | "bullet";
+    markDefs?: Array<{
+      customLink?: CustomUrl;
+      _type: "customLink";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  buttons?: Array<
+    {
+      _key: string;
+    } & Button
+  >;
+  cards?: Array<{
+    title: string;
+    description: string;
+    image?: {
+      asset?: {
+        _ref: string;
+        _type: "reference";
+        _weak?: boolean;
+        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+      };
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      alt?: string;
+      _type: "image";
     };
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    caption?: Array<{
+    url?: CustomUrl;
+    _type: "imageLinkCard";
+    _key: string;
+  }>;
+};
+
+export type FaqAccordion = {
+  _type: "faqAccordion";
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  link?: {
+    title?: string;
+    description?: string;
+    url?: CustomUrl;
+  };
+  faqs: Array<{
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    _key: string;
+    [internalGroqTypeReferenceTo]?: "faq";
+  }>;
+};
+
+export type FeatureCardsIcon = {
+  _type: "featureCardsIcon";
+  eyebrow?: string;
+  title?: string;
+  richText?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3" | "h4" | "h5" | "h6" | "inline";
+    listItem?: "number" | "bullet";
+    markDefs?: Array<{
+      customLink?: CustomUrl;
+      _type: "customLink";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+  cards?: Array<{
+    icon?: IconPicker;
+    title?: string;
+    richText?: Array<{
       children?: Array<{
         marks?: Array<string>;
         text?: string;
         _type: "span";
         _key: string;
       }>;
-      style?: "normal";
-      listItem?: "bullet" | "number";
+      style?: "normal" | "h2" | "h3" | "h4" | "h5" | "h6" | "inline";
+      listItem?: "number" | "bullet";
       markDefs?: Array<{
         customLink?: CustomUrl;
         _type: "customLink";
@@ -54,17 +165,14 @@ export type ImageGallery = {
       _type: "block";
       _key: string;
     }>;
-    variant?: "fit-to-container" | "full-bleed" | "inset";
-    _type: "image";
+    _type: "featureCardIcon";
     _key: string;
   }>;
-  columnVariant?: "single" | "two" | "three";
 };
 
-export type VideoSection = {
-  _type: "videoSection";
-  video?: MuxVideo;
-  styleVariant?: "fullBleed" | "fitToContainer";
+export type Cta = {
+  _type: "cta";
+  eyebrow?: string;
   title?: string;
   description?: string;
 };
@@ -215,35 +323,35 @@ export type Navbar = {
   _updatedAt: string;
   _rev: string;
   label: string;
-  columns?: Array<{
-    title?: string;
-    links: Array<{
-      icon?: IconPicker;
-      name?: string;
-      description?: string;
-      url?: CustomUrl;
-      _type: "navbarColumnLink";
+  columns?: Array<
+    | {
+        title?: string;
+        links: Array<{
+          icon?: IconPicker;
+          name?: string;
+          description?: string;
+          url?: CustomUrl;
+          _type: "navbarColumnLink";
+          _key: string;
+        }>;
+        _type: "navbarColumn";
+        _key: string;
+      }
+    | {
+        name?: string;
+        url?: CustomUrl;
+        _type: "navbarLink";
+        _key: string;
+      }
+  >;
+  buttons?: Array<
+    {
       _key: string;
-    }>;
-    _type: "navbarColumn";
-    _key: string;
-  } | {
-    name?: string;
-    url?: CustomUrl;
-    _type: "navbarLink";
-    _key: string;
-  }>;
-  buttons?: Array<{
-    _key: string;
-  } & Button>;
+    } & Button
+  >;
 };
 
-export type IconPicker = {
-  _type: "iconPicker";
-  provider?: string;
-  name?: string;
-  svg?: string;
-};
+export type LucideIcon = string;
 
 export type Footer = {
   _id: string;
@@ -780,7 +888,52 @@ export type Geopoint = {
   alt?: number;
 };
 
-export type AllSanitySchemaTypes = CollectionListing | TextSection | ImageGallery | VideoSection | ImageSection | GridLayout | PageBuilder | Button | RichText | CustomUrl | Redirect | Slug | Navbar | IconPicker | Footer | Settings | SanityImageCrop | SanityImageHotspot | CollectionIndex | HomePage | Collection | Page | MuxVideo | SanityPreviewUrlSecret | SanityAssistInstructionTask | SanityAssistTaskStatus | SanityAssistSchemaTypeAnnotations | SanityAssistOutputType | SanityAssistOutputField | SanityAssistInstructionContext | AssistInstructionContext | SanityAssistInstructionUserInput | SanityAssistInstructionPrompt | SanityAssistInstructionFieldRef | SanityAssistInstruction | SanityAssistSchemaTypeField | MuxVideoAsset | MuxAssetData | MuxStaticRenditions | MuxStaticRenditionFile | MuxPlaybackId | MuxTrack | MediaTag | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageMetadata | SanityFileAsset | SanityAssetSourceData | SanityImageAsset | Geopoint;
+export type AllSanitySchemaTypes =
+  | SubscribeNewsletter
+  | ImageLinkCards
+  | FaqAccordion
+  | FeatureCardsIcon
+  | Cta
+  | Hero
+  | PageBuilder
+  | Button
+  | RichText
+  | CustomUrl
+  | Redirect
+  | Slug
+  | Navbar
+  | IconPicker
+  | Footer
+  | Settings
+  | SanityImageCrop
+  | SanityImageHotspot
+  | BlogIndex
+  | HomePage
+  | Author
+  | Faq
+  | Page
+  | Blog
+  | SanityAssistInstructionTask
+  | SanityAssistTaskStatus
+  | SanityAssistSchemaTypeAnnotations
+  | SanityAssistOutputType
+  | SanityAssistOutputField
+  | SanityAssistInstructionContext
+  | AssistInstructionContext
+  | SanityAssistInstructionUserInput
+  | SanityAssistInstructionPrompt
+  | SanityAssistInstructionFieldRef
+  | SanityAssistInstruction
+  | SanityAssistSchemaTypeField
+  | MediaTag
+  | SanityImagePaletteSwatch
+  | SanityImagePalette
+  | SanityImageDimensions
+  | SanityImageMetadata
+  | SanityFileAsset
+  | SanityAssetSourceData
+  | SanityImageAsset
+  | Geopoint;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ../web/src/lib/sanity/query.ts
 // Variable: queryImageType
@@ -1055,25 +1208,10 @@ export type QueryHomePageDataResult = {
           _type: "block";
           _key: string;
         }> | null;
-        variant: "default" | "fit-to-container" | "full-bleed" | "inset" | null;
-        _type: "image";
-        _key: string;
-        id: string | null;
-        preview: string | null;
-      } | {
-        _key: string;
-        _type: "imageGallery";
-        images: Array<{
-          asset?: {
-            _ref: string;
-            _type: "reference";
-            _weak?: boolean;
-            [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-          };
-          media?: unknown;
-          hotspot?: SanityImageHotspot;
-          crop?: SanityImageCrop;
-          caption: Array<{
+        cards: Array<{
+          icon?: IconPicker;
+          title?: string;
+          richText: Array<{
             children?: Array<{
               marks?: Array<string>;
               text?: string;
@@ -1637,25 +1775,10 @@ export type QuerySlugPageDataResult = {
           _type: "block";
           _key: string;
         }> | null;
-        variant: "default" | "fit-to-container" | "full-bleed" | "inset" | null;
-        _type: "image";
-        _key: string;
-        id: string | null;
-        preview: string | null;
-      } | {
-        _key: string;
-        _type: "imageGallery";
-        images: Array<{
-          asset?: {
-            _ref: string;
-            _type: "reference";
-            _weak?: boolean;
-            [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-          };
-          media?: unknown;
-          hotspot?: SanityImageHotspot;
-          crop?: SanityImageCrop;
-          caption: Array<{
+        cards: Array<{
+          icon?: IconPicker;
+          title?: string;
+          richText: Array<{
             children?: Array<{
               marks?: Array<string>;
               text?: string;
@@ -2200,249 +2323,80 @@ export type QuerySlugPageDataResult = {
             _type: "customLink";
             _key: string;
           }> | null;
+        }>;
+      }
+    | {
+        _key: string;
+        _type: "featureCardsIcon";
+        eyebrow?: string;
+        title?: string;
+        richText: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "h2" | "h3" | "h4" | "h5" | "h6" | "inline" | "normal";
+          listItem?: "bullet" | "number";
+          markDefs: Array<
+            | {
+                customLink?: CustomUrl;
+                _type: "customLink";
+                _key: string;
+                openInNewTab: boolean | null;
+                href: string | "#" | null;
+              }
+            | {
+                customLink?: CustomUrl;
+                _type: "customLink";
+                _key: string;
+              }
+          > | null;
           level?: number;
           _type: "block";
           _key: string;
         }> | null;
-        variant: "default" | "fit-to-container" | "full-bleed" | "inset" | null;
-        _type: "image";
-        _key: string;
-        id: string | null;
-        preview: string | null;
-      } | {
-        _key: string;
-        _type: "imageGallery";
-        images: Array<{
-          asset?: {
-            _ref: string;
-            _type: "reference";
-            _weak?: boolean;
-            [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-          };
-          media?: unknown;
-          hotspot?: SanityImageHotspot;
-          crop?: SanityImageCrop;
-          caption: Array<{
+        cards: Array<{
+          icon?: IconPicker;
+          title?: string;
+          richText: Array<{
             children?: Array<{
               marks?: Array<string>;
               text?: string;
               _type: "span";
               _key: string;
             }>;
-            style?: "normal";
+            style?: "h2" | "h3" | "h4" | "h5" | "h6" | "inline" | "normal";
             listItem?: "bullet" | "number";
-            markDefs: Array<{
-              customLink?: CustomUrl;
-              _type: "customLink";
-              _key: string;
-              openInNewTab: boolean | null;
-              href: string | "#" | null;
-            } | {
-              customLink?: CustomUrl;
-              _type: "customLink";
-              _key: string;
-            }> | null;
+            markDefs: Array<
+              | {
+                  customLink?: CustomUrl;
+                  _type: "customLink";
+                  _key: string;
+                  openInNewTab: boolean | null;
+                  href: string | "#" | null;
+                }
+              | {
+                  customLink?: CustomUrl;
+                  _type: "customLink";
+                  _key: string;
+                }
+            > | null;
             level?: number;
             _type: "block";
             _key: string;
           }> | null;
-          variant?: "fit-to-container" | "full-bleed" | "inset";
-          _type: "image";
-          _key: string;
-          image: {
-            id: string | null;
-            preview: string | null;
-            hotspot: {
-              x: number;
-              y: number;
-            } | null;
-            crop: {
-              bottom: number;
-              left: number;
-              right: number;
-              top: number;
-            } | null;
-          };
-        }> | null;
-        columnVariant?: "single" | "three" | "two";
-      }> | null;
-      columnVariant?: "single" | "three" | "two";
-    } | {
-      _key: string;
-      _type: "videoSection";
-      video: {
-        asset: {
-          playbackId: string | null;
-          status: string | null;
-        } | null;
-      } | null;
-      styleVariant?: "fitToContainer" | "fullBleed";
-      title?: string;
-      description?: string;
-    }> | null;
-    columnVariant?: "auto" | "single" | "three" | "two";
-  } | {
-    _key: string;
-    _type: "imageGallery";
-    images: Array<{
-      asset?: {
-        _ref: string;
-        _type: "reference";
-        _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-      };
-      media?: unknown;
-      hotspot?: SanityImageHotspot;
-      crop?: SanityImageCrop;
-      caption: Array<{
-        children?: Array<{
-          marks?: Array<string>;
-          text?: string;
-          _type: "span";
-          _key: string;
-        }>;
-        style?: "normal";
-        listItem?: "bullet" | "number";
-        markDefs: Array<{
-          customLink?: CustomUrl;
-          _type: "customLink";
-          _key: string;
-          openInNewTab: boolean | null;
-          href: string | "#" | null;
-        } | {
-          customLink?: CustomUrl;
-          _type: "customLink";
+          _type: "featureCardIcon";
           _key: string;
         }> | null;
-        level?: number;
-        _type: "block";
+      }
+    | {
         _key: string;
-      }> | null;
-      variant?: "fit-to-container" | "full-bleed" | "inset";
-      _type: "image";
-      _key: string;
-      image: {
-        id: string | null;
-        preview: string | null;
-        hotspot: {
-          x: number;
-          y: number;
-        } | null;
-        crop: {
-          bottom: number;
-          left: number;
-          right: number;
-          top: number;
-        } | null;
-      };
-    }> | null;
-    columnVariant?: "single" | "three" | "two";
-  } | {
-    _key: string;
-    _type: "imageSection";
-    image: {
-      id: string | null;
-      preview: string | null;
-      hotspot: {
-        x: number;
-        y: number;
-      } | null;
-      crop: {
-        bottom: number;
-        left: number;
-        right: number;
-        top: number;
-      } | null;
-    } | null;
-    styleVariant?: "fitToContainer" | "fullBleed";
-    alt?: string;
-  } | {
-    _key: string;
-    _type: "textSection";
-    richText: Array<{
-      children?: Array<{
-        marks?: Array<string>;
-        text?: string;
-        _type: "span";
-        _key: string;
-      }>;
-      style?: "h2" | "h3" | "h4" | "h5" | "h6" | "inline" | "normal";
-      listItem?: "bullet" | "number";
-      markDefs: Array<{
-        customLink?: CustomUrl;
-        _type: "customLink";
-        _key: string;
-        openInNewTab: boolean | null;
-        href: string | "#" | null;
-      } | {
-        customLink?: CustomUrl;
-        _type: "customLink";
-        _key: string;
-      }> | null;
-      level?: number;
-      _type: "block";
-      _key: string;
-    } | {
-      asset?: {
-        _ref: string;
-        _type: "reference";
-        _weak?: boolean;
-        [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-      };
-      media?: unknown;
-      hotspot: {
-        x: number;
-        y: number;
-      } | null;
-      crop: {
-        bottom: number;
-        left: number;
-        right: number;
-        top: number;
-      } | null;
-      caption: Array<{
-        children?: Array<{
-          marks?: Array<string>;
-          text?: string;
-          _type: "span";
-          _key: string;
-        }>;
-        style?: "normal";
-        listItem?: "bullet" | "number";
-        markDefs: Array<{
-          customLink?: CustomUrl;
-          _type: "customLink";
-          _key: string;
-          openInNewTab: boolean | null;
-          href: string | "#" | null;
-        } | {
-          customLink?: CustomUrl;
-          _type: "customLink";
-          _key: string;
-        }> | null;
-        level?: number;
-        _type: "block";
-        _key: string;
-      }> | null;
-      variant: "default" | "fit-to-container" | "full-bleed" | "inset" | null;
-      _type: "image";
-      _key: string;
-      id: string | null;
-      preview: string | null;
-    } | {
-      _key: string;
-      _type: "imageGallery";
-      images: Array<{
-        asset?: {
-          _ref: string;
-          _type: "reference";
-          _weak?: boolean;
-          [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-        };
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        caption: Array<{
+        _type: "hero";
+        badge?: string;
+        title?: string;
+        richText: Array<{
           children?: Array<{
             marks?: Array<string>;
             text?: string;
@@ -3767,26 +3721,29 @@ export type QueryFooterDataResult = {
 // Query: *[_type == "navbar" && _id == "navbar"][0]{    _id,    columns[]{      _key,      _type == "navbarColumn" => {        "type": "column",        title,        links[]{          _key,          name,          icon,          description,          "openInNewTab": url.openInNewTab,          "href": select(            url.type == "internal" => url.internal->slug.current,            url.type == "external" => url.external,            url.href          )        }      },      _type == "navbarLink" => {        "type": "link",        name,        description,        "openInNewTab": url.openInNewTab,        "href": select(          url.type == "internal" => url.internal->slug.current,          url.type == "external" => url.external,          url.href        )      }    },      buttons[]{    text,    variant,    _key,    _type,    "openInNewTab": url.openInNewTab,    "href": select(      url.type == "internal" => url.internal->slug.current,      url.type == "external" => url.external,      url.href    ),  },  }
 export type QueryNavbarDataResult = {
   _id: string;
-  columns: Array<{
-    _key: string;
-    type: "link";
-    name: string | null;
-    description: null;
-    openInNewTab: boolean | null;
-    href: string | null;
-  } | {
-    _key: string;
-    type: "column";
-    title: string | null;
-    links: Array<{
-      _key: string;
-      name: string | null;
-      icon: IconPicker | null;
-      description: string | null;
-      openInNewTab: boolean | null;
-      href: string | null;
-    }>;
-  }> | null;
+  columns: Array<
+    | {
+        _key: string;
+        type: "link";
+        name: string | null;
+        description: null;
+        openInNewTab: boolean | null;
+        href: string | null;
+      }
+    | {
+        _key: string;
+        type: "column";
+        title: string | null;
+        links: Array<{
+          _key: string;
+          name: string | null;
+          icon: IconPicker | null;
+          description: string | null;
+          openInNewTab: boolean | null;
+          href: string | null;
+        }>;
+      }
+  > | null;
   buttons: Array<{
     text: string | null;
     variant: "default" | "link" | "outline" | "secondary" | null;

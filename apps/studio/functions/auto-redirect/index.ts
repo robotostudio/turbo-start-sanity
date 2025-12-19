@@ -1,5 +1,8 @@
 import { createClient } from "@sanity/client";
 import { documentEventHandler } from "@sanity/functions";
+import { Logger } from "@workspace/logger";
+
+const logger = new Logger("AutoRedirect");
 
 export const handler = documentEventHandler(async ({ context, event }) => {
   const client = createClient({
@@ -11,11 +14,11 @@ export const handler = documentEventHandler(async ({ context, event }) => {
   const { beforeSlug, slug } = event.data;
 
   if (!(slug && beforeSlug)) {
-    console.log("No slug or beforeSlug");
+    logger.info("No slug or beforeSlug provided");
     return;
   }
   if (slug === beforeSlug) {
-    console.log("Slug did not change");
+    logger.info("Slug did not change");
     return;
   }
   // check if redirect already exists
@@ -24,7 +27,7 @@ export const handler = documentEventHandler(async ({ context, event }) => {
     { beforeSlug }
   );
   if (existingRedirect) {
-    console.log(`Redirect already exists for source ${beforeSlug}`);
+    logger.info(`Redirect already exists for source ${beforeSlug}`);
     return;
   }
   // check for loops
@@ -33,7 +36,7 @@ export const handler = documentEventHandler(async ({ context, event }) => {
     { slug, beforeSlug }
   );
   if (loopRedirect) {
-    console.log("Redirect loop detected");
+    logger.warning("Redirect loop detected");
     return;
   }
   const redirect = {
@@ -50,10 +53,11 @@ export const handler = documentEventHandler(async ({ context, event }) => {
 
   try {
     const res = await client.create(redirect);
-    console.log(
-      `🔗 Redirect from ${beforeSlug} to ${slug} was created ${JSON.stringify(res)}`
+    logger.info(
+      `Redirect from ${beforeSlug} to ${slug} was created`,
+      JSON.stringify(res)
     );
   } catch (error) {
-    console.log(error);
+    logger.error("Failed to create redirect", error);
   }
 });

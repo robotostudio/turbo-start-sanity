@@ -35,7 +35,9 @@
       "env": [
         "SANITY_STUDIO_PROJECT_ID",
         "SANITY_STUDIO_DATASET"
-      ]
+      ],
+    "//#check-biome": {
+      "cache": false
     },
     "dev": {
       "cache": false,

@@ -1,21 +1,21 @@
-import {assist} from "@sanity/assist";
-import {codeInput} from "@sanity/code-input";
-import {crossDatasetDuplicator} from "@sanity/cross-dataset-duplicator";
-import {debugSecrets} from "@sanity/preview-url-secret/sanity-plugin-debug-secrets";
-import {type Config, defineConfig} from "sanity";
-import {presentationTool} from "sanity/presentation";
-import {structureTool} from "sanity/structure";
-import {unsplashImageAsset} from "sanity-plugin-asset-source-unsplash";
-import {iconPicker} from "sanity-plugin-icon-picker";
-import {media} from "sanity-plugin-media";
-import {muxInput} from "sanity-plugin-mux-input";
+import { assist } from "@sanity/assist";
+import { codeInput } from "@sanity/code-input";
+import { crossDatasetDuplicator } from "@sanity/cross-dataset-duplicator";
+import { debugSecrets } from "@sanity/preview-url-secret/sanity-plugin-debug-secrets";
+import { type Config, defineConfig } from "sanity";
+import { presentationTool } from "sanity/presentation";
+import { structureTool } from "sanity/structure";
+import { unsplashImageAsset } from "sanity-plugin-asset-source-unsplash";
+import { iconPicker } from "sanity-plugin-icon-picker";
+import { media } from "sanity-plugin-media";
+import { muxInput } from "sanity-plugin-mux-input";
 
-import {Logo} from "./components/logo";
-import {locations} from "./location";
-import {presentationUrl} from "./plugins/presentation-url";
-import {schemaTypes} from "./schemaTypes";
-import {structure} from "./structure";
-import {getPresentationUrl} from "./utils/helper";
+import { Logo } from "./components/logo";
+import { locations } from "./location";
+import { presentationUrl } from "./plugins/presentation-url";
+import { schemaTypes } from "./schemaTypes";
+import { structure } from "./structure";
+import { getPresentationUrl } from "./utils/helper";
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
 const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
@@ -56,8 +56,8 @@ export default defineConfig({
     crossDatasetDuplicator(),
   ], // push structure tool to first position in the tool navbar
   document: {
-    newDocumentOptions: (prev, {creationContext}) => {
-      const {type} = creationContext;
+    newDocumentOptions: (prev, { creationContext }) => {
+      const { type } = creationContext;
       if (type === "global") {
         return prev.filter(
           (template) =>
@@ -82,9 +82,11 @@ export default defineConfig({
         id: "nested-page-template",
         title: "Nested Page",
         schemaType: "page",
-        value: (props: {slug?: string; title?: string}) => ({
-          ...(props.slug ? {slug: {current: props.slug, _type: "slug"}} : {}),
-          ...(props.title ? {title: props.title} : {}),
+        value: (props: { slug?: string; title?: string }) => ({
+          ...(props.slug
+            ? { slug: { current: props.slug, _type: "slug" } }
+            : {}),
+          ...(props.title ? { title: props.title } : {}),
         }),
         parameters: [
           {
