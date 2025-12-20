@@ -1,16 +1,17 @@
-import { JsonIcon } from "@sanity/icons";
-import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
-import { File, type LucideIcon, Settings2 } from "lucide-react";
+import {JsonIcon} from "@sanity/icons";
+import {orderableDocumentListDeskItem} from "@sanity/orderable-document-list";
+import {File, type LucideIcon, Settings2} from "lucide-react";
 import type {
   ListItemBuilder,
   StructureBuilder,
   StructureResolverContext,
 } from "sanity/structure";
 
-import { createSlugBasedStructure } from "./components/nested-pages-structure";
-import type { SchemaType, SingletonType } from "./schemaTypes";
-import { getStructureIcon } from "./utils/document-icons";
-import { getTitleCase } from "./utils/helper";
+import {createSlugBasedStructure} from "./components/nested-pages-structure";
+import type {SchemaType, SingletonType} from "./schemaTypes";
+import {getStructureIcon} from "./utils/document-icons";
+import {getTitleCase} from "./utils/helper";
+import { iconWrapper } from './utils/icon-wrapper';
 
 type Base<T = SchemaType> = {
   id?: string;
@@ -24,11 +25,11 @@ type CreateSingleTon = {
   S: StructureBuilder;
 } & Base<SingletonType>;
 
-const createSingleTon = ({ S, type, title, icon }: CreateSingleTon) => {
+const createSingleTon = ({S, type, title, icon}: CreateSingleTon) => {
   const newTitle = title ?? getTitleCase(type);
   return S.listItem()
     .title(newTitle)
-    .icon(icon ?? File)
+    .icon(icon ?? iconWrapper(File))
     .child(S.document().schemaType(type).documentId(type));
 };
 
@@ -41,7 +42,7 @@ type CreateList = {
 // and uses a default icon if not provided. It then returns a list item with the generated or
 // provided title and icon.
 
-const createList = ({ S, type, icon, title, id }: CreateList) => {
+const createList = ({S, type, icon, title, id}: CreateList) => {
   const newTitle = title ?? getTitleCase(type);
   return S.documentTypeListItem(type)
     .id(id ?? type)
@@ -102,7 +103,7 @@ export const structure = (S: StructureBuilder) =>
       }),
       S.listItem()
         .title("Site Configuration")
-        .icon(Settings2)
+        .icon(iconWrapper        (Settings2))
         .child(
           S.list()
             .title("Site Configuration")

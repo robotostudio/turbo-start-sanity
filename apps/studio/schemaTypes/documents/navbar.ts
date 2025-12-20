@@ -1,13 +1,14 @@
 import { LayoutPanelLeft, Link } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
+import { iconWrapper } from "@/utils/icon-wrapper";
 import { getDocumentIcon } from "../../utils/document-icons";
-import { buttonsField} from "../common";
+import { buttonsField } from "../common";
 
 const navbarLink = defineField({
   name: "navbarLink",
   type: "object",
-  icon: Link,
+  icon: iconWrapper(Link),
   title: "Navigation Link",
   description: "Individual navigation link with name and URL",
   fields: [
@@ -50,7 +51,7 @@ const navbarLink = defineField({
 const navbarColumnLink = defineField({
   name: "navbarColumnLink",
   type: "object",
-  icon: LayoutPanelLeft,
+  icon: iconWrapper(LayoutPanelLeft),
   title: "Navigation Column Link",
   description: "A link within a navigation column",
   fields: [
