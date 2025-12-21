@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+
 import type { PagebuilderType } from "@/types";
 import { SanityImage } from "./elements/sanity-image";
 
@@ -24,29 +25,27 @@ export function CollectionCard({
   const href = normalizedSlug || "#";
 
   // Check if we have a valid image with an id
-  const hasValidImage = image && typeof image.id === "string" && image.id.length > 0;
+  const hasValidImage =
+    image && typeof image.id === "string" && image.id.length > 0;
 
   return (
     <article className="flex w-full flex-col gap-3">
-      <Link
-        className="peer relative block w-full overflow-hidden"
-        href={href}
-      >
+      <Link className="peer relative block w-full overflow-hidden" href={href}>
         {hasValidImage ? (
           <SanityImage
             alt={title ?? "Collection image"}
-            className="peer aspect-[4/5] w-full object-cover"
+            className="peer aspect-5/4 w-full object-cover"
             height={500}
             image={image}
             width={400}
           />
         ) : (
-          <div className="peer aspect-[4/5] w-full bg-muted" />
+          <div className="peer aspect-4/5 w-full bg-muted" />
         )}
       </Link>
       {title && (
         <Link
-          className="peer-hover:!underline peer-hover:!text-accent font-normal text-base decoration-dotted underline-offset-8"
+          className="peer-hover:underline! peer-hover:text-accent! font-normal text-base decoration-dotted underline-offset-8"
           href={href}
         >
           {title}

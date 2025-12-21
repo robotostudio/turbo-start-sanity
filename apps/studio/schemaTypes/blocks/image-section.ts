@@ -1,7 +1,13 @@
-import { ImageIcon } from "@sanity/icons";
-import { defineField, defineType } from "sanity";
+import {ImageIcon} from "@sanity/icons";
+import {defineField, defineType} from "sanity";
 
-import { createRadioListLayout } from "../../utils/helper";
+import {createRadioListLayout} from "../../utils/helper";
+
+type SanityImage = {
+  asset: {
+    _ref: string;
+  };
+};
 
 export const imageSection = defineType({
   name: "imageSection",
@@ -25,7 +31,11 @@ export const imageSection = defineType({
       description:
         "Choose how the image should be displayed - full bleed extends to the edges, fit to container maintains aspect ratio within the container",
       initialValue: () => "fitToContainer",
-      options: createRadioListLayout(["fullBleed", "fitToContainer"]),
+      options: createRadioListLayout([
+        "fullBleed",
+        "fitToContainer",
+        "fullViewport",
+      ]),
     }),
     defineField({
       name: "alt",
@@ -41,11 +51,11 @@ export const imageSection = defineType({
       styleVariant: "styleVariant",
       alt: "alt",
     },
-    prepare: ({ media, styleVariant, alt }) => ({
+    prepare: ({media, styleVariant, alt}) => ({
       title: alt || "Image Section",
-      subtitle: styleVariant === "fullBleed" ? "Full Bleed" : "Fit to Container",
+      subtitle:
+        styleVariant === "fullBleed" ? "Full Bleed" : "Fit to Container",
       media,
     }),
   },
 });
-

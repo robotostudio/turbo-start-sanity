@@ -1,6 +1,6 @@
 import {JsonIcon} from "@sanity/icons";
 import {orderableDocumentListDeskItem} from "@sanity/orderable-document-list";
-import {File, type LucideIcon, Settings2} from "lucide-react";
+import {File, ImageIcon, type LucideIcon, Settings2} from "lucide-react";
 import type {
   ListItemBuilder,
   StructureBuilder,
@@ -11,7 +11,7 @@ import {createSlugBasedStructure} from "./components/nested-pages-structure";
 import type {SchemaType, SingletonType} from "./schemaTypes";
 import {getStructureIcon} from "./utils/document-icons";
 import {getTitleCase} from "./utils/helper";
-import { iconWrapper } from './utils/icon-wrapper';
+import {iconWrapper} from "./utils/icon-wrapper";
 
 type Base<T = SchemaType> = {
   id?: string;
@@ -66,22 +66,16 @@ export const structure = (S: StructureBuilder) =>
         type: "homePage",
         icon: getStructureIcon("homePage"),
       }),
-      S.divider(),
       createSlugBasedStructure(S, "page"),
+      S.divider(),
+      // collection list page
+      createSingleTon({
+        S,
+        type: "collectionIndex",
+        icon: getStructureIcon("collectionIndex"),
+      }),
       createSlugBasedStructure(S, "collection"),
-      // createIndexListWithOrderableItems({
-      //   S,
-      //   index: {
-      //     type: "collectionIndex",
-      //     icon: getStructureIcon("collectionIndex"),
-      //   },
-      //   list: {
-      //     type: "collection",
-      //     title: "collections",
-      //     icon: getStructureIcon("collection"),
-      //   },
-      //   context,
-      // }),
+      S.divider(),
       createList({
         S,
         type: "redirect",
@@ -103,7 +97,7 @@ export const structure = (S: StructureBuilder) =>
       }),
       S.listItem()
         .title("Site Configuration")
-        .icon(iconWrapper        (Settings2))
+        .icon(iconWrapper(Settings2))
         .child(
           S.list()
             .title("Site Configuration")

@@ -2,7 +2,8 @@ import { DocumentIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 
 import { createRadioListLayout } from "../../utils/helper";
-import { limitedRichText } from "../definitions/rich-text";
+import { richTextField } from "../common";
+import { richText } from "../definitions/rich-text";
 
 export const textSection = defineType({
   name: "textSection",
@@ -11,11 +12,7 @@ export const textSection = defineType({
   icon: DocumentIcon,
   fields: [
     // richTextField,
-    limitedRichText({
-      name: "richText",
-      title: "Rich Text",
-      description: "The main text content for this section.",
-    }),
+    richTextField,
     defineField({
       name: "columnVariant",
       title: "Column Layout",

@@ -19,6 +19,7 @@ export const page = defineType({
     "Create a new page for your website, like an 'About Us' or 'Contact' page. Each page has its own web address and content that you can customize.",
   groups: GROUPS,
   fields: [
+    pageBuilderField,
     defineField({
       name: "title",
       type: "string",
@@ -63,7 +64,6 @@ export const page = defineType({
         hotspot: true,
       },
     }),
-    pageBuilderField,
     ...seoFields.filter((field) => field.name !== "seoHideFromLists"),
     ...ogFields,
   ],

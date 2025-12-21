@@ -93,36 +93,13 @@ export type ImageSection = {
     crop?: SanityImageCrop;
     _type: "image";
   };
-  styleVariant?: "fullBleed" | "fitToContainer";
+  styleVariant?: "fullBleed" | "fitToContainer" | "fullViewport";
   alt?: string;
 };
 
 export type TextSection = {
   _type: "textSection";
-  richText?: Array<
-    | {
-        children?: Array<{
-          marks?: Array<string>;
-          text?: string;
-          _type: "span";
-          _key: string;
-        }>;
-        style?: "normal";
-        listItem?: "bullet" | "number";
-        markDefs?: Array<{
-          customLink?: CustomUrl;
-          linkVariant?: LinkVariant;
-          _type: "customLink";
-          _key: string;
-        }>;
-        level?: number;
-        _type: "block";
-        _key: string;
-      }
-    | ({
-        _key: string;
-      } & InlineButton)
-  >;
+  richText?: RichText;
   columnVariant?: "single" | "two" | "three";
 };
 
@@ -432,12 +409,12 @@ export type HomePage = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  pageBuilder?: PageBuilder;
   title?: string;
   description?: string;
   slug: Slug;
   showLatestcollections?: boolean;
   latestcollectionsOffset?: 1 | 2;
-  pageBuilder?: PageBuilder;
   seoTitle?: string;
   seoDescription?: string;
   seoImage?: SeoImage;
@@ -580,6 +557,7 @@ export type Page = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  pageBuilder?: PageBuilder;
   title: string;
   description?: string;
   slug: Slug;
@@ -590,7 +568,6 @@ export type Page = {
     crop?: SanityImageCrop;
     _type: "image";
   };
-  pageBuilder?: PageBuilder;
   seoTitle?: string;
   seoDescription?: string;
   seoImage?: SeoImage;
@@ -1064,11 +1041,6 @@ export type QueryHomePageDataResult = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  title: string | null;
-  description: string | null;
-  slug: string;
-  showLatestcollections: boolean | null;
-  latestcollectionsOffset?: 1 | 2;
   pageBuilder: Array<
     | {
         _key: string;
@@ -1371,7 +1343,7 @@ export type QueryHomePageDataResult = {
                   top: number;
                 } | null;
               } | null;
-              styleVariant?: "fitToContainer" | "fullBleed";
+              styleVariant?: "fitToContainer" | "fullBleed" | "fullViewport";
               alt?: string;
             }
           | {
@@ -1385,12 +1357,18 @@ export type QueryHomePageDataResult = {
                       _type: "span";
                       _key: string;
                     }>;
-                    style?: "normal";
+                    style?:
+                      | "h2"
+                      | "h3"
+                      | "h4"
+                      | "h5"
+                      | "h6"
+                      | "inline"
+                      | "normal";
                     listItem?: "bullet" | "number";
                     markDefs: Array<
                       | {
                           customLink?: CustomUrl;
-                          linkVariant?: LinkVariant;
                           _type: "customLink";
                           _key: string;
                           openInNewTab: null;
@@ -1398,7 +1376,6 @@ export type QueryHomePageDataResult = {
                         }
                       | {
                           customLink?: CustomUrl;
-                          linkVariant?: LinkVariant;
                           _type: "customLink";
                           _key: string;
                         }
@@ -1408,10 +1385,65 @@ export type QueryHomePageDataResult = {
                     _key: string;
                   }
                 | {
+                    asset?: SanityImageAssetReference;
+                    media?: unknown;
+                    hotspot: {
+                      x: number;
+                      y: number;
+                    } | null;
+                    crop: {
+                      bottom: number;
+                      left: number;
+                      right: number;
+                      top: number;
+                    } | null;
+                    caption: Array<
+                      | {
+                          children?: Array<{
+                            marks?: Array<string>;
+                            text?: string;
+                            _type: "span";
+                            _key: string;
+                          }>;
+                          style?: "normal";
+                          listItem?: "bullet" | "number";
+                          markDefs: Array<
+                            | {
+                                customLink?: CustomUrl;
+                                linkVariant?: LinkVariant;
+                                _type: "customLink";
+                                _key: string;
+                                openInNewTab: null;
+                                href: string | "#" | null;
+                              }
+                            | {
+                                customLink?: CustomUrl;
+                                linkVariant?: LinkVariant;
+                                _type: "customLink";
+                                _key: string;
+                              }
+                          > | null;
+                          level?: number;
+                          _type: "block";
+                          _key: string;
+                        }
+                      | {
+                          _key: string;
+                          _type: "inlineButton";
+                          link?: CustomUrl;
+                          text?: string;
+                        }
+                    > | null;
+                    variant:
+                      | "default"
+                      | "fit-to-container"
+                      | "full-bleed"
+                      | "inset"
+                      | null;
+                    _type: "image";
                     _key: string;
-                    _type: "inlineButton";
-                    link?: CustomUrl;
-                    text?: string;
+                    id: string | null;
+                    preview: string | null;
                   }
               > | null;
               columnVariant?: "single" | "three" | "two";
@@ -1513,7 +1545,7 @@ export type QueryHomePageDataResult = {
             top: number;
           } | null;
         } | null;
-        styleVariant?: "fitToContainer" | "fullBleed";
+        styleVariant?: "fitToContainer" | "fullBleed" | "fullViewport";
         alt?: string;
       }
     | {
@@ -1527,12 +1559,11 @@ export type QueryHomePageDataResult = {
                 _type: "span";
                 _key: string;
               }>;
-              style?: "normal";
+              style?: "h2" | "h3" | "h4" | "h5" | "h6" | "inline" | "normal";
               listItem?: "bullet" | "number";
               markDefs: Array<
                 | {
                     customLink?: CustomUrl;
-                    linkVariant?: LinkVariant;
                     _type: "customLink";
                     _key: string;
                     openInNewTab: null;
@@ -1540,7 +1571,6 @@ export type QueryHomePageDataResult = {
                   }
                 | {
                     customLink?: CustomUrl;
-                    linkVariant?: LinkVariant;
                     _type: "customLink";
                     _key: string;
                   }
@@ -1550,10 +1580,65 @@ export type QueryHomePageDataResult = {
               _key: string;
             }
           | {
+              asset?: SanityImageAssetReference;
+              media?: unknown;
+              hotspot: {
+                x: number;
+                y: number;
+              } | null;
+              crop: {
+                bottom: number;
+                left: number;
+                right: number;
+                top: number;
+              } | null;
+              caption: Array<
+                | {
+                    children?: Array<{
+                      marks?: Array<string>;
+                      text?: string;
+                      _type: "span";
+                      _key: string;
+                    }>;
+                    style?: "normal";
+                    listItem?: "bullet" | "number";
+                    markDefs: Array<
+                      | {
+                          customLink?: CustomUrl;
+                          linkVariant?: LinkVariant;
+                          _type: "customLink";
+                          _key: string;
+                          openInNewTab: null;
+                          href: string | "#" | null;
+                        }
+                      | {
+                          customLink?: CustomUrl;
+                          linkVariant?: LinkVariant;
+                          _type: "customLink";
+                          _key: string;
+                        }
+                    > | null;
+                    level?: number;
+                    _type: "block";
+                    _key: string;
+                  }
+                | {
+                    _key: string;
+                    _type: "inlineButton";
+                    link?: CustomUrl;
+                    text?: string;
+                  }
+              > | null;
+              variant:
+                | "default"
+                | "fit-to-container"
+                | "full-bleed"
+                | "inset"
+                | null;
+              _type: "image";
               _key: string;
-              _type: "inlineButton";
-              link?: CustomUrl;
-              text?: string;
+              id: string | null;
+              preview: string | null;
             }
         > | null;
         columnVariant?: "single" | "three" | "two";
@@ -1572,6 +1657,11 @@ export type QueryHomePageDataResult = {
         description?: string;
       }
   > | null;
+  title: string | null;
+  description: string | null;
+  slug: string;
+  showLatestcollections: boolean | null;
+  latestcollectionsOffset?: 1 | 2;
   seoTitle?: string;
   seoDescription?: string;
   seoImage?: SeoImage;
@@ -1989,7 +2079,10 @@ export type QuerySlugPageDataResult =
                       top: number;
                     } | null;
                   } | null;
-                  styleVariant?: "fitToContainer" | "fullBleed";
+                  styleVariant?:
+                    | "fitToContainer"
+                    | "fullBleed"
+                    | "fullViewport";
                   alt?: string;
                 }
               | {
@@ -2003,12 +2096,18 @@ export type QuerySlugPageDataResult =
                           _type: "span";
                           _key: string;
                         }>;
-                        style?: "normal";
+                        style?:
+                          | "h2"
+                          | "h3"
+                          | "h4"
+                          | "h5"
+                          | "h6"
+                          | "inline"
+                          | "normal";
                         listItem?: "bullet" | "number";
                         markDefs: Array<
                           | {
                               customLink?: CustomUrl;
-                              linkVariant?: LinkVariant;
                               _type: "customLink";
                               _key: string;
                               openInNewTab: null;
@@ -2016,7 +2115,6 @@ export type QuerySlugPageDataResult =
                             }
                           | {
                               customLink?: CustomUrl;
-                              linkVariant?: LinkVariant;
                               _type: "customLink";
                               _key: string;
                             }
@@ -2026,10 +2124,65 @@ export type QuerySlugPageDataResult =
                         _key: string;
                       }
                     | {
+                        asset?: SanityImageAssetReference;
+                        media?: unknown;
+                        hotspot: {
+                          x: number;
+                          y: number;
+                        } | null;
+                        crop: {
+                          bottom: number;
+                          left: number;
+                          right: number;
+                          top: number;
+                        } | null;
+                        caption: Array<
+                          | {
+                              children?: Array<{
+                                marks?: Array<string>;
+                                text?: string;
+                                _type: "span";
+                                _key: string;
+                              }>;
+                              style?: "normal";
+                              listItem?: "bullet" | "number";
+                              markDefs: Array<
+                                | {
+                                    customLink?: CustomUrl;
+                                    linkVariant?: LinkVariant;
+                                    _type: "customLink";
+                                    _key: string;
+                                    openInNewTab: null;
+                                    href: string | "#" | null;
+                                  }
+                                | {
+                                    customLink?: CustomUrl;
+                                    linkVariant?: LinkVariant;
+                                    _type: "customLink";
+                                    _key: string;
+                                  }
+                              > | null;
+                              level?: number;
+                              _type: "block";
+                              _key: string;
+                            }
+                          | {
+                              _key: string;
+                              _type: "inlineButton";
+                              link?: CustomUrl;
+                              text?: string;
+                            }
+                        > | null;
+                        variant:
+                          | "default"
+                          | "fit-to-container"
+                          | "full-bleed"
+                          | "inset"
+                          | null;
+                        _type: "image";
                         _key: string;
-                        _type: "inlineButton";
-                        link?: CustomUrl;
-                        text?: string;
+                        id: string | null;
+                        preview: string | null;
                       }
                   > | null;
                   columnVariant?: "single" | "three" | "two";
@@ -2131,7 +2284,7 @@ export type QuerySlugPageDataResult =
                 top: number;
               } | null;
             } | null;
-            styleVariant?: "fitToContainer" | "fullBleed";
+            styleVariant?: "fitToContainer" | "fullBleed" | "fullViewport";
             alt?: string;
           }
         | {
@@ -2145,12 +2298,18 @@ export type QuerySlugPageDataResult =
                     _type: "span";
                     _key: string;
                   }>;
-                  style?: "normal";
+                  style?:
+                    | "h2"
+                    | "h3"
+                    | "h4"
+                    | "h5"
+                    | "h6"
+                    | "inline"
+                    | "normal";
                   listItem?: "bullet" | "number";
                   markDefs: Array<
                     | {
                         customLink?: CustomUrl;
-                        linkVariant?: LinkVariant;
                         _type: "customLink";
                         _key: string;
                         openInNewTab: null;
@@ -2158,7 +2317,6 @@ export type QuerySlugPageDataResult =
                       }
                     | {
                         customLink?: CustomUrl;
-                        linkVariant?: LinkVariant;
                         _type: "customLink";
                         _key: string;
                       }
@@ -2168,10 +2326,65 @@ export type QuerySlugPageDataResult =
                   _key: string;
                 }
               | {
+                  asset?: SanityImageAssetReference;
+                  media?: unknown;
+                  hotspot: {
+                    x: number;
+                    y: number;
+                  } | null;
+                  crop: {
+                    bottom: number;
+                    left: number;
+                    right: number;
+                    top: number;
+                  } | null;
+                  caption: Array<
+                    | {
+                        children?: Array<{
+                          marks?: Array<string>;
+                          text?: string;
+                          _type: "span";
+                          _key: string;
+                        }>;
+                        style?: "normal";
+                        listItem?: "bullet" | "number";
+                        markDefs: Array<
+                          | {
+                              customLink?: CustomUrl;
+                              linkVariant?: LinkVariant;
+                              _type: "customLink";
+                              _key: string;
+                              openInNewTab: null;
+                              href: string | "#" | null;
+                            }
+                          | {
+                              customLink?: CustomUrl;
+                              linkVariant?: LinkVariant;
+                              _type: "customLink";
+                              _key: string;
+                            }
+                        > | null;
+                        level?: number;
+                        _type: "block";
+                        _key: string;
+                      }
+                    | {
+                        _key: string;
+                        _type: "inlineButton";
+                        link?: CustomUrl;
+                        text?: string;
+                      }
+                  > | null;
+                  variant:
+                    | "default"
+                    | "fit-to-container"
+                    | "full-bleed"
+                    | "inset"
+                    | null;
+                  _type: "image";
                   _key: string;
-                  _type: "inlineButton";
-                  link?: CustomUrl;
-                  text?: string;
+                  id: string | null;
+                  preview: string | null;
                 }
             > | null;
             columnVariant?: "single" | "three" | "two";
@@ -2202,16 +2415,6 @@ export type QuerySlugPageDataResult =
       _createdAt: string;
       _updatedAt: string;
       _rev: string;
-      title: string;
-      description?: string;
-      slug: string;
-      image?: {
-        asset?: SanityImageAssetReference;
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        _type: "image";
-      };
       pageBuilder: Array<
         | {
             _key: string;
@@ -2514,7 +2717,10 @@ export type QuerySlugPageDataResult =
                       top: number;
                     } | null;
                   } | null;
-                  styleVariant?: "fitToContainer" | "fullBleed";
+                  styleVariant?:
+                    | "fitToContainer"
+                    | "fullBleed"
+                    | "fullViewport";
                   alt?: string;
                 }
               | {
@@ -2528,12 +2734,18 @@ export type QuerySlugPageDataResult =
                           _type: "span";
                           _key: string;
                         }>;
-                        style?: "normal";
+                        style?:
+                          | "h2"
+                          | "h3"
+                          | "h4"
+                          | "h5"
+                          | "h6"
+                          | "inline"
+                          | "normal";
                         listItem?: "bullet" | "number";
                         markDefs: Array<
                           | {
                               customLink?: CustomUrl;
-                              linkVariant?: LinkVariant;
                               _type: "customLink";
                               _key: string;
                               openInNewTab: null;
@@ -2541,7 +2753,6 @@ export type QuerySlugPageDataResult =
                             }
                           | {
                               customLink?: CustomUrl;
-                              linkVariant?: LinkVariant;
                               _type: "customLink";
                               _key: string;
                             }
@@ -2551,10 +2762,65 @@ export type QuerySlugPageDataResult =
                         _key: string;
                       }
                     | {
+                        asset?: SanityImageAssetReference;
+                        media?: unknown;
+                        hotspot: {
+                          x: number;
+                          y: number;
+                        } | null;
+                        crop: {
+                          bottom: number;
+                          left: number;
+                          right: number;
+                          top: number;
+                        } | null;
+                        caption: Array<
+                          | {
+                              children?: Array<{
+                                marks?: Array<string>;
+                                text?: string;
+                                _type: "span";
+                                _key: string;
+                              }>;
+                              style?: "normal";
+                              listItem?: "bullet" | "number";
+                              markDefs: Array<
+                                | {
+                                    customLink?: CustomUrl;
+                                    linkVariant?: LinkVariant;
+                                    _type: "customLink";
+                                    _key: string;
+                                    openInNewTab: null;
+                                    href: string | "#" | null;
+                                  }
+                                | {
+                                    customLink?: CustomUrl;
+                                    linkVariant?: LinkVariant;
+                                    _type: "customLink";
+                                    _key: string;
+                                  }
+                              > | null;
+                              level?: number;
+                              _type: "block";
+                              _key: string;
+                            }
+                          | {
+                              _key: string;
+                              _type: "inlineButton";
+                              link?: CustomUrl;
+                              text?: string;
+                            }
+                        > | null;
+                        variant:
+                          | "default"
+                          | "fit-to-container"
+                          | "full-bleed"
+                          | "inset"
+                          | null;
+                        _type: "image";
                         _key: string;
-                        _type: "inlineButton";
-                        link?: CustomUrl;
-                        text?: string;
+                        id: string | null;
+                        preview: string | null;
                       }
                   > | null;
                   columnVariant?: "single" | "three" | "two";
@@ -2656,7 +2922,7 @@ export type QuerySlugPageDataResult =
                 top: number;
               } | null;
             } | null;
-            styleVariant?: "fitToContainer" | "fullBleed";
+            styleVariant?: "fitToContainer" | "fullBleed" | "fullViewport";
             alt?: string;
           }
         | {
@@ -2670,12 +2936,18 @@ export type QuerySlugPageDataResult =
                     _type: "span";
                     _key: string;
                   }>;
-                  style?: "normal";
+                  style?:
+                    | "h2"
+                    | "h3"
+                    | "h4"
+                    | "h5"
+                    | "h6"
+                    | "inline"
+                    | "normal";
                   listItem?: "bullet" | "number";
                   markDefs: Array<
                     | {
                         customLink?: CustomUrl;
-                        linkVariant?: LinkVariant;
                         _type: "customLink";
                         _key: string;
                         openInNewTab: null;
@@ -2683,7 +2955,6 @@ export type QuerySlugPageDataResult =
                       }
                     | {
                         customLink?: CustomUrl;
-                        linkVariant?: LinkVariant;
                         _type: "customLink";
                         _key: string;
                       }
@@ -2693,10 +2964,65 @@ export type QuerySlugPageDataResult =
                   _key: string;
                 }
               | {
+                  asset?: SanityImageAssetReference;
+                  media?: unknown;
+                  hotspot: {
+                    x: number;
+                    y: number;
+                  } | null;
+                  crop: {
+                    bottom: number;
+                    left: number;
+                    right: number;
+                    top: number;
+                  } | null;
+                  caption: Array<
+                    | {
+                        children?: Array<{
+                          marks?: Array<string>;
+                          text?: string;
+                          _type: "span";
+                          _key: string;
+                        }>;
+                        style?: "normal";
+                        listItem?: "bullet" | "number";
+                        markDefs: Array<
+                          | {
+                              customLink?: CustomUrl;
+                              linkVariant?: LinkVariant;
+                              _type: "customLink";
+                              _key: string;
+                              openInNewTab: null;
+                              href: string | "#" | null;
+                            }
+                          | {
+                              customLink?: CustomUrl;
+                              linkVariant?: LinkVariant;
+                              _type: "customLink";
+                              _key: string;
+                            }
+                        > | null;
+                        level?: number;
+                        _type: "block";
+                        _key: string;
+                      }
+                    | {
+                        _key: string;
+                        _type: "inlineButton";
+                        link?: CustomUrl;
+                        text?: string;
+                      }
+                  > | null;
+                  variant:
+                    | "default"
+                    | "fit-to-container"
+                    | "full-bleed"
+                    | "inset"
+                    | null;
+                  _type: "image";
                   _key: string;
-                  _type: "inlineButton";
-                  link?: CustomUrl;
-                  text?: string;
+                  id: string | null;
+                  preview: string | null;
                 }
             > | null;
             columnVariant?: "single" | "three" | "two";
@@ -2715,6 +3041,16 @@ export type QuerySlugPageDataResult =
             description?: string;
           }
       > | null;
+      title: string;
+      description?: string;
+      slug: string;
+      image?: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        _type: "image";
+      };
       seoTitle?: string;
       seoDescription?: string;
       seoImage?: SeoImage;
@@ -3044,7 +3380,7 @@ export type QueryCollectionIndexPageDataResult = {
                   top: number;
                 } | null;
               } | null;
-              styleVariant?: "fitToContainer" | "fullBleed";
+              styleVariant?: "fitToContainer" | "fullBleed" | "fullViewport";
               alt?: string;
             }
           | {
@@ -3058,12 +3394,18 @@ export type QueryCollectionIndexPageDataResult = {
                       _type: "span";
                       _key: string;
                     }>;
-                    style?: "normal";
+                    style?:
+                      | "h2"
+                      | "h3"
+                      | "h4"
+                      | "h5"
+                      | "h6"
+                      | "inline"
+                      | "normal";
                     listItem?: "bullet" | "number";
                     markDefs: Array<
                       | {
                           customLink?: CustomUrl;
-                          linkVariant?: LinkVariant;
                           _type: "customLink";
                           _key: string;
                           openInNewTab: null;
@@ -3071,7 +3413,6 @@ export type QueryCollectionIndexPageDataResult = {
                         }
                       | {
                           customLink?: CustomUrl;
-                          linkVariant?: LinkVariant;
                           _type: "customLink";
                           _key: string;
                         }
@@ -3081,10 +3422,65 @@ export type QueryCollectionIndexPageDataResult = {
                     _key: string;
                   }
                 | {
+                    asset?: SanityImageAssetReference;
+                    media?: unknown;
+                    hotspot: {
+                      x: number;
+                      y: number;
+                    } | null;
+                    crop: {
+                      bottom: number;
+                      left: number;
+                      right: number;
+                      top: number;
+                    } | null;
+                    caption: Array<
+                      | {
+                          children?: Array<{
+                            marks?: Array<string>;
+                            text?: string;
+                            _type: "span";
+                            _key: string;
+                          }>;
+                          style?: "normal";
+                          listItem?: "bullet" | "number";
+                          markDefs: Array<
+                            | {
+                                customLink?: CustomUrl;
+                                linkVariant?: LinkVariant;
+                                _type: "customLink";
+                                _key: string;
+                                openInNewTab: null;
+                                href: string | "#" | null;
+                              }
+                            | {
+                                customLink?: CustomUrl;
+                                linkVariant?: LinkVariant;
+                                _type: "customLink";
+                                _key: string;
+                              }
+                          > | null;
+                          level?: number;
+                          _type: "block";
+                          _key: string;
+                        }
+                      | {
+                          _key: string;
+                          _type: "inlineButton";
+                          link?: CustomUrl;
+                          text?: string;
+                        }
+                    > | null;
+                    variant:
+                      | "default"
+                      | "fit-to-container"
+                      | "full-bleed"
+                      | "inset"
+                      | null;
+                    _type: "image";
                     _key: string;
-                    _type: "inlineButton";
-                    link?: CustomUrl;
-                    text?: string;
+                    id: string | null;
+                    preview: string | null;
                   }
               > | null;
               columnVariant?: "single" | "three" | "two";
@@ -3186,7 +3582,7 @@ export type QueryCollectionIndexPageDataResult = {
             top: number;
           } | null;
         } | null;
-        styleVariant?: "fitToContainer" | "fullBleed";
+        styleVariant?: "fitToContainer" | "fullBleed" | "fullViewport";
         alt?: string;
       }
     | {
@@ -3200,12 +3596,11 @@ export type QueryCollectionIndexPageDataResult = {
                 _type: "span";
                 _key: string;
               }>;
-              style?: "normal";
+              style?: "h2" | "h3" | "h4" | "h5" | "h6" | "inline" | "normal";
               listItem?: "bullet" | "number";
               markDefs: Array<
                 | {
                     customLink?: CustomUrl;
-                    linkVariant?: LinkVariant;
                     _type: "customLink";
                     _key: string;
                     openInNewTab: null;
@@ -3213,7 +3608,6 @@ export type QueryCollectionIndexPageDataResult = {
                   }
                 | {
                     customLink?: CustomUrl;
-                    linkVariant?: LinkVariant;
                     _type: "customLink";
                     _key: string;
                   }
@@ -3223,10 +3617,65 @@ export type QueryCollectionIndexPageDataResult = {
               _key: string;
             }
           | {
+              asset?: SanityImageAssetReference;
+              media?: unknown;
+              hotspot: {
+                x: number;
+                y: number;
+              } | null;
+              crop: {
+                bottom: number;
+                left: number;
+                right: number;
+                top: number;
+              } | null;
+              caption: Array<
+                | {
+                    children?: Array<{
+                      marks?: Array<string>;
+                      text?: string;
+                      _type: "span";
+                      _key: string;
+                    }>;
+                    style?: "normal";
+                    listItem?: "bullet" | "number";
+                    markDefs: Array<
+                      | {
+                          customLink?: CustomUrl;
+                          linkVariant?: LinkVariant;
+                          _type: "customLink";
+                          _key: string;
+                          openInNewTab: null;
+                          href: string | "#" | null;
+                        }
+                      | {
+                          customLink?: CustomUrl;
+                          linkVariant?: LinkVariant;
+                          _type: "customLink";
+                          _key: string;
+                        }
+                    > | null;
+                    level?: number;
+                    _type: "block";
+                    _key: string;
+                  }
+                | {
+                    _key: string;
+                    _type: "inlineButton";
+                    link?: CustomUrl;
+                    text?: string;
+                  }
+              > | null;
+              variant:
+                | "default"
+                | "fit-to-container"
+                | "full-bleed"
+                | "inset"
+                | null;
+              _type: "image";
               _key: string;
-              _type: "inlineButton";
-              link?: CustomUrl;
-              text?: string;
+              id: string | null;
+              preview: string | null;
             }
         > | null;
         columnVariant?: "single" | "three" | "two";
