@@ -125,7 +125,7 @@
 
 @layer components {
   .container {
-    @apply mx-auto px-4 !max-w-screen-lg;
+    @apply mx-auto px-0 !max-w-screen;
   }
 
   .container-narrow {

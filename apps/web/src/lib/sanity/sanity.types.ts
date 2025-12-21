@@ -93,7 +93,7 @@ export type ImageSection = {
     crop?: SanityImageCrop;
     _type: "image";
   };
-  styleVariant?: "fullBleed" | "fitToContainer" | "fullViewport";
+  styleVariant?: "default" | "inset" | "fullBleed" | "fullViewport";
   alt?: string;
 };
 
@@ -474,75 +474,7 @@ export type Collection = {
     crop?: SanityImageCrop;
     _type: "image";
   };
-  startDate?: string;
-  endDate?: string;
-  gallery?: "Gallery A" | "Gallery B";
-  artists?: Array<
-    {
-      _key: string;
-    } & ArtistReference
-  >;
-  pressRelease?: Array<
-    | {
-        children?: Array<{
-          marks?: Array<string>;
-          text?: string;
-          _type: "span";
-          _key: string;
-        }>;
-        style?: "normal";
-        listItem?: "bullet" | "number";
-        markDefs?: Array<{
-          customLink?: CustomUrl;
-          linkVariant?: LinkVariant;
-          _type: "customLink";
-          _key: string;
-        }>;
-        level?: number;
-        _type: "block";
-        _key: string;
-      }
-    | ({
-        _key: string;
-      } & InlineButton)
-  >;
-  artistBioInPressRelease?: boolean;
-  images?: Array<{
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    caption?: Array<
-      | {
-          children?: Array<{
-            marks?: Array<string>;
-            text?: string;
-            _type: "span";
-            _key: string;
-          }>;
-          style?: "normal";
-          listItem?: "bullet" | "number";
-          markDefs?: Array<{
-            customLink?: CustomUrl;
-            linkVariant?: LinkVariant;
-            _type: "customLink";
-            _key: string;
-          }>;
-          level?: number;
-          _type: "block";
-          _key: string;
-        }
-      | ({
-          _key: string;
-        } & InlineButton)
-    >;
-    _type: "image";
-    _key: string;
-  }>;
-  body?: RichText;
-  url?: string;
-  artistRaw?: string;
-  rawBody?: string;
+  pageBuilder?: PageBuilder;
   seoTitle?: string;
   seoDescription?: string;
   seoImage?: SeoImage;
@@ -1070,75 +1002,7 @@ export type QueryHomePageDataResult = {
               top: number;
             } | null;
           } | null;
-          startDate?: string;
-          endDate?: string;
-          gallery?: "Gallery A" | "Gallery B";
-          artists?: Array<
-            {
-              _key: string;
-            } & ArtistReference
-          >;
-          pressRelease?: Array<
-            | ({
-                _key: string;
-              } & InlineButton)
-            | {
-                children?: Array<{
-                  marks?: Array<string>;
-                  text?: string;
-                  _type: "span";
-                  _key: string;
-                }>;
-                style?: "normal";
-                listItem?: "bullet" | "number";
-                markDefs?: Array<{
-                  customLink?: CustomUrl;
-                  linkVariant?: LinkVariant;
-                  _type: "customLink";
-                  _key: string;
-                }>;
-                level?: number;
-                _type: "block";
-                _key: string;
-              }
-          >;
-          artistBioInPressRelease?: boolean;
-          images?: Array<{
-            asset?: SanityImageAssetReference;
-            media?: unknown;
-            hotspot?: SanityImageHotspot;
-            crop?: SanityImageCrop;
-            caption?: Array<
-              | ({
-                  _key: string;
-                } & InlineButton)
-              | {
-                  children?: Array<{
-                    marks?: Array<string>;
-                    text?: string;
-                    _type: "span";
-                    _key: string;
-                  }>;
-                  style?: "normal";
-                  listItem?: "bullet" | "number";
-                  markDefs?: Array<{
-                    customLink?: CustomUrl;
-                    linkVariant?: LinkVariant;
-                    _type: "customLink";
-                    _key: string;
-                  }>;
-                  level?: number;
-                  _type: "block";
-                  _key: string;
-                }
-            >;
-            _type: "image";
-            _key: string;
-          }>;
-          body?: RichText;
-          url?: string;
-          artistRaw?: string;
-          rawBody?: string;
+          pageBuilder?: PageBuilder;
           seoTitle?: string;
           seoDescription?: string;
           seoImage?: SeoImage;
@@ -1179,75 +1043,7 @@ export type QueryHomePageDataResult = {
                     top: number;
                   } | null;
                 } | null;
-                startDate?: string;
-                endDate?: string;
-                gallery?: "Gallery A" | "Gallery B";
-                artists?: Array<
-                  {
-                    _key: string;
-                  } & ArtistReference
-                >;
-                pressRelease?: Array<
-                  | ({
-                      _key: string;
-                    } & InlineButton)
-                  | {
-                      children?: Array<{
-                        marks?: Array<string>;
-                        text?: string;
-                        _type: "span";
-                        _key: string;
-                      }>;
-                      style?: "normal";
-                      listItem?: "bullet" | "number";
-                      markDefs?: Array<{
-                        customLink?: CustomUrl;
-                        linkVariant?: LinkVariant;
-                        _type: "customLink";
-                        _key: string;
-                      }>;
-                      level?: number;
-                      _type: "block";
-                      _key: string;
-                    }
-                >;
-                artistBioInPressRelease?: boolean;
-                images?: Array<{
-                  asset?: SanityImageAssetReference;
-                  media?: unknown;
-                  hotspot?: SanityImageHotspot;
-                  crop?: SanityImageCrop;
-                  caption?: Array<
-                    | ({
-                        _key: string;
-                      } & InlineButton)
-                    | {
-                        children?: Array<{
-                          marks?: Array<string>;
-                          text?: string;
-                          _type: "span";
-                          _key: string;
-                        }>;
-                        style?: "normal";
-                        listItem?: "bullet" | "number";
-                        markDefs?: Array<{
-                          customLink?: CustomUrl;
-                          linkVariant?: LinkVariant;
-                          _type: "customLink";
-                          _key: string;
-                        }>;
-                        level?: number;
-                        _type: "block";
-                        _key: string;
-                      }
-                  >;
-                  _type: "image";
-                  _key: string;
-                }>;
-                body?: RichText;
-                url?: string;
-                artistRaw?: string;
-                rawBody?: string;
+                pageBuilder?: PageBuilder;
                 seoTitle?: string;
                 seoDescription?: string;
                 seoImage?: SeoImage;
@@ -1343,7 +1139,7 @@ export type QueryHomePageDataResult = {
                   top: number;
                 } | null;
               } | null;
-              styleVariant?: "fitToContainer" | "fullBleed" | "fullViewport";
+              styleVariant?: "default" | "fullBleed" | "fullViewport" | "inset";
               alt?: string;
             }
           | {
@@ -1545,7 +1341,7 @@ export type QueryHomePageDataResult = {
             top: number;
           } | null;
         } | null;
-        styleVariant?: "fitToContainer" | "fullBleed" | "fullViewport";
+        styleVariant?: "default" | "fullBleed" | "fullViewport" | "inset";
         alt?: string;
       }
     | {
@@ -1690,93 +1486,6 @@ export type QuerySlugPageDataResult =
         crop?: SanityImageCrop;
         _type: "image";
       };
-      startDate?: string;
-      endDate?: string;
-      gallery?: "Gallery A" | "Gallery B";
-      artists?: Array<
-        {
-          _key: string;
-        } & ArtistReference
-      >;
-      pressRelease?: Array<
-        | ({
-            _key: string;
-          } & InlineButton)
-        | {
-            children?: Array<{
-              marks?: Array<string>;
-              text?: string;
-              _type: "span";
-              _key: string;
-            }>;
-            style?: "normal";
-            listItem?: "bullet" | "number";
-            markDefs?: Array<{
-              customLink?: CustomUrl;
-              linkVariant?: LinkVariant;
-              _type: "customLink";
-              _key: string;
-            }>;
-            level?: number;
-            _type: "block";
-            _key: string;
-          }
-      >;
-      artistBioInPressRelease?: boolean;
-      images?: Array<{
-        asset?: SanityImageAssetReference;
-        media?: unknown;
-        hotspot?: SanityImageHotspot;
-        crop?: SanityImageCrop;
-        caption?: Array<
-          | ({
-              _key: string;
-            } & InlineButton)
-          | {
-              children?: Array<{
-                marks?: Array<string>;
-                text?: string;
-                _type: "span";
-                _key: string;
-              }>;
-              style?: "normal";
-              listItem?: "bullet" | "number";
-              markDefs?: Array<{
-                customLink?: CustomUrl;
-                linkVariant?: LinkVariant;
-                _type: "customLink";
-                _key: string;
-              }>;
-              level?: number;
-              _type: "block";
-              _key: string;
-            }
-        >;
-        _type: "image";
-        _key: string;
-      }>;
-      body?: RichText;
-      url?: string;
-      artistRaw?: string;
-      rawBody?: string;
-      seoTitle?: string;
-      seoDescription?: string;
-      seoImage?: SeoImage;
-      seoNoIndex?: boolean;
-      ogTitle?: string;
-      ogDescription?: string;
-      pageBuilder: null;
-    }
-  | {
-      _id: string;
-      _type: "collectionIndex";
-      _createdAt: string;
-      _updatedAt: string;
-      _rev: string;
-      title?: string;
-      description?: string;
-      slug: string;
-      listcollections?: boolean;
       pageBuilder: Array<
         | {
             _key: string;
@@ -1806,75 +1515,7 @@ export type QuerySlugPageDataResult =
                   top: number;
                 } | null;
               } | null;
-              startDate?: string;
-              endDate?: string;
-              gallery?: "Gallery A" | "Gallery B";
-              artists?: Array<
-                {
-                  _key: string;
-                } & ArtistReference
-              >;
-              pressRelease?: Array<
-                | ({
-                    _key: string;
-                  } & InlineButton)
-                | {
-                    children?: Array<{
-                      marks?: Array<string>;
-                      text?: string;
-                      _type: "span";
-                      _key: string;
-                    }>;
-                    style?: "normal";
-                    listItem?: "bullet" | "number";
-                    markDefs?: Array<{
-                      customLink?: CustomUrl;
-                      linkVariant?: LinkVariant;
-                      _type: "customLink";
-                      _key: string;
-                    }>;
-                    level?: number;
-                    _type: "block";
-                    _key: string;
-                  }
-              >;
-              artistBioInPressRelease?: boolean;
-              images?: Array<{
-                asset?: SanityImageAssetReference;
-                media?: unknown;
-                hotspot?: SanityImageHotspot;
-                crop?: SanityImageCrop;
-                caption?: Array<
-                  | ({
-                      _key: string;
-                    } & InlineButton)
-                  | {
-                      children?: Array<{
-                        marks?: Array<string>;
-                        text?: string;
-                        _type: "span";
-                        _key: string;
-                      }>;
-                      style?: "normal";
-                      listItem?: "bullet" | "number";
-                      markDefs?: Array<{
-                        customLink?: CustomUrl;
-                        linkVariant?: LinkVariant;
-                        _type: "customLink";
-                        _key: string;
-                      }>;
-                      level?: number;
-                      _type: "block";
-                      _key: string;
-                    }
-                >;
-                _type: "image";
-                _key: string;
-              }>;
-              body?: RichText;
-              url?: string;
-              artistRaw?: string;
-              rawBody?: string;
+              pageBuilder?: PageBuilder;
               seoTitle?: string;
               seoDescription?: string;
               seoImage?: SeoImage;
@@ -1915,75 +1556,7 @@ export type QuerySlugPageDataResult =
                         top: number;
                       } | null;
                     } | null;
-                    startDate?: string;
-                    endDate?: string;
-                    gallery?: "Gallery A" | "Gallery B";
-                    artists?: Array<
-                      {
-                        _key: string;
-                      } & ArtistReference
-                    >;
-                    pressRelease?: Array<
-                      | ({
-                          _key: string;
-                        } & InlineButton)
-                      | {
-                          children?: Array<{
-                            marks?: Array<string>;
-                            text?: string;
-                            _type: "span";
-                            _key: string;
-                          }>;
-                          style?: "normal";
-                          listItem?: "bullet" | "number";
-                          markDefs?: Array<{
-                            customLink?: CustomUrl;
-                            linkVariant?: LinkVariant;
-                            _type: "customLink";
-                            _key: string;
-                          }>;
-                          level?: number;
-                          _type: "block";
-                          _key: string;
-                        }
-                    >;
-                    artistBioInPressRelease?: boolean;
-                    images?: Array<{
-                      asset?: SanityImageAssetReference;
-                      media?: unknown;
-                      hotspot?: SanityImageHotspot;
-                      crop?: SanityImageCrop;
-                      caption?: Array<
-                        | ({
-                            _key: string;
-                          } & InlineButton)
-                        | {
-                            children?: Array<{
-                              marks?: Array<string>;
-                              text?: string;
-                              _type: "span";
-                              _key: string;
-                            }>;
-                            style?: "normal";
-                            listItem?: "bullet" | "number";
-                            markDefs?: Array<{
-                              customLink?: CustomUrl;
-                              linkVariant?: LinkVariant;
-                              _type: "customLink";
-                              _key: string;
-                            }>;
-                            level?: number;
-                            _type: "block";
-                            _key: string;
-                          }
-                      >;
-                      _type: "image";
-                      _key: string;
-                    }>;
-                    body?: RichText;
-                    url?: string;
-                    artistRaw?: string;
-                    rawBody?: string;
+                    pageBuilder?: PageBuilder;
                     seoTitle?: string;
                     seoDescription?: string;
                     seoImage?: SeoImage;
@@ -2080,9 +1653,10 @@ export type QuerySlugPageDataResult =
                     } | null;
                   } | null;
                   styleVariant?:
-                    | "fitToContainer"
+                    | "default"
                     | "fullBleed"
-                    | "fullViewport";
+                    | "fullViewport"
+                    | "inset";
                   alt?: string;
                 }
               | {
@@ -2284,7 +1858,515 @@ export type QuerySlugPageDataResult =
                 top: number;
               } | null;
             } | null;
-            styleVariant?: "fitToContainer" | "fullBleed" | "fullViewport";
+            styleVariant?: "default" | "fullBleed" | "fullViewport" | "inset";
+            alt?: string;
+          }
+        | {
+            _key: string;
+            _type: "textSection";
+            richText: Array<
+              | {
+                  children?: Array<{
+                    marks?: Array<string>;
+                    text?: string;
+                    _type: "span";
+                    _key: string;
+                  }>;
+                  style?:
+                    | "h2"
+                    | "h3"
+                    | "h4"
+                    | "h5"
+                    | "h6"
+                    | "inline"
+                    | "normal";
+                  listItem?: "bullet" | "number";
+                  markDefs: Array<
+                    | {
+                        customLink?: CustomUrl;
+                        _type: "customLink";
+                        _key: string;
+                        openInNewTab: null;
+                        href: string | "#" | null;
+                      }
+                    | {
+                        customLink?: CustomUrl;
+                        _type: "customLink";
+                        _key: string;
+                      }
+                  > | null;
+                  level?: number;
+                  _type: "block";
+                  _key: string;
+                }
+              | {
+                  asset?: SanityImageAssetReference;
+                  media?: unknown;
+                  hotspot: {
+                    x: number;
+                    y: number;
+                  } | null;
+                  crop: {
+                    bottom: number;
+                    left: number;
+                    right: number;
+                    top: number;
+                  } | null;
+                  caption: Array<
+                    | {
+                        children?: Array<{
+                          marks?: Array<string>;
+                          text?: string;
+                          _type: "span";
+                          _key: string;
+                        }>;
+                        style?: "normal";
+                        listItem?: "bullet" | "number";
+                        markDefs: Array<
+                          | {
+                              customLink?: CustomUrl;
+                              linkVariant?: LinkVariant;
+                              _type: "customLink";
+                              _key: string;
+                              openInNewTab: null;
+                              href: string | "#" | null;
+                            }
+                          | {
+                              customLink?: CustomUrl;
+                              linkVariant?: LinkVariant;
+                              _type: "customLink";
+                              _key: string;
+                            }
+                        > | null;
+                        level?: number;
+                        _type: "block";
+                        _key: string;
+                      }
+                    | {
+                        _key: string;
+                        _type: "inlineButton";
+                        link?: CustomUrl;
+                        text?: string;
+                      }
+                  > | null;
+                  variant:
+                    | "default"
+                    | "fit-to-container"
+                    | "full-bleed"
+                    | "inset"
+                    | null;
+                  _type: "image";
+                  _key: string;
+                  id: string | null;
+                  preview: string | null;
+                }
+            > | null;
+            columnVariant?: "single" | "three" | "two";
+          }
+        | {
+            _key: string;
+            _type: "videoSection";
+            video: {
+              asset: {
+                playbackId: string | null;
+                status: string | null;
+              } | null;
+            } | null;
+            styleVariant?: "fitToContainer" | "fullBleed";
+            title?: string;
+            description?: string;
+          }
+      > | null;
+      seoTitle?: string;
+      seoDescription?: string;
+      seoImage?: SeoImage;
+      seoNoIndex?: boolean;
+      ogTitle?: string;
+      ogDescription?: string;
+    }
+  | {
+      _id: string;
+      _type: "collectionIndex";
+      _createdAt: string;
+      _updatedAt: string;
+      _rev: string;
+      title?: string;
+      description?: string;
+      slug: string;
+      listcollections?: boolean;
+      pageBuilder: Array<
+        | {
+            _key: string;
+            _type: "collectionListing";
+            columnVariant?: "auto" | "four" | "three" | "two";
+            collections: Array<{
+              _id: string;
+              _type: "collection";
+              _createdAt: string;
+              _updatedAt: string;
+              _rev: string;
+              orderRank: string | null;
+              title: string;
+              description: string | null;
+              slug: string;
+              image: {
+                id: string | null;
+                preview: string | null;
+                hotspot: {
+                  x: number;
+                  y: number;
+                } | null;
+                crop: {
+                  bottom: number;
+                  left: number;
+                  right: number;
+                  top: number;
+                } | null;
+              } | null;
+              pageBuilder?: PageBuilder;
+              seoTitle?: string;
+              seoDescription?: string;
+              seoImage?: SeoImage;
+              seoNoIndex?: boolean;
+              ogTitle?: string;
+              ogDescription?: string;
+            }>;
+          }
+        | {
+            _key: string;
+            _type: "gridLayout";
+            pageBuilder: Array<
+              | {
+                  _key: string;
+                  _type: "collectionListing";
+                  columnVariant?: "auto" | "four" | "three" | "two";
+                  collections: Array<{
+                    _id: string;
+                    _type: "collection";
+                    _createdAt: string;
+                    _updatedAt: string;
+                    _rev: string;
+                    orderRank: string | null;
+                    title: string;
+                    description: string | null;
+                    slug: string;
+                    image: {
+                      id: string | null;
+                      preview: string | null;
+                      hotspot: {
+                        x: number;
+                        y: number;
+                      } | null;
+                      crop: {
+                        bottom: number;
+                        left: number;
+                        right: number;
+                        top: number;
+                      } | null;
+                    } | null;
+                    pageBuilder?: PageBuilder;
+                    seoTitle?: string;
+                    seoDescription?: string;
+                    seoImage?: SeoImage;
+                    seoNoIndex?: boolean;
+                    ogTitle?: string;
+                    ogDescription?: string;
+                  }>;
+                }
+              | {
+                  _key: string;
+                  _type: "gridLayout";
+                  pageBuilder?: PageBuilder;
+                  columnVariant?: "auto" | "single" | "three" | "two";
+                }
+              | {
+                  _key: string;
+                  _type: "imageGallery";
+                  images: Array<{
+                    asset?: SanityImageAssetReference;
+                    media?: unknown;
+                    hotspot?: SanityImageHotspot;
+                    crop?: SanityImageCrop;
+                    caption: Array<
+                      | {
+                          children?: Array<{
+                            marks?: Array<string>;
+                            text?: string;
+                            _type: "span";
+                            _key: string;
+                          }>;
+                          style?: "normal";
+                          listItem?: "bullet" | "number";
+                          markDefs: Array<
+                            | {
+                                customLink?: CustomUrl;
+                                linkVariant?: LinkVariant;
+                                _type: "customLink";
+                                _key: string;
+                                openInNewTab: null;
+                                href: string | "#" | null;
+                              }
+                            | {
+                                customLink?: CustomUrl;
+                                linkVariant?: LinkVariant;
+                                _type: "customLink";
+                                _key: string;
+                              }
+                          > | null;
+                          level?: number;
+                          _type: "block";
+                          _key: string;
+                        }
+                      | {
+                          _key: string;
+                          _type: "inlineButton";
+                          link?: CustomUrl;
+                          text?: string;
+                        }
+                    > | null;
+                    _type: "image";
+                    _key: string;
+                    image: {
+                      id: string | null;
+                      preview: string | null;
+                      hotspot: {
+                        x: number;
+                        y: number;
+                      } | null;
+                      crop: {
+                        bottom: number;
+                        left: number;
+                        right: number;
+                        top: number;
+                      } | null;
+                    };
+                  }> | null;
+                  columnVariant?: "single" | "three" | "two";
+                }
+              | {
+                  _key: string;
+                  _type: "imageSection";
+                  image: {
+                    id: string | null;
+                    preview: string | null;
+                    hotspot: {
+                      x: number;
+                      y: number;
+                    } | null;
+                    crop: {
+                      bottom: number;
+                      left: number;
+                      right: number;
+                      top: number;
+                    } | null;
+                  } | null;
+                  styleVariant?:
+                    | "default"
+                    | "fullBleed"
+                    | "fullViewport"
+                    | "inset";
+                  alt?: string;
+                }
+              | {
+                  _key: string;
+                  _type: "textSection";
+                  richText: Array<
+                    | {
+                        children?: Array<{
+                          marks?: Array<string>;
+                          text?: string;
+                          _type: "span";
+                          _key: string;
+                        }>;
+                        style?:
+                          | "h2"
+                          | "h3"
+                          | "h4"
+                          | "h5"
+                          | "h6"
+                          | "inline"
+                          | "normal";
+                        listItem?: "bullet" | "number";
+                        markDefs: Array<
+                          | {
+                              customLink?: CustomUrl;
+                              _type: "customLink";
+                              _key: string;
+                              openInNewTab: null;
+                              href: string | "#" | null;
+                            }
+                          | {
+                              customLink?: CustomUrl;
+                              _type: "customLink";
+                              _key: string;
+                            }
+                        > | null;
+                        level?: number;
+                        _type: "block";
+                        _key: string;
+                      }
+                    | {
+                        asset?: SanityImageAssetReference;
+                        media?: unknown;
+                        hotspot: {
+                          x: number;
+                          y: number;
+                        } | null;
+                        crop: {
+                          bottom: number;
+                          left: number;
+                          right: number;
+                          top: number;
+                        } | null;
+                        caption: Array<
+                          | {
+                              children?: Array<{
+                                marks?: Array<string>;
+                                text?: string;
+                                _type: "span";
+                                _key: string;
+                              }>;
+                              style?: "normal";
+                              listItem?: "bullet" | "number";
+                              markDefs: Array<
+                                | {
+                                    customLink?: CustomUrl;
+                                    linkVariant?: LinkVariant;
+                                    _type: "customLink";
+                                    _key: string;
+                                    openInNewTab: null;
+                                    href: string | "#" | null;
+                                  }
+                                | {
+                                    customLink?: CustomUrl;
+                                    linkVariant?: LinkVariant;
+                                    _type: "customLink";
+                                    _key: string;
+                                  }
+                              > | null;
+                              level?: number;
+                              _type: "block";
+                              _key: string;
+                            }
+                          | {
+                              _key: string;
+                              _type: "inlineButton";
+                              link?: CustomUrl;
+                              text?: string;
+                            }
+                        > | null;
+                        variant:
+                          | "default"
+                          | "fit-to-container"
+                          | "full-bleed"
+                          | "inset"
+                          | null;
+                        _type: "image";
+                        _key: string;
+                        id: string | null;
+                        preview: string | null;
+                      }
+                  > | null;
+                  columnVariant?: "single" | "three" | "two";
+                }
+              | {
+                  _key: string;
+                  _type: "videoSection";
+                  video: {
+                    asset: {
+                      playbackId: string | null;
+                      status: string | null;
+                    } | null;
+                  } | null;
+                  styleVariant?: "fitToContainer" | "fullBleed";
+                  title?: string;
+                  description?: string;
+                }
+            > | null;
+            columnVariant?: "auto" | "single" | "three" | "two";
+          }
+        | {
+            _key: string;
+            _type: "imageGallery";
+            images: Array<{
+              asset?: SanityImageAssetReference;
+              media?: unknown;
+              hotspot?: SanityImageHotspot;
+              crop?: SanityImageCrop;
+              caption: Array<
+                | {
+                    children?: Array<{
+                      marks?: Array<string>;
+                      text?: string;
+                      _type: "span";
+                      _key: string;
+                    }>;
+                    style?: "normal";
+                    listItem?: "bullet" | "number";
+                    markDefs: Array<
+                      | {
+                          customLink?: CustomUrl;
+                          linkVariant?: LinkVariant;
+                          _type: "customLink";
+                          _key: string;
+                          openInNewTab: null;
+                          href: string | "#" | null;
+                        }
+                      | {
+                          customLink?: CustomUrl;
+                          linkVariant?: LinkVariant;
+                          _type: "customLink";
+                          _key: string;
+                        }
+                    > | null;
+                    level?: number;
+                    _type: "block";
+                    _key: string;
+                  }
+                | {
+                    _key: string;
+                    _type: "inlineButton";
+                    link?: CustomUrl;
+                    text?: string;
+                  }
+              > | null;
+              _type: "image";
+              _key: string;
+              image: {
+                id: string | null;
+                preview: string | null;
+                hotspot: {
+                  x: number;
+                  y: number;
+                } | null;
+                crop: {
+                  bottom: number;
+                  left: number;
+                  right: number;
+                  top: number;
+                } | null;
+              };
+            }> | null;
+            columnVariant?: "single" | "three" | "two";
+          }
+        | {
+            _key: string;
+            _type: "imageSection";
+            image: {
+              id: string | null;
+              preview: string | null;
+              hotspot: {
+                x: number;
+                y: number;
+              } | null;
+              crop: {
+                bottom: number;
+                left: number;
+                right: number;
+                top: number;
+              } | null;
+            } | null;
+            styleVariant?: "default" | "fullBleed" | "fullViewport" | "inset";
             alt?: string;
           }
         | {
@@ -2444,75 +2526,7 @@ export type QuerySlugPageDataResult =
                   top: number;
                 } | null;
               } | null;
-              startDate?: string;
-              endDate?: string;
-              gallery?: "Gallery A" | "Gallery B";
-              artists?: Array<
-                {
-                  _key: string;
-                } & ArtistReference
-              >;
-              pressRelease?: Array<
-                | ({
-                    _key: string;
-                  } & InlineButton)
-                | {
-                    children?: Array<{
-                      marks?: Array<string>;
-                      text?: string;
-                      _type: "span";
-                      _key: string;
-                    }>;
-                    style?: "normal";
-                    listItem?: "bullet" | "number";
-                    markDefs?: Array<{
-                      customLink?: CustomUrl;
-                      linkVariant?: LinkVariant;
-                      _type: "customLink";
-                      _key: string;
-                    }>;
-                    level?: number;
-                    _type: "block";
-                    _key: string;
-                  }
-              >;
-              artistBioInPressRelease?: boolean;
-              images?: Array<{
-                asset?: SanityImageAssetReference;
-                media?: unknown;
-                hotspot?: SanityImageHotspot;
-                crop?: SanityImageCrop;
-                caption?: Array<
-                  | ({
-                      _key: string;
-                    } & InlineButton)
-                  | {
-                      children?: Array<{
-                        marks?: Array<string>;
-                        text?: string;
-                        _type: "span";
-                        _key: string;
-                      }>;
-                      style?: "normal";
-                      listItem?: "bullet" | "number";
-                      markDefs?: Array<{
-                        customLink?: CustomUrl;
-                        linkVariant?: LinkVariant;
-                        _type: "customLink";
-                        _key: string;
-                      }>;
-                      level?: number;
-                      _type: "block";
-                      _key: string;
-                    }
-                >;
-                _type: "image";
-                _key: string;
-              }>;
-              body?: RichText;
-              url?: string;
-              artistRaw?: string;
-              rawBody?: string;
+              pageBuilder?: PageBuilder;
               seoTitle?: string;
               seoDescription?: string;
               seoImage?: SeoImage;
@@ -2553,75 +2567,7 @@ export type QuerySlugPageDataResult =
                         top: number;
                       } | null;
                     } | null;
-                    startDate?: string;
-                    endDate?: string;
-                    gallery?: "Gallery A" | "Gallery B";
-                    artists?: Array<
-                      {
-                        _key: string;
-                      } & ArtistReference
-                    >;
-                    pressRelease?: Array<
-                      | ({
-                          _key: string;
-                        } & InlineButton)
-                      | {
-                          children?: Array<{
-                            marks?: Array<string>;
-                            text?: string;
-                            _type: "span";
-                            _key: string;
-                          }>;
-                          style?: "normal";
-                          listItem?: "bullet" | "number";
-                          markDefs?: Array<{
-                            customLink?: CustomUrl;
-                            linkVariant?: LinkVariant;
-                            _type: "customLink";
-                            _key: string;
-                          }>;
-                          level?: number;
-                          _type: "block";
-                          _key: string;
-                        }
-                    >;
-                    artistBioInPressRelease?: boolean;
-                    images?: Array<{
-                      asset?: SanityImageAssetReference;
-                      media?: unknown;
-                      hotspot?: SanityImageHotspot;
-                      crop?: SanityImageCrop;
-                      caption?: Array<
-                        | ({
-                            _key: string;
-                          } & InlineButton)
-                        | {
-                            children?: Array<{
-                              marks?: Array<string>;
-                              text?: string;
-                              _type: "span";
-                              _key: string;
-                            }>;
-                            style?: "normal";
-                            listItem?: "bullet" | "number";
-                            markDefs?: Array<{
-                              customLink?: CustomUrl;
-                              linkVariant?: LinkVariant;
-                              _type: "customLink";
-                              _key: string;
-                            }>;
-                            level?: number;
-                            _type: "block";
-                            _key: string;
-                          }
-                      >;
-                      _type: "image";
-                      _key: string;
-                    }>;
-                    body?: RichText;
-                    url?: string;
-                    artistRaw?: string;
-                    rawBody?: string;
+                    pageBuilder?: PageBuilder;
                     seoTitle?: string;
                     seoDescription?: string;
                     seoImage?: SeoImage;
@@ -2718,9 +2664,10 @@ export type QuerySlugPageDataResult =
                     } | null;
                   } | null;
                   styleVariant?:
-                    | "fitToContainer"
+                    | "default"
                     | "fullBleed"
-                    | "fullViewport";
+                    | "fullViewport"
+                    | "inset";
                   alt?: string;
                 }
               | {
@@ -2922,7 +2869,7 @@ export type QuerySlugPageDataResult =
                 top: number;
               } | null;
             } | null;
-            styleVariant?: "fitToContainer" | "fullBleed" | "fullViewport";
+            styleVariant?: "default" | "fullBleed" | "fullViewport" | "inset";
             alt?: string;
           }
         | {
@@ -3107,75 +3054,7 @@ export type QueryCollectionIndexPageDataResult = {
               top: number;
             } | null;
           } | null;
-          startDate?: string;
-          endDate?: string;
-          gallery?: "Gallery A" | "Gallery B";
-          artists?: Array<
-            {
-              _key: string;
-            } & ArtistReference
-          >;
-          pressRelease?: Array<
-            | ({
-                _key: string;
-              } & InlineButton)
-            | {
-                children?: Array<{
-                  marks?: Array<string>;
-                  text?: string;
-                  _type: "span";
-                  _key: string;
-                }>;
-                style?: "normal";
-                listItem?: "bullet" | "number";
-                markDefs?: Array<{
-                  customLink?: CustomUrl;
-                  linkVariant?: LinkVariant;
-                  _type: "customLink";
-                  _key: string;
-                }>;
-                level?: number;
-                _type: "block";
-                _key: string;
-              }
-          >;
-          artistBioInPressRelease?: boolean;
-          images?: Array<{
-            asset?: SanityImageAssetReference;
-            media?: unknown;
-            hotspot?: SanityImageHotspot;
-            crop?: SanityImageCrop;
-            caption?: Array<
-              | ({
-                  _key: string;
-                } & InlineButton)
-              | {
-                  children?: Array<{
-                    marks?: Array<string>;
-                    text?: string;
-                    _type: "span";
-                    _key: string;
-                  }>;
-                  style?: "normal";
-                  listItem?: "bullet" | "number";
-                  markDefs?: Array<{
-                    customLink?: CustomUrl;
-                    linkVariant?: LinkVariant;
-                    _type: "customLink";
-                    _key: string;
-                  }>;
-                  level?: number;
-                  _type: "block";
-                  _key: string;
-                }
-            >;
-            _type: "image";
-            _key: string;
-          }>;
-          body?: RichText;
-          url?: string;
-          artistRaw?: string;
-          rawBody?: string;
+          pageBuilder?: PageBuilder;
           seoTitle?: string;
           seoDescription?: string;
           seoImage?: SeoImage;
@@ -3216,75 +3095,7 @@ export type QueryCollectionIndexPageDataResult = {
                     top: number;
                   } | null;
                 } | null;
-                startDate?: string;
-                endDate?: string;
-                gallery?: "Gallery A" | "Gallery B";
-                artists?: Array<
-                  {
-                    _key: string;
-                  } & ArtistReference
-                >;
-                pressRelease?: Array<
-                  | ({
-                      _key: string;
-                    } & InlineButton)
-                  | {
-                      children?: Array<{
-                        marks?: Array<string>;
-                        text?: string;
-                        _type: "span";
-                        _key: string;
-                      }>;
-                      style?: "normal";
-                      listItem?: "bullet" | "number";
-                      markDefs?: Array<{
-                        customLink?: CustomUrl;
-                        linkVariant?: LinkVariant;
-                        _type: "customLink";
-                        _key: string;
-                      }>;
-                      level?: number;
-                      _type: "block";
-                      _key: string;
-                    }
-                >;
-                artistBioInPressRelease?: boolean;
-                images?: Array<{
-                  asset?: SanityImageAssetReference;
-                  media?: unknown;
-                  hotspot?: SanityImageHotspot;
-                  crop?: SanityImageCrop;
-                  caption?: Array<
-                    | ({
-                        _key: string;
-                      } & InlineButton)
-                    | {
-                        children?: Array<{
-                          marks?: Array<string>;
-                          text?: string;
-                          _type: "span";
-                          _key: string;
-                        }>;
-                        style?: "normal";
-                        listItem?: "bullet" | "number";
-                        markDefs?: Array<{
-                          customLink?: CustomUrl;
-                          linkVariant?: LinkVariant;
-                          _type: "customLink";
-                          _key: string;
-                        }>;
-                        level?: number;
-                        _type: "block";
-                        _key: string;
-                      }
-                  >;
-                  _type: "image";
-                  _key: string;
-                }>;
-                body?: RichText;
-                url?: string;
-                artistRaw?: string;
-                rawBody?: string;
+                pageBuilder?: PageBuilder;
                 seoTitle?: string;
                 seoDescription?: string;
                 seoImage?: SeoImage;
@@ -3380,7 +3191,7 @@ export type QueryCollectionIndexPageDataResult = {
                   top: number;
                 } | null;
               } | null;
-              styleVariant?: "fitToContainer" | "fullBleed" | "fullViewport";
+              styleVariant?: "default" | "fullBleed" | "fullViewport" | "inset";
               alt?: string;
             }
           | {
@@ -3582,7 +3393,7 @@ export type QueryCollectionIndexPageDataResult = {
             top: number;
           } | null;
         } | null;
-        styleVariant?: "fitToContainer" | "fullBleed" | "fullViewport";
+        styleVariant?: "default" | "fullBleed" | "fullViewport" | "inset";
         alt?: string;
       }
     | {

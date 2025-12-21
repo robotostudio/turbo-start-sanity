@@ -1,28 +1,35 @@
 "use client";
 
-import {ViewportImage} from "@workspace/ui/components/ViewportImage";
-import {stegaClean} from "next-sanity";
+import { ViewportImage } from "@workspace/ui/components/ViewportImage";
+import { cn } from "@workspace/ui/lib/utils";
+import { stegaClean } from "next-sanity";
 
-import {urlFor} from "@/lib/sanity/client";
-import type {PagebuilderType} from "@/types";
-import {SanityImage} from "../elements/sanity-image";
+import { urlFor } from "@/lib/sanity/client";
+import type { PagebuilderType } from "@/types";
+import { SanityImage } from "../elements/sanity-image";
 
 type ImageSectionProps = PagebuilderType<"imageSection">;
 
-export function ImageSection({image, styleVariant, alt}: ImageSectionProps) {
+export function ImageSection({ image, styleVariant, alt }: ImageSectionProps) {
   if (!image) {
     return null;
   }
 
   const cleanStyleVariant = stegaClean(styleVariant);
+
   const isFullBleed = cleanStyleVariant === "fullBleed";
   const isFullViewport = cleanStyleVariant === "fullViewport";
+  const isDefault = cleanStyleVariant === "default";
+  const isInset = cleanStyleVariant === "inset";
 
   return (
     <section
-      className={
-        isFullBleed ? "relative w-full max-w-screen" : "container mx-auto px-4"
-      }
+      className={cn({
+        "relative w-full max-w-screen": isFullBleed,
+        "fixed inset-0 z-0 h-full w-full": isFullViewport,
+        "container mx-auto px-4": isDefault,
+        "container-narrow": isInset,
+      })}
     >
       {isFullViewport ? (
         <ViewportImage src={urlFor(image).url()} alt={""} />

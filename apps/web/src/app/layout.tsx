@@ -16,7 +16,7 @@ import {
   baseTwelveSerif,
   baseTwelveSerifSmallCaps,
 } from "@/fonts";
-import { getNavigationData } from "@/lib/navigation";
+// import { getNavigationData } from "@/lib/navigation";
 import { SanityLive } from "@/lib/sanity/live";
 
 export default async function RootLayout({
@@ -26,7 +26,7 @@ export default async function RootLayout({
 }>) {
   preconnect("https://cdn.sanity.io");
   prefetchDNS("https://cdn.sanity.io");
-  const nav = await getNavigationData();
+  // const nav = await getNavigationData();
   return (
     <html lang="en" suppressHydrationWarning>
       <body

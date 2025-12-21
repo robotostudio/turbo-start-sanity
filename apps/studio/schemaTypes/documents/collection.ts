@@ -1,12 +1,17 @@
-import {orderRankField} from "@sanity/orderable-document-list";
-import {defineField, defineType, type PreviewConfig} from "sanity";
-import {GROUP, GROUPS} from "../../utils/constant";
-import {getDocumentIcon} from "../../utils/document-icons";
-import {ogFields} from "../../utils/og-fields";
-import {seoFields} from "../../utils/seo-fields";
-import {createDocumentPreview, documentSlugField} from "../common";
-import {imageWithCaption} from "../definitions/image-with-caption";
-import { limitedRichText } from '../definitions/rich-text';
+import { orderRankField } from "@sanity/orderable-document-list";
+import { defineField, defineType, type PreviewConfig } from "sanity";
+
+import { GROUP, GROUPS } from "../../utils/constant";
+import { getDocumentIcon } from "../../utils/document-icons";
+import { ogFields } from "../../utils/og-fields";
+import { seoFields } from "../../utils/seo-fields";
+import {
+  createDocumentPreview,
+  documentSlugField,
+  pageBuilderField,
+} from "../common";
+import { imageWithCaption } from "../definitions/image-with-caption";
+import { limitedRichText } from "../definitions/rich-text";
 
 export const collection = defineType({
   name: "collection",
@@ -18,12 +23,12 @@ export const collection = defineType({
     {
       title: "Newest First",
       name: "newestFirst",
-      by: [{field: "startDate", direction: "desc"}],
+      by: [{ field: "startDate", direction: "desc" }],
     },
     {
       title: "Oldest First",
       name: "oldestFirst",
-      by: [{field: "startDate", direction: "asc"}],
+      by: [{ field: "startDate", direction: "asc" }],
     },
   ],
   fieldsets: [
@@ -44,7 +49,7 @@ export const collection = defineType({
     },
   ],
   fields: [
-    orderRankField({type: "collection"}),
+    orderRankField({ type: "collection" }),
     defineField({
       name: "title",
       type: "string",
@@ -90,112 +95,7 @@ export const collection = defineType({
         hotspot: true,
       },
     }),
-    defineField({
-      fieldset: "dates",
-      name: "startDate",
-      type: "date",
-      title: "Start Date",
-      description: "The starting date of the collection",
-      group: GROUP.MAIN_CONTENT,
-    }),
-    defineField({
-      fieldset: "dates",
-      name: "endDate",
-      type: "date",
-      title: "End Date",
-      description: "The ending date of the collection",
-      group: GROUP.MAIN_CONTENT,
-    }),
-    defineField({
-      group: GROUP.MAIN_CONTENT,
-      name: "gallery",
-      title: "Gallery",
-      description: "Leave this blank if the collection is in both galleries",
-      type: "string",
-      options: {
-        layout: "radio",
-        direction: "horizontal",
-        list: [
-          {title: "Gallery A", value: "Gallery A"},
-          {title: "Gallery B", value: "Gallery B"},
-        ],
-      },
-    }),
-    defineField({
-      group: GROUP.MAIN_CONTENT,
-      name: "artists",
-      title: "Artists",
-      type: "array",
-      of: [
-        {
-          type: "reference",
-          to: [{type: "artist"}],
-        },
-      ],
-    }),
-    limitedRichText({
-      name: "pressRelease",
-      title: "Press Release",
-      description:
-        "The press release for this collection. If provided, it will replace the body content on the collection page.",
-      group: GROUP.MAIN_CONTENT,
-    }),
-    defineField({
-      name: "artistBioInPressRelease",
-      title: "Artist Bio in Press Release?",
-      type: "boolean",
-      group: GROUP.MAIN_CONTENT,
-    }),
-    defineField({
-      name: "images",
-      title: "Images",
-      type: "array",
-      of: [imageWithCaption],
-      group: GROUP.MAIN_CONTENT,
-    }),
-    // pageBuilderField,
-    defineField({
-      name: "body",
-      title: "Body",
-      type: "richText",
-      hidden: ({document}) => Boolean(document?.pressRelease),
-      group: GROUP.MAIN_CONTENT,
-    }),
-    defineField({
-      fieldset: "migration",
-      name: "url",
-      title: "URL",
-      type: "url",
-      readOnly: true,
-      group: GROUP.MAIN_CONTENT,
-    }),
-    defineField({
-      fieldset: "migration",
-      readOnly: true,
-      name: "artistRaw",
-      title: "Artist Raw",
-      type: "string",
-      group: GROUP.MAIN_CONTENT,
-    }),
-    // defineField({
-    //   fieldset: "migration",
-    //   name: "rawBody",
-    //   title: "Raw Body",
-    //   type: "string",
-    //   options: {
-    //     wordWrap: true,
-    //   } as Record<string, unknown>,
-
-    //   group: GROUP.MAIN_CONTENT,
-    // }),
-    defineField({
-      fieldset: "migration",
-      name: "rawBody",
-      type: "text",
-      title: "Raw Body",
-      group: GROUP.MAIN_CONTENT,
-      readOnly: true,
-    }),
+    pageBuilderField,
 
     ...seoFields.filter((field) => field.name !== "seoHideFromLists"),
     ...ogFields,

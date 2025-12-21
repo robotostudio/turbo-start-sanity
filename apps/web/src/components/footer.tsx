@@ -15,7 +15,6 @@ import {
   YoutubeIcon,
 } from "./social-icons";
 
-
 type SocialLinksProps = {
   data: NonNullable<QueryGlobalSeoSettingsResult>["socialLinks"];
 };
@@ -24,6 +23,28 @@ type FooterProps = {
   year: number;
   data: NonNullable<QueryFooterDataResult>;
   settingsData: NonNullable<QueryGlobalSeoSettingsResult>;
+};
+
+export const CollectionsFooter = ({collections}: {collections: string[]}) => {
+  const [firstCollection, ...otherCollections] = collections;
+
+  return (
+    <>
+      <span className="text-8xl font-akzidenz-grotesk">
+        {firstCollection && (
+          <div className="sticky bottom-0 text-accent">{firstCollection}</div>
+        )}
+        <ul className="grid gap-0 *:leading-none">
+          {otherCollections.map((city) => (
+            <div key={city}>{city}</div>
+          ))}
+        </ul>
+      </span>
+      <h1 className="z-50 text-9xl font-akzidenz-grotesk fixed bottom-0 right-0 leading-none! block h-min mix-blend-exclusion text-white">
+        ☻
+      </h1>
+    </>
+  );
 };
 
 export async function FooterServer() {
@@ -49,34 +70,16 @@ export async function FooterServer() {
     "Naples",
   ];
 
-  const isCurrentPage = true; // Placeholder for actual logic
+  // if (!(response?.data && settingsResponse?.data)) {
+  //   return null;
+  // }
 
-  const [firstCollection, ...otherCollections] = citiesMock;
-
-  if (!(response?.data && settingsResponse?.data)) {
-    return (
-      <span className="text-8xl font-akzidenz-grotesk">
-        {firstCollection && (
-          <div className="sticky bottom-0 text-accent">{firstCollection}</div>
-        )}
-        <ul className="grid gap-0 *:leading-none">
-          {otherCollections.map((city) => (
-            <div key={city}>{city}</div>
-          ))}
-        </ul>
-      <ul>
-        {navigationD && (
-          <SocialLinks data={settingsResponse.data.socialLinks} />
-        )}
-      </ul>
-      </span>
-    );
-  }
   return (
-    <Footer
-      data={response.data}
-      settingsData={settingsResponse.data}
-      year={year}
+    <CollectionsFooter
+      collections={citiesMock}
+      // data={response.data}
+      // settingsData={settingsResponse.data}
+      // year={year}
     />
   );
 }

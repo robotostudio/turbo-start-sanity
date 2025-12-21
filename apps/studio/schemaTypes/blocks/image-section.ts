@@ -32,8 +32,9 @@ export const imageSection = defineType({
         "Choose how the image should be displayed - full bleed extends to the edges, fit to container maintains aspect ratio within the container",
       initialValue: () => "fitToContainer",
       options: createRadioListLayout([
+        "default",
+        "inset",
         "fullBleed",
-        "fitToContainer",
         "fullViewport",
       ]),
     }),
