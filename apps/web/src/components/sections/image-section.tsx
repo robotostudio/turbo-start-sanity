@@ -18,8 +18,6 @@ export function ImageSection({image, styleVariant, alt}: ImageSectionProps) {
   const isFullBleed = cleanStyleVariant === "fullBleed";
   const isFullViewport = cleanStyleVariant === "fullViewport";
 
-  const imageUrl = urlFor(image).width(20480).url() || "";
-
   return (
     <section
       className={
@@ -27,7 +25,7 @@ export function ImageSection({image, styleVariant, alt}: ImageSectionProps) {
       }
     >
       {isFullViewport ? (
-        <ViewportImage src={imageUrl} alt={""} />
+        <ViewportImage src={urlFor(image).url()} alt={""} />
       ) : (
         <div className={isFullBleed ? "w-full max-w-screen" : "w-full"}>
           <SanityImage

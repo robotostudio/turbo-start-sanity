@@ -1,12 +1,12 @@
 import Link from "next/link";
 
-import { sanityFetch } from "@/lib/sanity/live";
-import { queryFooterData, queryGlobalSeoSettings } from "@/lib/sanity/query";
+import {sanityFetch} from "@/lib/sanity/live";
+import {queryFooterData, queryGlobalSeoSettings} from "@/lib/sanity/query";
 import type {
   QueryFooterDataResult,
   QueryGlobalSeoSettingsResult,
 } from "@/lib/sanity/sanity.types";
-import { Logo } from "./logo";
+import {Logo} from "./logo";
 import {
   FacebookIcon,
   InstagramIcon,
@@ -14,6 +14,7 @@ import {
   XIcon,
   YoutubeIcon,
 } from "./social-icons";
+
 
 type SocialLinksProps = {
   data: NonNullable<QueryGlobalSeoSettingsResult>["socialLinks"];
@@ -37,11 +38,38 @@ export async function FooterServer() {
 
   const year = new Date().getFullYear();
 
+  const citiesMock = [
+    "Mexico City",
+    "Berlin",
+    "New York",
+    "Rome",
+    "Miami",
+    "Detroit",
+    "Columbus",
+    "Naples",
+  ];
+
+  const isCurrentPage = true; // Placeholder for actual logic
+
+  const [firstCollection, ...otherCollections] = citiesMock;
+
   if (!(response?.data && settingsResponse?.data)) {
     return (
-      <FooterSkeleton>
-        <p>&copy; {year}. All rights reserved.</p>
-      </FooterSkeleton>
+      <span className="text-8xl font-akzidenz-grotesk">
+        {firstCollection && (
+          <div className="sticky bottom-0 text-accent">{firstCollection}</div>
+        )}
+        <ul className="grid gap-0 *:leading-none">
+          {otherCollections.map((city) => (
+            <div key={city}>{city}</div>
+          ))}
+        </ul>
+      <ul>
+        {navigationD && (
+          <SocialLinks data={settingsResponse.data.socialLinks} />
+        )}
+      </ul>
+      </span>
     );
   }
   return (
@@ -53,12 +81,12 @@ export async function FooterServer() {
   );
 }
 
-function SocialLinks({ data }: SocialLinksProps) {
+function SocialLinks({data}: SocialLinksProps) {
   if (!data) {
     return null;
   }
 
-  const { facebook, twitter, instagram, youtube, linkedin } = data;
+  const {facebook, twitter, instagram, youtube, linkedin} = data;
 
   const socialLinks = [
     {
@@ -71,7 +99,7 @@ function SocialLinks({ data }: SocialLinksProps) {
       Icon: FacebookIcon,
       label: "Follow us on Facebook",
     },
-    { url: twitter, Icon: XIcon, label: "Follow us on Twitter" },
+    {url: twitter, Icon: XIcon, label: "Follow us on Twitter"},
     {
       url: linkedin,
       Icon: LinkedinIcon,
@@ -86,7 +114,7 @@ function SocialLinks({ data }: SocialLinksProps) {
 
   return (
     <ul className="flex items-center space-x-6 text-muted-foreground">
-      {socialLinks.map(({ url, Icon, label }, index) => (
+      {socialLinks.map(({url, Icon, label}, index) => (
         <li
           className="font-medium hover:text-primary"
           key={`social-link-${url}-${index.toString()}`}
@@ -107,10 +135,10 @@ function SocialLinks({ data }: SocialLinksProps) {
   );
 }
 
-export function FooterSkeleton({ children }: { children: React.ReactNode }) {
+export function FooterSkeleton({children}: {children: React.ReactNode}) {
   return (
     <footer className="pt-16 pb-8">
-      <section className="borer-t-2 container mx-auto border-accent border-t-2 border-dotted py-8">
+      <section className="borer-t-2 container mx-auto border-accent! border-t-2 border-dotted py-8">
         {" "}
         {children}
       </section>
@@ -118,9 +146,9 @@ export function FooterSkeleton({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Footer({ year, data, settingsData }: FooterProps) {
-  const { subtitle, columns } = data;
-  const { siteTitle, logo, socialLinks } = settingsData;
+function Footer({year, data, settingsData}: FooterProps) {
+  const {subtitle, columns} = data;
+  const {siteTitle, logo, socialLinks} = settingsData;
 
   return (
     <footer className="mt-20 pb-8">

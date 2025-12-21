@@ -38,7 +38,6 @@ export default async function RootLayout({
         )}
       >
         <Providers>
-          <Navbar navbarData={nav.navbarData} settingsData={nav.settingsData} />
           {children}
           <Suspense
             fallback={

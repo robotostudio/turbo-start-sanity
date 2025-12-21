@@ -38,7 +38,7 @@ export const baseTwelveSerifSmallCaps = localFont({
       style: "italic",
     },
   ],
-  variable: "--font-face-twelve-serif-small-caps",
+  variable: "--base-twelve-serif-small-caps",
 });
 
 export const baseTwelveSerif = localFont({
@@ -69,7 +69,7 @@ export const baseTwelveSerif = localFont({
       style: "italic",
     },
   ],
-  variable: "--font-face-twelve-serif",
+  variable: "--base-twelve-serif",
 });
 
 // AkzidenzGrotesk - ExtraBold.otf;
@@ -148,5 +148,5 @@ export const akzidenzGrotesk = localFont({
       style: "normal",
     },
   ],
-  variable: "--font-face-akzidenz-grotesk",
+  variable: "--akzidenz-grotesk",
 });
