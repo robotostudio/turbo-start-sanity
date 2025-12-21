@@ -1,12 +1,13 @@
 import Link from "next/link";
 
-import {sanityFetch} from "@/lib/sanity/live";
-import {queryFooterData, queryGlobalSeoSettings} from "@/lib/sanity/query";
+import { sanityFetch } from "@/lib/sanity/live";
+import { queryFooterData, queryGlobalSeoSettings } from "@/lib/sanity/query";
 import type {
   QueryFooterDataResult,
   QueryGlobalSeoSettingsResult,
 } from "@/lib/sanity/sanity.types";
-import {Logo} from "./logo";
+import { GlyphBox } from "./GlyphBox";
+import { Logo } from "./logo";
 import {
   FacebookIcon,
   InstagramIcon,
@@ -25,7 +26,11 @@ type FooterProps = {
   settingsData: NonNullable<QueryGlobalSeoSettingsResult>;
 };
 
-export const CollectionsFooter = ({collections}: {collections: string[]}) => {
+export const CollectionsFooter = ({
+  collections,
+}: {
+  collections: string[];
+}) => {
   const [firstCollection, ...otherCollections] = collections;
 
   return (
@@ -40,9 +45,14 @@ export const CollectionsFooter = ({collections}: {collections: string[]}) => {
           ))}
         </ul>
       </span>
-      <h1 className="z-50 text-9xl font-akzidenz-grotesk fixed bottom-0 right-0 leading-none! block h-min mix-blend-exclusion text-white">
-        ☻
-      </h1>
+      <div className="z-50 fixed bottom-0 right-0 mix-blend-exclusion">
+        <GlyphBox
+          char="☻"
+          className="text-white font-akzidenz-grotesk"
+          fontSize={160}
+          style={{ transform: "rotate(0deg)" }}
+        />
+      </div>
     </>
   );
 };
@@ -84,12 +94,12 @@ export async function FooterServer() {
   );
 }
 
-function SocialLinks({data}: SocialLinksProps) {
+function SocialLinks({ data }: SocialLinksProps) {
   if (!data) {
     return null;
   }
 
-  const {facebook, twitter, instagram, youtube, linkedin} = data;
+  const { facebook, twitter, instagram, youtube, linkedin } = data;
 
   const socialLinks = [
     {
@@ -102,7 +112,7 @@ function SocialLinks({data}: SocialLinksProps) {
       Icon: FacebookIcon,
       label: "Follow us on Facebook",
     },
-    {url: twitter, Icon: XIcon, label: "Follow us on Twitter"},
+    { url: twitter, Icon: XIcon, label: "Follow us on Twitter" },
     {
       url: linkedin,
       Icon: LinkedinIcon,
@@ -117,7 +127,7 @@ function SocialLinks({data}: SocialLinksProps) {
 
   return (
     <ul className="flex items-center space-x-6 text-muted-foreground">
-      {socialLinks.map(({url, Icon, label}, index) => (
+      {socialLinks.map(({ url, Icon, label }, index) => (
         <li
           className="font-medium hover:text-primary"
           key={`social-link-${url}-${index.toString()}`}
@@ -138,7 +148,7 @@ function SocialLinks({data}: SocialLinksProps) {
   );
 }
 
-export function FooterSkeleton({children}: {children: React.ReactNode}) {
+export function FooterSkeleton({ children }: { children: React.ReactNode }) {
   return (
     <footer className="pt-16 pb-8">
       <section className="borer-t-2 container mx-auto border-accent! border-t-2 border-dotted py-8">
@@ -149,9 +159,9 @@ export function FooterSkeleton({children}: {children: React.ReactNode}) {
   );
 }
 
-function Footer({year, data, settingsData}: FooterProps) {
-  const {subtitle, columns} = data;
-  const {siteTitle, logo, socialLinks} = settingsData;
+function Footer({ year, data, settingsData }: FooterProps) {
+  const { subtitle, columns } = data;
+  const { siteTitle, logo, socialLinks } = settingsData;
 
   return (
     <footer className="mt-20 pb-8">

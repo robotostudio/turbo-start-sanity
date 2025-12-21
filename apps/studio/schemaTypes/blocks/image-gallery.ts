@@ -1,9 +1,9 @@
-import { ImagesIcon } from "lucide-react";
-import { defineField, defineType } from "sanity";
+import {ImagesIcon} from "lucide-react";
+import {defineField, defineType} from "sanity";
 
-import { createRadioListLayout } from "../../utils/helper";
-import { iconWrapper } from "../../utils/icon-wrapper";
-import { imageWithCaption } from "../definitions/image-with-caption";
+import {createRadioListLayout} from "../../utils/helper";
+import {iconWrapper} from "../../utils/icon-wrapper";
+import { imagesArrayField } from '../common';
 
 export const imageGallery = defineType({
   name: "imageGallery",
@@ -11,13 +11,7 @@ export const imageGallery = defineType({
   type: "object",
   icon: iconWrapper(ImagesIcon),
   fields: [
-    defineField({
-      name: "images",
-      title: "Images",
-      type: "array",
-      description: "Add images to display in the gallery",
-      of: [imageWithCaption],
-    }),
+    imagesArrayField,
     defineField({
       name: "columnVariant",
       title: "Column Variant",
@@ -33,7 +27,7 @@ export const imageGallery = defineType({
       images: "images",
       firstImage: "images.0.image",
     },
-    prepare: ({ columnVariant, images, firstImage }) => ({
+    prepare: ({columnVariant, images, firstImage}) => ({
       title:
         Object.keys(images).length > 0
           ? `${Object.keys(images).length} images`

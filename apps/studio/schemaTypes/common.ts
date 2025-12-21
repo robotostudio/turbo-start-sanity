@@ -8,11 +8,13 @@ import {
 } from "sanity";
 
 import { PathnameFieldComponent } from "@/components/slug-field-component";
+import { ImagesArrayFieldComponent } from "@/plugins/ImagesArrayFieldItemPreview";
 import { GROUP } from "@/utils/constant";
 import {
   createSlugValidator,
   getDocumentTypeConfig,
 } from "@/utils/slug-validation";
+import { imageWithCaption } from "./definitions/image-with-caption";
 
 export const richTextField = defineField({
   name: "richText",
@@ -119,7 +121,6 @@ export const imageWithAltField = ({
     ],
   });
 
-
 export const createDocumentPreview = (options?: {
   defaultTitle?: string;
   privateStatusEmoji?: string;
@@ -173,3 +174,17 @@ export const createDocumentPreview = (options?: {
     },
   } as PreviewConfig;
 };
+
+export const imagesArrayField = defineField({
+  name: "images",
+  title: "Images",
+  type: "array",
+  description: "Add images to display in the gallery",
+  options: {
+    layout: "grid",
+  },
+  components: {
+    input: ImagesArrayFieldComponent as any,
+  },
+  of: [imageWithCaption],
+});

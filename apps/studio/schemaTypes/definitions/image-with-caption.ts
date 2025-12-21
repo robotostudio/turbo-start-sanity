@@ -1,8 +1,10 @@
-import {ImageIcon} from "@sanity/icons";
-import {defineField} from "sanity";
+import { ImageIcon } from "@sanity/icons";
+import type { Component } from "react";
+import { defineField, type PreviewComponent } from "sanity";
 
-import {iconWrapper} from "../../utils/icon-wrapper";
-import {limitedRichText} from "./rich-text";
+import { ImagesArrayFieldIemPreview } from "@/plugins/ImagesArrayFieldItemPreview";
+import { iconWrapper } from "../../utils/icon-wrapper";
+import { limitedRichText } from "./rich-text";
 
 export const imageWithCaption = defineField({
   name: "image",
@@ -11,6 +13,10 @@ export const imageWithCaption = defineField({
   icon: iconWrapper(ImageIcon),
   options: {
     hotspot: true,
+  },
+  components: {
+    item: ImagesArrayFieldIemPreview as unknown as any,
+    // item: ImagesArrayFieldIemPreview as unknown as PreviewComponent,
   },
   fields: [
     limitedRichText({
