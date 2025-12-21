@@ -1,28 +1,45 @@
-import {Flex} from "@sanity/ui";
-import {createContext, useContext} from "react";
-import {type ArrayFieldProps, type ItemProps, useFormValue} from "sanity";
+import type { ReactNode } from "react";
+import {
+  type ArrayFieldProps,
+  type ItemProps,
+  type PreviewComponent,
+  type PreviewProps,
+  useFormValue,
+} from "sanity";
+import { useImageUrlBuilder } from "sanity-plugin-utils";
 import styled from "styled-components";
 
-export const ImagesArrayFieldIemPreview = (props: ItemProps) => {
-  const {columnVariant} = useImagesArrayFieldContext();
+import type { SanityImageAsset } from "@/sanity.types";
 
-  const TwoColItemPreview = styled.div`
-    width: 50%;
-    padding: 8px;
-    background: red;
+export const ImagesArrayFieldIemPreview = (props: PreviewProps) => {
+  const ObjectFitContainImg = styled.img`
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
   `;
 
-  return <TwoColItemPreview>{props.renderDefault(props)}</TwoColItemPreview>;
+  const builder = useImageUrlBuilder({
+    apiVersion: "2024-06-07",
+  });
+
+  return props.renderDefault({
+    ...props,
+    media: props?.media && (
+      <ObjectFitContainImg
+        src={builder
+          ?.image(props.media as unknown as SanityImageAsset)
+          .width(400)
+          .url()}
+        alt={"Image"}
+      />
+    ),
+  });
 };
 
-const ImagesArrayFieldContext = createContext<any>({columnVariant: {}});
-
-const useImagesArrayFieldContext = () => useContext(ImagesArrayFieldContext);
-
-const ImagesArrayFieldContextProvider = ImagesArrayFieldContext.Provider;
-
 export const ImagesArrayFieldComponent = (props: ArrayFieldProps) => {
-  const {id, path} = props as any;
+  const { id, path } = props as any;
 
   const columnVariant =
     useFormValue([...path.slice(0, path.length - 1), "columnVariant"]) || {};
@@ -40,19 +57,31 @@ export const ImagesArrayFieldComponent = (props: ArrayFieldProps) => {
 
   const DynamicColumnVariantWrapper = styled.div`
     display: block;
-    width: 100%;
 
     & [data-ui="ArrayInput__content"] [data-ui="Card"] [data-ui="Grid"] {
-        grid-template-columns: repeat(${columnVariantNumberMap[columnVariant as string] || 1}, minmax(0, 1fr)) !important;
+        grid-template-columns: repeat(${columnVariantNumberMap[columnVariant as string] || 1}        , minmax(0, 1fr)) !important;
       ) !important;
+
+      & [data-ui="PreviewCard"] {
+
+        * {
+          margin: 0 auto;
+          max-height: 200px;
+          padding: 0;
+          object-fit: contain; 
+        }
+
+        > img {
+          object-fit: contain;
+        }
+      }
+
     }
   `;
 
   return (
-    <ImagesArrayFieldContextProvider value={{columnVariant}}>
-      <DynamicColumnVariantWrapper id={id}>
-        {props.renderDefault(mutatedProps)}
-      </DynamicColumnVariantWrapper>
-    </ImagesArrayFieldContextProvider>
+    <DynamicColumnVariantWrapper id={id}>
+      {props.renderDefault(mutatedProps)}
+    </DynamicColumnVariantWrapper>
   );
 };

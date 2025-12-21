@@ -15,7 +15,7 @@ export const imageWithCaption = defineField({
     hotspot: true,
   },
   components: {
-    item: ImagesArrayFieldIemPreview as unknown as any,
+    preview: ImagesArrayFieldIemPreview as unknown as any,
     // item: ImagesArrayFieldIemPreview as unknown as PreviewComponent,
   },
   fields: [
