@@ -8,6 +8,7 @@ import {
 } from "sanity";
 import slugify from "slugify";
 
+import { API_VERSION } from "@/utils/constant";
 import type { PathnameParams } from "@/utils/types";
 
 export function defineSlug(
@@ -36,7 +37,7 @@ export async function isUnique(
   context: SlugValidationContext
 ): Promise<boolean> {
   const { document, getClient } = context;
-  const client = getClient({ apiVersion: "2025-02-10" });
+  const client = getClient({ apiVersion: API_VERSION });
   const id = getPublishedId(document?._id ?? "");
   const draftId = getDraftId(id);
   const params = {

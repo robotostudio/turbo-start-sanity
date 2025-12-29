@@ -2,6 +2,8 @@ import { TrendingUpDown } from "lucide-react";
 import type { SanityClient, SlugValue } from "sanity";
 import { defineField, defineType, getDraftId, getPublishedId } from "sanity";
 
+import { API_VERSION } from "@/utils/constant";
+
 type Redirect = {
   source: SlugValue;
   destination: SlugValue;
@@ -69,7 +71,7 @@ export const redirect = defineType({
           if (source === destination) {
             return "Source and destination cannot be the same URL";
           }
-          const client = getClient({ apiVersion: "2025-01-01" });
+          const client = getClient({ apiVersion: API_VERSION });
           const existingRedirect = await validateRedirectLoop(client, {
             _id: document?._id ?? "",
             slug: source,
@@ -102,7 +104,7 @@ export const redirect = defineType({
           if (destination === source) {
             return "Source and destination cannot be the same URL";
           }
-          const client = getClient({ apiVersion: "2025-01-01" });
+          const client = getClient({ apiVersion: API_VERSION });
           const existingRedirect = await validateRedirectLoop(client, {
             _id: document?._id ?? "",
             slug: destination,

@@ -40,3 +40,6 @@ export const GROUPS: FieldGroupDefinition[] = [
     title: "Related",
   },
 ];
+
+export const API_VERSION =
+  process.env.SANITY_STUDIO_API_VERSION ?? "2025-05-08";
