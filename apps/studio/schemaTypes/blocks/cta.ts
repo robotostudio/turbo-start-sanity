@@ -1,7 +1,7 @@
 import { PhoneIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { buttonsField } from "@/schemaTypes/common";
+import { buttonsField, previewThumbnail } from "@/schemaTypes/common";
 import { customRichText } from "@/schemaTypes/definitions/rich-text";
 
 export const cta = defineType({
@@ -24,6 +24,7 @@ export const cta = defineType({
     }),
     customRichText(["block"]),
     buttonsField,
+    previewThumbnail,
   ],
   preview: {
     select: {

@@ -2,7 +2,7 @@ import { LayoutGrid } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
 import { lucideIconPreview } from "@/components/icon-preview";
-import { iconField } from "@/schemaTypes/common";
+import { iconField, previewThumbnail } from "@/schemaTypes/common";
 import { customRichText } from "@/schemaTypes/definitions/rich-text";
 
 const featureCardIcon = defineField({
@@ -53,6 +53,7 @@ export const featureCardsIcon = defineType({
       description: "The individual feature cards to display in the grid",
       of: [featureCardIcon],
     }),
+    previewThumbnail,
   ],
   preview: {
     select: {

@@ -1,7 +1,7 @@
 import { ImageIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { buttonsField, imageWithAltField } from "@/schemaTypes/common";
+import { buttonsField, imageWithAltField, previewThumbnail } from "@/schemaTypes/common";
 import { customRichText } from "@/schemaTypes/definitions/rich-text";
 
 const imageLinkCard = defineField({
@@ -30,6 +30,7 @@ const imageLinkCard = defineField({
       title: "Link URL",
       type: "customUrl",
     }),
+    previewThumbnail,
   ],
   preview: {
     select: {

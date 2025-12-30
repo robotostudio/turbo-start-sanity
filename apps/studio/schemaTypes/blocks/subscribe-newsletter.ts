@@ -2,6 +2,7 @@ import { Mail } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
 import { customRichText } from "@/schemaTypes/definitions/rich-text";
+import { previewThumbnail } from "../common";
 
 export const subscribeNewsletter = defineType({
   name: "subscribeNewsletter",
@@ -22,6 +23,7 @@ export const subscribeNewsletter = defineType({
       name: "helperText",
       title: "Helper Text",
     }),
+    previewThumbnail,
   ],
   preview: {
     select: {

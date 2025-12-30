@@ -1,7 +1,7 @@
 import { Star } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { buttonsField, imageWithAltField } from "@/schemaTypes/common";
+import { buttonsField, imageWithAltField, previewThumbnail } from "@/schemaTypes/common";
 import { customRichText } from "@/schemaTypes/definitions/rich-text";
 
 export const hero = defineType({
@@ -27,6 +27,7 @@ export const hero = defineType({
     customRichText(["block"]),
     imageWithAltField(),
     buttonsField,
+    previewThumbnail,
   ],
   preview: {
     select: {

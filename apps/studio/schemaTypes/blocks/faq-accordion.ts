@@ -1,6 +1,8 @@
 import { MessageCircle } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
+import { previewThumbnail } from "@/schemaTypes/common";
+
 export const faqAccordion = defineType({
   name: "faqAccordion",
   type: "object",
@@ -66,6 +68,7 @@ export const faqAccordion = defineType({
       ],
       validation: (Rule) => [Rule.required(), Rule.unique()],
     }),
+    previewThumbnail,
   ],
   preview: {
     select: {
