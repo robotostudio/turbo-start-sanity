@@ -1,6 +1,7 @@
 import { ImageIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
+import { PageBuilderBlockInput } from "@/components/generate-thumbnail";
 import { buttonsField, imageWithAltField, previewThumbnail } from "@/schemaTypes/common";
 import { customRichText } from "@/schemaTypes/definitions/rich-text";
 
@@ -8,6 +9,9 @@ const imageLinkCard = defineField({
   name: "imageLinkCard",
   type: "object",
   icon: ImageIcon,
+  components: {
+    input: PageBuilderBlockInput,
+  },
   fields: [
     defineField({
       name: "title",

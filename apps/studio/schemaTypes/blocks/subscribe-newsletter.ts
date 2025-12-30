@@ -1,6 +1,7 @@
 import { Mail } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
+import { PageBuilderBlockInput } from "@/components/generate-thumbnail";
 import { customRichText } from "@/schemaTypes/definitions/rich-text";
 import { previewThumbnail } from "../common";
 
@@ -9,6 +10,9 @@ export const subscribeNewsletter = defineType({
   title: "Subscribe Newsletter",
   type: "object",
   icon: Mail,
+  components: {
+    input: PageBuilderBlockInput,
+  },
   fields: [
     defineField({
       name: "title",

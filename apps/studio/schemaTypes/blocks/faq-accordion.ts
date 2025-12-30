@@ -1,12 +1,16 @@
 import { MessageCircle } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
+import { PageBuilderBlockInput } from "@/components/generate-thumbnail";
 import { previewThumbnail } from "@/schemaTypes/common";
 
 export const faqAccordion = defineType({
   name: "faqAccordion",
   type: "object",
   icon: MessageCircle,
+  components: {
+    input: PageBuilderBlockInput,
+  },
   fields: [
     defineField({
       name: "eyebrow",
