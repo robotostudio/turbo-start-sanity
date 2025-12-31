@@ -28,6 +28,7 @@
     "next": "16.0.10",
     "next-sanity": "^11.6.10",
     "next-themes": "catalog:",
+    "playwright": "^1.57.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "sanity-image": "^1.0.0",

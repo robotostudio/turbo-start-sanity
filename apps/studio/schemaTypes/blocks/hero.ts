@@ -1,7 +1,8 @@
 import { Star } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { buttonsField, imageWithAltField } from "@/schemaTypes/common";
+import { PageBuilderBlockInput } from "@/components/generate-thumbnail";
+import { buttonsField, imageWithAltField, previewThumbnail } from "@/schemaTypes/common";
 import { customRichText } from "@/schemaTypes/definitions/rich-text";
 
 export const hero = defineType({
@@ -9,6 +10,9 @@ export const hero = defineType({
   title: "Hero",
   icon: Star,
   type: "object",
+  components: {
+    input: PageBuilderBlockInput,
+  },
   fields: [
     defineField({
       name: "badge",
@@ -27,6 +31,7 @@ export const hero = defineType({
     customRichText(["block"]),
     imageWithAltField(),
     buttonsField,
+    previewThumbnail,
   ],
   preview: {
     select: {

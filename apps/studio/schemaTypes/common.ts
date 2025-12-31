@@ -111,3 +111,12 @@ export const imageWithAltField = ({
       }),
     ],
   });
+
+
+export const previewThumbnail = defineField({
+  name: "previewThumbnail",
+  title: "Preview thumbnail",
+  type: "image",
+  readOnly: true,
+  options: { hotspot: true },
+});

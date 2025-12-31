@@ -30,6 +30,10 @@ const queryResultModule = /** @type {{queryRedirects: string}} */ (
 const { client } = clientModule;
 const { queryRedirects } = queryResultModule;
 
+const ALLOWED_ORIGINS = process.env.NODE_ENV === "development" ? 
+  "http://localhost:3333" : 
+  "https://robotostudio.com";
+
 /** @type {import("next").NextConfig} */
 const nextConfig = {
   transpilePackages: ["@workspace/ui"],
@@ -61,6 +65,36 @@ const nextConfig = {
         permanent: redirect.permanent ?? false,
       })
     );
+  },
+  async headers() {
+    return [
+      {
+        // Apply CORS headers to all API routes and pages
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: ALLOWED_ORIGINS, 
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Content-Type, Authorization, X-Requested-With',
+          },
+          {
+            key: 'Access-Control-Allow-Credentials',
+            value: 'true',
+          },
+          {
+            key: 'Access-Control-Max-Age',
+            value: '86400', // 24 hours
+          },
+        ],
+      },
+    ];
   },
 };
 

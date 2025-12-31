@@ -1,13 +1,17 @@
 import { PhoneIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-import { buttonsField } from "@/schemaTypes/common";
+import { PageBuilderBlockInput } from "@/components/generate-thumbnail";
+import { buttonsField, previewThumbnail } from "@/schemaTypes/common";
 import { customRichText } from "@/schemaTypes/definitions/rich-text";
 
 export const cta = defineType({
   name: "cta",
   type: "object",
   icon: PhoneIcon,
+  components: {
+    input: PageBuilderBlockInput,
+  },
   fields: [
     defineField({
       name: "eyebrow",
@@ -24,6 +28,7 @@ export const cta = defineType({
     }),
     customRichText(["block"]),
     buttonsField,
+    previewThumbnail,
   ],
   preview: {
     select: {
