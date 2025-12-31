@@ -3,6 +3,14 @@ import { NextResponse } from "next/server";
 import { uploadThumbnail } from "@/lib/sanity/thunmbnail-upload";
 import { generateThumbnail } from "@/lib/thumbnail-generator";
 
+/**
+ * Generates a thumbnail for a specified document block and uploads it to storage.
+ *
+ * @returns A JSON NextResponse:
+ * - `{ success: true }` on success.
+ * - `{ error: "Missing docId or blockKey" }` with status 400 if required fields are missing.
+ * - `{ error: "Internal server error" }` with status 500 on failure.
+ */
 export async function POST(req: Request) {
   try {
     const { docId, blockKey } = await req.json();
