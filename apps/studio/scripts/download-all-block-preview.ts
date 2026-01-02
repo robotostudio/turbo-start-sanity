@@ -23,7 +23,10 @@ const BLOCK_SELECTORS = {
 
 const NAVIGATION_OPTIONS = {
   waitUntil: "networkidle2" as const,
+  timeout: 30000,
 } as const;
+
+const BLOCK_SELECTOR_TIMEOUT = 10000;
 
 const THUMBNAILS_DIR = "static/thumbnails";
 
@@ -145,13 +148,28 @@ async function closeBrowserSafely(browser: Browser): Promise<void> {
   }
 }
 
-async function navigateToPage(page: Page, baseUrl: string, slug: string): Promise<void> {
+async function navigateToPage(
+  page: Page,
+  baseUrl: string,
+  slug: string,
+): Promise<boolean> {
   const fullUrl = `${baseUrl}${slug}`;
 
   logger.info(`Navigating to: ${fullUrl}`);
   await page.goto(fullUrl, NAVIGATION_OPTIONS);
-  await page.waitForSelector(BLOCK_SELECTORS.element);
-  logger.info("Page loaded and blocks detected");
+
+  try {
+    await page.waitForSelector(BLOCK_SELECTORS.element, {
+      timeout: BLOCK_SELECTOR_TIMEOUT,
+    });
+    logger.info("Page loaded and blocks detected");
+    return true;
+  } catch (error) {
+    logger.warn(
+      `No blocks found on page ${slug} within ${BLOCK_SELECTOR_TIMEOUT}ms timeout`, error instanceof Error ? error.message : String(error)
+    );
+    return false;
+  }
 }
 
 async function captureBlockPreviewScreenshots(page: Page): Promise<string[]> {
@@ -200,13 +218,18 @@ async function captureBlockPreviewScreenshots(page: Page): Promise<string[]> {
 async function capturePageScreenshots(
   previewUrl: string,
   pageSlug: string,
-): Promise<ScreenshotResult> {
+): Promise<ScreenshotResult | null> {
   logger.info("Launching browser...");
   const browser = await puppeteer.launch();
 
   try {
     const page = await createConfiguredPage(browser);
-    await navigateToPage(page, previewUrl, pageSlug);
+    const hasBlocks = await navigateToPage(page, previewUrl, pageSlug);
+
+    if (!hasBlocks) {
+      logger.warn(`Skipping screenshot capture for ${pageSlug} - no blocks found`);
+      return null;
+    }
 
     const fullPagePath = generateScreenshotFilename(pageSlug, "fullpage");
     logger.info(`Capturing full page screenshot: ${fullPagePath}`);
@@ -231,6 +254,12 @@ async function executeScreenshotCapture(
   const previewUrl = validateEnvironment();
   const blockTypes = await fetchPageBuilderBlockTypes(pageSlug);
 
+  if (blockTypes.length === 0) {
+    logger.warn(`No block types found in Sanity for page: ${pageSlug}`);
+    logger.info("Screenshot capture skipped - page has no pagebuilder blocks");
+    return;
+  }
+
   ensureThumbnailsDirectory();
 
   const shouldProceed = await checkExistingFilesAndPrompt(blockTypes);
@@ -241,6 +270,11 @@ async function executeScreenshotCapture(
   }
 
   const result = await capturePageScreenshots(previewUrl, pageSlug);
+
+  if (!result) {
+    logger.warn("Screenshot capture completed with no blocks captured");
+    return;
+  }
 
   logger.info("\n✅ Screenshot capture completed successfully");
   logger.info(`📍 Page slug: ${pageSlug}`);
