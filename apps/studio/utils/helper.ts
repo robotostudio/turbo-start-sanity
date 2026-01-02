@@ -181,3 +181,8 @@ export const getPresentationUrl = () => {
 
   return presentationUrl;
 };
+
+
+export const convertToKebabCase = (str: string) => {
+  return str.replaceAll(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+};
