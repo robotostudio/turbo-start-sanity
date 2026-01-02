@@ -33,7 +33,6 @@
     "@workspace/logger": "workspace:*",
     "friendlier-words": "^1.1.3",
     "lucide-react": "catalog:",
-    "puppeteer": "^24.34.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "sanity": "^4.20.3",
@@ -48,6 +47,7 @@
     "@sanity/blueprints": "0.7.0",
     "@types/react": "catalog:",
     "@types/styled-components": "^5.1.36",
+    "puppeteer": "^24.34.0",
     "typescript": "catalog:",
     "vite": "^7.2.6",
     "vite-plugin-tsconfig-paths": "^1.4.1"
