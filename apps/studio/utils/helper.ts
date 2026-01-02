@@ -7,8 +7,7 @@ export const isValidUrl = (url: string) => {
   try {
     new URL(url);
     return true;
-  } catch (error: unknown) {
-    console.log(error);
+  } catch (_e) {
     return isRelativeUrl(url);
   }
 };
