@@ -134,6 +134,7 @@ function useBlockRenderer(id: string, type: string) {
       return (
         <div
           data-sanity={createBlockDataAttribute(block._key)}
+          data-block-type={block._type}
           key={`${block._type}-${block._key}`}
         >
           {/** biome-ignore lint/suspicious/noExplicitAny: <any is used to allow for dynamic component rendering> */}
