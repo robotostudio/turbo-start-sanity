@@ -7,7 +7,8 @@ export const isValidUrl = (url: string) => {
   try {
     new URL(url);
     return true;
-  } catch (_e) {
+  } catch (error: unknown) {
+    console.log(error);
     return isRelativeUrl(url);
   }
 };
@@ -180,4 +181,9 @@ export const getPresentationUrl = () => {
   }
 
   return presentationUrl;
+};
+
+
+export const convertToKebabCase = (str: string) => {
+  return str.replaceAll(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 };

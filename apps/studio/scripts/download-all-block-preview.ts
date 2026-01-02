@@ -1,8 +1,11 @@
+import { existsSync, mkdirSync } from "node:fs";
+import { join } from "node:path";
+import * as readline from "node:readline";
 import type { Browser, ElementHandle, Page } from "puppeteer";
 import puppeteer from "puppeteer";
-import { Logger} from "@workspace/logger";
+import { Logger } from "@workspace/logger";
 import { getSanityClient } from "./utils";
-
+import { convertToKebabCase } from "@/utils/helper";
 
 const logger = new Logger("download-all-block-preview");
 
@@ -22,33 +25,77 @@ const NAVIGATION_OPTIONS = {
   waitUntil: "networkidle2" as const,
 } as const;
 
+const THUMBNAILS_DIR = "static/thumbnails";
+
 const PAGEBUILDER_BLOCK_TYPES_QUERY = `*[defined(slug.current) && slug.current == $slug][0].pageBuilder[]._type`;
+
+
+function generateBlockPreviewFilename(blockType: string): string {
+  const kebabCaseType = convertToKebabCase(blockType);
+  return `preview-${kebabCaseType}.jpg`;
+}
 
 function generateScreenshotFilename(slug: string, prefix = "page"): string {
   const sanitizedSlug = slug === "/" ? "home" : slug.replace(/^\//, "").replace(/\//g, "_");
   return `${prefix}_${sanitizedSlug}.png`;
 }
 
-function generateBlockScreenshotFilename(
-  slug: string,
-  blockType: string,
-  index: number,
-): string {
-  const sanitizedSlug = slug === "/" ? "home" : slug.replace(/^\//, "").replace(/\//g, "_");
-  return `block_${sanitizedSlug}_${blockType}_${index}.png`;
+function ensureThumbnailsDirectory(): void {
+  if (!existsSync(THUMBNAILS_DIR)) {
+    mkdirSync(THUMBNAILS_DIR, { recursive: true });
+    logger.info(`Created directory: ${THUMBNAILS_DIR}`);
+  }
+}
+
+async function promptUserConfirmation(message: string): Promise<boolean> {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  return new Promise((resolve) => {
+    rl.question(`${message} (y/n): `, (answer) => {
+      rl.close();
+      resolve(answer.toLowerCase() === "y" || answer.toLowerCase() === "yes");
+    });
+  });
+}
+
+async function checkExistingFilesAndPrompt(
+  blockTypes: string[],
+): Promise<boolean> {
+  const existingFiles = blockTypes.filter((type) => {
+    const filename = generateBlockPreviewFilename(type);
+    const filepath = join(THUMBNAILS_DIR, filename);
+    return existsSync(filepath);
+  });
+
+  if (existingFiles.length === 0) {
+    logger.info("No existing preview files found");
+    return true;
+  }
+
+  logger.warn(`Found ${existingFiles.length} existing preview file(s):`);
+  for (const type of existingFiles) {
+    logger.warn(`  - ${generateBlockPreviewFilename(type)}`);
+  }
+
+  return await promptUserConfirmation(
+    "\nDo you want to replace the existing files?",
+  );
 }
 
 
 
 interface BlockScreenshotInfo {
-  type: string | null;
-  index: number;
+  type: string;
   handle: ElementHandle<Element>;
+  isFirstOfType: boolean;
 }
 
 interface ScreenshotResult {
   fullPagePath: string;
-  blockPaths: string[];
+  blockPreviewPaths: string[];
 }
 
 function validateEnvironment(): string {
@@ -107,35 +154,45 @@ async function navigateToPage(page: Page, baseUrl: string, slug: string): Promis
   logger.info("Page loaded and blocks detected");
 }
 
-async function captureBlockScreenshots(page: Page, pageSlug: string): Promise<string[]> {
+async function captureBlockPreviewScreenshots(page: Page): Promise<string[]> {
   const blockHandles = await page.$$(BLOCK_SELECTORS.element);
-  logger.info(`Capturing ${blockHandles.length} block screenshots...`);
-  
-  const screenshotPaths: string[] = [];
+  logger.info(`Found ${blockHandles.length} block elements on page`);
 
-  const blockInfos: BlockScreenshotInfo[] = await Promise.all(
-    blockHandles.map(async (handle, index) => {
-      const blockType = await handle.evaluate(
-        (node, attributeName) => node.getAttribute(attributeName),
-        BLOCK_SELECTORS.typeAttribute,
-      );
+  const seenTypes = new Set<string>();
+  const blockInfos: BlockScreenshotInfo[] = [];
 
-      return { type: blockType, index, handle };
-    }),
-  );
-
-  for (const blockInfo of blockInfos) {
-    const screenshotPath = generateBlockScreenshotFilename(
-      pageSlug,
-      blockInfo.type ?? "unknown",
-      blockInfo.index,
+  for (const handle of blockHandles) {
+    const blockType = await handle.evaluate(
+      (node, attributeName) => node.getAttribute(attributeName),
+      BLOCK_SELECTORS.typeAttribute,
     );
 
-    await blockInfo.handle.screenshot({ path: screenshotPath });
-    screenshotPaths.push(screenshotPath);
+    if (!blockType) continue;
+
+    const isFirstOfType = !seenTypes.has(blockType);
+    if (isFirstOfType) {
+      seenTypes.add(blockType);
+      blockInfos.push({ type: blockType, handle, isFirstOfType });
+    }
   }
 
-  logger.info(`Captured ${screenshotPaths.length} block screenshots`);
+  logger.info(`Capturing preview for ${blockInfos.length} unique block types...`);
+  const screenshotPaths: string[] = [];
+
+  for (const blockInfo of blockInfos) {
+    const filename = generateBlockPreviewFilename(blockInfo.type);
+    const filepath = join(THUMBNAILS_DIR, filename);
+
+    await blockInfo.handle.screenshot({
+      path: filepath,
+      type: "jpeg",
+      quality: 90,
+    });
+
+    screenshotPaths.push(filepath);
+    logger.info(`  ✓ ${filename}`);
+  }
+
   return screenshotPaths;
 }
 
@@ -158,27 +215,38 @@ async function capturePageScreenshots(
       fullPage: true,
     });
 
-    const blockPaths = await captureBlockScreenshots(page, pageSlug);
+    const blockPreviewPaths = await captureBlockPreviewScreenshots(page);
 
-    return { fullPagePath, blockPaths };
+    return { fullPagePath, blockPreviewPaths };
   } finally {
     await closeBrowserSafely(browser);
   }
 }
 
-async function executeScreenshotCapture(pageSlug = DEFAULT_PAGE_SLUG): Promise<void> {
+async function executeScreenshotCapture(
+  pageSlug = DEFAULT_PAGE_SLUG,
+): Promise<void> {
   logger.info(`Starting screenshot capture for page: ${pageSlug}`);
-  
+
   const previewUrl = validateEnvironment();
   const blockTypes = await fetchPageBuilderBlockTypes(pageSlug);
 
+  ensureThumbnailsDirectory();
+
+  const shouldProceed = await checkExistingFilesAndPrompt(blockTypes);
+
+  if (!shouldProceed) {
+    logger.info("Screenshot capture cancelled by user");
+    return;
+  }
+
   const result = await capturePageScreenshots(previewUrl, pageSlug);
 
-  logger.info("Screenshot capture completed successfully");
-  logger.info(`Page slug: ${pageSlug}`);
-  logger.info(`Full page: ${result.fullPagePath}`);
-  logger.info(`Block screenshots: ${result.blockPaths.length} files`);
-  logger.info(`Block types: ${blockTypes.join(", ")}`);
+  logger.info("\n✅ Screenshot capture completed successfully");
+  logger.info(`📍 Page slug: ${pageSlug}`);
+  logger.info(`📄 Full page: ${result.fullPagePath}`);
+  logger.info(`🎨 Block previews: ${result.blockPreviewPaths.length} files`);
+  logger.info(`📁 Preview location: ${THUMBNAILS_DIR}/`);
 }
 
 async function main(): Promise<void> {
