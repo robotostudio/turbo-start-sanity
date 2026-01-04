@@ -1,17 +1,15 @@
 "use client";
 
-import {Button} from "@repo/ui/components/button";
 import {cn} from "@repo/ui/lib/utils";
-import {ChevronDown, Menu, X} from "lucide-react";
+import {ChevronDown} from "lucide-react";
 import Link from "next/link";
-import {useCallback, useEffect, useState} from "react";
+import {useState} from "react";
 
 import type {
   QueryGlobalSeoSettingsResult,
   QueryNavbarDataResult,
 } from "@/lib/sanity/sanity.types";
 import {LucideIcon} from "./elements/lucide-icon";
-import {Logo} from "./logo";
 
 // Type helpers using utility types
 type NavigationData = {
@@ -66,10 +64,8 @@ function MenuLink({name, href, description, onClick}: MenuLinkProps) {
 
 function ColumnDropdown({
   column,
-  onLinkClick,
 }: {
   column: Extract<NavColumn, {type: "column"}>;
-  onLinkClick?: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -121,7 +117,6 @@ function ColumnDropdown({
                 icon={link.icon}
                 key={link._key}
                 name={link.name || ""}
-                onClick={onLinkClick}
               />
             ))}
           </div>
@@ -133,16 +128,13 @@ function ColumnDropdown({
 
 function ColumnLink({
   column,
-  onLinkClick,
 }: {
   column: Extract<NavColumn, {type: "link"}>;
-  onLinkClick?: () => void;
 }) {
   return (
     <Link
       className="px-3 py-2 font-medium text-base text-muted-foreground transition-colors hover:text-foreground md:px-3 md:py-2"
       href={column.href || "#"}
-      onClick={onLinkClick}
     >
       {column.name}
     </Link>
@@ -150,119 +142,43 @@ function ColumnLink({
 }
 
 export function Navbar({navbarData, settingsData}: NavigationData) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const {columns} = navbarData || {};
   const {logo, siteTitle} = settingsData || {};
 
-  const closeMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen(false);
-  }, []);
-
-  function toggleMobileMenu() {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  }
-
-  useEffect(() => {
-    function handleEscape(e: KeyboardEvent) {
-      if (e.key === "Escape" && isMobileMenuOpen) {
-        closeMobileMenu();
-      }
-    }
-
-    if (isMobileMenuOpen) {
-      document.addEventListener("keydown", handleEscape);
-      return () => {
-        document.removeEventListener("keydown", handleEscape);
-      };
-    }
-  }, [isMobileMenuOpen, closeMobileMenu]);
-
   return (
-    <header className="sticky top-0 z-40 w-full">
+    <header className="sticky top-0 z-40 w-full bg-background">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 max-w-prose items-center justify-between">
+        <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <div className="flex h-10 w-[120px] items-center">
-            {logo ? (
-              <Logo
-                alt={siteTitle || ""}
-                height={40}
-                image={logo}
-                priority
-                width={120}
-              />
-            ) : (
-              <div>
-                <Link
-                  className="font-medium font-twelve-serif text-xl"
-                  href={"/"}
-                >
-                  {siteTitle}
-                </Link>
-              </div>
-            )}
+          <div className="flex h-10 w-max items-center">
+            <div>
+              <Link
+                className="font-medium font-twelve-serif text-xl"
+                href={"/"}
+              >
+                {siteTitle}
+              </Link>
+            </div>
           </div>
 
-          {/* Mobile menu button */}
-          <Button
-            className="md:hidden"
-            onClick={toggleMobileMenu}
-            size="icon"
-            variant="ghost"
+          {/* Hidden checkbox for mobile menu state */}
+          <input
+            className="peer hidden"
+            id="mobile-menu-toggle"
+            type="checkbox"
+          />
+
+          {/* Mobile menu toggle label */}
+          <label
+            className="cursor-pointer font-medium text-sm md:hidden peer-checked:[&_.menu-text]:hidden peer-checked:[&_.close-text]:inline"
+            htmlFor="mobile-menu-toggle"
           >
-            {isMobileMenuOpen ? (
-              <LucideIcon icon={X} />
-            ) : (
-              <LucideIcon icon={Menu} />
-            )}
-            <span className="sr-only">Toggle menu</span>
-          </Button>
+            <span className="menu-text inline">Menu</span>
+            <span className="close-text hidden">Close</span>
+          </label>
 
-          {/* Mobile menu overlay */}
-          {isMobileMenuOpen && (
-            <button
-              className="fixed inset-0 top-16 z-50 bg-black/50 md:hidden"
-              onClick={closeMobileMenu}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  closeMobileMenu();
-                }
-              }}
-              type="button"
-            >
-              <span className="sr-only">Close menu</span>
-            </button>
-          )}
-          {isMobileMenuOpen && (
-            <div className="fixed left-0 top-16 z-50 h-[calc(100vh-4rem)] w-full border-r bg-background p-6 shadow-lg md:hidden">
-              <nav className="flex flex-col gap-4">
-                {columns?.map((column) => {
-                  if (column.type === "column") {
-                    return (
-                      <ColumnDropdown
-                        column={column}
-                        key={column._key}
-                        onLinkClick={closeMobileMenu}
-                      />
-                    );
-                  }
-                  if (column.type === "link") {
-                    return (
-                      <ColumnLink
-                        column={column}
-                        key={column._key}
-                        onLinkClick={closeMobileMenu}
-                      />
-                    );
-                  }
-                  return null;
-                })}
-              </nav>
-            </div>
-          )}
-
-          {/* Desktop Navigation */}
-          <nav className="hidden items-center justify-between gap-16 md:flex">
+          {/* Navigation - shared between mobile and desktop */}
+          <nav className="fixed right-0 top-16 z-50 hidden h-auto max-h-[calc(100vh-4rem)] w-64 origin-top-right scale-95 flex-col gap-4 overflow-y-auto rounded-bl-lg border bg-background p-6 opacity-0 shadow-lg transition-all duration-200 peer-checked:flex peer-checked:scale-100 peer-checked:opacity-100 md:relative md:right-auto md:top-auto md:flex md:h-auto md:max-h-none md:w-auto md:scale-100 md:flex-row md:gap-6 md:overflow-visible md:rounded-none md:border-0 md:bg-transparent md:p-0 md:opacity-100 md:shadow-none">
             {columns?.map((column) => {
               if (column.type === "column") {
                 return <ColumnDropdown column={column} key={column._key} />;
