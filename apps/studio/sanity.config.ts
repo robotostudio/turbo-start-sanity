@@ -12,6 +12,7 @@ import { muxInput } from "sanity-plugin-mux-input";
 
 import { Logo } from "./components/logo";
 import { locations } from "./location";
+import { arrayClearButton } from "./plugins/array-operations-input/array-clear-button";
 import { presentationUrl } from "./plugins/presentation-url";
 import { schemaTypes } from "./schemaTypes";
 import { structure } from "./structure";
@@ -48,6 +49,7 @@ export default defineConfig({
     structureTool({
       structure,
     }),
+    arrayClearButton(),
     presentationUrl(),
     unsplashImageAsset(),
     media(),
