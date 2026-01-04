@@ -55,7 +55,7 @@ export default defineCliConfig({
   studioHost,
   deployment: {
     appId: process.env.SANITY_STUDIO_APP_ID || "",
-    autoUpdates: true,
+    autoUpdates: false,
   },
   vite: {
     plugins: [tsconfigPaths()],
