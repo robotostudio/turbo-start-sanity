@@ -42,7 +42,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@workspace/typescript-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "semantic-release": "^24.0.0",
     "tsup": "^8.0.0",
     "typescript": "catalog:"

@@ -1,10 +1,9 @@
 "use client";
 
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@repo/ui/lib/utils";
 import { stegaClean } from "next-sanity";
 
 import type { PagebuilderType } from "@/types";
-
 import { CollectionCard } from "../collection-card";
 
 type CollectionListingProps = PagebuilderType<"collectionListing">;
@@ -35,4 +34,3 @@ export function CollectionListing({
     </section>
   );
 }
-

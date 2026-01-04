@@ -1,4 +1,4 @@
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@repo/ui/lib/utils";
 import type { LucideIcon as LucideIconType } from "lucide-react";
 import type { ComponentProps } from "react";
 import { memo } from "react";

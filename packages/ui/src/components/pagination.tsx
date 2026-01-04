@@ -1,5 +1,5 @@
-import { type Button, buttonVariants } from "@workspace/ui/components/button";
-import { cn } from "@workspace/ui/lib/utils";
+import { type Button, buttonVariants } from "@repo/ui/components/button";
+import { cn } from "@repo/uiutils";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,

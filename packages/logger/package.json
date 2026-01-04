@@ -14,6 +14,6 @@
     "format": "biome check --write ."
   },
   "devDependencies": {
-    "@workspace/typescript-config": "workspace:*"
+    "@repo/typescript-config": "workspace:*"
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import { ViewportImage } from "@workspace/ui/components/ViewportImage";
-import { cn } from "@workspace/ui/lib/utils";
+import { ViewportImage } from "@repo/ui/components/ViewportImage";
+import { cn } from "@repo/ui/lib/utils";
 import { stegaClean } from "next-sanity";
 
 import { urlFor } from "@/lib/sanity/client";

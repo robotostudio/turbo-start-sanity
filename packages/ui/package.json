@@ -1,5 +1,5 @@
 {
-  "name": "@workspace/ui",
+  "name": "@repo/ui",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -31,7 +31,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@workspace/typescript-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "tailwindcss": "^4.1.17"
   },
   "exports": {

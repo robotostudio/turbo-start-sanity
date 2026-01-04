@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useMemo } from "react";
+import {useMemo} from "react";
 
 type GlyphBoxProps = {
   char: string;
@@ -31,7 +31,7 @@ function toFontString(opts: {
   const size =
     typeof opts.fontSize === "number"
       ? `${opts.fontSize}px`
-      : (opts.fontSize ?? "16px");
+      : opts.fontSize ?? "16px";
   const family = opts.fontFamily ?? "inherit";
   return `${style} ${weight} ${size} ${family}`;
 }
@@ -55,6 +55,8 @@ function measureGlyph(char: string, font: string): Metrics | null {
     // Fallback: approximate using font size when actual metrics aren't available
     const approxSize = (() => {
       const match = /\b(\d+(?:\.\d+)?)px\b/.exec(font);
+      // biome-ignore lint/style/noMagicNumbers: magic
+      // @ts-expect-error
       return match ? parseFloat(match[1]) : 16;
     })();
     // Approximate width using advance width (mt.width) if available
@@ -87,7 +89,7 @@ export function GlyphBox({
   style,
 }: GlyphBoxProps) {
   const font = useMemo(
-    () => toFontString({ fontFamily, fontSize, fontWeight, fontStyle }),
+    () => toFontString({fontFamily, fontSize, fontWeight, fontStyle}),
     [fontFamily, fontSize, fontWeight, fontStyle]
   );
 
@@ -96,9 +98,10 @@ export function GlyphBox({
   // If metrics aren't available yet (SSR), render nothing to avoid hydration mismatch
   if (!metrics) return null;
 
-  const { width, height, left, ascent } = metrics;
+  const {width, height, left, ascent} = metrics;
 
   return (
+    // biome-ignore lint/a11y/noSvgWithoutTitle: special case
     <svg
       width={width}
       height={height}

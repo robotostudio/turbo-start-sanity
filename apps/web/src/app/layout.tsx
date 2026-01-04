@@ -1,6 +1,6 @@
-import "@workspace/ui/globals.css";
+import "@repo/ui/globals.css";
 
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@repo/ui/lib/utils";
 import { draftMode } from "next/headers";
 import { VisualEditing } from "next-sanity/visual-editing";
 import { Suspense } from "react";
@@ -16,6 +16,7 @@ import {
   baseTwelveSerif,
   baseTwelveSerifSmallCaps,
 } from "@/fonts";
+import { getNavigationData } from "@/lib/navigation";
 // import { getNavigationData } from "@/lib/navigation";
 import { SanityLive } from "@/lib/sanity/live";
 
@@ -26,7 +27,7 @@ export default async function RootLayout({
 }>) {
   preconnect("https://cdn.sanity.io");
   prefetchDNS("https://cdn.sanity.io");
-  // const nav = await getNavigationData();
+  const nav = await getNavigationData();
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -38,6 +39,7 @@ export default async function RootLayout({
         )}
       >
         <Providers>
+          <Navbar navbarData={nav.navbarData} settingsData={nav.settingsData} />
           {children}
           <Suspense
             fallback={

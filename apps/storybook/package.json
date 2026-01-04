@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev:next": "bunx next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -35,6 +35,8 @@
     "vitest": "^4.0.16",
     "playwright": "^1.57.0",
     "@vitest/browser-playwright": "^4.0.16",
-    "@vitest/coverage-v8": "^4.0.16"
+    "@vitest/coverage-v8": "^4.0.16",
+    "@repo/typescript-config": "workspace:*",
+    "@repo/ui": "workspace:*"
   }
 }
