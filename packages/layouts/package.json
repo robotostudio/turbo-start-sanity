@@ -1,6 +1,6 @@
 {
   "name": "@workspace/layouts",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Flexible React components for grid layouts",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -61,4 +61,3 @@
     "url": ""
   }
 }
-
