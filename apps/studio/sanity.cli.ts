@@ -59,6 +59,12 @@ export default defineCliConfig({
   },
   vite: {
     plugins: [tsconfigPaths()],
+    resolve: {
+      dedupe: ['react', 'react-dom'],
+    },
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'framework7-icons/react'],
+    },
   },
   typegen: {
     generates: "../web/src/lib/sanity/sanity.types.ts",
