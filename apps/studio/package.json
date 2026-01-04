@@ -27,6 +27,7 @@
     "@codemirror/view": "^6.38.8",
     "@portabletext/editor": "^3.2.2",
     "@portabletext/keyboard-shortcuts": "^2.1.0",
+    "@portabletext/sanity-bridge": "^1.2.7",
     "@portabletext/toolbar": "^4.0.15",
     "@sanity/assist": "^5.0.2",
     "@sanity/client": "catalog:",

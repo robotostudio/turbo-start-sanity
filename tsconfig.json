@@ -1,7 +1,9 @@
 {
   "extends": "@workspace/typescript-config/base.json",
   "compilerOptions": {
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "module": "esnext",
+    "moduleResolution": "bundler"
   },
   "include": [],
   "exclude": [
