@@ -4,7 +4,7 @@ import { client } from "@/lib/sanity/client";
 import { queryRedirects } from "@/lib/sanity/query";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@workspace/ui"],
+  transpilePackages: ["@repo/ui"],
   experimental: {
     inlineCss: true,
   },

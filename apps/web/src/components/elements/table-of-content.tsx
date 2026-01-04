@@ -1,12 +1,12 @@
 "use client";
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@repo/ui/lib/utils";
 import { ChevronDown, Circle } from "lucide-react";
 import Link from "next/link";
 import { type FC, useCallback, useMemo } from "react";
 import slugify from "slugify";
 
-import { LucideIcon } from "./lucide-icon";
 import type { SanityRichTextBlock, SanityRichTextProps } from "@/types";
+import { LucideIcon } from "./lucide-icon";
 
 // ============================================================================
 // TYPES & INTERFACES
