@@ -1,4 +1,4 @@
-import { env } from "env";
+import { env } from "@workspace/env/server";
 import { defineEnableDraftMode } from "next-sanity/draft-mode";
 
 import { client } from "@/lib/sanity/client";

@@ -1,4 +1,4 @@
-import { env } from "env";
+import { env } from "@workspace/env/client";
 import type { WrapperProps } from "sanity-image";
 
 import type { SanityImageProps as SanityImageData } from "@/types";
