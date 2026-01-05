@@ -10,7 +10,7 @@
     "lint": "npx ultracite lint",
     "format": "npx ultracite fix",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck"
+    "check": "pnpm run lint && pnpm run typecheck"
   },
   "dependencies": {
     "@sanity/asset-utils": "^2.3.0",
@@ -35,6 +35,7 @@
     "server-only": "^0.0.1",
     "slugify": "^1.6.6",
     "swr": "^2.3.7",
+    "@workspace/env": "workspace:*",
     "zod": "catalog:"
   },
   "devDependencies": {
