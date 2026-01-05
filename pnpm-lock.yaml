@@ -177,12 +177,6 @@ importers:
       '@sanity/visual-editing':
         specifier: ^4.0.2
         version: 4.0.2(@emotion/is-prop-valid@1.2.2)(@sanity/client@7.13.1)(@sanity/types@4.21.0(@types/react@19.2.7))(next@16.0.10(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(react-dom@19.2.1(react@19.2.1))(react-is@19.2.1)(react@19.2.1)(sanity@4.21.0(@emotion/is-prop-valid@1.2.2)(@portabletext/sanity-bridge@1.2.12(@types/react@19.2.7))(@types/node@24.10.2)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(babel-plugin-react-compiler@19.1.0-rc.2)(immer@11.0.1)(jiti@2.6.1)(lightningcss@1.30.2)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)(styled-components@6.1.19(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(terser@5.37.0)(typescript@5.9.2)(yaml@2.6.1))(styled-components@6.1.19(react-dom@19.2.1(react@19.2.1))(react@19.2.1))(typescript@5.9.2)
-      '@t3-oss/env-core':
-        specifier: ^0.13.8
-        version: 0.13.8(typescript@5.9.2)(valibot@1.2.0(typescript@5.9.2))(zod@4.1.13)
-      '@t3-oss/env-nextjs':
-        specifier: ^0.13.8
-        version: 0.13.8(typescript@5.9.2)(valibot@1.2.0(typescript@5.9.2))(zod@4.1.13)
       '@tanstack/react-query':
         specifier: ^5.90.12
         version: 5.90.12(react@19.2.1)
@@ -253,9 +247,6 @@ importers:
       baseline-browser-mapping:
         specifier: ^2.9.5
         version: 2.9.5
-      jiti:
-        specifier: ^2.6.1
-        version: 2.6.1
 
   packages/env:
     dependencies:
