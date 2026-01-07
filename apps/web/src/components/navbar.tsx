@@ -1,8 +1,8 @@
 "use client";
 
+import { env } from "@workspace/env/client";
 import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
-import { env } from "env";
 import { ChevronDown, Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
