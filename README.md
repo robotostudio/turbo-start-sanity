@@ -63,10 +63,12 @@ Add a unique Pokémon to each blog post using the PokéAPI.
 
 ## Submission
 
-1. Create a new branch with your changes
-2. Commit your work with clear, meaningful commit messages
-3. Push your branch and open a pull request against this branch (`backend-tech-test`)
-4. In your PR description, include:
+1. Fork this repository and complete the tasks
+2. Deploy your solution to Vercel with a working environment
+3. Book your follow-up interview at [cal.com/roboto/follow-up-interview](https://cal.com/roboto/follow-up-interview)
+4. Come prepared to share:
+   - A link to your GitHub repository
+   - A link to your live Vercel deployment
    - Any assumptions you made
    - Trade-offs you considered
    - What you would improve given more time
