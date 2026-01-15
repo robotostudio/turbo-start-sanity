@@ -55,7 +55,7 @@ Add a unique Pokémon to each blog post using the PokéAPI.
 - Each blog post should have an associated Pokémon
 - Display the Pokémon's sprite image at the top of each blog post page
 - The Pokémon should be configurable per post (e.g., the "hello-world" post might feature Pikachu)
-- Consider how to store this association and how content editors would assign Pokémon to posts
+- Create a custom Sanity input component that allows content editors to search for and select a Pokémon directly within the Studio
 
 **Resources:** [PokéAPI Documentation](https://pokeapi.co/)
 
