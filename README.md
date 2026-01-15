@@ -79,7 +79,8 @@ We're looking at:
 
 - **Code quality** - Clean, readable, maintainable code
 - **Problem solving** - How you approach and break down the tasks
-- **Attention to detail** - Edge cases, error handling, user experience
+- **User experience** - Intuitive interfaces, smooth interactions, thoughtful design choices
+- **Attention to detail** - Edge cases, error handling, polish
 - **Technical decisions** - Your choices and ability to justify them
 - **Git hygiene** - Commit history and PR quality
 
