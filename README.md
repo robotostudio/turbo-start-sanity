@@ -71,7 +71,6 @@ Add a unique Pokémon to each blog post using the PokéAPI.
 4. Come prepared to discuss:
    - Any assumptions you made
    - Trade-offs you considered
-   - What you would improve given more time
 
 ---
 
