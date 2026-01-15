@@ -65,10 +65,11 @@ Add a unique Pokémon to each blog post using the PokéAPI.
 
 1. Fork this repository and complete the tasks
 2. Deploy your solution to Vercel with a working environment
-3. Book your follow-up interview at [cal.com/roboto/follow-up-interview](https://cal.com/roboto/follow-up-interview)
-4. Come prepared to share:
+3. Send us:
    - A link to your GitHub repository
    - A link to your live Vercel deployment
+4. Book your follow-up interview at [cal.com/roboto/follow-up-interview](https://cal.com/roboto/follow-up-interview)
+5. Come prepared to discuss:
    - Any assumptions you made
    - Trade-offs you considered
    - What you would improve given more time
