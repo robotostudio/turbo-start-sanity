@@ -84,6 +84,5 @@ We're looking at:
 - **User experience** - Intuitive interfaces, smooth interactions, thoughtful design choices
 - **Attention to detail** - Edge cases, error handling, polish
 - **Technical decisions** - Your choices and ability to justify them
-- **Git hygiene** - Commit history and PR quality
 
 Good luck!
