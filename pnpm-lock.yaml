@@ -143,6 +143,9 @@ importers:
       styled-components:
         specifier: ^6.3.8
         version: 6.3.8(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      swr:
+        specifier: ^2.3.8
+        version: 2.3.8(react@19.2.3)
     devDependencies:
       '@sanity/blueprints':
         specifier: 0.7.1

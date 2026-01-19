@@ -2,8 +2,14 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { getMetadata } from "@/lib/metadata";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
 
 type ErrorResponse = {
   success: false;
@@ -11,7 +17,17 @@ type ErrorResponse = {
 };
 
 function errorResponse(message: string, status: number): NextResponse<ErrorResponse> {
-  return NextResponse.json({ success: false, error: message }, { status });
+  return NextResponse.json(
+    { success: false, error: message },
+    { status, headers: CORS_HEADERS }
+  );
+}
+
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: CORS_HEADERS,
+  });
 }
 
 export async function GET(request: NextRequest) {
@@ -25,8 +41,9 @@ export async function GET(request: NextRequest) {
   const result = await getMetadata(url);
 
   return NextResponse.json(result, {
-    status: result.success ? 200 : 206, // 206 Partial Content for fallback data
+    status: result.success ? 200 : 206,
     headers: {
+      ...CORS_HEADERS,
       "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
     },
   });
@@ -45,6 +62,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result, {
       status: result.success ? 200 : 206,
+      headers: CORS_HEADERS,
     });
   } catch {
     return errorResponse("Invalid JSON body", 400);

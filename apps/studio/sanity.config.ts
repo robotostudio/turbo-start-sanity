@@ -47,6 +47,7 @@ export default defineConfig({
     seoPane({
       types: ["page", "blog", "homePage", "blogIndex"],
       baseUrl: getPresentationUrl(),
+      apiUrl: getPresentationUrl(),
     }),
     visionTool(),
     lucideIconPicker(),

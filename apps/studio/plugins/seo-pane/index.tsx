@@ -1,4 +1,3 @@
-
 import { SearchIcon } from "@sanity/icons";
 import { lazy } from "react";
 import type { DocumentInspectorProps } from "sanity";
@@ -7,10 +6,11 @@ import { defineDocumentInspector, definePlugin } from "sanity";
 export type SeoPaneOptions = {
   types: string[];
   baseUrl: string;
+  apiUrl: string;
 };
 
 export const seoPane = definePlugin<SeoPaneOptions>((options) => {
-  const { types, baseUrl } = options;
+  const { types, baseUrl, apiUrl } = options;
 
   const seoInspector = defineDocumentInspector({
     name: "seo-preview",
@@ -21,7 +21,7 @@ export const seoPane = definePlugin<SeoPaneOptions>((options) => {
     component: lazy(() =>
       import("./serp-preview").then((mod) => ({
         default: (props: DocumentInspectorProps) => (
-          <mod.SerpPreview {...props} baseUrl={baseUrl} />
+          <mod.SerpPreview {...props} baseUrl={baseUrl} apiUrl={apiUrl} />
         ),
       }))
     ),
