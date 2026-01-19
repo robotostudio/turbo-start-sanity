@@ -8,7 +8,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useState } from "react";
-import type { DocumentInspectorProps } from "sanity";
+import type { DocumentInspectorProps, SanityDocument } from "sanity";
 import { useEditState } from "sanity";
 
 import { buildUrl } from "./resolvers";
@@ -129,7 +129,9 @@ function getDescriptionStatusMessage(status: StatusType): string {
 }
 
 function getImageStatusMessage(status: StatusType): string {
-  return status === "success" ? "Social image detected" : "No social image found";
+  return status === "success"
+    ? "Social image detected"
+    : "No social image found";
 }
 
 function formatDisplayUrl(url: string): string {
@@ -137,11 +139,13 @@ function formatDisplayUrl(url: string): string {
 }
 
 function getDocumentState(
-  editState: { draft: unknown; published: unknown },
+  editState: { draft: SanityDocument | null; published: SanityDocument | null },
   baseUrl: string
 ): DocumentState {
   const draft = editState.draft as { slug?: { current?: string } } | null;
-  const published = editState.published as { slug?: { current?: string } } | null;
+  const published = editState.published as {
+    slug?: { current?: string };
+  } | null;
   const doc = draft || published;
 
   if (!doc) {
@@ -185,7 +189,9 @@ function getDocumentStateConfig(
         "This document needs a slug to generate its URL. Add a slug in the document editor to preview how it will appear in search results.",
     },
     "draft-only": {
-      icon: <AlertCircle size={20} color="var(--card-badge-caution-dot-color)" />,
+      icon: (
+        <AlertCircle size={20} color="var(--card-badge-caution-dot-color)" />
+      ),
       bgColor: "var(--card-badge-caution-bg-color)",
       title: "Unpublished Document",
       subtitle: "Publish to see live preview",
@@ -270,7 +276,9 @@ function IconBox({
   children: React.ReactNode;
 }) {
   return (
-    <Box style={{ ...ICON_BOX_STYLE, backgroundColor: bgColor }}>{children}</Box>
+    <Box style={{ ...ICON_BOX_STYLE, backgroundColor: bgColor }}>
+      {children}
+    </Box>
   );
 }
 
@@ -324,7 +332,12 @@ function LoadingState() {
 
       <Stack space={3}>
         <Skeleton height={12} width={80} />
-        <Card padding={4} radius={3} shadow={1} style={{ backgroundColor: "#fff" }}>
+        <Card
+          padding={4}
+          radius={3}
+          shadow={1}
+          style={{ backgroundColor: "#fff" }}
+        >
           <Stack space={3}>
             <Flex align="center" gap={2}>
               <Skeleton height={20} width={20} />
@@ -398,7 +411,9 @@ function FetchErrorState({
   return (
     <Stack space={5}>
       <HeaderSection
-        icon={<AlertCircle size={20} color="var(--card-badge-caution-dot-color)" />}
+        icon={
+          <AlertCircle size={20} color="var(--card-badge-caution-dot-color)" />
+        }
         bgColor="var(--card-badge-caution-bg-color)"
         title="Unable to Fetch Metadata"
         subtitle="The page may not be accessible"
@@ -409,8 +424,8 @@ function FetchErrorState({
             {error}
           </Text>
           <Text size={0} muted style={{ lineHeight: 1.5 }}>
-            This could happen if the page hasn't been deployed yet, or if there's a
-            network issue. Try refreshing after the page is live.
+            This could happen if the page hasn't been deployed yet, or if
+            there's a network issue. Try refreshing after the page is live.
           </Text>
         </Stack>
       </Card>
@@ -691,16 +706,19 @@ function MetadataContent({
 
   return (
     <Stack space={5} style={{ marginBottom: 100 }}>
-      <Flex align="flex-start" gap={3} >
+      <Flex align="flex-start" gap={3}>
         <IconBox bgColor="var(--card-badge-positive-bg-color)">
-          <CheckCircle2 size={20} color="var(--card-badge-positive-dot-color)" />
+          <CheckCircle2
+            size={20}
+            color="var(--card-badge-positive-dot-color)"
+          />
         </IconBox>
         <Stack space={2} style={{ flex: 1, minWidth: 0, overflow: "hidden" }}>
           <Text size={1} weight="semibold">
             Live Metadata
           </Text>
           <Flex align="center" gap={2}>
-            <Box >
+            <Box>
               <Text size={0} muted style={{ whiteSpace: "nowrap" }}>
                 {url}
               </Text>
@@ -798,7 +816,10 @@ function SerpPreviewContent({
     ) : null;
 
     return (
-      <FetchErrorState error={metadataState.error} fallbackContent={fallbackContent} />
+      <FetchErrorState
+        error={metadataState.error}
+        fallbackContent={fallbackContent}
+      />
     );
   }
 
