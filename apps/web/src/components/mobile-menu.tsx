@@ -97,10 +97,10 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
 
       <SheetContent
         side="right"
-        className="w-full sm:max-w-sm flex flex-col"
+        className="w-full sm:max-w-sm flex flex-col px-0"
         showCloseButton={false}
       >
-        <SheetHeader className="flex-row items-center justify-between pb-4 border-b">
+        <SheetHeader className="flex-row items-center px-6 justify-between pb-4 border-b">
           {logo ? (
             <div className="[&_img]:w-auto [&_img]:h-6 [&_img]:rounded-none">
               <Logo alt={siteTitle || ""} image={logo} />
@@ -115,7 +115,7 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
         </SheetHeader>
 
         {/* Navigation items - scrollable */}
-        <nav className="flex-1 overflow-y-auto pt-4 grid gap-1 content-start">
+        <nav className="flex-1 overflow-y-auto pt-4 grid px-6 gap-1 content-start">
           {columns?.map((column) => {
             if (column.type === "link") {
               return (
@@ -161,7 +161,7 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
         </nav>
 
         {/* Action buttons - fixed at bottom */}
-        <div className="border-t pt-4 mt-auto">
+        <div className="border-t pt-4 mt-auto px-6">
           <SanityButtons
             buttonClassName="w-full justify-center"
             buttons={buttons || []}
