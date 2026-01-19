@@ -11,6 +11,7 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -160,14 +161,13 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
           })}
         </nav>
 
-        {/* Action buttons - fixed at bottom */}
-        <div className="border-t pt-4 mt-auto px-6">
+<SheetFooter className="border-t">
           <SanityButtons
             buttonClassName="w-full justify-center"
             buttons={buttons || []}
             className="grid gap-3"
           />
-        </div>
+</SheetFooter>
       </SheetContent>
     </Sheet>
   );
