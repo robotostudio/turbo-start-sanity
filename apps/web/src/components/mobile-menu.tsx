@@ -98,7 +98,7 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
 
       <SheetContent
         side="right"
-        className="w-full sm:max-w-sm overflow-y-auto"
+        className="w-full sm:max-w-sm flex flex-col"
         showCloseButton={false}
       >
         <SheetHeader className="flex-row items-center justify-between pb-4 border-b">
@@ -115,64 +115,62 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
           </SheetClose>
         </SheetHeader>
 
-        <div className="flex flex-col gap-4 pt-4 flex-1 overflow-y-auto">
-          {/* Navigation items */}
-          <nav className="grid gap-1">
-            {columns?.map((column) => {
-              if (column.type === "link") {
-                return (
-                  <Link
-                    className="flex items-center py-3 font-medium text-sm transition-colors hover:text-primary"
-                    href={column.href || "#"}
-                    key={column._key}
-                    onClick={closeMenu}
-                  >
-                    {column.name}
-                  </Link>
-                );
-              }
+        {/* Navigation items - scrollable */}
+        <nav className="flex-1 overflow-y-auto pt-4 grid gap-1 content-start">
+          {columns?.map((column) => {
+            if (column.type === "link") {
+              return (
+                <Link
+                  className="flex items-center py-3 font-medium text-sm transition-colors hover:text-primary"
+                  href={column.href || "#"}
+                  key={column._key}
+                  onClick={closeMenu}
+                >
+                  {column.name}
+                </Link>
+              );
+            }
 
-              if (column.type === "column") {
-                return (
-                  <Accordion type="single" collapsible key={column._key}>
-                    <AccordionItem value={column._key} className="border-b-0">
-                      <AccordionTrigger className="py-3 hover:no-underline">
-                        {column.title}
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <div className="grid gap-1 border-border border-l-2 pl-4 ml-1">
-                          {column.links?.map((link: ColumnLink) => (
-                            <MenuLink
-                              description={link.description || ""}
-                              href={link.href || ""}
-                              icon={link.icon}
-                              key={link._key}
-                              name={link.name || ""}
-                              onClick={closeMenu}
-                            />
-                          ))}
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  </Accordion>
-                );
-              }
+            if (column.type === "column") {
+              return (
+                <Accordion type="single" collapsible key={column._key}>
+                  <AccordionItem value={column._key} className="border-b-0">
+                    <AccordionTrigger className="py-3 hover:no-underline">
+                      {column.title}
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="grid gap-1 border-border border-l-2 pl-4 ml-1">
+                        {column.links?.map((link: ColumnLink) => (
+                          <MenuLink
+                            description={link.description || ""}
+                            href={link.href || ""}
+                            icon={link.icon}
+                            key={link._key}
+                            name={link.name || ""}
+                            onClick={closeMenu}
+                          />
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              );
+            }
 
-              return null;
-            })}
-          </nav>
+            return null;
+          })}
+        </nav>
 
-          {/* Action buttons */}
-          <div className="grid gap-3 border-t pt-4">
-            <div className="flex justify-start">
-              <ModeToggle />
-            </div>
-            <SanityButtons
-              buttonClassName="w-full justify-center"
-              buttons={buttons || []}
-              className="grid gap-3"
-            />
+        {/* Action buttons - fixed at bottom */}
+        <div className="grid gap-3 border-t pt-4 mt-auto">
+          <div className="flex justify-start">
+            <ModeToggle />
           </div>
+          <SanityButtons
+            buttonClassName="w-full justify-center"
+            buttons={buttons || []}
+            className="grid gap-3"
+          />
         </div>
       </SheetContent>
     </Sheet>
