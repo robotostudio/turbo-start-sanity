@@ -10,6 +10,7 @@ import { media } from "sanity-plugin-media";
 import { Logo } from "@/components/logo";
 import { locations } from "@/location";
 import { presentationUrl } from "@/plugins/presentation-url";
+import { seoPane } from "@/plugins/seo-pane/index";
 import { schemaTypes } from "@/schemaTypes/index";
 import { structure } from "@/structure";
 import { getPresentationUrl } from "@/utils/helper";
@@ -43,6 +44,10 @@ export default defineConfig({
       structure,
     }),
     presentationUrl(),
+    seoPane({
+      types: ["page", "blog", "homePage", "blogIndex"],
+      baseUrl: getPresentationUrl(),
+    }),
     visionTool(),
     lucideIconPicker(),
     unsplashImageAsset(),
