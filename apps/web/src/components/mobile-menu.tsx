@@ -1,5 +1,11 @@
 "use client";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@workspace/ui/components/accordion";
 import { Button } from "@workspace/ui/components/button";
 import {
   Sheet,
@@ -9,8 +15,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@workspace/ui/components/sheet";
-import { cn } from "@workspace/ui/lib/utils";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -74,15 +79,9 @@ function MenuLink({ name, href, description, icon, onClick }: MenuLinkProps) {
 
 export function MobileMenu({ navbarData, settingsData }: NavigationData) {
   const [isOpen, setIsOpen] = useState(false);
-  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
-
-  function toggleDropdown(key: string) {
-    setOpenDropdown((curr) => (curr === key ? null : key));
-  }
 
   function closeMenu() {
     setIsOpen(false);
-    setOpenDropdown(null);
   }
 
   const { columns, buttons } = navbarData || {};
@@ -97,7 +96,11 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="right" className="w-full sm:max-w-sm overflow-y-auto" showCloseButton={false}>
+      <SheetContent
+        side="right"
+        className="w-full sm:max-w-sm overflow-y-auto"
+        showCloseButton={false}
+      >
         <SheetHeader className="flex-row items-center justify-between pb-4 border-b">
           {logo ? (
             <div className="[&_img]:w-auto [&_img]:h-6 [&_img]:rounded-none">
@@ -114,12 +117,12 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
 
         <div className="flex flex-col gap-4 pt-4 flex-1 overflow-y-auto">
           {/* Navigation items */}
-          <nav className="grid gap-2">
+          <nav className="grid gap-1">
             {columns?.map((column) => {
               if (column.type === "link") {
                 return (
                   <Link
-                    className="flex items-center py-2 font-medium text-sm transition-colors hover:text-primary"
+                    className="flex items-center py-3 font-medium text-sm transition-colors hover:text-primary"
                     href={column.href || "#"}
                     key={column._key}
                     onClick={closeMenu}
@@ -130,37 +133,28 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
               }
 
               if (column.type === "column") {
-                const isDropdownOpen = openDropdown === column._key;
                 return (
-                  <div className="grid gap-1" key={column._key}>
-                    <button
-                      className="flex items-center justify-between py-2 font-medium text-sm transition-colors hover:text-primary"
-                      onClick={() => toggleDropdown(column._key)}
-                      type="button"
-                    >
-                      {column.title}
-                      <ChevronDown
-                        className={cn(
-                          "size-4 transition-transform duration-200",
-                          isDropdownOpen && "rotate-180"
-                        )}
-                      />
-                    </button>
-                    {isDropdownOpen && (
-                      <div className="grid gap-1 border-border border-l-2 pl-4 ml-1">
-                        {column.links?.map((link: ColumnLink) => (
-                          <MenuLink
-                            description={link.description || ""}
-                            href={link.href || ""}
-                            icon={link.icon}
-                            key={link._key}
-                            name={link.name || ""}
-                            onClick={closeMenu}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  <Accordion type="single" collapsible key={column._key}>
+                    <AccordionItem value={column._key} className="border-b-0">
+                      <AccordionTrigger className="py-3 hover:no-underline">
+                        {column.title}
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="grid gap-1 border-border border-l-2 pl-4 ml-1">
+                          {column.links?.map((link: ColumnLink) => (
+                            <MenuLink
+                              description={link.description || ""}
+                              href={link.href || ""}
+                              icon={link.icon}
+                              key={link._key}
+                              name={link.name || ""}
+                              onClick={closeMenu}
+                            />
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 );
               }
 
