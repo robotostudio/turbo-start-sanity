@@ -161,13 +161,13 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
           })}
         </nav>
 
-<SheetFooter className="border-t">
+        <SheetFooter className="border-t">
           <SanityButtons
             buttonClassName="w-full justify-center"
             buttons={buttons || []}
             className="grid gap-3"
           />
-</SheetFooter>
+        </SheetFooter>
       </SheetContent>
     </Sheet>
   );
