@@ -26,7 +26,6 @@ import type {
 import { SanityButtons } from "./elements/sanity-buttons";
 import { SanityIcon } from "./elements/sanity-icon";
 import { Logo } from "./logo";
-import { ModeToggle } from "./mode-toggle";
 
 type NavigationData = {
   navbarData: QueryNavbarDataResult;
@@ -90,7 +89,7 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button className="md:hidden" size="icon" variant="ghost">
+        <Button size="icon" variant="ghost">
           <Menu className="size-4" />
           <span className="sr-only">Open menu</span>
         </Button>
@@ -162,10 +161,7 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
         </nav>
 
         {/* Action buttons - fixed at bottom */}
-        <div className="grid gap-3 border-t pt-4 mt-auto">
-          <div className="flex justify-start">
-            <ModeToggle />
-          </div>
+        <div className="border-t pt-4 mt-auto">
           <SanityButtons
             buttonClassName="w-full justify-center"
             buttons={buttons || []}

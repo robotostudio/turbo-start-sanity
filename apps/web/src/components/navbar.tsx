@@ -255,8 +255,11 @@ export function Navbar({
             />
           </div>
 
-          {/* Mobile Menu */}
-          <MobileMenu navbarData={navbarData} settingsData={settingsData} />
+          {/* Mobile Actions */}
+          <div className="flex items-center gap-2 md:hidden">
+            <ModeToggle />
+            <MobileMenu navbarData={navbarData} settingsData={settingsData} />
+          </div>
         </div>
       </div>
 
