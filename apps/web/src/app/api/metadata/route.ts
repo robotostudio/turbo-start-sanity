@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     : "no-store";
 
   return NextResponse.json(result, {
-    status: result.success ? 200 : 206,
+    status: 200,
     headers: {
       ...CORS_HEADERS,
       "Cache-Control": cacheHeader,
@@ -65,9 +65,16 @@ export async function POST(request: NextRequest) {
 
     const result = await getMetadata(url);
 
+    const cacheHeader = result.success
+      ? "public, s-maxage=3600, stale-while-revalidate=86400"
+      : "no-store";
+
     return NextResponse.json(result, {
-      status: result.success ? 200 : 206,
-      headers: CORS_HEADERS,
+      status: 200,
+      headers: {
+        ...CORS_HEADERS,
+        "Cache-Control": cacheHeader,
+      },
     });
   } catch {
     return errorResponse("Invalid JSON body", 400);

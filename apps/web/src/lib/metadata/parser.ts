@@ -71,7 +71,13 @@ function buildMetaMap(parsed: ParsedHead): MetaMap {
   // Process link tags (split multi-token rel values like "shortcut icon", normalized to lowercase)
   for (const { rel, href } of parsed.linkTags) {
     if (!rel || !href) continue;
-    const tokens = rel.toLowerCase().split(/\s+/).filter(Boolean);
+    const normalizedRel = rel.toLowerCase();
+    // Store the full rel string first (e.g., "shortcut icon")
+    if (!map[normalizedRel]) {
+      map[normalizedRel] = href;
+    }
+    // Also store individual tokens (e.g., "shortcut" and "icon")
+    const tokens = normalizedRel.split(/\s+/).filter(Boolean);
     for (const token of tokens) {
       if (!map[token]) {
         map[token] = href;

@@ -137,7 +137,8 @@ async function fetchWithTimeout(
 }
 
 function isCloudflareProtected(response: Response, html: string): boolean {
-  const isCloudflareServer = response.headers.get("server") === "cloudflare";
+  const server = response.headers.get("server")?.toLowerCase();
+  const isCloudflareServer = server === "cloudflare";
   const hasChallengePage =
     html.includes("challenge-platform") ||
     html.includes("cf-browser-verification") ||

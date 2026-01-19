@@ -729,6 +729,7 @@ function MetadataContent({
               href={url}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Open link in new tab"
               style={{
                 lineHeight: 0,
                 color: "var(--card-muted-fg-color)",
