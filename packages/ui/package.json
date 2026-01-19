@@ -24,13 +24,13 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.17",
-    "@turbo/gen": "^2.6.3",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@turbo/gen": "^2.7.5",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@workspace/typescript-config": "workspace:*",
-    "tailwindcss": "^4.1.17"
+    "tailwindcss": "^4.1.18"
   },
   "exports": {
     "./globals.css": "./src/styles/globals.css",
