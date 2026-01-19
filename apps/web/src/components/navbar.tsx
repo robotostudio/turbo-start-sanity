@@ -6,38 +6,12 @@ import Link from "next/link";
 import { useState } from "react";
 import useSWR from "swr";
 
-import type {
-  QueryGlobalSeoSettingsResult,
-  QueryNavbarDataResult,
-} from "@/lib/sanity/sanity.types";
+import type { ColumnLink, NavColumn, NavigationData } from "@/types";
+import { MenuLink } from "./elements/menu-link";
 import { SanityButtons } from "./elements/sanity-buttons";
-import { SanityIcon } from "./elements/sanity-icon";
 import { Logo } from "./logo";
 import { MobileMenu } from "./mobile-menu";
 import { ModeToggle } from "./mode-toggle";
-
-// Type helpers using utility types
-type NavigationData = {
-  navbarData: QueryNavbarDataResult;
-  settingsData: QueryGlobalSeoSettingsResult;
-};
-
-type NavColumn = NonNullable<
-  NonNullable<QueryNavbarDataResult>["columns"]
->[number];
-
-type ColumnLink =
-  Extract<NavColumn, { type: "column" }>["links"] extends Array<infer T>
-    ? T
-    : never;
-
-type MenuLinkProps = {
-  name: string;
-  href: string;
-  description?: string;
-  icon?: string | null;
-  onClick?: () => void;
-};
 
 // Fetcher function
 const fetcher = async (url: string): Promise<NavigationData> => {
@@ -47,33 +21,6 @@ const fetcher = async (url: string): Promise<NavigationData> => {
   }
   return response.json();
 };
-
-function MenuLink({ name, href, description, icon, onClick }: MenuLinkProps) {
-  return (
-    <Link
-      className="group flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-accent"
-      href={href || "#"}
-      onClick={onClick}
-    >
-      {icon && (
-        <SanityIcon
-          className="mt-0.5 size-4 shrink-0 text-muted-foreground"
-          icon={icon}
-        />
-      )}
-      <div className="grid gap-1">
-        <div className="font-medium leading-none group-hover:text-accent-foreground">
-          {name}
-        </div>
-        {description && (
-          <div className="line-clamp-2 text-muted-foreground text-sm">
-            {description}
-          </div>
-        )}
-      </div>
-    </Link>
-  );
-}
 
 function DesktopColumnDropdown({
   column,
@@ -132,10 +79,12 @@ function DesktopColumnLink({
 }: {
   column: Extract<NavColumn, { type: "link" }>;
 }) {
+  if (!column.href) return null;
+
   return (
     <Link
       className="px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
-      href={column.href || "#"}
+      href={column.href}
     >
       {column.name}
     </Link>

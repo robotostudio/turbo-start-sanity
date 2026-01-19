@@ -20,62 +20,10 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-import type {
-  QueryGlobalSeoSettingsResult,
-  QueryNavbarDataResult,
-} from "@/lib/sanity/sanity.types";
+import type { ColumnLink, NavigationData } from "@/types";
+import { MenuLink } from "./elements/menu-link";
 import { SanityButtons } from "./elements/sanity-buttons";
-import { SanityIcon } from "./elements/sanity-icon";
 import { Logo } from "./logo";
-
-type NavigationData = {
-  navbarData: QueryNavbarDataResult;
-  settingsData: QueryGlobalSeoSettingsResult;
-};
-
-type NavColumn = NonNullable<
-  NonNullable<QueryNavbarDataResult>["columns"]
->[number];
-
-type ColumnLink =
-  Extract<NavColumn, { type: "column" }>["links"] extends Array<infer T>
-    ? T
-    : never;
-
-type MenuLinkProps = {
-  name: string;
-  href: string;
-  description?: string;
-  icon?: string | null;
-  onClick?: () => void;
-};
-
-function MenuLink({ name, href, description, icon, onClick }: MenuLinkProps) {
-  return (
-    <Link
-      className="group flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-accent"
-      href={href || "#"}
-      onClick={onClick}
-    >
-      {icon && (
-        <SanityIcon
-          className="mt-0.5 size-4 shrink-0 text-muted-foreground"
-          icon={icon}
-        />
-      )}
-      <div className="grid gap-1">
-        <div className="font-medium leading-none group-hover:text-accent-foreground">
-          {name}
-        </div>
-        {description && (
-          <div className="line-clamp-2 text-muted-foreground text-sm">
-            {description}
-          </div>
-        )}
-      </div>
-    </Link>
-  );
-}
 
 export function MobileMenu({ navbarData, settingsData }: NavigationData) {
   const [isOpen, setIsOpen] = useState(false);
@@ -119,10 +67,11 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
         <nav className="flex-1 overflow-y-auto pt-4 grid px-6 gap-1 content-start">
           {columns?.map((column) => {
             if (column.type === "link") {
+              if (!column.href) return null;
               return (
                 <Link
                   className="flex items-center py-3 font-medium text-sm transition-colors hover:text-primary"
-                  href={column.href || "#"}
+                  href={column.href}
                   key={column._key}
                   onClick={closeMenu}
                 >
