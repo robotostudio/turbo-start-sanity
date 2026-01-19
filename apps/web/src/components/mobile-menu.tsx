@@ -65,25 +65,29 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
 
         {/* Navigation items - scrollable */}
         <nav className="flex-1 overflow-y-auto pt-4 grid px-6 gap-1 content-start">
-          {columns?.map((column) => {
-            if (column.type === "link") {
-              if (!column.href) return null;
-              return (
-                <Link
-                  className="flex items-center py-3 font-medium text-sm transition-colors hover:text-primary"
-                  href={column.href}
-                  key={column._key}
-                  onClick={closeMenu}
-                >
-                  {column.name}
-                </Link>
-              );
-            }
+          <Accordion type="single" collapsible>
+            {columns?.map((column) => {
+              if (column.type === "link") {
+                if (!column.href) return null;
+                return (
+                  <Link
+                    className="flex items-center py-3 font-medium text-sm transition-colors hover:text-primary"
+                    href={column.href}
+                    key={column._key}
+                    onClick={closeMenu}
+                  >
+                    {column.name}
+                  </Link>
+                );
+              }
 
-            if (column.type === "column") {
-              return (
-                <Accordion type="single" collapsible key={column._key}>
-                  <AccordionItem value={column._key} className="border-b-0">
+              if (column.type === "column") {
+                return (
+                  <AccordionItem
+                    key={column._key}
+                    value={column._key}
+                    className="border-b-0"
+                  >
                     <AccordionTrigger className="py-3 hover:no-underline">
                       {column.title}
                     </AccordionTrigger>
@@ -102,12 +106,12 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
                       </div>
                     </AccordionContent>
                   </AccordionItem>
-                </Accordion>
-              );
-            }
+                );
+              }
 
-            return null;
-          })}
+              return null;
+            })}
+          </Accordion>
         </nav>
 
         <SheetFooter className="border-t">
