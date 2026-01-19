@@ -29,7 +29,7 @@ export async function getMetadata(rawUrl: string): Promise<MetadataResult> {
     return {
       success: false,
       error: "Invalid URL",
-      data: generateFallbackMetadata(rawUrl),
+      data: generateFallbackMetadata(url),
     };
   }
 
