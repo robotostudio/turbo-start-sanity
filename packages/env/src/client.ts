@@ -1,17 +1,11 @@
-import { vercel } from "@t3-oss/env-core/presets-zod";
 import { createEnv } from "@t3-oss/env-nextjs";
-import { z } from "zod";
+import { z } from "zod/v4";
 
-export const env = createEnv({
+const env = createEnv({
   shared: {
     NODE_ENV: z
       .enum(["development", "production", "test"])
       .default("development"),
-  },
-
-  server: {
-    SANITY_API_READ_TOKEN: z.string().min(1),
-    SANITY_API_WRITE_TOKEN: z.string().min(1),
   },
 
   client: {
@@ -22,6 +16,15 @@ export const env = createEnv({
     NEXT_PUBLIC_VERCEL_ENV: z
       .enum(["production", "preview", "development"])
       .default("development"),
+    NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL: z
+      .string()
+      .default("localhost:3000")
+      .transform((url) => {
+        if (url.includes("localhost")) {
+          return `http://${url}`;
+        }
+        return `https://${url}`;
+      }),
     NEXT_PUBLIC_VERCEL_URL: z
       .string()
       .default("localhost:3000")
@@ -43,12 +46,14 @@ export const env = createEnv({
 
     NEXT_PUBLIC_VERCEL_ENV: process.env.NEXT_PUBLIC_VERCEL_ENV,
     NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
+    NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL:
+      process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL,
 
     NEXT_PUBLIC_SANITY_API_VERSION: process.env.NEXT_PUBLIC_SANITY_API_VERSION,
     NEXT_PUBLIC_SANITY_STUDIO_URL: process.env.NEXT_PUBLIC_SANITY_STUDIO_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
   },
-
-  extends: [vercel()],
 });
+
+export { env };

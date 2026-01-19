@@ -1,22 +1,14 @@
-import { env } from "env";
+import { env } from "@workspace/env/client";
 import type { PortableTextBlock } from "next-sanity";
 import slugify from "slugify";
 
-export function assertValue<T>(v: T | undefined, errorMessage: string): T {
-  if (v === undefined) {
-    throw new Error(errorMessage);
-  }
-
-  return v;
-}
-
 export const getBaseUrl = () => {
-  if (env.VERCEL_ENV === "production") {
-    return `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  if (env.NEXT_PUBLIC_VERCEL_ENV === "production") {
+    return env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL;
   }
 
-  if (env.VERCEL_ENV === "preview") {
-    return `https://${env.VERCEL_URL}`;
+  if (env.NEXT_PUBLIC_VERCEL_ENV === "preview") {
+    return env.NEXT_PUBLIC_VERCEL_URL;
   }
 
   return "http://localhost:3000";
@@ -45,7 +37,7 @@ export const getTitleCase = (name: string) => {
 type Response<T> = [T, undefined] | [undefined, string];
 
 export async function handleErrors<T>(
-  promise: Promise<T>
+  promise: Promise<T>,
 ): Promise<Response<T>> {
   try {
     const data = await promise;
@@ -60,7 +52,7 @@ export async function handleErrors<T>(
 
 export function convertToSlug(
   text?: string,
-  { fallback }: { fallback?: string } = { fallback: "top-level" }
+  { fallback }: { fallback?: string } = { fallback: "top-level" },
 ) {
   if (!text) {
     return fallback;
@@ -101,7 +93,7 @@ export type PaginationMetadata = {
 export function calculatePaginationMetadata(
   totalItems: number,
   currentPage = 1,
-  itemsPerPage = BLOG_ITEMS_PER_PAGE
+  itemsPerPage = BLOG_ITEMS_PER_PAGE,
 ): PaginationMetadata {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const hasNextPage = currentPage < totalPages;

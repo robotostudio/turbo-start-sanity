@@ -1,6 +1,6 @@
 import type { SanityImageSource } from "@sanity/asset-utils";
 import { createImageUrlBuilder } from "@sanity/image-url";
-import { env } from "env";
+import { env } from "@workspace/env/client";
 import { createClient } from "next-sanity";
 
 export const client = createClient({
