@@ -7,6 +7,7 @@ import {
   Globe,
   RefreshCw,
 } from "lucide-react";
+import { useState } from "react";
 import type { DocumentInspectorProps } from "sanity";
 import { useEditState } from "sanity";
 
@@ -423,14 +424,11 @@ function FetchErrorState({
 // ============================================================================
 
 function FaviconImage({ src }: { src: string }) {
-  const handleError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const target = e.target as HTMLImageElement;
-    target.style.display = "none";
-    const parent = target.parentElement;
-    if (parent) {
-      parent.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#5f6368" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`;
-    }
-  };
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError) {
+    return <Globe size={12} color="#5f6368" />;
+  }
 
   return (
     <img
@@ -439,7 +437,7 @@ function FaviconImage({ src }: { src: string }) {
       width={14}
       height={14}
       style={{ objectFit: "contain" }}
-      onError={handleError}
+      onError={() => setHasError(true)}
     />
   );
 }
@@ -821,7 +819,6 @@ export function SerpPreview({
   apiUrl,
 }: SerpPreviewProps) {
   const editState = useEditState(documentId, documentType);
-  console.log("🚀 ~ SerpPreview ~ editState:", editState)
   const docState = getDocumentState(editState, baseUrl);
   const url = docState.status === "ready" ? docState.url : null;
   const metadataState = useMetadata(url, apiUrl);

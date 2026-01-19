@@ -2,7 +2,6 @@ import { fetchHtml } from "./fetcher";
 import { extractMetadata, generateFallbackMetadata } from "./parser";
 import type { MetadataResult } from "./types";
 
-
 function normalizeUrl(url: string): string {
   let normalized = url.trim();
 

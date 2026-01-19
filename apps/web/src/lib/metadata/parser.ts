@@ -7,15 +7,16 @@ export function parseHead(html: string): ParsedHead {
   const root = parse(html);
 
   const metaTags: MetaTag[] = root.querySelectorAll("meta").map((el) => ({
-    property: el.getAttribute("property") || el.getAttribute("name"),
-    content: el.getAttribute("content"),
+    property:
+      el.getAttribute("property") ?? el.getAttribute("name") ?? undefined,
+    content: el.getAttribute("content") ?? undefined,
   }));
 
   const title = root.querySelector("title")?.textContent?.trim();
 
   const linkTags: LinkTag[] = root.querySelectorAll("link").map((el) => ({
-    rel: el.getAttribute("rel"),
-    href: el.getAttribute("href"),
+    rel: el.getAttribute("rel") ?? undefined,
+    href: el.getAttribute("href") ?? undefined,
   }));
 
   return { metaTags, title, linkTags };
@@ -64,14 +65,26 @@ function buildMetaMap(parsed: ParsedHead): MetaMap {
     }
   }
 
-  // Process link tags
+  // Process link tags (split multi-token rel values like "shortcut icon")
   for (const { rel, href } of parsed.linkTags) {
-    if (rel && href && !map[rel]) {
-      map[rel] = href;
+    if (!rel || !href) continue;
+    const tokens = rel.split(/\s+/).filter(Boolean);
+    for (const token of tokens) {
+      if (!map[token]) {
+        map[token] = href;
+      }
     }
   }
 
   return map;
+}
+
+function getSafeHostname(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return typeof url === "string" ? url : "";
+  }
 }
 
 export function extractMetadata(html: string, url: string): SiteMetadata {
@@ -80,7 +93,10 @@ export function extractMetadata(html: string, url: string): SiteMetadata {
 
   // Title: og:title > twitter:title > <title>
   const title =
-    meta["og:title"] || meta["twitter:title"] || parsed.title || new URL(url).hostname;
+    meta["og:title"] ||
+    meta["twitter:title"] ||
+    parsed.title ||
+    getSafeHostname(url);
 
   // Description: og:description > twitter:description > description
   const description =

@@ -27,6 +27,9 @@ out/
 build
 dist
 
+# Generated files
+next-env.d.ts
+
 
 # Debug
 npm-debug.log*

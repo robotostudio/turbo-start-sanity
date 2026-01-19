@@ -19,12 +19,31 @@ export type MetadataState =
   | { status: "error"; error: string; fallback: SiteMetadata; refetch: () => void; isRefetching: boolean }
   | { status: "success"; data: SiteMetadata; refetch: () => void; isRefetching: boolean };
 
+function isValidMetadataResponse(data: unknown): data is MetadataResponse {
+  if (typeof data !== "object" || data === null) return false;
+  const obj = data as Record<string, unknown>;
+  if (typeof obj.success !== "boolean") return false;
+  if (obj.success) {
+    return typeof obj.data === "object" && obj.data !== null;
+  }
+  return typeof obj.error === "string" && typeof obj.data === "object" && obj.data !== null;
+}
+
 const fetcher = async (url: string): Promise<MetadataResponse> => {
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
   }
-  return response.json();
+  let data: unknown;
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("Invalid JSON response");
+  }
+  if (!isValidMetadataResponse(data)) {
+    throw new Error("Invalid response shape");
+  }
+  return data;
 };
 
 export function useMetadata(url: string | null, apiBase: string): MetadataState {

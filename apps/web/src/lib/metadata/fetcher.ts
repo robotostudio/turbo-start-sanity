@@ -1,4 +1,108 @@
+import { lookup } from "node:dns/promises";
+
 const DEFAULT_TIMEOUT = 10000;
+const MAX_HTML_SIZE = 5 * 1024 * 1024; // 5MB limit
+
+const PRIVATE_IP_RANGES = [
+  /^127\./, // 127.0.0.0/8 (loopback)
+  /^10\./, // 10.0.0.0/8
+  /^172\.(1[6-9]|2[0-9]|3[0-1])\./, // 172.16.0.0/12
+  /^192\.168\./, // 192.168.0.0/16
+  /^169\.254\./, // 169.254.0.0/16 (link-local)
+  /^0\./, // 0.0.0.0/8
+  /^::1$/, // IPv6 loopback
+  /^fe80:/i, // IPv6 link-local
+  /^fc00:/i, // IPv6 unique local
+  /^fd00:/i, // IPv6 unique local
+];
+
+const BLOCKED_HOSTNAMES = [
+  "localhost",
+  "metadata.google.internal",
+  "169.254.169.254",
+];
+
+function isPrivateIp(ip: string): boolean {
+  return PRIVATE_IP_RANGES.some((pattern) => pattern.test(ip));
+}
+
+async function validateUrl(
+  url: string
+): Promise<{ valid: true } | { valid: false; error: string }> {
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return { valid: false, error: "Invalid URL format" };
+  }
+
+  // Only allow http/https
+  if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+    return { valid: false, error: "Only HTTP and HTTPS protocols are allowed" };
+  }
+
+  const hostname = parsed.hostname.toLowerCase();
+
+  // Block known dangerous hostnames
+  if (BLOCKED_HOSTNAMES.includes(hostname)) {
+    return { valid: false, error: "Access to this host is not allowed" };
+  }
+
+  // Resolve hostname and check for private IPs
+  try {
+    const addresses = await lookup(hostname, { all: true });
+    for (const addr of addresses) {
+      if (isPrivateIp(addr.address)) {
+        return {
+          valid: false,
+          error: "Access to private networks is not allowed",
+        };
+      }
+    }
+  } catch {
+    // DNS lookup failed - let the fetch fail naturally
+  }
+
+  return { valid: true };
+}
+
+async function readLimitedResponse(
+  response: Response,
+  maxSize: number
+): Promise<string> {
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new Error("No response body");
+  }
+
+  const chunks: Uint8Array[] = [];
+  let totalSize = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      totalSize += value.length;
+      if (totalSize > maxSize) {
+        reader.cancel();
+        throw new Error(
+          `Response too large (exceeds ${maxSize / 1024 / 1024}MB limit)`
+        );
+      }
+
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const decoder = new TextDecoder();
+  return (
+    chunks.map((chunk) => decoder.decode(chunk, { stream: true })).join("") +
+    decoder.decode()
+  );
+}
 
 const BROWSER_HEADERS = {
   "User-Agent":
@@ -40,6 +144,12 @@ function isCloudflareProtected(response: Response, html: string): boolean {
 
 export async function fetchHtml(url: string): Promise<FetchResult> {
   try {
+    // SSRF protection: validate URL before fetching
+    const validation = await validateUrl(url);
+    if (!validation.valid) {
+      return { success: false, error: validation.error };
+    }
+
     const response = await fetchWithTimeout(url);
 
     if (!response.ok) {
@@ -57,7 +167,8 @@ export async function fetchHtml(url: string): Promise<FetchResult> {
       };
     }
 
-    const html = await response.text();
+    // Read response with size limit to prevent memory exhaustion
+    const html = await readLimitedResponse(response, MAX_HTML_SIZE);
 
     if (isCloudflareProtected(response, html)) {
       return {

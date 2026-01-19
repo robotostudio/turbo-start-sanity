@@ -16,10 +16,13 @@ type ErrorResponse = {
   error: string;
 };
 
-function errorResponse(message: string, status: number): NextResponse<ErrorResponse> {
+function errorResponse(
+  message: string,
+  status: number
+): NextResponse<ErrorResponse> {
   return NextResponse.json(
     { success: false, error: message },
-    { status, headers: CORS_HEADERS }
+    { status, headers: { ...CORS_HEADERS, "Cache-Control": "no-store" } }
   );
 }
 
@@ -40,11 +43,15 @@ export async function GET(request: NextRequest) {
 
   const result = await getMetadata(url);
 
+  const cacheHeader = result.success
+    ? "public, s-maxage=3600, stale-while-revalidate=86400"
+    : "no-store";
+
   return NextResponse.json(result, {
     status: result.success ? 200 : 206,
     headers: {
       ...CORS_HEADERS,
-      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      "Cache-Control": cacheHeader,
     },
   });
 }

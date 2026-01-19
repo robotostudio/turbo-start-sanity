@@ -26,7 +26,9 @@ export function resolveDescription(
 }
 
 export function truncate(text: string, maxLength: number): string {
+  if (maxLength <= 0) return "";
   if (text.length <= maxLength) return text;
+  if (maxLength <= 3) return text.slice(0, maxLength);
   return `${text.slice(0, maxLength - 3)}...`;
 }
 
@@ -35,5 +37,7 @@ export function buildUrl(
   slug: string | undefined
 ): string | null {
   if (!slug) return null;
-  return `${baseUrl || ""}${slug}`;
+  const normalizedBase = baseUrl?.replace(/\/+$/, "") || "";
+  const normalizedSlug = slug.startsWith("/") ? slug : `/${slug}`;
+  return `${normalizedBase}${normalizedSlug}`;
 }
