@@ -1,6 +1,8 @@
+export type FieldSource = "seoTitle" | "title" | "seoDescription" | null;
+
 export type FieldResolution = {
   value: string | null;
-  source: string | null;
+  source: FieldSource;
 };
 
 export function resolveTitle(

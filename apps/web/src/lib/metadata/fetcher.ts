@@ -60,7 +60,7 @@ async function validateUrl(
       }
     }
   } catch {
-    // DNS lookup failed - let the fetch fail naturally
+    return { valid: false, error: "DNS resolution failed" };
   }
 
   return { valid: true };
@@ -159,7 +159,9 @@ export async function fetchHtml(url: string): Promise<FetchResult> {
       };
     }
 
-    const contentType = response.headers.get("content-type") || "";
+    const contentType = (
+      response.headers.get("content-type") || ""
+    ).toLowerCase();
     if (!contentType.includes("text/html")) {
       return {
         success: false,

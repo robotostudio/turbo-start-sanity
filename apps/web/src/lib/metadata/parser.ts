@@ -58,17 +58,20 @@ type MetaMap = Record<string, string>;
 function buildMetaMap(parsed: ParsedHead): MetaMap {
   const map: MetaMap = {};
 
-  // Process meta tags (first occurrence wins)
+  // Process meta tags (first occurrence wins, normalized to lowercase keys)
   for (const { property, content } of parsed.metaTags) {
-    if (property && content && !map[property]) {
-      map[property] = decodeContent(content) || content;
+    if (property && content) {
+      const key = property.toLowerCase();
+      if (!map[key]) {
+        map[key] = decodeContent(content) || content;
+      }
     }
   }
 
-  // Process link tags (split multi-token rel values like "shortcut icon")
+  // Process link tags (split multi-token rel values like "shortcut icon", normalized to lowercase)
   for (const { rel, href } of parsed.linkTags) {
     if (!rel || !href) continue;
-    const tokens = rel.split(/\s+/).filter(Boolean);
+    const tokens = rel.toLowerCase().split(/\s+/).filter(Boolean);
     for (const token of tokens) {
       if (!map[token]) {
         map[token] = href;

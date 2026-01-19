@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 import { getMetadata } from "@/lib/metadata";
+import { generateFallbackMetadata } from "@/lib/metadata/parser";
+import type { MetadataResult } from "@/lib/metadata/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,17 +13,13 @@ const CORS_HEADERS = {
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
-type ErrorResponse = {
-  success: false;
-  error: string;
-};
-
 function errorResponse(
   message: string,
-  status: number
-): NextResponse<ErrorResponse> {
+  status: number,
+  url = ""
+): NextResponse<MetadataResult> {
   return NextResponse.json(
-    { success: false, error: message },
+    { success: false, error: message, data: generateFallbackMetadata(url) },
     { status, headers: { ...CORS_HEADERS, "Cache-Control": "no-store" } }
   );
 }

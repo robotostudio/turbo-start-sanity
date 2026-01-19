@@ -664,6 +664,8 @@ function RefetchButton({
       type="button"
       onClick={onClick}
       disabled={isRefetching}
+      aria-label={isRefetching ? "Refreshing metadata" : "Refresh metadata"}
+      aria-busy={isRefetching}
       style={{
         display: "inline-flex",
         alignItems: "center",
