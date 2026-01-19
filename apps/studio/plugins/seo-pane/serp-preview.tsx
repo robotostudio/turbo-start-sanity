@@ -821,7 +821,6 @@ export function SerpPreview({
   apiUrl,
 }: SerpPreviewProps) {
   const editState = useEditState(documentId, documentType);
-  console.log("🚀 ~ SerpPreview ~ editState:", editState)
   const docState = getDocumentState(editState, baseUrl);
   const url = docState.status === "ready" ? docState.url : null;
   const metadataState = useMetadata(url, apiUrl);
