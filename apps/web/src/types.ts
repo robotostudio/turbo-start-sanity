@@ -1,8 +1,10 @@
 import type {
   QueryBlogIndexPageBlogsResult,
   QueryBlogSlugPageDataResult,
+  QueryGlobalSeoSettingsResult,
   QueryHomePageDataResult,
   QueryImageTypeResult,
+  QueryNavbarDataResult,
 } from "@/lib/sanity/sanity.types";
 
 export type PageBuilderBlockTypes = NonNullable<
@@ -31,3 +33,26 @@ export type SanityRichTextBlock = Extract<
 export type Blog = NonNullable<QueryBlogIndexPageBlogsResult>[number];
 
 export type Maybe<T> = T | null | undefined;
+
+// Navigation types
+export type NavigationData = {
+  navbarData: QueryNavbarDataResult;
+  settingsData: QueryGlobalSeoSettingsResult;
+};
+
+export type NavColumn = NonNullable<
+  NonNullable<QueryNavbarDataResult>["columns"]
+>[number];
+
+export type ColumnLink =
+  Extract<NavColumn, { type: "column" }>["links"] extends Array<infer T>
+    ? T
+    : never;
+
+export type MenuLinkProps = {
+  name: string;
+  href: string;
+  description?: string;
+  icon?: string | null;
+  onClick?: () => void;
+};
