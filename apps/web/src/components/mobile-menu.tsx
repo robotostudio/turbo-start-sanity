@@ -114,13 +114,15 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
           </Accordion>
         </nav>
 
-        <SheetFooter className="border-t">
-          <SanityButtons
-            buttonClassName="w-full justify-center"
-            buttons={buttons || []}
-            className="grid gap-3"
-          />
-        </SheetFooter>
+        {buttons?.length && (
+          <SheetFooter className="border-t">
+            <SanityButtons
+              buttonClassName="w-full justify-center"
+              buttons={buttons || []}
+              className="grid gap-3"
+            />
+          </SheetFooter>
+        )}
       </SheetContent>
     </Sheet>
   );
