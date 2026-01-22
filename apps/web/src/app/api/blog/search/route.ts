@@ -3,7 +3,7 @@ import { queryAllBlogDataForSearch } from "@workspace/sanity/query";
 import Fuse from "fuse.js";
 import { NextResponse } from "next/server";
 
-export const revalidate = 360; // every 5 minutes
+export const revalidate = 300; // every 5 minutes
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
