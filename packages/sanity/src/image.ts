@@ -1,7 +1,9 @@
 import { env } from "@workspace/env/client";
 import type { WrapperProps } from "sanity-image";
 
-import type { SanityImageProps as SanityImageData } from "@/types";
+import type { QueryImageTypeResult } from "./sanity.types";
+
+type SanityImageData = NonNullable<QueryImageTypeResult>;
 
 // Types
 type ImageHotspot = {

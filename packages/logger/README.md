@@ -20,4 +20,3 @@ logger.error("An error occurred", error);
 - Standard log levels: info, warn/warning, error
 - TypeScript support
 - Zero dependencies
-

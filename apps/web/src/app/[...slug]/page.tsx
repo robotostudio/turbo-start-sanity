@@ -1,10 +1,10 @@
 import { Logger } from "@workspace/logger";
+import { client } from "@workspace/sanity/client";
+import { sanityFetch } from "@workspace/sanity/live";
+import { querySlugPageData, querySlugPagePaths } from "@workspace/sanity/query";
 import { notFound } from "next/navigation";
 
 import { PageBuilder } from "@/components/pagebuilder";
-import { client } from "@/lib/sanity/client";
-import { sanityFetch } from "@/lib/sanity/live";
-import { querySlugPageData, querySlugPagePaths } from "@/lib/sanity/query";
 import { getSEOMetadata } from "@/lib/seo";
 
 const logger = new Logger("PageSlug");

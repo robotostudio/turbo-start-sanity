@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { Logger } from "@workspace/logger";
 import { defineCliConfig } from "sanity/cli";
 import tsconfigPaths from "vite-plugin-tsconfig-paths";

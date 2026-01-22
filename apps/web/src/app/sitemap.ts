@@ -1,8 +1,8 @@
+import { client } from "@workspace/sanity/client";
+import { querySitemapData } from "@workspace/sanity/query";
+import type { QuerySitemapDataResult } from "@workspace/sanity/types";
 import type { MetadataRoute } from "next";
 
-import { client } from "@/lib/sanity/client";
-import { querySitemapData } from "@/lib/sanity/query";
-import type { QuerySitemapDataResult } from "@/lib/sanity/sanity.types";
 import { getBaseUrl } from "@/utils";
 
 type Page = QuerySitemapDataResult["slugPages"][number];

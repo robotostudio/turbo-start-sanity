@@ -1,8 +1,7 @@
+import { sanityFetch } from "@workspace/sanity/live";
+import { queryAllBlogDataForSearch } from "@workspace/sanity/query";
 import Fuse from "fuse.js";
 import { NextResponse } from "next/server";
-
-import { sanityFetch } from "@/lib/sanity/live";
-import { queryAllBlogDataForSearch } from "@/lib/sanity/query";
 
 export const revalidate = 360; // every 5 minutes
 
