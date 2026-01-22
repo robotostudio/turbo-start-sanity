@@ -41,7 +41,8 @@
     "sanity-plugin-lucide-icon-picker": "^1.0.3",
     "sanity-plugin-media": "^4.1.1",
     "slugify": "^1.6.6",
-    "styled-components": "^6.3.8"
+    "styled-components": "^6.3.8",
+    "swr": "^2.3.8"
   },
   "devDependencies": {
     "@sanity/blueprints": "0.7.1",
