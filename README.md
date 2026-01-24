@@ -9,7 +9,7 @@ A modern, full-stack monorepo template built with Next.js App Router, Sanity CMS
 ### Monorepo Structure
 
 - Apps: web (Next.js frontend) and studio (Sanity Studio)
-- Shared packages: UI components, TypeScript config, ESLint config
+- Shared packages: UI components, TypeScript config, environment utilities, logger
 - Turborepo for build orchestration and caching
 
 ### Frontend (Web)
@@ -24,7 +24,7 @@ A modern, full-stack monorepo template built with Next.js App Router, Sanity CMS
 
 ### Content Management (Studio)
 
-- Sanity Studio v4
+- Sanity Studio v5
 - Custom document types (Blog, FAQ, Pages)
 - Visual editing integration
 - Structured content with schemas
