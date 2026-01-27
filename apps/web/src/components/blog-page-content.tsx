@@ -1,12 +1,13 @@
 "use client";
 
+import type { QueryBlogIndexPageDataResult } from "@workspace/sanity/types";
+
 import { BlogHeader } from "@/components/blog-card";
 import { BlogPagination } from "@/components/blog-pagination";
 import { BlogSearchResults } from "@/components/blog-search-results";
 import { BlogSection } from "@/components/blog-section";
 import { PageBuilder } from "@/components/pagebuilder";
 import { useBlogSearch } from "@/hooks/use-blog-search";
-import type { QueryBlogIndexPageDataResult } from "@/lib/sanity/sanity.types";
 import type { Blog } from "@/types";
 import type { PaginationMetadata } from "@/utils";
 import { SearchInput } from "./blog-search";

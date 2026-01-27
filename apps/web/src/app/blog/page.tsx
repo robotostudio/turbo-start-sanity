@@ -1,14 +1,14 @@
+import { sanityFetch } from "@workspace/sanity/live";
+import {
+  queryBlogIndexPageBlogs,
+  queryBlogIndexPageBlogsCount,
+  queryBlogIndexPageData,
+} from "@workspace/sanity/query";
 import { notFound } from "next/navigation";
 
 import { BlogHeader } from "@/components/blog-card";
 import { BlogPageContent } from "@/components/blog-page-content";
 import { PageBuilder } from "@/components/pagebuilder";
-import { sanityFetch } from "@/lib/sanity/live";
-import {
-  queryBlogIndexPageBlogs,
-  queryBlogIndexPageBlogsCount,
-  queryBlogIndexPageData,
-} from "@/lib/sanity/query";
 import { getSEOMetadata } from "@/lib/seo";
 import {
   calculatePaginationMetadata,
