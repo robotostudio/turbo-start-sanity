@@ -36,7 +36,7 @@
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sanity": "^5.6.0",
+    "sanity": "^5.7.0",
     "sanity-plugin-asset-source-unsplash": "^7.0.2",
     "sanity-plugin-lucide-icon-picker": "^1.0.3",
     "sanity-plugin-media": "^4.1.1",
