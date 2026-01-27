@@ -11,7 +11,7 @@
     "@sanity/client": "catalog:",
     "@sanity/image-url": "^2.0.3",
     "@workspace/env": "workspace:*",
-    "next-sanity": "^12.0.12",
+    "next-sanity": "^12.0.14",
     "sanity-image": "^1.0.0"
   },
   "devDependencies": {
