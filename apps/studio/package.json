@@ -29,7 +29,7 @@
     "@sanity/orderable-document-list": "^1.5.0",
     "@sanity/ui": "^3.1.11",
     "@sanity/uuid": "^3.0.2",
-    "@sanity/vision": "^5.6.0",
+    "@sanity/vision": "^5.7.0",
     "@workspace/logger": "workspace:*",
     "dotenv": "^17.2.3",
     "friendlier-words": "^1.1.3",
