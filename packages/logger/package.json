@@ -15,6 +15,7 @@
     "format:check": "biome format ."
   },
   "devDependencies": {
-    "@workspace/typescript-config": "workspace:*"
+    "@workspace/typescript-config": "workspace:*",
+    "typescript": "catalog:"
   }
 }

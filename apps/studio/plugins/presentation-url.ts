@@ -22,7 +22,7 @@ function getDocumentSlug(
 ) {
   if (draft?.slug?.current) return draft.slug.current;
   if (published?.slug?.current) return published.slug.current;
-  return;
+  return undefined;
 }
 
 export const presentationUrl = definePlugin(() => ({
