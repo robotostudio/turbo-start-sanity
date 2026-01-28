@@ -58,7 +58,7 @@ jobs:
         run: pnpm run build
         env:
           # Sanity environment variables for build
-          SANITY_STUDIO_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
-          SANITY_STUDIO_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
-          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ vars.SANITY_STUDIO_PROJECT_ID }}
-          NEXT_PUBLIC_SANITY_DATASET: ${{ vars.SANITY_STUDIO_DATASET }}
+          SANITY_STUDIO_PROJECT_ID: ${{ secrets.SANITY_STUDIO_PROJECT_ID }}
+          SANITY_STUDIO_DATASET: ${{ secrets.SANITY_STUDIO_DATASET }}
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.SANITY_STUDIO_PROJECT_ID }}
+          NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.SANITY_STUDIO_DATASET }}
