@@ -8,7 +8,6 @@ import tsconfigPaths from "vite-plugin-tsconfig-paths";
 const logger = new Logger("SanityCLI");
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
 const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
 
