@@ -9,13 +9,12 @@ const logger = new Logger("SanityCLI");
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
 const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
 
-// Warn about missing env vars but don't throw - allows Vite config to load for builds
-if (!projectId || projectId === "project_id") {
+if (!projectId ) {
   logger.warn(
     "Missing or invalid SANITY_STUDIO_PROJECT_ID - some features may not work"
   );
 }
-if (!dataset || dataset === "dataset") {
+if (!dataset) {
   logger.warn(
     "Missing or invalid SANITY_STUDIO_DATASET - some features may not work"
   );
