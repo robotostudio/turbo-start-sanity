@@ -30,32 +30,13 @@ type StructureOptions = {
 // Type for Sanity list items (includes dividers)
 type SanityListItem = ListItemBuilder | ReturnType<StructureBuilder["divider"]>;
 
-// Helper function to fetch documents with error handling
-const fetchDocuments = async (
-  client: SanityClient,
-  schemaType: string
-): Promise<DocumentData[]> => {
-  try {
-    const documents = await client.fetch(`
-      *[_type == "${schemaType}" && defined(slug.current)] {
-        _id,
-        title,
-        "slug": slug.current
-      }
-    `);
-
-    if (!Array.isArray(documents)) {
-      throw new Error("Invalid documents response");
+const DOCUMENTS_QUERY = `
+  *[_type == $schemaType && defined(slug.current)] {
+      _id,
+      title,
+      "slug": slug.current
     }
-
-    return documents;
-  } catch (error) {
-    // console.error(`Failed to fetch ${schemaType} documents:`, error);
-    throw new Error(
-      `Unable to load ${schemaType} documents. Please try again. ${error instanceof Error ? error.message : "Unknown error"}`
-    );
-  }
-};
+`;
 
 // Helper function to deduplicate documents
 const deduplicateDocuments = (documents: DocumentData[]): DocumentData[] => {
@@ -364,8 +345,9 @@ export const createSlugBasedStructure = (
         if (!client) {
           throw new Error("Unable to get Sanity client");
         }
+
         // 2. Fetch and process documents
-        const documents = await fetchDocuments(client, schemaType);
+        const documents = await client.fetch(DOCUMENTS_QUERY, { schemaType });
         const uniqueDocuments = deduplicateDocuments(documents);
 
         // 3. Build folder structure
