@@ -135,7 +135,8 @@ export function useSlugValidation(
 
   const sanityValidation = useValidationStatus(
     publishedId || "",
-    document?._type
+    document?._type,
+    true
   );
 
   // Extract Sanity slug validation errors

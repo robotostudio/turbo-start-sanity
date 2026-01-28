@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Lint, Format, Type Check & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SANITY_STUDIO_PROJECT_ID: ${{ secrets.SANITY_STUDIO_PROJECT_ID }}
+      SANITY_STUDIO_DATASET: ${{ secrets.SANITY_STUDIO_DATASET }}
+      SANITY_STUDIO_TITLE: ${{ secrets.SANITY_STUDIO_TITLE }}
+      SANITY_STUDIO_PRESENTATION_URL: ${{ secrets.SANITY_STUDIO_PRESENTATION_URL }}
+      NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.SANITY_STUDIO_PROJECT_ID }}
+      NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.SANITY_STUDIO_DATASET }}
+      NEXT_PUBLIC_SANITY_API_VERSION: ${{ secrets.SANITY_STUDIO_API_VERSION }}
+      NEXT_PUBLIC_SANITY_STUDIO_URL: ${{ secrets.SANITY_STUDIO_PRESENTATION_URL }}
+      SANITY_API_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
+      SANITY_API_WRITE_TOKEN: ${{ secrets.SANITY_API_WRITE_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache Turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ hashFiles('**/turbo.json', 'pnpm-lock.yaml') }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Format Check
+        run: pnpm run format:check
+
+      - name: Type Check
+        run: pnpm run check-types
+
+      - name: Build
+        run: pnpm run build

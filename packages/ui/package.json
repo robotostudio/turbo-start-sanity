@@ -4,8 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "lint": "npx ultracite lint",
-    "format": "npx ultracite fix"
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",

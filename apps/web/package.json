@@ -7,10 +7,10 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "npx ultracite lint",
-    "format": "npx ultracite fix",
-    "typecheck": "tsc --noEmit",
-    "check": "pnpm run lint && pnpm run typecheck"
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@sanity/asset-utils": "^2.3.0",

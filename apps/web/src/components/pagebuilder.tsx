@@ -88,7 +88,7 @@ function UnknownBlockError({
  */
 function useOptimisticPageBuilder(
   initialBlocks: PageBuilderBlock[],
-  documentId: string,
+  documentId: string
 ) {
   // biome-ignore lint/suspicious/noExplicitAny: <any is used to allow for dynamic component rendering>
   return useOptimistic<PageBuilderBlock[], any>(
@@ -98,7 +98,7 @@ function useOptimisticPageBuilder(
         return action.document.pageBuilder;
       }
       return currentBlocks;
-    },
+    }
   );
 }
 
@@ -113,7 +113,7 @@ function useBlockRenderer(id: string, type: string) {
         type,
         path: `pageBuilder[_key=="${blockKey}"]`,
       }),
-    [id, type],
+    [id, type]
   );
 
   const renderBlock = useCallback(
@@ -141,7 +141,7 @@ function useBlockRenderer(id: string, type: string) {
         </div>
       );
     },
-    [createBlockDataAttribute],
+    [createBlockDataAttribute]
   );
 
   return { renderBlock };
@@ -160,7 +160,7 @@ export function PageBuilder({
 
   const containerDataAttribute = useMemo(
     () => createSanityDataAttribute({ id, type, path: "pageBuilder" }),
-    [id, type],
+    [id, type]
   );
 
   if (!blocks.length) {

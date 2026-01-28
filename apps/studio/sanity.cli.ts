@@ -1,21 +1,24 @@
-import "dotenv/config";
+import path from "node:path";
 import { Logger } from "@workspace/logger";
+import "dotenv/config";
 import { defineCliConfig } from "sanity/cli";
 import tsconfigPaths from "vite-plugin-tsconfig-paths";
 
 const logger = new Logger("SanityCLI");
 
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID;
-const dataset = process.env.SANITY_STUDIO_DATASET;
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
+const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
 
-if (!projectId || projectId === "project_id")
-  throw new Error(
-    "Missing required environment variable: SANITY_STUDIO_PROJECT_ID"
+if (!projectId) {
+  logger.warn(
+    "Missing or invalid SANITY_STUDIO_PROJECT_ID - some features may not work"
   );
-if (!dataset || dataset === "dataset")
-  throw new Error(
-    "Missing required environment variable: SANITY_STUDIO_DATASET"
+}
+if (!dataset) {
+  logger.warn(
+    "Missing or invalid SANITY_STUDIO_DATASET - some features may not work"
   );
+}
 
 /**
  * Returns the correct studio host based on environment variables.
@@ -59,5 +62,10 @@ export default defineCliConfig({
   },
   vite: {
     plugins: [tsconfigPaths()],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "."),
+      },
+    },
   },
 });

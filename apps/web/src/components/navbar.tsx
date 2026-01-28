@@ -146,7 +146,7 @@ export function Navbar({
       refreshInterval: 30_000,
       errorRetryCount: 3,
       errorRetryInterval: 5000,
-    },
+    }
   );
 
   const navigationData = data || {
