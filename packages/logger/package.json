@@ -10,8 +10,9 @@
     }
   },
   "scripts": {
-    "lint": "biome check .",
-    "format": "biome check --write ."
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "format:check": "biome format ."
   },
   "devDependencies": {
     "@workspace/typescript-config": "workspace:*"

@@ -4,7 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@t3-oss/env-nextjs": "^0.13.10",

@@ -3,16 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "turbo build",
+    "build": "turbo run build",
     "build:studio": "turbo run build --filter=studio",
     "build:web": "turbo run build --filter=web",
-    "dev": "turbo dev",
+    "dev": "turbo run dev",
     "dev:studio": "turbo run dev --filter=studio",
     "dev:web": "turbo run dev --filter=web",
-    "lint": "npx ultracite check",
-    "format": "npx ultracite fix",
-    "check-types": "turbo check-types",
-    "check-biome": "turbo check-biome"
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "format:check": "turbo run format:check",
+    "check-types": "turbo run check-types"
   },
   "dependencies": {
     "@workspace/env": "workspace:*"
