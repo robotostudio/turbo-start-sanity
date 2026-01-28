@@ -1,15 +1,18 @@
-import path from "node:path";
-import "dotenv/config";
 import { Logger } from "@workspace/logger";
+import "dotenv/config";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineCliConfig } from "sanity/cli";
 import tsconfigPaths from "vite-plugin-tsconfig-paths";
 
 const logger = new Logger("SanityCLI");
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
 const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
 
-if (!projectId ) {
+if (!projectId) {
   logger.warn(
     "Missing or invalid SANITY_STUDIO_PROJECT_ID - some features may not work"
   );
