@@ -1,3 +1,4 @@
+import path from "node:path";
 import "dotenv/config";
 import { Logger } from "@workspace/logger";
 import { defineCliConfig } from "sanity/cli";
@@ -59,5 +60,10 @@ export default defineCliConfig({
   },
   vite: {
     plugins: [tsconfigPaths()],
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "."),
+      },
+    },
   },
 });
