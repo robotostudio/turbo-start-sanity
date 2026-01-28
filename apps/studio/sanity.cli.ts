@@ -6,17 +6,20 @@ import tsconfigPaths from "vite-plugin-tsconfig-paths";
 
 const logger = new Logger("SanityCLI");
 
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID;
-const dataset = process.env.SANITY_STUDIO_DATASET;
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
+const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
 
-if (!projectId || projectId === "project_id")
-  throw new Error(
-    "Missing required environment variable: SANITY_STUDIO_PROJECT_ID"
+// Warn about missing env vars but don't throw - allows Vite config to load for builds
+if (!projectId || projectId === "project_id") {
+  logger.warn(
+    "Missing or invalid SANITY_STUDIO_PROJECT_ID - some features may not work"
   );
-if (!dataset || dataset === "dataset")
-  throw new Error(
-    "Missing required environment variable: SANITY_STUDIO_DATASET"
+}
+if (!dataset || dataset === "dataset") {
+  logger.warn(
+    "Missing or invalid SANITY_STUDIO_DATASET - some features may not work"
   );
+}
 
 /**
  * Returns the correct studio host based on environment variables.
