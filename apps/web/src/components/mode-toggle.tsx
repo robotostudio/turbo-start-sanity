@@ -9,6 +9,7 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 const THEMES = [
   { id: 'light', value: 'light', label: 'Light' },
@@ -17,7 +18,12 @@ const THEMES = [
 ] as const
 
 export function ModeToggle() {
-  const { setTheme, theme } = useTheme();
+  const {theme, setTheme} = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <DropdownMenu>
@@ -33,7 +39,7 @@ export function ModeToggle() {
           <DropdownMenuItem
             key={id}
             onClick={() => setTheme(value)}
-            className={theme === value ? "font-bold" : ""}
+            className={mounted && theme === value ? "font-bold" : ""}
           >
             {label}
           </DropdownMenuItem>
