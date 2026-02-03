@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { Moon, Sun } from "lucide-react";
+import { Check, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -39,9 +39,10 @@ export function ModeToggle() {
           <DropdownMenuItem
             key={id}
             onClick={() => setTheme(value)}
-            className={mounted && theme === value ? "font-bold" : ""}
+            className="flex justify-between items-center"
           >
             {label}
+            {mounted && theme === value && <Check className="w-4 h-4 ml-2" />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
