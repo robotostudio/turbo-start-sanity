@@ -143,6 +143,7 @@ const faqFragment = /* groq */ `
 const faqAccordionBlock = /* groq */ `
   _type == "faqAccordion" => {
     ...,
+    "eyebrow": coalesce(eyebrow, null),
     ${faqFragment},
     link{
       ...,
