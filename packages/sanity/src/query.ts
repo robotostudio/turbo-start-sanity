@@ -181,6 +181,13 @@ const featureCardsIconBlock = /* groq */ `
   }
 `;
 
+const richTextBlockFragment = /* groq */ `
+  _type == "richTextBlock" => {
+    ...,
+    ${richTextFragment}
+  }
+`;
+
 const pageBuilderFragment = /* groq */ `
   pageBuilder[]{
     ...,
@@ -190,7 +197,8 @@ const pageBuilderFragment = /* groq */ `
     ${faqAccordionBlock},
     ${featureCardsIconBlock},
     ${subscribeNewsletterBlock},
-    ${imageLinkCardsBlock}
+    ${imageLinkCardsBlock},
+    ${richTextBlockFragment}
   }
 `;
 
