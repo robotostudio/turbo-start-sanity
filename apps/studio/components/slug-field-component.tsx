@@ -1,7 +1,7 @@
 import { CopyIcon } from "@sanity/icons";
 import { Box, Button, Flex, Stack, Text, TextInput } from "@sanity/ui";
 import type { ChangeEvent } from "react";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import {
   type ObjectFieldProps,
   type SanityDocument,
@@ -44,31 +44,11 @@ const UrlPreview = styled.div`
   overflow-wrap: break-word;
 `;
 
-// Types
-type SlugInputProps = {
-  value: string;
-  onChange: (value: string) => void;
-  readOnly?: boolean;
-  placeholder?: string;
-};
-
-type GenerateButtonProps = {
-  onGenerate: () => void;
-  disabled?: boolean;
-};
-
-type UrlPreviewProps = {
-  url: string;
-  onCopy: () => void;
-};
-
-type FieldHeaderProps = {
-  title?: string;
-  description?: string;
-};
-
 // Focused sub-components
-function FieldHeader({ title, description }: FieldHeaderProps) {
+function FieldHeader({
+  title,
+  description,
+}: { title?: string; description?: string }) {
   if (!(title || description)) {
     return null;
   }
@@ -94,7 +74,12 @@ function SlugInputField({
   onChange,
   readOnly,
   placeholder,
-}: SlugInputProps) {
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  readOnly?: boolean;
+  placeholder?: string;
+}) {
   const handleInputChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       onChange(e.target.value);
@@ -112,7 +97,10 @@ function SlugInputField({
   );
 }
 
-function SlugGenerateButton({ onGenerate, disabled }: GenerateButtonProps) {
+function SlugGenerateButton({
+  onGenerate,
+  disabled,
+}: { onGenerate: () => void; disabled?: boolean }) {
   return (
     <GenerateButton
       disabled={disabled}
@@ -125,7 +113,10 @@ function SlugGenerateButton({ onGenerate, disabled }: GenerateButtonProps) {
   );
 }
 
-function UrlPreviewSection({ url, onCopy }: UrlPreviewProps) {
+function UrlPreviewSection({
+  url,
+  onCopy,
+}: { url: string; onCopy: () => void }) {
   return (
     <Stack space={2}>
       <Text size={1} weight="medium">
@@ -176,20 +167,10 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
     includeSanityValidation: true,
   });
 
-  // Memoize computed values for performance
-  const localizedPathname = useMemo(() => {
-    try {
-      // Simple path generation - just use the slug as the path
-      return currentSlug.startsWith("/") ? currentSlug : `/${currentSlug}`;
-    } catch {
-      return currentSlug || "/";
-    }
-  }, [currentSlug]);
-
-  const fullUrl = useMemo(
-    () => `${presentationOriginUrl ?? ""}${localizedPathname}`,
-    [localizedPathname]
-  );
+  const localizedPathname = currentSlug.startsWith("/")
+    ? currentSlug
+    : `/${currentSlug}`;
+  const fullUrl = `${presentationOriginUrl ?? ""}${localizedPathname}`;
 
   // Event handlers with error handling
   const handleChange = useCallback(
