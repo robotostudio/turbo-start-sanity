@@ -33,7 +33,7 @@ const MIN_LEN = 3;
 const MAX_LEN = 60;
 
 export const SLUG_ERROR_MESSAGES = {
-  REQUIRED: "Slug is required.",
+  REQUIRED: "Slug must have a value",
   INVALID_CHARACTERS:
     "Only lowercase letters, numbers, and hyphens are allowed.",
   INVALID_START_END: "Slug can't start or end with a hyphen.",
@@ -227,14 +227,23 @@ export function getDocumentTypeConfig(docType: string): SlugValidationOptions {
       };
 }
 
-/** Create a Sanity schema validator from options. */
-export function createSlugValidator(
+/** Create a Sanity schema error validator from options. */
+export function createSlugErrorValidator(
   options: SlugValidationOptions
 ): (slug: { current?: string } | undefined) => string | true {
   return (slug) => {
-    const result = validateSlug(slug?.current, options);
-    const messages = [...result.errors, ...result.warnings];
-    return messages.length > 0 ? messages.join("; ") : true;
+    const { errors } = validateSlug(slug?.current, options);
+    return errors.length > 0 ? errors.join("; ") : true;
+  };
+}
+
+/** Create a Sanity schema warning validator from options. */
+export function createSlugWarningValidator(
+  options: SlugValidationOptions
+): (slug: { current?: string } | undefined) => string | true {
+  return (slug) => {
+    const { warnings } = validateSlug(slug?.current, options);
+    return warnings.length > 0 ? warnings.join("; ") : true;
   };
 }
 
