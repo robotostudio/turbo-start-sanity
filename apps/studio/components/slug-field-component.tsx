@@ -30,11 +30,23 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
   const currentSlug = value?.current || "";
 
   const errors = useMemo(
-    () => [...new Set(validation.filter((v) => v.level === "error").flatMap((v) => v.message.split("; ")))],
+    () => [
+      ...new Set(
+        validation
+          .filter((v) => v.level === "error")
+          .flatMap((v) => v.message.split("; "))
+      ),
+    ],
     [validation]
   );
   const warnings = useMemo(
-    () => [...new Set(validation.filter((v) => v.level === "warning").flatMap((v) => v.message.split("; ")))],
+    () => [
+      ...new Set(
+        validation
+          .filter((v) => v.level === "warning")
+          .flatMap((v) => v.message.split("; "))
+      ),
+    ],
     [validation]
   );
 
@@ -108,8 +120,7 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
   }, [fullUrl]);
 
   const generateDisabled =
-    !(typeof document?.title === "string" && document.title.trim()) ||
-    readOnly;
+    !(typeof document?.title === "string" && document.title.trim()) || readOnly;
 
   return (
     <Stack space={4}>
