@@ -32,7 +32,7 @@ function Badge({
   ...props
 }: React.ComponentProps<"span"> &
   VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
-  if (!children || (typeof children === "string" && !children.trim())) {
+  if (children === null || (typeof children === "string" && !children.trim())) {
     return null;
   }
 
