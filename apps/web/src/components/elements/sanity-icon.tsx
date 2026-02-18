@@ -1,9 +1,9 @@
-import type { LucideProps } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
-import type { ComponentProps } from 'react';
-import { memo } from 'react';
+import DOMPurify from "isomorphic-dompurify";
+import { DynamicIcon } from "lucide-react/dynamic";
+import type { ComponentProps } from "react";
+import { memo } from "react";
 
-interface IconProps extends Omit<ComponentProps<'svg'>, 'src'> {
+interface IconProps extends Omit<ComponentProps<"svg">, "src"> {
   icon?: string | null | IconData;
   alt?: string;
   size?: number;
@@ -16,12 +16,10 @@ interface IconData {
   svg?: string;
 }
 
-// Convert kebab-case to PascalCase for lucide icon names
-function kebabToPascal(str: string): string {
-  return str
-    .split('-')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join('');
+// Convert kebab-case to kebab-case (DynamicIcon expects kebab-case names)
+function normalizeIconName(str: string): string {
+  // Ensure it's in kebab-case format
+  return str.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
 }
 
 export const SanityIcon = memo(function SanityIconUnmemorized({
@@ -35,55 +33,63 @@ export const SanityIcon = memo(function SanityIconUnmemorized({
   }
 
   // Handle old iconPicker format with SVG string
-  if (typeof icon === 'object' && icon !== null) {
+  if (typeof icon === "object" && icon !== null) {
     const iconObj = icon as IconData;
 
-    // If SVG string is provided, use it directly
+    // If SVG string is provided, sanitize and use it
     if (iconObj.svg) {
-      // Remove only inline styles, keep width/height attributes but override with fontSize
-      const cleanSvg = iconObj.svg.replaceAll(/style="[^"]*"/g, '');
+      // Sanitize the SVG using DOMPurify with SVG profile to remove malicious content
+      const safeSvg = DOMPurify.sanitize(iconObj.svg, {
+        USE_PROFILES: { svg: true },
+      });
 
       return (
         <span
           className={className}
-          dangerouslySetInnerHTML={{ __html: cleanSvg }}
+          dangerouslySetInnerHTML={{ __html: safeSvg }}
           style={{
             fontSize: size,
             lineHeight: 0,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         />
       );
     }
 
     // For lucide-icon format, extract the name
-    const iconName = kebabToPascal(iconObj.name);
-    const IconComponent = (
-      LucideIcons as unknown as Record<string, React.ComponentType<LucideProps>>
-    )[iconName];
-
-    if (IconComponent && typeof IconComponent === 'function') {
-      return <IconComponent {...props} className={className} size={size} />;
-    }
-
-    // Fallback
-    return <LucideIcons.TriangleAlert className={className} size={size} />;
+    const iconName = normalizeIconName(iconObj.name);
+    return (
+      <DynamicIcon
+        name={iconName}
+        size={size}
+        {...props}
+        className={className}
+      />
+    );
   }
 
   // Handle string format (lucide-icon)
-  if (typeof icon === 'string') {
-    const iconName = kebabToPascal(icon);
-    const IconComponent = (
-      LucideIcons as unknown as Record<string, React.ComponentType<LucideProps>>
-    )[iconName];
-
-    if (IconComponent && typeof IconComponent === 'function') {
-      return <IconComponent {...props} className={className} size={size} />;
-    }
+  if (typeof icon === "string") {
+    const iconName = normalizeIconName(icon);
+    return (
+      <DynamicIcon
+        name={iconName}
+        size={size}
+        {...props}
+        className={className}
+      />
+    );
   }
 
   // Final fallback
-  return <LucideIcons.TriangleAlert className={className} size={size} />;
+  return (
+    <DynamicIcon
+      name="triangle-alert"
+      size={size}
+      {...props}
+      className={className}
+    />
+  );
 });
