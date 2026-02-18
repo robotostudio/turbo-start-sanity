@@ -132,7 +132,20 @@ You have the freedom to deploy your Next.js app to your hosting provider of choi
 3. Set the `Root Directory` to your Next.js app (`/apps/web`).
 4. Configure your Environment Variables.
 
-#### 3. Invite a collaborator
+#### 3. Configure CORS Origins
+
+Your production URLs must be added to your Sanity project's CORS origins, otherwise the frontend will be blocked from fetching content.
+
+1. Go to [Sanity Manage](https://www.sanity.io/manage), select your project, and navigate to **API** > **CORS origins**.
+2. Add the following origins:
+   - Your production URL (e.g. `https://your-app.vercel.app`)
+   - Your custom domain if applicable (e.g. `https://yourdomain.com`)
+   - `http://localhost:3000` (for local development — added by default)
+3. Enable **Allow credentials** for each origin that needs authenticated requests (e.g. live preview, visual editing).
+
+> **Note**: Vercel preview deployments use unique URLs per commit. If you need CORS access on preview deployments, add a wildcard origin like `https://*-your-project.vercel.app` or add specific preview URLs as needed.
+
+#### 4. Invite a collaborator
 
 Now that you've deployed your Next.js application and Sanity Studio, you can optionally invite a collaborator to your Studio. Open up [Manage](https://www.sanity.io/manage), select your project and click "Invite project members"
 
