@@ -40,6 +40,7 @@ export function ModeToggle() {
             key={id}
             onClick={() => setTheme(value)}
             className="flex justify-between items-center"
+            aria-current={mounted && theme === value ? "true" : undefined}
           >
             {label}
             {mounted && theme === value && <Check className="w-4 h-4 ml-2" />}
