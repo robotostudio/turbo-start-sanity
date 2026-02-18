@@ -25,6 +25,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      { source: "/.md", destination: "/api/md" },
+      { source: "/llms.txt", destination: "/api/llms-txt" },
+      { source: "/sitemap.md", destination: "/api/sitemap-md" },
+      { source: "/:path+.md", destination: "/api/md/:path+" },
+    ];
+  },
   async redirects() {
     const redirects = await client.fetch(queryRedirects);
     return redirects.map((redirect) => ({
