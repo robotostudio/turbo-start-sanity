@@ -61,11 +61,12 @@ export function portableTextToMarkdown(
         const headers = rows[0]?.cells;
         if (!headers || !Array.isArray(headers)) return "";
         const dataRows = rows.slice(1);
-        let table = `| ${headers.join(" | ")} |\n`;
+        const esc = (s: string) => s.replace(/\|/g, "\\|");
+        let table = `| ${headers.map(esc).join(" | ")} |\n`;
         table += `| ${headers.map(() => "---").join(" | ")} |\n`;
         for (const row of dataRows) {
           if (row?.cells && Array.isArray(row.cells)) {
-            table += `| ${row.cells.join(" | ")} |\n`;
+            table += `| ${row.cells.map(esc).join(" | ")} |\n`;
           }
         }
         return `\n${table}\n`;

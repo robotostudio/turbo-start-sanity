@@ -14,5 +14,8 @@ const SITE_URL =
  * @returns Markdown with all links made absolute
  */
 export function normalizeMarkdownUrls(markdown: string): string {
-  return markdown.replace(/\[([^\]]+)\]\(\/([^)]+)\)/g, `[$1](${SITE_URL}/$2)`);
+  return markdown.replace(
+    /\[([^\]]+)\]\(\/((?:[^()]*|\([^()]*\))*)\)/g,
+    `[$1](${SITE_URL}/$2)`,
+  );
 }

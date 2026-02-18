@@ -60,7 +60,7 @@ export async function GET(
 
     // Fallback: check known URL-to-singleton mappings
     if (!documentType && slug in PATH_TO_SINGLETON) {
-      documentType = PATH_TO_SINGLETON[slug]!;
+      documentType = PATH_TO_SINGLETON[slug] ?? null;
     }
 
     if (!documentType) {
@@ -93,8 +93,12 @@ export async function GET(
 
     // For blogIndex, attach the actual blog posts to the data
     if (documentType === "blogIndex") {
-      const blogs = await client.fetch(allBlogsQuery);
-      data.blogs = blogs;
+      try {
+        data.blogs = await client.fetch(allBlogsQuery);
+      } catch (blogError) {
+        console.error("[api/md] Failed to fetch blog posts:", blogError);
+        data.blogs = [];
+      }
     }
 
     const markdown = formatDocumentAsMarkdown({ type: documentType, data });

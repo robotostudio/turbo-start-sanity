@@ -136,16 +136,23 @@ function extractTextContent(block: any): string {
     "dimensions",
   ]);
 
+  function isSanityAssetOrUrl(value: string): boolean {
+    if (value.startsWith("data:image") || value.startsWith("image-")) {
+      return true;
+    }
+    try {
+      const url = new URL(value);
+      if (url.protocol === "http:" || url.protocol === "https:") return true;
+    } catch {
+      // Not a URL — treat as text
+    }
+    return false;
+  }
+
   function walk(obj: any, depth = 0): void {
     if (depth > 5) return;
     if (typeof obj === "string") {
-      if (
-        obj.length < 500 &&
-        !obj.startsWith("data:image") &&
-        !obj.startsWith("image-") &&
-        !obj.startsWith("http") &&
-        !obj.includes("sanity.io")
-      ) {
+      if (obj.length < 500 && !isSanityAssetOrUrl(obj)) {
         text.push(obj);
       }
     } else if (Array.isArray(obj)) {

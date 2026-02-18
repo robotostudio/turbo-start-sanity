@@ -13,7 +13,7 @@ function truncate(text: string): string {
 }
 
 function escapeMarkdownLink(text: string): string {
-  return text.replace(/[[\]()]/g, "\\$&");
+  return text.replace(/\\/g, "\\\\").replace(/[[\]()]/g, "\\$&");
 }
 
 export async function GET() {
