@@ -61,7 +61,8 @@ export function portableTextToMarkdown(
         const headers = rows[0]?.cells;
         if (!headers || !Array.isArray(headers)) return "";
         const dataRows = rows.slice(1);
-        const esc = (s: string) => s.replace(/\|/g, "\\|");
+        const esc = (s: string) =>
+          s.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
         let table = `| ${headers.map(esc).join(" | ")} |\n`;
         table += `| ${headers.map(() => "---").join(" | ")} |\n`;
         for (const row of dataRows) {

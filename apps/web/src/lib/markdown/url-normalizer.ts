@@ -15,7 +15,7 @@ const SITE_URL =
  */
 export function normalizeMarkdownUrls(markdown: string): string {
   return markdown.replace(
-    /\[([^\]]+)\]\(\/((?:[^()]*|\([^()]*\))*)\)/g,
+    /\[([^\]]+)\]\(\/((?:\([^()]*\)|[^()])*)\)/g,
     `[$1](${SITE_URL}/$2)`,
   );
 }
