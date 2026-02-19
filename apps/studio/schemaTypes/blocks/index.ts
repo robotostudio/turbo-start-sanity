@@ -3,6 +3,7 @@ import { faqAccordion } from "@/schemaTypes/blocks/faq-accordion";
 import { featureCardsIcon } from "@/schemaTypes/blocks/feature-cards-icon";
 import { hero } from "@/schemaTypes/blocks/hero";
 import { imageLinkCards } from "@/schemaTypes/blocks/image-link-cards";
+import { richTextBlock } from "@/schemaTypes/blocks/rich-text";
 import { subscribeNewsletter } from "@/schemaTypes/blocks/subscribe-newsletter";
 
 export const pageBuilderBlocks = [
@@ -11,5 +12,6 @@ export const pageBuilderBlocks = [
   featureCardsIcon,
   faqAccordion,
   imageLinkCards,
+  richTextBlock,
   subscribeNewsletter,
 ];
