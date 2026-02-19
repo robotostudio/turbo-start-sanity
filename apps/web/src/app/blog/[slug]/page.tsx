@@ -4,6 +4,7 @@ import { sanityFetch } from "@workspace/sanity/live";
 import { queryBlogPaths, queryBlogSlugPageData } from "@workspace/sanity/query";
 import { notFound } from "next/navigation";
 
+import { CopyPageMenu } from "@/components/elements/copy-page-menu";
 import { RichText } from "@/components/elements/rich-text";
 import { SanityImage } from "@/components/elements/sanity-image";
 import { TableOfContent } from "@/components/elements/table-of-content";
@@ -93,7 +94,12 @@ export default async function BlogSlugPage({
         <main>
           <ArticleJsonLd article={data} />
           <header className="mb-8">
-            <h1 className="mt-2 font-bold text-4xl">{title}</h1>
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <h1 className="font-bold text-4xl">{title}</h1>
+              <div className="shrink-0">
+                <CopyPageMenu markdownPath={`/blog/${slug}.md`} />
+              </div>
+            </div>
             <p className="mt-4 text-lg text-muted-foreground">{description}</p>
           </header>
           {image && (
