@@ -505,7 +505,7 @@ export type BlogIndex = {
   _rev: string;
   title?: string;
   description?: string;
-  slug: Slug;
+  slug?: Slug;
   displayFeaturedBlogs?: "yes" | "no";
   featuredBlogsCount?: "1" | "2" | "3";
   pageBuilder?: PageBuilder;
@@ -524,7 +524,7 @@ export type HomePage = {
   _rev: string;
   title?: string;
   description?: string;
-  slug: Slug;
+  slug?: Slug;
   pageBuilder?: PageBuilder;
   seoTitle?: string;
   seoDescription?: string;
@@ -587,7 +587,7 @@ export type Page = {
   _rev: string;
   title: string;
   description?: string;
-  slug: Slug;
+  slug?: Slug;
   image?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -623,7 +623,7 @@ export type Blog = {
   orderRank?: string;
   title: string;
   description?: string;
-  slug: Slug;
+  slug?: Slug;
   authors: Array<
     {
       _key: string;
@@ -987,7 +987,7 @@ export type QueryHomePageDataResult = {
   _rev: string;
   title: string | null;
   description: string | null;
-  slug: string;
+  slug: string | null;
   pageBuilder: Array<
     | {
         _key: string;
@@ -1396,7 +1396,7 @@ export type QuerySlugPageDataResult = {
   _rev: string;
   title: string;
   description?: string;
-  slug: string;
+  slug: string | null;
   image?: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -1819,7 +1819,7 @@ export type QueryBlogIndexPageDataResult = {
   _rev: string;
   title: string | null;
   description: string | null;
-  slug: string;
+  slug: string | null;
   displayFeaturedBlogs: false | true;
   featuredBlogsCount: "1" | "2" | "3" | null;
   pageBuilder: Array<
@@ -2227,7 +2227,7 @@ export type QueryBlogIndexPageBlogsResult = Array<{
   _id: string;
   title: string;
   description: string | null;
-  slug: string;
+  slug: string | null;
   orderRank: string | null;
   image: {
     id: string | null;
@@ -2275,7 +2275,7 @@ export type QueryAllBlogDataForSearchResult = Array<{
   _id: string;
   title: string;
   description: string | null;
-  slug: string;
+  slug: string | null;
   orderRank: string | null;
   image: {
     id: string | null;
@@ -2332,7 +2332,7 @@ export type QueryBlogSlugPageDataResult = {
   orderRank?: string;
   title: string;
   description?: string;
-  slug: string;
+  slug: string | null;
   authors: {
     _id: string;
     name: string;
