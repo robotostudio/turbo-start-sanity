@@ -8,7 +8,8 @@ import {
 import { PathnameFieldComponent } from "@/components/slug-field-component";
 import { GROUP } from "@/utils/constant";
 import {
-  createSlugValidator,
+  createSlugErrorValidator,
+  createSlugWarningValidator,
   getDocumentTypeConfig,
 } from "@/utils/slug-validation";
 
@@ -38,11 +39,6 @@ export const pageBuilderField = defineField({
 export const iconField = defineField({
   name: "icon",
   title: "Icon",
-  options: {
-    // storeSvg: true,
-    // providers: ["fi"],
-  },
-  // type: "iconPicker",
   type: "lucide-icon",
   description:
     "Choose a small picture symbol to represent this item, like a home icon or shopping cart",
@@ -71,10 +67,13 @@ export const documentSlugField = (
     components: {
       field: PathnameFieldComponent,
     },
-    validation: (Rule) => [
-      Rule.required().error("A URL slug is required"),
-      Rule.custom(createSlugValidator(getDocumentTypeConfig(documentType))),
-    ],
+    validation: (Rule) => {
+      const config = getDocumentTypeConfig(documentType);
+      return [
+        Rule.custom(createSlugErrorValidator(config)),
+        Rule.custom(createSlugWarningValidator(config)).warning(),
+      ];
+    },
   });
 };
 
