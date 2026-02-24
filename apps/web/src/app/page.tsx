@@ -14,8 +14,7 @@ export async function generateMetadata() {
   const { data: homePageData } = await fetchHomePageData();
   return getSEOMetadata({
     title: homePageData?.title ?? homePageData?.seoTitle,
-    description:
-      homePageData?.description ?? homePageData?.seoDescription,
+    description: homePageData?.description ?? homePageData?.seoDescription,
     slug: "/",
     contentId: homePageData?._id,
     contentType: homePageData?._type,
