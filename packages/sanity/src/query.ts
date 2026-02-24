@@ -225,7 +225,7 @@ export const queryHomePageData =
   }`);
 
 export const querySlugPageData = defineQuery(`
-  *[_type == "page" && slug.current == $slug][0]{
+  *[_type == "page" && defined(slug.current) && slug.current == $slug][0]{
     ...,
     "slug": slug.current,
     ${pageBuilderFragment}

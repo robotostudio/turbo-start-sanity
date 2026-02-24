@@ -1,3 +1,4 @@
+import type { FilterByType, Get } from "@sanity/codegen";
 import type {
   QueryBlogIndexPageBlogsResult,
   QueryBlogSlugPageDataResult,
@@ -7,30 +8,31 @@ import type {
   QueryNavbarDataResult,
 } from "@workspace/sanity/types";
 
-export type PageBuilderBlockTypes = NonNullable<
-  NonNullable<QueryHomePageDataResult>["pageBuilder"]
->[number]["_type"];
-
-export type PagebuilderType<T extends PageBuilderBlockTypes> = Extract<
-  NonNullable<NonNullable<QueryHomePageDataResult>["pageBuilder"]>[number],
-  { _type: T }
+export type PageBuilderBlock = Get<
+  QueryHomePageDataResult,
+  "pageBuilder",
+  number
 >;
 
-export type SanityButtonProps = NonNullable<
-  NonNullable<PagebuilderType<"hero">>["buttons"]
->[number];
+export type PageBuilderBlockTypes = NonNullable<PageBuilderBlock>["_type"];
+
+export type PagebuilderType<T extends PageBuilderBlockTypes> = FilterByType<
+  NonNullable<PageBuilderBlock>,
+  T
+>;
+
+export type SanityButtonProps = Get<PagebuilderType<"hero">, "buttons", number>;
 
 export type SanityImageProps = NonNullable<QueryImageTypeResult>;
 
-export type SanityRichTextProps =
-  NonNullable<QueryBlogSlugPageDataResult>["richText"];
+export type SanityRichTextProps = Get<QueryBlogSlugPageDataResult, "richText">;
 
-export type SanityRichTextBlock = Extract<
+export type SanityRichTextBlock = FilterByType<
   NonNullable<NonNullable<SanityRichTextProps>[number]>,
-  { _type: "block" }
+  "block"
 >;
 
-export type Blog = NonNullable<QueryBlogIndexPageBlogsResult>[number];
+export type Blog = Get<QueryBlogIndexPageBlogsResult, number>;
 
 export type Maybe<T> = T | null | undefined;
 
@@ -40,9 +42,7 @@ export type NavigationData = {
   settingsData: QueryGlobalSeoSettingsResult;
 };
 
-export type NavColumn = NonNullable<
-  NonNullable<QueryNavbarDataResult>["columns"]
->[number];
+export type NavColumn = Get<QueryNavbarDataResult, "columns", number>;
 
 export type ColumnLink =
   Extract<NavColumn, { type: "column" }>["links"] extends Array<infer T>
