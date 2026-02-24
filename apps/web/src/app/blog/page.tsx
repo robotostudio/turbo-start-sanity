@@ -104,8 +104,7 @@ export default async function BlogIndexPage({ searchParams }: BlogPageProps) {
 
   const { start, end } = getBlogPaginationStartEnd(currentPage);
   const blogStart = currentPage === 1 ? 0 : start + featuredBlogsCount;
-  const blogEnd =
-    currentPage === 1 ? end + featuredBlogsCount : end + featuredBlogsCount;
+  const blogEnd = end + featuredBlogsCount;
 
   const [blogs, errBlogs] = await handleErrors(
     fetchBlogIndexPageBlogs(blogStart, blogEnd)
