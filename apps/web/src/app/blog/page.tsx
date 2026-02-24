@@ -39,19 +39,14 @@ async function fetchBlogIndexPageBlogsCount() {
 export async function generateMetadata() {
   const { data: result } = await sanityFetch({
     query: queryBlogIndexPageData,
-    stega: false,
   });
-  return getSEOMetadata(
-    result
-      ? {
-          title: result?.title ?? result?.seoTitle ?? "",
-          description: result?.description ?? result?.seoDescription ?? "",
-          slug: result?.slug,
-          contentId: result?._id,
-          contentType: result?._type,
-        }
-      : {}
-  );
+  return getSEOMetadata({
+    title: result?.title ?? result?.seoTitle ?? "",
+    description: result?.description ?? result?.seoDescription ?? "",
+    slug: "/blog",
+    contentId: result?._id,
+    contentType: result?._type,
+  });
 }
 
 type BlogPageProps = {
