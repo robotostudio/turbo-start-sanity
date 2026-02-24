@@ -18,5 +18,5 @@
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "dist", ".next", ".sanity"]
+  "exclude": ["node_modules", "dist", ".next", ".sanity", "sanity.blueprint.ts"]
 }
