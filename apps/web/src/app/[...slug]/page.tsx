@@ -73,7 +73,7 @@ export default async function SlugPage({
   params: Promise<{ slug: string[] }>;
 }) {
   const { slug } = await params;
-  const slugString = slug.join("/");
+  const slugString = `/${slug.join("/")}`;
   const { data: pageData } = await fetchSlugPageData(slugString);
 
   if (!pageData) {
