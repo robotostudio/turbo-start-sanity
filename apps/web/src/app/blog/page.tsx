@@ -41,8 +41,8 @@ export async function generateMetadata() {
     query: queryBlogIndexPageData,
   });
   return getSEOMetadata({
-    title: result?.title ?? result?.seoTitle ?? "",
-    description: result?.description ?? result?.seoDescription ?? "",
+    title: result?.title ?? result?.seoTitle,
+    description: result?.description ?? result?.seoDescription,
     slug: "/blog",
     contentId: result?._id,
     contentType: result?._type,

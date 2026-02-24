@@ -55,8 +55,8 @@ export async function generateMetadata({
   const slugString = `/blog/${slug}`;
   const { data } = await fetchBlogSlugPageData(slugString);
   return getSEOMetadata({
-    title: data?.title ?? data?.seoTitle ?? "",
-    description: data?.description ?? data?.seoDescription ?? "",
+    title: data?.title ?? data?.seoTitle,
+    description: data?.description ?? data?.seoDescription,
     slug: slugString,
     contentId: data?._id,
     contentType: data?._type,

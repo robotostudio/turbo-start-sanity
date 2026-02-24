@@ -51,8 +51,8 @@ export async function generateMetadata({
   const { data: pageData } = await fetchSlugPageData(slugString);
 
   return getSEOMetadata({
-    title: pageData?.title ?? pageData?.seoTitle ?? "",
-    description: pageData?.description ?? pageData?.seoDescription ?? "",
+    title: pageData?.title ?? pageData?.seoTitle,
+    description: pageData?.description ?? pageData?.seoDescription,
     slug: slugString,
     contentId: pageData?._id,
     contentType: pageData?._type,
