@@ -242,6 +242,13 @@ function MobileMenu({ navbarData, settingsData }: NavigationData) {
 
                   return null;
                 })}
+                <Link
+                  className="flex items-center py-2 font-medium text-sm transition-colors hover:text-primary"
+                  href="/pokedex"
+                  onClick={closeMenu}
+                >
+                  Pokédex
+                </Link>
               </div>
 
               {/* Action buttons */}
@@ -364,6 +371,12 @@ export function Navbar({
               }
               return null;
             })}
+            <Link
+              className="px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
+              href="/pokedex"
+            >
+              Pokédex
+            </Link>
           </nav>
 
           {/* Desktop Actions */}

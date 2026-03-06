@@ -5,6 +5,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@workspace/ui/*": ["../../packages/ui/src/*"],
+      "@workspace/opensearch": ["../../packages/opensearch/src/index.ts"],
+      "@workspace/opensearch/*": ["../../packages/opensearch/src/*"],
     },
     "plugins": [
       {
