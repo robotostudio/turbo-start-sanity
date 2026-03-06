@@ -12,22 +12,33 @@ type BlogSearchResultsProps = {
   hasQuery: boolean;
   searchQuery: string;
   error?: Error | null;
+  total: number;
+  source?: "opensearch" | "fallback" | null;
 };
 
 function SearchResultsHeader({
   query,
   count,
+  total,
+  source,
 }: {
   query: string;
   count: number;
+  total: number;
+  source?: "opensearch" | "fallback" | null;
 }) {
   return (
     <div className="mb-6">
       <h2 className="font-semibold text-lg">Search Results for "{query}"</h2>
       <p className="text-muted-foreground text-sm">
-        {count === 0
+        {total === 0
           ? "No articles found"
-          : `${count} article${count === 1 ? "" : "s"} found`}
+          : `${total} article${total === 1 ? "" : "s"} found`}
+        {source === "fallback" && (
+          <span className="ml-2 text-xs text-amber-500" title="Search is running in limited mode. Some features like fuzzy matching and faceted filters may be unavailable.">
+            (limited mode)
+          </span>
+        )}
       </p>
     </div>
   );
@@ -120,6 +131,8 @@ export function BlogSearchResults({
   hasQuery,
   searchQuery,
   error,
+  total,
+  source,
 }: BlogSearchResultsProps) {
   if (!hasQuery) {
     return null;
@@ -135,7 +148,7 @@ export function BlogSearchResults({
 
   return (
     <section className={cn("mt-8", className)}>
-      <SearchResultsHeader count={results.length} query={searchQuery} />
+      <SearchResultsHeader count={results.length} total={total} query={searchQuery} source={source} />
 
       {error ? (
         <ErrorState query={searchQuery} />

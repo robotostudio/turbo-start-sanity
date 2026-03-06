@@ -8,7 +8,7 @@ import { client } from "@/lib/sanity/client";
 import { queryRedirects } from "@/lib/sanity/query";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@workspace/ui"],
+  transpilePackages: ["@workspace/ui", "@workspace/opensearch"],
   reactCompiler: true,
   experimental: {
     inlineCss: true,
@@ -27,12 +27,17 @@ const nextConfig: NextConfig = {
     ],
   },
   async redirects() {
-    const redirects = await client.fetch(queryRedirects);
-    return redirects.map((redirect) => ({
-      source: redirect.source,
-      destination: redirect.destination,
-      permanent: redirect.permanent ?? false,
-    }));
+    try {
+      const redirects = await client.fetch(queryRedirects);
+      return redirects.map((redirect) => ({
+        source: redirect.source,
+        destination: redirect.destination,
+        permanent: redirect.permanent ?? false,
+      }));
+    } catch (error) {
+      console.warn("[next.config] Failed to fetch redirects from Sanity:", error);
+      return [];
+    }
   },
 };
 

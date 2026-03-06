@@ -75,6 +75,7 @@ const blogCardFragment = /* groq */ `
   title,
   description,
   "slug":slug.current,
+  "categories": coalesce(categories, []),
   orderRank,
   ${imageFragment},
   publishedAt,

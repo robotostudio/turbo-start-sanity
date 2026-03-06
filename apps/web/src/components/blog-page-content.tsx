@@ -5,6 +5,7 @@ import { BlogPagination } from "@/components/blog-pagination";
 import { BlogSearchResults } from "@/components/blog-search-results";
 import { BlogSection } from "@/components/blog-section";
 import { PageBuilder } from "@/components/pagebuilder";
+import { SearchFilters } from "@/components/search-filters";
 import { useBlogSearch } from "@/hooks/use-blog-search";
 import type { QueryBlogIndexPageDataResult } from "@/lib/sanity/sanity.types";
 import type { Blog } from "@/types";
@@ -32,8 +33,22 @@ export function BlogPageContent({
     displayFeaturedBlogs,
   } = indexPageData;
 
-  const { searchQuery, setSearchQuery, results, isSearching, hasQuery, error } =
-    useBlogSearch();
+  const {
+    searchQuery,
+    setSearchQuery,
+    results,
+    total,
+    isSearching,
+    hasQuery,
+    error,
+    facets,
+    filters,
+    setCategoryFilter,
+    setAuthorFilter,
+    setDateFilter,
+    clearFilters,
+    source,
+  } = useBlogSearch();
 
   const validFeaturedBlogsCount = featuredBlogsCount
     ? Number.parseInt(featuredBlogsCount, 10)
@@ -59,12 +74,24 @@ export function BlogPageContent({
         <BlogHeader description={description} title={title} />
 
         <SearchInput
-          className="mt-8 mb-12"
+          className="mt-8 mb-4"
           onChange={setSearchQuery}
           onClear={() => setSearchQuery("")}
           placeholder="Search blogs..."
           value={searchQuery}
         />
+
+        {hasQuery && (
+          <SearchFilters
+            className="mb-8"
+            facets={facets}
+            filters={filters}
+            onCategoryChange={setCategoryFilter}
+            onAuthorChange={setAuthorFilter}
+            onDateChange={setDateFilter}
+            onClearFilters={clearFilters}
+          />
+        )}
 
         {hasQuery ? (
           <BlogSearchResults
@@ -73,6 +100,8 @@ export function BlogPageContent({
             isSearching={isSearching}
             results={results}
             searchQuery={searchQuery}
+            total={total}
+            source={source}
           />
         ) : (
           <>

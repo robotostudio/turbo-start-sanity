@@ -83,6 +83,23 @@ export const blog = defineType({
       group: GROUP.MAIN_CONTENT,
     }),
     defineField({
+      name: "categories",
+      type: "array",
+      title: "Categories",
+      description:
+        "Topics used for grouping and faceted search, such as React, Next.js, or SEO",
+      of: [
+        defineArrayMember({
+          type: "string",
+        }),
+      ],
+      options: {
+        layout: "tags",
+      },
+      validation: (Rule) => [Rule.unique()],
+      group: GROUP.MAIN_CONTENT,
+    }),
+    defineField({
       name: "publishedAt",
       type: "date",
       initialValue: () => new Date().toISOString().split("T")[0],
