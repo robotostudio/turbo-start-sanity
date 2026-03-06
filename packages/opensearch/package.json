@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "reindex": "tsx src/scripts/reindex.ts"
+    "reindex": "tsx src/scripts/reindex.ts",
+    "reindex:pokemon": "tsx src/scripts/reindex-pokemon.ts"
   },
   "dependencies": {
     "@opensearch-project/opensearch": "^2.12.0",
@@ -24,6 +25,9 @@
     "./client": "./src/client.ts",
     "./indexer": "./src/indexer.ts",
     "./search": "./src/search.ts",
-    "./env": "./src/env.ts"
+    "./env": "./src/env.ts",
+    "./pokemon-mapping": "./src/pokemon-mapping.ts",
+    "./pokemon-indexer": "./src/pokemon-indexer.ts",
+    "./pokemon-search": "./src/pokemon-search.ts"
   }
 }

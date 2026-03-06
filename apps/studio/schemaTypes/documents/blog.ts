@@ -5,6 +5,7 @@ import {
 import { FileTextIcon } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+import { PokemonPickerInput } from "@/components/pokemon-picker-input";
 import { documentSlugField, imageWithAltField } from "@/schemaTypes/common";
 import { GROUP, GROUPS } from "@/utils/constant";
 import { ogFields } from "@/utils/og-fields";
@@ -120,6 +121,28 @@ export const blog = defineType({
       type: "richText",
       description:
         "The main content of your blog post with text, images, and formatting",
+      group: GROUP.MAIN_CONTENT,
+    }),
+    defineField({
+      name: "pokemon",
+      title: "Linked Pokémon",
+      type: "object",
+      description:
+        "Link a Pokémon from the Pokédex to this blog post. Search and select a Pokémon to create a cross-reference.",
+      components: {
+        input: PokemonPickerInput,
+      },
+      fields: [
+        defineField({ name: "name", type: "string", title: "Name" }),
+        defineField({ name: "id", type: "number", title: "Pokédex Number" }),
+        defineField({ name: "spriteUrl", type: "string", title: "Sprite URL" }),
+        defineField({
+          name: "types",
+          type: "array",
+          title: "Types",
+          of: [defineArrayMember({ type: "string" })],
+        }),
+      ],
       group: GROUP.MAIN_CONTENT,
     }),
     ...seoFields,

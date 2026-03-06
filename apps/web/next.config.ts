@@ -24,6 +24,11 @@ const nextConfig: NextConfig = {
         hostname: "cdn.sanity.io",
         pathname: `/images/${env.NEXT_PUBLIC_SANITY_PROJECT_ID}/**`,
       },
+      {
+        protocol: "https",
+        hostname: "raw.githubusercontent.com",
+        pathname: "/PokeAPI/**",
+      },
     ],
   },
   async redirects() {
