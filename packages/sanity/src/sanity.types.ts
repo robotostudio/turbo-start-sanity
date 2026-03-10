@@ -639,6 +639,7 @@ export type Blog = {
     _type: "image";
   };
   richText?: RichText;
+  featuredPokemon?: string;
   seoTitle?: string;
   seoDescription?: string;
   seoImage?: SeoImage;
@@ -2412,6 +2413,7 @@ export type QueryBlogSlugPageDataResult = {
         alt: string | "untitled";
       }
   > | null;
+  featuredPokemon?: string;
   seoTitle?: string;
   seoDescription?: string;
   seoImage?: SeoImage;
