@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "search:reindex": "curl -X POST http://localhost:3000/api/search/reindex -H \"Authorization: Bearer $SEARCH_REINDEX_SECRET\"",
+    "pokemon:reindex": "curl -X POST http://localhost:3000/api/pokemon/reindex -H \"Authorization: Bearer $SEARCH_REINDEX_SECRET\"",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "format:check": "biome format .",

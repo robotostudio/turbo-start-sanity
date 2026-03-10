@@ -33,7 +33,7 @@ export function BlogPageContent({
     displayFeaturedBlogs,
   } = indexPageData;
 
-  const { searchQuery, setSearchQuery, results, isSearching, hasQuery, error } =
+  const { searchQuery, setSearchQuery, results, pokemon, isSearching, hasQuery, error } =
     useBlogSearch();
 
   const validFeaturedBlogsCount = featuredBlogsCount
@@ -72,6 +72,7 @@ export function BlogPageContent({
             error={error}
             hasQuery={hasQuery}
             isSearching={isSearching}
+            pokemon={pokemon}
             results={results}
             searchQuery={searchQuery}
           />
