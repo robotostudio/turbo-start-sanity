@@ -19,5 +19,5 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
   ],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "src/lib/sanity/sanity.types.ts"],
 }
