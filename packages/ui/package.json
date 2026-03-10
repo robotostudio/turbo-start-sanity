@@ -4,8 +4,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "lint": "npx ultracite lint",
-    "format": "npx ultracite fix"
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",
@@ -24,13 +26,13 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.17",
-    "@turbo/gen": "^2.6.3",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@turbo/gen": "^2.7.5",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@workspace/typescript-config": "workspace:*",
-    "tailwindcss": "^4.1.17"
+    "tailwindcss": "^4.1.18"
   },
   "exports": {
     "./globals.css": "./src/styles/globals.css",

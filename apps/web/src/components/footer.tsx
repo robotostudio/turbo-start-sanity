@@ -1,11 +1,14 @@
-import Link from "next/link";
-
-import { sanityFetch } from "@/lib/sanity/live";
-import { queryFooterData, queryGlobalSeoSettings } from "@/lib/sanity/query";
+import { sanityFetch } from "@workspace/sanity/live";
+import {
+  queryFooterData,
+  queryGlobalSeoSettings,
+} from "@workspace/sanity/query";
 import type {
   QueryFooterDataResult,
   QueryGlobalSeoSettingsResult,
-} from "@/lib/sanity/sanity.types";
+} from "@workspace/sanity/types";
+import Link from "next/link";
+
 import { Logo } from "./logo";
 import {
   FacebookIcon,

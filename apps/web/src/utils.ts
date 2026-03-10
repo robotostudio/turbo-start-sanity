@@ -37,7 +37,7 @@ export const getTitleCase = (name: string) => {
 type Response<T> = [T, undefined] | [undefined, string];
 
 export async function handleErrors<T>(
-  promise: Promise<T>,
+  promise: Promise<T>
 ): Promise<Response<T>> {
   try {
     const data = await promise;
@@ -52,7 +52,7 @@ export async function handleErrors<T>(
 
 export function convertToSlug(
   text?: string,
-  { fallback }: { fallback?: string } = { fallback: "top-level" },
+  { fallback }: { fallback?: string } = { fallback: "top-level" }
 ) {
   if (!text) {
     return fallback;
@@ -93,7 +93,7 @@ export type PaginationMetadata = {
 export function calculatePaginationMetadata(
   totalItems: number,
   currentPage = 1,
-  itemsPerPage = BLOG_ITEMS_PER_PAGE,
+  itemsPerPage = BLOG_ITEMS_PER_PAGE
 ): PaginationMetadata {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const hasNextPage = currentPage < totalPages;

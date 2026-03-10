@@ -12,16 +12,19 @@ async function searchBlog(query: string, signal: AbortSignal) {
     return [];
   }
 
-  const response = await fetch(
-    `/api/blog/search?q=${encodeURIComponent(query)}`,
-    { signal }
-  );
+  const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`, {
+    signal,
+  });
 
   if (!response.ok) {
     throw new Error("Failed to search");
   }
 
-  return response.json() as Promise<Blog[]>;
+  const payload = (await response.json()) as {
+    results?: Blog[];
+  };
+
+  return payload.results ?? [];
 }
 
 export function useBlogSearch() {

@@ -5,19 +5,14 @@ import { env } from "@workspace/env/client";
 import { createDataAttribute } from "next-sanity";
 import { useCallback, useMemo } from "react";
 
-import type { QueryHomePageDataResult } from "@/lib/sanity/sanity.types";
-import type { PageBuilderBlockTypes } from "@/types";
+import type { PageBuilderBlock, PageBuilderBlockTypes } from "@/types";
 import { CTABlock } from "./sections/cta";
 import { FaqAccordion } from "./sections/faq-accordion";
 import { FeatureCardsWithIcon } from "./sections/feature-cards-with-icon";
 import { HeroBlock } from "./sections/hero";
 import { ImageLinkCards } from "./sections/image-link-cards";
+import { RichTextBlock } from "./sections/rich-text-block";
 import { SubscribeNewsletter } from "./sections/subscribe-newsletter";
-
-// More specific and descriptive type aliases
-type PageBuilderBlock = NonNullable<
-  NonNullable<QueryHomePageDataResult>["pageBuilder"]
->[number];
 
 export type PageBuilderProps = {
   readonly pageBuilder?: PageBuilderBlock[];
@@ -39,6 +34,7 @@ const BLOCK_COMPONENTS = {
   featureCardsIcon: FeatureCardsWithIcon,
   subscribeNewsletter: SubscribeNewsletter,
   imageLinkCards: ImageLinkCards,
+  richTextBlock: RichTextBlock,
   // biome-ignore lint/suspicious/noExplicitAny: <any is used to allow for dynamic component rendering>
 } as const satisfies Record<PageBuilderBlockTypes, React.ComponentType<any>>;
 
@@ -88,7 +84,7 @@ function UnknownBlockError({
  */
 function useOptimisticPageBuilder(
   initialBlocks: PageBuilderBlock[],
-  documentId: string,
+  documentId: string
 ) {
   // biome-ignore lint/suspicious/noExplicitAny: <any is used to allow for dynamic component rendering>
   return useOptimistic<PageBuilderBlock[], any>(
@@ -98,7 +94,7 @@ function useOptimisticPageBuilder(
         return action.document.pageBuilder;
       }
       return currentBlocks;
-    },
+    }
   );
 }
 
@@ -113,7 +109,7 @@ function useBlockRenderer(id: string, type: string) {
         type,
         path: `pageBuilder[_key=="${blockKey}"]`,
       }),
-    [id, type],
+    [id, type]
   );
 
   const renderBlock = useCallback(
@@ -141,7 +137,7 @@ function useBlockRenderer(id: string, type: string) {
         </div>
       );
     },
-    [createBlockDataAttribute],
+    [createBlockDataAttribute]
   );
 
   return { renderBlock };
@@ -160,7 +156,7 @@ export function PageBuilder({
 
   const containerDataAttribute = useMemo(
     () => createSanityDataAttribute({ id, type, path: "pageBuilder" }),
-    [id, type],
+    [id, type]
   );
 
   if (!blocks.length) {

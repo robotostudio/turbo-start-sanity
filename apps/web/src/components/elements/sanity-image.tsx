@@ -1,15 +1,14 @@
 "use client";
+import {
+  processImageData,
+  SANITY_BASE_URL,
+  type SanityImageProps,
+} from "@workspace/sanity/image";
 import { type ElementType, memo } from "react";
 import {
   SanityImage as BaseSanityImage,
   type WrapperProps,
 } from "sanity-image";
-
-import {
-  processImageData,
-  SANITY_BASE_URL,
-  type SanityImageProps,
-} from "@/lib/sanity/image";
 
 // Image wrapper component
 const ImageWrapper = <T extends ElementType = "img">(

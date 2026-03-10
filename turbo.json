@@ -15,19 +15,20 @@
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**", ".sanity/**"]
     },
-    "//#format": {},
-    "//#lint": {
-      "cache": false
+    "transit": {
+      "dependsOn": ["^transit"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["transit"]
     },
-    "format": {},
+    "format": {
+      "dependsOn": ["transit"]
+    },
+    "format:check": {
+      "dependsOn": ["transit"]
+    },
     "check-types": {
-      "dependsOn": ["^check-types"]
-    },
-    "//#check-biome": {
-      "cache": false
+      "dependsOn": ["transit"]
     },
     "dev": {
       "cache": false,

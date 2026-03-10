@@ -1,135 +1,152 @@
-# Senior Backend Technical Test
+# Next.js Monorepo with Sanity CMS
 
-Welcome to the Roboto Studio senior backend technical assessment. This test evaluates your ability to work with Next.js, Sanity CMS, third-party APIs, search infrastructure, and your approach to production architecture.
+A modern, full-stack monorepo template built with Next.js App Router, Sanity CMS, Shadcn UI, and TurboRepo.
 
-**Time:** 6-8 hours
+![Easiest way to build a webpage](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/turbo-start-sanity-og.png)
 
-## Setup
+## Features
 
-Before starting, follow the [installation instructions on the main branch](https://github.com/robotostudio/turbo-start-sanity/tree/main#getting-started) to get the project running locally.
+### Monorepo Structure
 
-Once you have the project running with sample content, you're ready to begin.
+- Apps: web (Next.js frontend) and studio (Sanity Studio)
+- Shared packages: UI components, TypeScript config, environment utilities, logger
+- Turborepo for build orchestration and caching
 
-**A few things to note before you start:**
+### Frontend (Web)
 
-- This project uses **Next.js 16**, **pnpm workspaces**, and **Turborepo**. Some deployment platforms have limited support for this combination. Choosing how to handle this is part of the test.
-- The existing `/api/og` route uses **Edge Runtime**. Depending on your deployment target, you may need to adapt this.
-- The project currently uses a basic [Fuse.js](https://www.fusejs.io/) search implementation. You'll be replacing this.
+- Next.js App Router with TypeScript
+- Shadcn UI components with Tailwind CSS
+- Server Components and Server Actions
+- SEO optimization with metadata
+- Blog system with rich text editor
+- Table of contents generation
+- Responsive layouts
 
----
+### Content Management (Studio)
 
-## The Test
+- Sanity Studio v5
+- Custom document types (Blog, FAQ, Pages)
+- Visual editing integration
+- Structured content with schemas
+- Live preview capabilities
+- Asset management
 
-You have **three tasks** to complete. Each task has core requirements that you must deliver and stretch goals that are not required but will be evaluated if present.
+## Getting Started
 
-### Task 1: Blog Search with OpenSearch
+### Installing the template
 
-Replace the existing Fuse.js search with a proper search backend powered by [OpenSearch](https://opensearch.org/).
+#### 1. Initialize template with Sanity CLI
 
-**Core requirements:**
+Run the command in your Terminal to initialize this template on your local computer.
 
-- Set up an OpenSearch instance (locally via Docker, on AWS, or via another provider — your choice, but be prepared to justify it)
-- Build an indexing pipeline that syncs Sanity blog content into OpenSearch. This must be a repeatable, production-viable approach — not a one-off data import script. Consider how content gets re-indexed when an editor publishes, updates, or deletes a post.
-- Create a Next.js API route (`/api/search`) that queries OpenSearch and returns results
-- Build a search UI on the blog index page. Results should update as the user types (debounced), and the experience should handle empty states, loading states, and errors gracefully.
-- Consider what happens when OpenSearch is unavailable. Your application should degrade gracefully, not crash.
+See the documentation if you are [having issues with the CLI](https://www.sanity.io/help/cli-errors).
 
-**Stretch goals:**
+```shell
+npm create sanity@latest -- --template robotostudio/turbo-start-sanity
+```
 
-- Faceted search — filter results by category, author, or date range alongside free-text search
-- Custom analysers for better relevance (synonyms, stemming, fuzzy matching)
-- Sanity webhook for real-time index updates on content publish
+#### 2. Run Studio and Next.js app locally
 
-**Resources:** [OpenSearch Documentation](https://opensearch.org/docs/latest/), [Docker Hub - OpenSearch](https://hub.docker.com/r/opensearchproject/opensearch)
+Navigate to the template directory using `cd <your app name>`, and start the development servers by running the following command
 
----
+```shell
+pnpm run dev
+```
 
-### Task 2: AWS Architecture Document
+#### 3. Open the app and sign in to the Studio
 
-Write a concise architecture document (`docs/aws-architecture.md`) explaining how you would deploy this application to AWS with CDN and firewall protection.
+Open the Next.js app running locally in your browser on [http://localhost:3000](http://localhost:3000).
 
-You do not need to actually deploy to AWS. We want to see that you understand the infrastructure, can make informed decisions, and can communicate them clearly. In an agency setting, this is the kind of document you'd write for a client proposal or a technical handover.
+Open the Studio running locally in your browser on [http://localhost:3333](http://localhost:3333). You should now see a screen prompting you to log in to the Studio. Use the same service (Google, GitHub, or email) that you used when you logged in to the CLI.
 
-**Core requirements:**
+### Adding content with Sanity
 
-Your document must cover:
+#### 1. Publish your first document
 
-1. **Compute** — How would you deploy this Next.js 16 application on AWS? What service would you use (Amplify, SST/OpenNext, ECS/Fargate, Lambda, something else) and why? Address the specific challenges of this project: Next.js 16, pnpm monorepo, Turborepo, Edge Runtime usage.
+The template comes pre-defined with a schema containing `Author`, `Blog`, `BlogIndex`, `FAQ`, `Footer`, `HomePage`, `Navbar`, `Page`, and `Settings` document types.
 
-2. **CDN** — Describe your CloudFront configuration. Define the cache behaviours you'd set up for static assets, dynamic pages, API routes, and ISR content. What TTLs would you use for each and why?
+From the Studio, click "+ Create" and select the `Blog` document type. Go ahead and create and publish the document.
 
-3. **WAF** — Define the AWS WAF rules you'd attach to the CloudFront distribution. At minimum cover:
-   - Rate limiting on API routes (define your thresholds and explain the trade-off between too aggressive and too lenient)
-   - SQL injection and XSS protection (which AWS managed rule groups would you use?)
-   - One additional rule of your choice (geo-blocking, bot detection, IP reputation — whatever you think is appropriate for an agency client site)
+Your content should now appear in your Next.js app ([http://localhost:3000](http://localhost:3000)) as well as in the Studio on the "Presentation" Tab
 
-4. **Data flow** — How does content get from Sanity to your search index to the user? Where does caching happen at each layer? How would you invalidate stale content after a publish?
+#### 2. Sample Content
 
-5. **Diagram** — Include a simple architecture diagram showing the request flow. Mermaid, ASCII art, Excalidraw export — we don't care about visual polish, we care about accuracy and completeness.
+When you initialize the template using the Sanity CLI, sample content is not automatically imported into your project. However, you can import it after the init is done. This data includes example blog posts, authors, and other content types to help you get started quickly (see next step).
 
-**Stretch goals:**
+#### 3. Seed data using script
 
-- Infrastructure as Code snippets (CDK, SST, Terraform, or CloudFormation) for any of the resources you describe
-- Cost estimate for a typical agency client site (~10k monthly visitors)
-- Monitoring and alerting strategy (what CloudWatch alarms would you set up?)
-- CI/CD pipeline design for deploying to this infrastructure
-- Cache invalidation strategy for when content editors publish changes
+To add sample data programmatically, run the following command:
 
-**What this tests:** The same AWS and infrastructure knowledge as a hands-on deployment, but through articulation. A senior engineer should be able to explain this clearly without needing to provision anything. This also tests technical writing, which matters when you're writing proposals and handover documents for clients.
+```shell
+cd apps/studio
+npx sanity dataset import ./seed-data.tar.gz production --replace
+```
 
----
+This command imports seed content into your Sanity dataset.
 
-### Task 3: Pokedex Feature
+#### 4. Extending the Sanity schema
 
-Build a Pokedex section within the application using the [PokeAPI](https://pokeapi.co/).
+The schemas for all document types are defined in the `studio/schemaTypes/documents` directory. You can [add more document types](https://www.sanity.io/docs/schema-types) to the schema to suit your needs.
 
-**Core requirements:**
+### Deploying your application and inviting editors
 
-- Create a `/pokedex` route with a paginated list of Pokemon
-- Each entry should display: sprite, name, types, and base stats
-- Fetch and include evolution chain data for each Pokemon. This requires aggregating data from multiple PokeAPI endpoints (`/pokemon`, `/pokemon-species`, `/evolution-chain`). Design an efficient data fetching strategy that doesn't hammer the API on every request.
-- Implement server-side caching so the PokeAPI isn't hit on every page load (ISR, in-memory cache, or another approach — justify your choice)
-- Create a detail page (`/pokedex/[name]`) with full stats, abilities, and the evolution chain
-- Create a **custom Sanity input component** that lets content editors search for and select a Pokemon directly within the Studio, linking blog posts to Pokedex entries
-- The Pokedex content should be searchable in your OpenSearch instance from Task 1 — a user searching for "fire" should find both blog posts about fire and fire-type Pokemon
+#### 1. Deploy Sanity Studio
 
-**Stretch goals:**
+Your Next.js frontend (`/web`) and Sanity Studio (`/studio`) are still only running on your local computer. It's time to deploy and get it into the hands of other content editors.
 
-- Type-based filtering on the Pokedex index page
-- Visual evolution chain rendering (handle branching evolutions like Eevee)
-- Side-by-side Pokemon comparison feature
-- Aggressive local caching layer that respects the [PokeAPI fair use policy](https://pokeapi.co/docs/v2#fairuse)
+> **⚠️ Important**: When initializing the template with the Sanity CLI, the `.github` folder may not be included or might be renamed to `github` (without the dot). If you don't see a `.github` folder in your project root, you'll need to manually create it and copy the GitHub Actions workflows from the [template repository](https://github.com/robotostudio/turbo-start-sanity/tree/main/.github) for the deployment automation to work.
 
-**Resources:** [PokeAPI Documentation](https://pokeapi.co/docs/v2), [PokeAPI GraphQL](https://pokeapi.co/docs/graphql) (if you prefer)
+The template includes a GitHub Actions workflow [`deploy-sanity.yml`](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/.github/workflows/deploy-sanity.yml) that automatically deploys your Sanity Studio whenever changes are pushed to the `studio` directory.
 
----
+> **Note**: To use the GitHub Actions workflow, make sure to configure the following secrets in your repository settings:
+>
+> - `SANITY_DEPLOY_TOKEN`
+> - `SANITY_STUDIO_PROJECT_ID`
+> - `SANITY_STUDIO_DATASET`
+> - `SANITY_STUDIO_TITLE`
+> - `SANITY_STUDIO_PRESENTATION_URL`
+> - `SANITY_STUDIO_PRODUCTION_HOSTNAME`
 
-## Submission
+Set `SANITY_STUDIO_PRODUCTION_HOSTNAME` to whatever you want your deployed Sanity Studio hostname to be. Eg. for `SANITY_STUDIO_PRODUCTION_HOSTNAME=my-cool-project` you'll get a studio URL of `https://my-cool-project.sanity.studio` (and `<my-branch-name>-my-cool-project.sanity.studio` for PR previews builds done automatically via the `deploy-sanity.yml` github CI workflow when you open a PR.)
 
-1. Fork this repository and complete the tasks
-2. Deploy your solution to **Vercel** with a working environment
-3. Ensure your `docs/aws-architecture.md` is committed to the repo
-4. Book your follow-up interview at [cal.com/roboto/follow-up-interview](https://cal.com/roboto/follow-up-interview)
-   - Include a link to your GitHub repository
-   - Include a link to your live Vercel deployment
-5. Come prepared to discuss:
-   - Your search infrastructure choices and how your indexing pipeline works
-   - Your AWS architecture document — we'll probe the decisions you made
-   - Your caching strategy across the stack (CDN, server, API)
-   - How your Pokedex data aggregation works and why you structured it that way
-   - What you'd change or add given more time
+Set `SANITY_STUDIO_PRESENTATION_URL` to your web app front-end URL (from the Vercel deployment). This URL is required for production deployments and should be:
 
----
+- Set in your GitHub repository secrets for CI/CD deployments
+- Set in your local environment if deploying manually with `npx sanity deploy`
+- Not needed for local development, where preview will automatically use `http://localhost:3000`
 
-## Evaluation Criteria
+You can then manually deploy from your Studio directory (`/studio`) using:
 
-- **Architecture and decision-making** — How you structure services, why you chose specific tools, and how you handle failure modes. We care more about the reasoning than the specific choice.
-- **Code quality** — Clean, typed, maintainable code with proper error handling and edge case coverage
-- **Infrastructure knowledge** — Your AWS architecture document should demonstrate real understanding of CDN behaviours, WAF configuration, and deployment trade-offs — not just surface-level descriptions
-- **Data pipeline design** — How content flows from Sanity to OpenSearch, how PokeAPI data is cached and aggregated, and how these systems interact
-- **Security awareness** — WAF rule design, input validation, rate limiting rationale
-- **Cross-feature integration** — The Pokedex is searchable in OpenSearch, blog posts link to Pokedex entries. We're looking at how you connect features, not just build them in isolation.
-- **User experience** — Search feels fast, the Pokedex handles loading and error states, nothing is broken
-- **Technical communication** — Your architecture document is clear, concise, and demonstrates depth
+```shell
+npx sanity deploy
+```
 
-Good luck!
+**Note**: To use the live preview feature, your browser needs to enable third party cookies.
+
+#### 2. Deploy Next.js app to Vercel
+
+You have the freedom to deploy your Next.js app to your hosting provider of choice. With Vercel and GitHub being a popular choice, we'll cover the basics of that approach.
+
+1. Create a GitHub repository from this project. [Learn more](https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/adding-locally-hosted-code-to-github).
+2. Create a new Vercel project and connect it to your Github repository.
+3. Set the `Root Directory` to your Next.js app (`/apps/web`).
+4. Configure your Environment Variables.
+
+#### 3. Configure CORS Origins
+
+Your production URLs must be added to your Sanity project's CORS origins, otherwise the frontend will be blocked from fetching content.
+
+1. Go to [Sanity Manage](https://www.sanity.io/manage), select your project, and navigate to **API** > **CORS origins**.
+2. Add the following origins:
+   - Your production URL (e.g. `https://your-app.vercel.app`)
+   - Your custom domain if applicable (e.g. `https://yourdomain.com`)
+   - `http://localhost:3000` (for local development — added by default)
+3. Enable **Allow credentials** for each origin that needs authenticated requests (e.g. live preview, visual editing).
+
+> **Note**: Vercel preview deployments use unique URLs per commit. If you need CORS access on preview deployments, add a wildcard origin like `https://*-your-project.vercel.app` or add specific preview URLs as needed.
+
+#### 4. Invite a collaborator
+
+Now that you've deployed your Next.js application and Sanity Studio, you can optionally invite a collaborator to your Studio. Open up [Manage](https://www.sanity.io/manage), select your project and click "Invite project members"
+
+They will be able to access the deployed Studio, where you can collaborate together on creating content.

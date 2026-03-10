@@ -2,10 +2,9 @@ import "@workspace/env/client";
 import "@workspace/env/server";
 
 import { env } from "@workspace/env/client";
+import { client } from "@workspace/sanity/client";
+import { queryRedirects } from "@workspace/sanity/query";
 import type { NextConfig } from "next";
-
-import { client } from "@/lib/sanity/client";
-import { queryRedirects } from "@/lib/sanity/query";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@workspace/ui"],

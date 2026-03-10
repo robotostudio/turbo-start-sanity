@@ -1,5 +1,8 @@
-import { sanityFetch } from "./sanity/live";
-import { queryGlobalSeoSettings, queryNavbarData } from "./sanity/query";
+import { sanityFetch } from "@workspace/sanity/live";
+import {
+  queryGlobalSeoSettings,
+  queryNavbarData,
+} from "@workspace/sanity/query";
 
 export const getNavigationData = async () => {
   const [navbarData, settingsData] = await Promise.all([

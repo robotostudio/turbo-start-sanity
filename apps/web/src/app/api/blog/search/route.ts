@@ -1,35 +1,46 @@
-import Fuse from "fuse.js";
 import { NextResponse } from "next/server";
 
-import { sanityFetch } from "@/lib/sanity/live";
-import { queryAllBlogDataForSearch } from "@/lib/sanity/query";
-
-export const revalidate = 360; // every 5 minutes
+export const revalidate = 60;
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const query = searchParams.get("q");
+  const query = searchParams.get("q")?.trim();
 
   if (!query) {
     return NextResponse.json({ error: "Query is required" }, { status: 400 });
   }
 
-  const { data } = await sanityFetch({
-    query: queryAllBlogDataForSearch,
-    stega: false,
-  });
+  const params = new URLSearchParams(searchParams);
+  const url = new URL(`/api/search?${params.toString()}`, request.url);
 
-  if (!data) {
-    return NextResponse.json({ error: "No data found" }, { status: 404 });
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      next: {
+        revalidate,
+      },
+    });
+
+    if (!response.ok) {
+      return NextResponse.json({ error: "Search failed" }, { status: 502 });
+    }
+
+    const payload = (await response.json()) as {
+      results?: unknown;
+    };
+
+    if (!Array.isArray(payload.results)) {
+      return NextResponse.json([], { status: 200 });
+    }
+
+    return NextResponse.json(payload.results, { status: 200 });
+  } catch {
+    return NextResponse.json(
+      { error: "Search service unavailable" },
+      { status: 503 }
+    );
   }
-
-  const fuse = new Fuse(data, {
-    keys: ["title", "description", "slug", "authors.name"],
-    threshold: 0.3,
-  });
-
-  const results = fuse.search(query, {
-    limit: 10,
-  });
-  return NextResponse.json(results.map((result) => result.item));
 }
