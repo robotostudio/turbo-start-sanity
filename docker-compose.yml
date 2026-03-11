@@ -1,6 +1,6 @@
 services:
   opensearch:
-    image: opensearchproject/opensearch:2.12.0
+    image: opensearchproject/opensearch:2.17.1
     container_name: opensearch
     environment:
       - discovery.type=single-node
@@ -20,7 +20,7 @@ services:
       - opensearch-data:/usr/share/opensearch/data
 
   opensearch-dashboards:
-    image: opensearchproject/opensearch-dashboards:2.12.0
+    image: opensearchproject/opensearch-dashboards:2.17.1
     container_name: opensearch-dashboards
     ports:
       - "5601:5601"

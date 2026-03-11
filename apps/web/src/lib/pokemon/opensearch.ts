@@ -74,6 +74,7 @@ export async function searchPokemon(
 ): Promise<SearchablePokemon[]> {
   const client = getClient();
   await ensurePokemonIndex();
+  const normalizedQuery = query.trim().toLowerCase();
 
   const response = await client.search({
     index: INDEX_NAME,
@@ -84,12 +85,17 @@ export async function searchPokemon(
           should: [
             {
               multi_match: {
-                query,
+                query: normalizedQuery,
                 fields: ["name^3", "typesText^2"],
                 fuzziness: "AUTO",
               },
             },
-            { term: { types: query.toLowerCase() } },
+            {
+              prefix: {
+                "name.keyword": normalizedQuery,
+              },
+            },
+            { term: { types: normalizedQuery } },
           ],
           minimum_should_match: 1,
         },
