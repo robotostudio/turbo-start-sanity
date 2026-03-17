@@ -51,9 +51,11 @@ export function SubscribeNewsletter({
     <section className="px-4 py-8 sm:py-12 md:py-16" id="subscribe">
       <div className="container relative mx-auto overflow-hidden rounded-3xl bg-gray-50 px-4 py-8 sm:py-16 md:px-8 md:py-24 lg:py-32 dark:bg-zinc-900">
         <div className="relative z-10 mx-auto text-center">
-          <h2 className="mb-4 text-balance font-semibold text-gray-900 text-xl sm:text-3xl md:text-5xl dark:text-neutral-300">
-            {title}
-          </h2>
+         {title && (
+            <h2 className="mb-4 text-balance font-semibold text-gray-900 text-xl sm:text-3xl md:text-5xl dark:text-neutral-300">
+              {title}
+            </h2>
+          )}
           {subTitle && (
             <RichText
               className="mb-6 text-balance text-gray-600 text-sm sm:mb-8 sm:text-base dark:text-neutral-300"

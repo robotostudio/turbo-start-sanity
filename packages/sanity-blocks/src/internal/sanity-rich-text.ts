@@ -5,9 +5,15 @@ import {
   defineField,
 } from 'sanity'
 
+// Single source of truth for portable text member names
+const PORTABLE_TEXT_MEMBER_NAMES = {
+  block: 'block',
+  image: 'image',
+} as const
+
 const richTextMembers = [
   defineArrayMember({
-    name: 'block',
+    name: PORTABLE_TEXT_MEMBER_NAMES.block,
     type: 'block',
     styles: [
       { title: 'Normal', value: 'normal' },
@@ -45,7 +51,7 @@ const richTextMembers = [
     },
   }),
   defineArrayMember({
-    name: 'image',
+    name: PORTABLE_TEXT_MEMBER_NAMES.image,
     title: 'Image',
     type: 'image',
     icon: ImageIcon,
@@ -62,7 +68,7 @@ const richTextMembers = [
   }),
 ]
 
-export const portableTextMemberTypes = ['block', 'image'] as const
+export const portableTextMemberTypes = Object.values(PORTABLE_TEXT_MEMBER_NAMES)
 
 type PortableTextMemberType = (typeof portableTextMemberTypes)[number]
 

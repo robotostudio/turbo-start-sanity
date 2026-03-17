@@ -17,17 +17,31 @@ type SanityButtonsProps = {
   buttons?: ButtonProps[] | null;
   className?: string;
   buttonClassName?: string;
-  size: "sm" | "lg" | "default" | "icon" | null | undefined;
+  size?: "sm" | "lg" | "default" | "icon" | null | undefined;
 };
 
 type SanityButtonRenderProps = {
   text?: string | null;
   href?: string | null;
-  variant?: ButtonVariant;
+  variant?: Exclude<ButtonVariant, null | undefined>;
   openInNewTab?: boolean | null;
   className?: string;
-  size: SanityButtonsProps["size"];
+  size?: SanityButtonsProps["size"];
 };
+
+const VALID_VARIANTS = [
+  "default",
+  "destructive",
+  "outline",
+  "secondary",
+  "ghost",
+  "link",
+] as const;
+
+function isValidVariant(v: string | null | undefined): v is Exclude<ButtonVariant, null | undefined> {
+  return v != null && (VALID_VARIANTS as readonly string[]).includes(v);
+}
+
 
 function SanityButton({
   text,
@@ -46,7 +60,7 @@ function SanityButton({
       asChild
       className={cn("rounded-[10px]", className)}
       size={size ?? "default"}
-      variant={variant}
+      variant={variant ?? "default"}
     >
       <Link
         aria-label={`Navigate to ${text}`}
@@ -80,7 +94,7 @@ export function SanityButtons({
           openInNewTab={button.openInNewTab}
           size={size}
           text={button.text}
-          variant={button.variant as ButtonVariant}
+          variant={isValidVariant(button.variant) ? button.variant : "default"}
         />
       ))}
     </div>

@@ -28,6 +28,7 @@ export interface PortableTextSpan {
 }
 
 export interface PortableTextBlock {
+  _key?: string | null;
   _type?: string;
   alt?: string | null;
   caption?: string | null;
@@ -45,6 +46,16 @@ export interface SanityImageValue {
 }
 
 export const getHref = (url?: CustomUrlValue | null) => {
+  const isSafeHref = (href: string) => {
+    if (href.startsWith("/") || href.startsWith("#")) return true;
+    try {
+      const parsed = new URL(href);
+      return ["http:", "https:", "mailto:", "tel:"].includes(parsed.protocol);
+    } catch {
+      return false;
+    }
+  };
+
   if (!url) {
     return undefined;
   }
@@ -54,7 +65,11 @@ export const getHref = (url?: CustomUrlValue | null) => {
     return slug ? `/${slug.replace(/^\/+/, "")}` : undefined;
   }
 
-  return url.external ?? undefined;
+const external = url.external?.trim();
+  if (!external) {
+    return undefined;
+  }
+  return isSafeHref(external) ? external : undefined;
 };
 
 export const portableTextToPlainText = (value?: PortableTextValue) =>
@@ -74,9 +89,10 @@ export const portableTextToPlainText = (value?: PortableTextValue) =>
 
 export const renderPortableText = (value?: PortableTextValue) =>
   (value ?? []).map((block, index) => {
+     const key = block._key ?? `block-${index}`;
     if (block._type === "image") {
       const text = block.caption ?? block.alt;
-      return text ? <p key={`image-${index}`}>{text}</p> : null;
+      return text ? <p key={key}>{text}</p> : null;
     }
 
     const text = (block.children ?? [])
@@ -91,7 +107,7 @@ export const renderPortableText = (value?: PortableTextValue) =>
     const style = block.style ?? "normal";
     const tag = /^h[2-6]$/.test(style) ? style : "p";
 
-    return createElement(tag, { key: `block-${index}` }, text);
+    return createElement(tag, { key }, text);
   });
 
 export const renderButtons = (buttons?: ButtonValue[] | null) => {

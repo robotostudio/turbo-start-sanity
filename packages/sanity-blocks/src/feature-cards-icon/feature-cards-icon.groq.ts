@@ -10,6 +10,7 @@ export const featureCardsIconGroqProjection = /* groq */ `
       }
     },
     cards[]{
+      _key,
       icon,
       title,
       richText[]{
@@ -20,4 +21,4 @@ export const featureCardsIconGroqProjection = /* groq */ `
       }
     }
   }
-`
+`;

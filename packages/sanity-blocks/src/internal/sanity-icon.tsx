@@ -11,7 +11,7 @@ interface IconProps extends Omit<ComponentProps<"svg">, "src"> {
 export const SanityIcon = memo(function SanityIconUnmemorized({
   icon,
   className,
-  alt: _alt,
+  alt,
   ...props
 }: IconProps) {
   if (!icon) {
@@ -21,6 +21,9 @@ export const SanityIcon = memo(function SanityIconUnmemorized({
   return (
     <DynamicIcon
       {...props}
+      aria-hidden={alt ? undefined : true}
+      aria-label={alt || undefined}
+      role={alt ? "img" : undefined}
       className={cn("flex size-12 items-center justify-center", className)}
       fallback={() => <TriangleAlert size={24} />}
       name={icon as IconName}

@@ -13,6 +13,10 @@ export function RichTextBlock({
   title,
   eyebrow,
 }: Readonly<RichTextBlockProps>) {
+  if (!eyebrow && !title && !richText) {
+    return null;
+  }
+
   return (
     <section className="my-6 md:my-16">
       <div className="container mx-auto px-4 md:px-6">
@@ -24,9 +28,11 @@ export function RichTextBlock({
             )}
           </div>
         </div>
-        <div className="mx-auto mt-8 max-w-4xl">
-          <RichText richText={richText} />
-        </div>
+        {richText && (
+          <div className="mx-auto mt-8 max-w-4xl">
+            <RichText richText={richText} />
+          </div>
+        )}
       </div>
     </section>
   );

@@ -10,7 +10,9 @@ test("ImageLinkCards renders cards and links", () => {
           _key: "card-1",
           title: "Hero",
           description: "Reusable homepage banner.",
+          // Match the customUrl shape from the schema
           href: "https://example.com/hero",
+          openInNewTab: false,
         },
       ]}
     />,
@@ -19,15 +21,17 @@ test("ImageLinkCards renders cards and links", () => {
   expect(html).toMatch(/Blocks/);
   expect(html).toMatch(/Hero/);
   expect(html).toMatch(/Reusable homepage banner/);
+  expect(html).toMatch(/href="https:\/\/example\.com\/hero"/);
 });
 
-test("ImageLinkCards renders cards without hrefs", () => {
+test("ImageLinkCards renders card description", () => {
   const html = renderToStaticMarkup(
     <ImageLinkCards
       cards={[
         {
           _key: "card-1",
           description: "Fallback card body.",
+          href: "/fallback",
         },
       ]}
     />,

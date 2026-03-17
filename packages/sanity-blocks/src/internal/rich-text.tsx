@@ -14,7 +14,7 @@ const logger = new Logger("RichText");
 
 function parseChildrenToSlug(children: PortableTextBlock["children"]): string {
   if (!children) return "";
-  const text = children.map((child) => child.text).join("");
+  const text = children.map((child) => child.text ?? "").join("");
   return slugify(text.trim(), { lower: true, remove: /[^a-zA-Z0-9 ]/g });
 }
 

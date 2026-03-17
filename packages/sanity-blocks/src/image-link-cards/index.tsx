@@ -29,14 +29,21 @@ function CTACard({
   card: ImageLinkCard;
   className?: string;
 }>) {
-  const { image, description, title, href } = card;
+  const { image, description, title, href, openInNewTab } = card;
+
+  if (!href) {
+    return null;
+  }
+
   return (
     <Link
       className={cn(
         "group relative flex flex-col justify-end overflow-hidden rounded-3xl p-4 transition-colors md:p-8 xl:h-[400px]",
         className
       )}
-      href={href ?? "#"}
+      href={href}
+      rel={openInNewTab ? "noopener noreferrer" : undefined}
+      target={openInNewTab ? "_blank" : undefined}
     >
       {image?.id && (
         <div className="absolute inset-0 z-1 mix-blend-multiply">
@@ -50,12 +57,16 @@ function CTACard({
         </div>
       )}
       <div className="z-2 mb-4 flex flex-col space-y-2 pt-64 duration-500 group-hover:top-8 xl:absolute xl:inset-x-8 xl:top-24">
-        <h3 className="font-medium text-[#111827] text-xl dark:text-neutral-300">
-          {title}
-        </h3>
-        <p className="text-[#374151] text-sm transition-opacity delay-150 duration-300 xl:opacity-0 xl:group-hover:opacity-100 dark:text-neutral-300">
-          {description}
-        </p>
+        {title && (
+          <h3 className="font-medium text-[`#111827`] text-xl dark:text-neutral-300">
+            {title}
+          </h3>
+        )}
+        {description && (
+          <p className="text-[`#374151`] text-sm transition-opacity delay-150 duration-300 xl:opacity-0 xl:group-hover:opacity-100 dark:text-neutral-300">
+            {description}
+          </p>
+        )}
       </div>
     </Link>
   );
@@ -73,9 +84,11 @@ export function ImageLinkCards({
         <div className="flex w-full flex-col items-center">
           <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">
             {eyebrow && <Badge variant="secondary">{eyebrow}</Badge>}
-            <h2 className="text-balance font-semibold text-3xl md:text-5xl">
-              {title}
-            </h2>
+            {title && (
+             <h2 className="text-balance font-semibold text-3xl md:text-5xl">
+                {title}
+              </h2>
+            )}
             <RichText className="text-balance" richText={richText} />
           </div>
 
