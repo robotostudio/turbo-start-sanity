@@ -2,6 +2,8 @@
  * Slug validation — single source of truth for all URL path validation.
  */
 
+import slugify from "slugify";
+
 // --- Types ---
 
 export type SlugValidationResult = {
@@ -250,12 +252,7 @@ export function createSlugWarningValidator(
 /** Clean a raw string into a valid slug segment. */
 export function cleanSlug(slug: string): string {
   if (!slug) return "";
-  return slug
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "")
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "");
+  return slugify(slug, { lower: true, strict: true });
 }
 
 /** Generate a slug from a document title using doc type conventions. */
