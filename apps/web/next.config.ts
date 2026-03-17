@@ -7,7 +7,7 @@ import { queryRedirects } from "@workspace/sanity/query";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@workspace/ui"],
+  transpilePackages: ["@workspace/ui", "@workspace/sanity-blocks"],
   reactCompiler: true,
   experimental: {
     inlineCss: true,

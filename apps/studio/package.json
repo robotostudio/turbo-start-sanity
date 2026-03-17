@@ -16,7 +16,8 @@
     "extract": "sanity schema extract",
     "check-types": "tsc --noEmit",
     "type": "sanity typegen generate",
-    "postinstall": "sanity exec scripts/cli-alert-for-data.ts"
+    "sync-thumbnails": "node --experimental-strip-types ../../packages/sanity-blocks/scripts/sync-thumbnails.ts --target-root ../../apps/studio/static/thumbnails --file-prefix preview-",
+    "postinstall": "sanity exec scripts/cli-alert-for-data.ts && pnpm sync-thumbnails"
   },
   "keywords": [
     "sanity"
@@ -31,6 +32,7 @@
     "@sanity/uuid": "^3.0.2",
     "@sanity/vision": "^5.16.0",
     "@workspace/logger": "workspace:*",
+    "@workspace/sanity-blocks": "workspace:*",
     "dotenv": "^17.3.1",
     "friendlier-words": "^1.2.0",
     "lucide-react": "catalog:",

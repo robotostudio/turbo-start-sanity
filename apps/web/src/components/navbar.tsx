@@ -1,6 +1,7 @@
 "use client";
 
 import { env } from "@workspace/env/client";
+import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -8,7 +9,6 @@ import useSWR from "swr";
 
 import type { ColumnLink, NavColumn, NavigationData } from "@/types";
 import { MenuLink } from "./elements/menu-link";
-import { SanityButtons } from "./elements/sanity-buttons";
 import { Logo } from "./logo";
 import { MobileMenu } from "./mobile-menu";
 import { ModeToggle } from "./mode-toggle";

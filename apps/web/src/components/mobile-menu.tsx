@@ -1,5 +1,6 @@
 "use client";
 
+import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import {
   Accordion,
   AccordionContent,
@@ -22,7 +23,6 @@ import { useState } from "react";
 
 import type { ColumnLink, NavigationData } from "@/types";
 import { MenuLink } from "./elements/menu-link";
-import { SanityButtons } from "./elements/sanity-buttons";
 import { Logo } from "./logo";
 
 export function MobileMenu({ navbarData, settingsData }: NavigationData) {

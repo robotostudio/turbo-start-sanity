@@ -1,0 +1,153 @@
+import { TriangleAlert } from "lucide-react";
+import { createElement, type ReactNode } from "react";
+
+export interface SlugValue {
+  current?: string | null;
+}
+
+export interface ReferenceValue {
+  slug?: SlugValue | null;
+}
+
+export interface CustomUrlValue {
+  external?: string | null;
+  internal?: ReferenceValue | null;
+  openInNewTab?: boolean | null;
+  type?: string | null;
+}
+
+export interface ButtonValue {
+  text?: string | null;
+  url?: CustomUrlValue | null;
+  variant?: string | null;
+}
+
+export interface PortableTextSpan {
+  _type?: string;
+  text?: string | null;
+}
+
+export interface PortableTextBlock {
+  _type?: string;
+  alt?: string | null;
+  caption?: string | null;
+  children?: PortableTextSpan[] | null;
+  style?: string | null;
+}
+
+export type PortableTextValue = PortableTextBlock[] | null | undefined;
+
+export interface SanityImageValue {
+  alt?: string | null;
+  asset?: {
+    _ref?: string | null;
+  } | null;
+}
+
+export const getHref = (url?: CustomUrlValue | null) => {
+  if (!url) {
+    return undefined;
+  }
+
+  if (url.type === "internal") {
+    const slug = url.internal?.slug?.current;
+    return slug ? `/${slug.replace(/^\/+/, "")}` : undefined;
+  }
+
+  return url.external ?? undefined;
+};
+
+export const portableTextToPlainText = (value?: PortableTextValue) =>
+  (value ?? [])
+    .map((block) => {
+      if (block._type === "image") {
+        return block.caption ?? block.alt ?? "";
+      }
+
+      return (block.children ?? [])
+        .map((child) => child.text ?? "")
+        .join("")
+        .trim();
+    })
+    .filter(Boolean)
+    .join(" ");
+
+export const renderPortableText = (value?: PortableTextValue) =>
+  (value ?? []).map((block, index) => {
+    if (block._type === "image") {
+      const text = block.caption ?? block.alt;
+      return text ? <p key={`image-${index}`}>{text}</p> : null;
+    }
+
+    const text = (block.children ?? [])
+      .map((child) => child.text ?? "")
+      .join("")
+      .trim();
+
+    if (!text) {
+      return null;
+    }
+
+    const style = block.style ?? "normal";
+    const tag = /^h[2-6]$/.test(style) ? style : "p";
+
+    return createElement(tag, { key: `block-${index}` }, text);
+  });
+
+export const renderButtons = (buttons?: ButtonValue[] | null) => {
+  if (!buttons?.length) {
+    return null;
+  }
+
+  return (
+    <ul>
+      {buttons.map((button, index) => {
+        const text = button.text ?? `Button ${index + 1}`;
+        const href = getHref(button.url);
+
+        return (
+          <li key={`${text}-${index}`}>
+            {href ? (
+              <a
+                href={href}
+                rel={button.url?.openInNewTab ? "noreferrer" : undefined}
+                target={button.url?.openInNewTab ? "_blank" : undefined}
+              >
+                {text}
+              </a>
+            ) : (
+              <span>{text}</span>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
+
+export const IconBadge = ({ name }: { name?: string | null }) => {
+  if (!name) {
+    return <TriangleAlert size={16} />;
+  }
+
+  return <span>{name}</span>;
+};
+
+export const renderOptionalHeading = (
+  content: string | null | undefined,
+  tag: "h2" | "h3" | "p"
+): ReactNode => {
+  if (!content) {
+    return null;
+  }
+
+  if (tag === "h2") {
+    return <h2>{content}</h2>;
+  }
+
+  if (tag === "h3") {
+    return <h3>{content}</h3>;
+  }
+
+  return <p>{content}</p>;
+};
