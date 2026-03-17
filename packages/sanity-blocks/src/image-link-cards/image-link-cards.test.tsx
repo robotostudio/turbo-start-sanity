@@ -38,6 +38,7 @@ test("ImageLinkCards renders card description", () => {
   );
 
   expect(html).toMatch(/Fallback card body\./);
+  expect(html).toMatch(/href="\/fallback"/);
 });
 
 test("ImageLinkCards renders with no cards", () => {

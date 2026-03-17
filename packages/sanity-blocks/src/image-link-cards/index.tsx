@@ -58,12 +58,12 @@ function CTACard({
       )}
       <div className="z-2 mb-4 flex flex-col space-y-2 pt-64 duration-500 group-hover:top-8 xl:absolute xl:inset-x-8 xl:top-24">
         {title && (
-          <h3 className="font-medium text-[`#111827`] text-xl dark:text-neutral-300">
+          <h3 className="font-medium text-[#111827] text-xl dark:text-neutral-300">
             {title}
           </h3>
         )}
         {description && (
-          <p className="text-[`#374151`] text-sm transition-opacity delay-150 duration-300 xl:opacity-0 xl:group-hover:opacity-100 dark:text-neutral-300">
+          <p className="text-[#374151] text-sm transition-opacity delay-150 duration-300 xl:opacity-0 xl:group-hover:opacity-100 dark:text-neutral-300">
             {description}
           </p>
         )}

@@ -126,7 +126,9 @@ export const renderButtons = (buttons?: ButtonValue[] | null) => {
             {href ? (
               <a
                 href={href}
-                rel={button.url?.openInNewTab ? "noreferrer" : undefined}
+                rel={
+                  button.url?.openInNewTab ? "noopener noreferrer" : undefined
+                }
                 target={button.url?.openInNewTab ? "_blank" : undefined}
               >
                 {text}

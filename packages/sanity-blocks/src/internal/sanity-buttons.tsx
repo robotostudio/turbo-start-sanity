@@ -17,7 +17,7 @@ type SanityButtonsProps = {
   buttons?: ButtonProps[] | null;
   className?: string;
   buttonClassName?: string;
-  size?: "sm" | "lg" | "default" | "icon" | null | undefined;
+  size?: "sm" | "lg" | "default" | "icon" | null;
 };
 
 type SanityButtonRenderProps = {

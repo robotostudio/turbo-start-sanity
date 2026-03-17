@@ -46,7 +46,9 @@ export function FaqAccordion({
         <div className="flex w-full flex-col items-center">
           <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">
             {eyebrow && <Badge variant="secondary">{eyebrow}</Badge>}
-            {title && <h2 className="font-semibold text-3xl md:text-5xl">{title}</h2>}
+            {title && (
+              <h2 className="font-semibold text-3xl md:text-5xl">{title}</h2>
+            )}
             {subtitle && (
               <h3 className="text-balance font-normal text-[#374151] text-lg dark:text-zinc-400">
                 {subtitle}
@@ -58,7 +60,7 @@ export function FaqAccordion({
           <Accordion
             className="w-full"
             collapsible
-            defaultValue="3"
+            defaultValue={faqs?.find((faq) => faq?.title)?._id}
             type="single"
           >
             {faqs?.map((faq) => {
@@ -91,6 +93,7 @@ export function FaqAccordion({
                 className="flex items-center gap-2"
                 href={link.href}
                 target={link.openInNewTab ? "_blank" : "_self"}
+                rel={link.openInNewTab ? "noopener noreferrer" : undefined}
               >
                 {link?.description && (
                   <p className="font-medium text-[15px] leading-6">

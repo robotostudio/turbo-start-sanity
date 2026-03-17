@@ -8,6 +8,10 @@ interface IconProps extends Omit<ComponentProps<"svg">, "src"> {
   alt?: string;
 }
 
+const ICON_SIZE = 24;
+
+const FallbackIcon = () => <TriangleAlert size={ICON_SIZE} />;
+
 export const SanityIcon = memo(function SanityIconUnmemorized({
   icon,
   className,
@@ -25,9 +29,9 @@ export const SanityIcon = memo(function SanityIconUnmemorized({
       aria-label={alt || undefined}
       role={alt ? "img" : undefined}
       className={cn("flex size-12 items-center justify-center", className)}
-      fallback={() => <TriangleAlert size={24} />}
+      fallback={FallbackIcon}
       name={icon as IconName}
-      size={24}
+      size={ICON_SIZE}
     />
   );
 });

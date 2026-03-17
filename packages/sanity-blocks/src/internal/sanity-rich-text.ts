@@ -70,7 +70,7 @@ const richTextMembers = [
 
 export const portableTextMemberTypes = Object.values(PORTABLE_TEXT_MEMBER_NAMES)
 
-type PortableTextMemberType = (typeof portableTextMemberTypes)[number]
+export type PortableTextMemberType = (typeof portableTextMemberTypes)[number];
 
 export const definePortableTextField = (
   memberTypes: PortableTextMemberType[],
