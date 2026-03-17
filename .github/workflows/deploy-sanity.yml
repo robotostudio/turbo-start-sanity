@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
     inputs:
       presentation_url:
-        description: "Frontend URL for Presentation tool (e.g. https://example.com)"
-        required: true
+        description: "Frontend URL for Presentation tool (defaults to secret on main)"
+        required: false
         type: string
 
 permissions:
@@ -22,7 +22,7 @@ jobs:
       SANITY_STUDIO_PROJECT_ID: ${{ secrets.SANITY_STUDIO_PROJECT_ID }}
       SANITY_STUDIO_DATASET: ${{ secrets.SANITY_STUDIO_DATASET }}
       SANITY_STUDIO_TITLE: ${{ secrets.SANITY_STUDIO_TITLE }}
-      SANITY_STUDIO_PRESENTATION_URL: ${{ inputs.presentation_url }}
+      SANITY_STUDIO_PRESENTATION_URL: ${{ inputs.presentation_url || secrets.SANITY_STUDIO_PRESENTATION_URL }}
       SANITY_STUDIO_PRODUCTION_HOSTNAME: ${{ secrets.SANITY_STUDIO_PRODUCTION_HOSTNAME }}
 
     steps:
