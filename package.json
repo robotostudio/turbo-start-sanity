@@ -18,13 +18,23 @@
     "@workspace/env": "workspace:*"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.8",
+    "@biomejs/biome": "2.4.7",
     "@workspace/typescript-config": "workspace:*",
-    "turbo": "^2.7.5",
+    "turbo": "^2.8.17",
     "typescript": "catalog:",
     "ultracite": "5.6.2"
   },
-  "packageManager": "pnpm@10.28.0",
+  "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "sanity-plugin-utils>sanity": ">=5",
+        "sanity-plugin-lucide-icon-picker>sanity": ">=5",
+        "sanity-plugin-lucide-icon-picker>@sanity/ui": ">=3",
+        "@csstools/css-syntax-patches-for-csstree>css-tree": ">=3"
+      }
+    }
+  },
+  "packageManager": "pnpm@10.32.1",
   "engines": {
     "node": ">=22"
   }

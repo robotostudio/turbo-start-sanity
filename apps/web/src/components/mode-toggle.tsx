@@ -12,13 +12,13 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 const THEMES = [
-  { id: 'light', value: 'light', label: 'Light' },
-  { id: 'dark', value: 'dark', label: 'Dark' },
-  { id: 'system', value: 'system', label: 'System' },
-] as const
+  { id: "light", value: "light", label: "Light" },
+  { id: "dark", value: "dark", label: "Dark" },
+  { id: "system", value: "system", label: "System" },
+] as const;
 
 export function ModeToggle() {
-  const {theme, setTheme} = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
