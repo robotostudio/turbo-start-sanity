@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -19,17 +18,6 @@ jobs:
     name: Lint, Format & Type Check
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      SANITY_STUDIO_PROJECT_ID: ${{ secrets.SANITY_STUDIO_PROJECT_ID }}
-      SANITY_STUDIO_DATASET: ${{ secrets.SANITY_STUDIO_DATASET }}
-      SANITY_STUDIO_TITLE: ${{ secrets.SANITY_STUDIO_TITLE }}
-      SANITY_STUDIO_PRESENTATION_URL: ${{ secrets.SANITY_STUDIO_PRESENTATION_URL }}
-      NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.SANITY_STUDIO_PROJECT_ID }}
-      NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.SANITY_STUDIO_DATASET }}
-      NEXT_PUBLIC_SANITY_API_VERSION: ${{ secrets.SANITY_STUDIO_API_VERSION }}
-      NEXT_PUBLIC_SANITY_STUDIO_URL: ${{ secrets.SANITY_STUDIO_PRESENTATION_URL }}
-      SANITY_API_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
-      SANITY_API_WRITE_TOKEN: ${{ secrets.SANITY_API_WRITE_TOKEN }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
