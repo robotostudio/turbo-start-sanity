@@ -15,7 +15,7 @@
     "@sanity/image-url": "^2.0.3",
     "@workspace/env": "workspace:*",
     "next-sanity": "^12.1.1",
-    "react-is": "^19.1.0",
+    "react-is": "catalog:",
     "sanity-image": "^1.1.0"
   },
   "devDependencies": {

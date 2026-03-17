@@ -30,6 +30,9 @@ catalogs:
     react-dom:
       specifier: ^19.2.4
       version: 19.2.4
+    react-is:
+      specifier: ^19.2.4
+      version: 19.2.4
     typescript:
       specifier: 5.9.2
       version: 5.9.2
@@ -106,7 +109,7 @@ importers:
         specifier: 'catalog:'
         version: 19.2.4(react@19.2.4)
       react-is:
-        specifier: ^19.1.0
+        specifier: 'catalog:'
         version: 19.2.4
       sanity:
         specifier: ^5.16.0
@@ -280,7 +283,7 @@ importers:
         specifier: ^12.1.1
         version: 12.1.1(@emotion/is-prop-valid@1.4.0)(@sanity/client@7.17.0)(@sanity/types@5.16.0(@types/react@19.2.14))(next@16.1.7(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react-dom@19.2.4(react@19.2.4))(react-is@19.2.4)(react@19.2.4)(sanity@5.16.0(@emotion/is-prop-valid@1.4.0)(@noble/hashes@2.0.1)(@oclif/core@4.9.0)(@sanity/cli-core@1.1.2(@noble/hashes@2.0.1)(@sanity/telemetry@0.8.1(react@19.2.4))(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(terser@5.37.0)(yaml@2.8.2))(@types/node@25.5.0)(@types/react@19.2.14)(immer@11.0.1)(jiti@2.6.1)(lightningcss@1.32.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.3.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(terser@5.37.0)(typescript@5.9.2))(styled-components@6.3.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(typescript@5.9.2)
       react-is:
-        specifier: ^19.1.0
+        specifier: 'catalog:'
         version: 19.2.4
       sanity-image:
         specifier: ^1.1.0
