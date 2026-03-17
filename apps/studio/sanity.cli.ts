@@ -73,7 +73,7 @@ export default defineCliConfig({
     overloadClientMethods: true,
   },
   vite: {
-    plugins: [tsconfigPaths()],
+    plugins: [tsconfigPaths() as any],
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "."),
