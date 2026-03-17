@@ -15,7 +15,7 @@ const logger = new Logger("BlogSlug");
 async function fetchBlogSlugPageData(slug: string) {
   return await sanityFetch({
     query: queryBlogSlugPageData,
-    params: { slug: `/blog/${slug}` },
+    params: { slug },
   });
 }
 
@@ -52,19 +52,16 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { data } = await fetchBlogSlugPageData(slug);
-  return getSEOMetadata(
-    data
-      ? {
-          title: data?.title ?? data?.seoTitle ?? "",
-          description: data?.description ?? data?.seoDescription ?? "",
-          slug: data?.slug,
-          contentId: data?._id,
-          contentType: data?._type,
-          pageType: "article",
-        }
-      : {}
-  );
+  const slugString = `/blog/${slug}`;
+  const { data } = await fetchBlogSlugPageData(slugString);
+  return getSEOMetadata({
+    title: data?.title ?? data?.seoTitle,
+    description: data?.description ?? data?.seoDescription,
+    slug: slugString,
+    contentId: data?._id,
+    contentType: data?._type,
+    pageType: "article",
+  });
 }
 
 export async function generateStaticParams() {
@@ -81,7 +78,8 @@ export default async function BlogSlugPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { data } = await fetchBlogSlugPageData(slug);
+  const slugString = `/blog/${slug}`;
+  const { data } = await fetchBlogSlugPageData(slugString);
   if (!data) {
     return notFound();
   }

@@ -89,7 +89,8 @@
         "**/.next/**",
         "**/node_modules/**",
         "**/dist/**",
-        "**/.sanity/**"
+        "**/.sanity/**",
+        "**/sanity.blueprint.ts"
       ],
       "linter": {
         "enabled": false

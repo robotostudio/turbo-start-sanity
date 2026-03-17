@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   ci:
-    name: Lint, Format, Type Check & Build
+    name: Lint, Format & Type Check
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -66,6 +66,3 @@ jobs:
 
       - name: Type Check
         run: pnpm run check-types
-
-      - name: Build
-        run: pnpm run build

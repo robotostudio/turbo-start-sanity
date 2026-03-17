@@ -9,11 +9,10 @@ import { getSEOMetadata } from "@/lib/seo";
 
 const logger = new Logger("PageSlug");
 
-async function fetchSlugPageData(slug: string, stega = true) {
+async function fetchSlugPageData(slug: string) {
   return await sanityFetch({
     query: querySlugPageData,
-    params: { slug: `/${slug}` },
-    stega,
+    params: { slug },
   });
 }
 
@@ -48,19 +47,16 @@ export async function generateMetadata({
   params: Promise<{ slug: string[] }>;
 }) {
   const { slug } = await params;
-  const slugString = slug.join("/");
-  const { data: pageData } = await fetchSlugPageData(slugString, false);
-  return getSEOMetadata(
-    pageData
-      ? {
-          title: pageData?.title ?? pageData?.seoTitle ?? "",
-          description: pageData?.description ?? pageData?.seoDescription ?? "",
-          slug: pageData?.slug,
-          contentId: pageData?._id,
-          contentType: pageData?._type,
-        }
-      : {}
-  );
+  const slugString = `/${slug.join("/")}`;
+  const { data: pageData } = await fetchSlugPageData(slugString);
+
+  return getSEOMetadata({
+    title: pageData?.title ?? pageData?.seoTitle,
+    description: pageData?.description ?? pageData?.seoDescription,
+    slug: slugString,
+    contentId: pageData?._id,
+    contentType: pageData?._type,
+  });
 }
 
 export async function generateStaticParams() {
@@ -77,7 +73,7 @@ export default async function SlugPage({
   params: Promise<{ slug: string[] }>;
 }) {
   const { slug } = await params;
-  const slugString = slug.join("/");
+  const slugString = `/${slug.join("/")}`;
   const { data: pageData } = await fetchSlugPageData(slugString);
 
   if (!pageData) {

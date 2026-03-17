@@ -1,4 +1,3 @@
-import type { SanityClient } from "@sanity/client";
 import { DocumentIcon, FolderIcon } from "@sanity/icons";
 import { friendlyWords } from "friendlier-words";
 import { getPublishedId } from "sanity";

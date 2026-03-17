@@ -182,6 +182,13 @@ const featureCardsIconBlock = /* groq */ `
   }
 `;
 
+const richTextBlockFragment = /* groq */ `
+  _type == "richTextBlock" => {
+    ...,
+    ${richTextFragment}
+  }
+`;
+
 const pageBuilderFragment = /* groq */ `
   pageBuilder[]{
     ...,
@@ -191,7 +198,8 @@ const pageBuilderFragment = /* groq */ `
     ${faqAccordionBlock},
     ${featureCardsIconBlock},
     ${subscribeNewsletterBlock},
-    ${imageLinkCardsBlock}
+    ${imageLinkCardsBlock},
+    ${richTextBlockFragment}
   }
 `;
 
@@ -218,7 +226,7 @@ export const queryHomePageData =
   }`);
 
 export const querySlugPageData = defineQuery(`
-  *[_type == "page" && slug.current == $slug][0]{
+  *[_type == "page" && defined(slug.current) && slug.current == $slug][0]{
     ...,
     "slug": slug.current,
     ${pageBuilderFragment}

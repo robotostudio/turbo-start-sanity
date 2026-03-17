@@ -12,18 +12,13 @@ async function fetchHomePageData() {
 
 export async function generateMetadata() {
   const { data: homePageData } = await fetchHomePageData();
-  return getSEOMetadata(
-    homePageData
-      ? {
-          title: homePageData?.title ?? homePageData?.seoTitle ?? "",
-          description:
-            homePageData?.description ?? homePageData?.seoDescription ?? "",
-          slug: homePageData?.slug,
-          contentId: homePageData?._id,
-          contentType: homePageData?._type,
-        }
-      : {}
-  );
+  return getSEOMetadata({
+    title: homePageData?.title ?? homePageData?.seoTitle,
+    description: homePageData?.description ?? homePageData?.seoDescription,
+    slug: "/",
+    contentId: homePageData?._id,
+    contentType: homePageData?._type,
+  });
 }
 
 export default async function Page() {
