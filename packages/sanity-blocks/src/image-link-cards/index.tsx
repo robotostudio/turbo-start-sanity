@@ -51,7 +51,7 @@ function CTACard({
             className="pointer-events-none object-cover opacity-40 grayscale duration-1000 group-hover:opacity-100 group-hover:transition-opacity dark:opacity-60 dark:saturate-200 dark:hover:opacity-[2]"
             height={1080}
             image={image}
-            loading="eager"
+            loading="lazy"
             width={1920}
           />
         </div>
@@ -79,7 +79,7 @@ export function ImageLinkCards({
   cards,
 }: Readonly<ImageLinkCardsProps>) {
   return (
-    <section className="my-16" id="image-link-cards">
+    <section className="my-16">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex w-full flex-col items-center">
           <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">

@@ -17,6 +17,7 @@ export interface CustomUrlValue {
 }
 
 export interface ButtonValue {
+  _key?: string | null;
   text?: string | null;
   url?: CustomUrlValue | null;
   variant?: string | null;
@@ -122,7 +123,7 @@ export const renderButtons = (buttons?: ButtonValue[] | null) => {
         const href = getHref(button.url);
 
         return (
-          <li key={`${text}-${index}`}>
+          <li key={button._key ?? `button-${index}`}>
             {href ? (
               <a
                 href={href}
@@ -155,17 +156,18 @@ export const renderOptionalHeading = (
   content: string | null | undefined,
   tag: "h2" | "h3" | "p"
 ): ReactNode => {
-  if (!content) {
+  const normalized = content?.trim();
+  if (!normalized) {
     return null;
   }
 
   if (tag === "h2") {
-    return <h2>{content}</h2>;
+    return <h2>{normalized}</h2>;
   }
 
   if (tag === "h3") {
-    return <h3>{content}</h3>;
+    return <h3>{normalized}</h3>;
   }
 
-  return <p>{content}</p>;
+  return <p>{normalized}</p>;
 };

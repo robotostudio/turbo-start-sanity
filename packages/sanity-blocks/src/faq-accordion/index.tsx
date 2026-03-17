@@ -60,7 +60,11 @@ export function FaqAccordion({
           <Accordion
             className="w-full"
             collapsible
-            defaultValue={faqs?.find((faq) => faq?.title)?._id}
+            defaultValue={
+              (faqs?.find((faq) => faq?.title)?._key ??
+                faqs?.find((faq) => faq?.title)?._id) ||
+              undefined
+            }
             type="single"
           >
             {faqs?.map((faq) => {
@@ -69,8 +73,8 @@ export function FaqAccordion({
               return (
                 <AccordionItem
                   className="py-2"
-                  key={`AccordionItem-${faq._id}`}
-                  value={faq._id}
+                  key={`AccordionItem-${faq._key ?? faq._id}`}
+                  value={faq._key ?? faq._id}
                 >
                   <AccordionTrigger className="group py-2 text-[15px] leading-6 hover:no-underline">
                     {faq.title}
@@ -86,7 +90,7 @@ export function FaqAccordion({
             })}
           </Accordion>
 
-          {link?.href && (
+          {link?.href && (link?.description || link?.title) && (
             <div className="w-full py-6">
               {link?.title && <p className="mb-1 text-xs">{link.title}</p>}
               <Link
@@ -94,6 +98,7 @@ export function FaqAccordion({
                 href={link.href}
                 target={link.openInNewTab ? "_blank" : "_self"}
                 rel={link.openInNewTab ? "noopener noreferrer" : undefined}
+                aria-label={link.description ?? link.title ?? "Learn more"}
               >
                 {link?.description && (
                   <p className="font-medium text-[15px] leading-6">
