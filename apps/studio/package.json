@@ -49,7 +49,6 @@
     "@types/react": "catalog:",
     "@types/styled-components": "^5.1.36",
     "typescript": "catalog:",
-    "vite": "^8.0.0",
-    "vite-plugin-tsconfig-paths": "^1.4.1"
+    "vite": "^8.0.0"
   }
 }
