@@ -9,7 +9,7 @@ export function MenuLink({
   description,
   icon,
   onClick,
-}: MenuLinkProps) {
+}: Readonly<MenuLinkProps>) {
   if (!href) return null;
 
   return (

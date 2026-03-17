@@ -46,7 +46,7 @@ export function SubscribeNewsletter({
   title,
   subTitle,
   helperText,
-}: SubscribeNewsletterProps) {
+}: Readonly<SubscribeNewsletterProps>) {
   return (
     <section className="px-4 py-8 sm:py-12 md:py-16" id="subscribe">
       <div className="container relative mx-auto overflow-hidden rounded-3xl bg-gray-50 px-4 py-8 sm:py-16 md:px-8 md:py-24 lg:py-32 dark:bg-zinc-900">

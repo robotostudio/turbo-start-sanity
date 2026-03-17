@@ -1,8 +1,11 @@
 import { Logger } from "@workspace/logger";
 import { cn } from "@workspace/ui/lib/utils";
 import Link from "next/link";
-import type { PortableTextBlock } from "next-sanity";
-import { PortableText, type PortableTextReactComponents } from "next-sanity";
+import {
+  PortableText,
+  type PortableTextBlock,
+  type PortableTextReactComponents,
+} from "next-sanity";
 import slugify from "slugify";
 
 import { SanityImage } from "./sanity-image";
@@ -118,10 +121,10 @@ export type RichTextValue = PortableTextBlock[] | null | undefined;
 export function RichText<T extends RichTextValue>({
   richText,
   className,
-}: {
+}: Readonly<{
   richText?: T | null;
   className?: string;
-}) {
+}>) {
   if (!richText) {
     return null;
   }

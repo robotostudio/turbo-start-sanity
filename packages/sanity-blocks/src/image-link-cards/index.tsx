@@ -66,7 +66,7 @@ export function ImageLinkCards({
   title,
   eyebrow,
   cards,
-}: ImageLinkCardsProps) {
+}: Readonly<ImageLinkCardsProps>) {
   return (
     <section className="my-16" id="image-link-cards">
       <div className="container mx-auto px-4 md:px-6">

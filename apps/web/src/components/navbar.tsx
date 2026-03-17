@@ -131,7 +131,7 @@ function NavbarSkeleton() {
 export function Navbar({
   navbarData: initialNavbarData,
   settingsData: initialSettingsData,
-}: NavigationData) {
+}: Readonly<NavigationData>) {
   const { data, error, isLoading } = useSWR<NavigationData>(
     "/api/navigation",
     fetcher,

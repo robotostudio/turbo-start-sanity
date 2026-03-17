@@ -17,7 +17,7 @@ type SanityButtonsProps = {
   buttons?: ButtonProps[] | null;
   className?: string;
   buttonClassName?: string;
-  size?: "sm" | "lg" | "default" | "icon" | null | undefined;
+  size: "sm" | "lg" | "default" | "icon" | null | undefined;
 };
 
 type SanityButtonRenderProps = {
@@ -26,7 +26,7 @@ type SanityButtonRenderProps = {
   variant?: ButtonVariant;
   openInNewTab?: boolean | null;
   className?: string;
-  size?: SanityButtonsProps["size"];
+  size: SanityButtonsProps["size"];
 };
 
 function SanityButton({
@@ -36,7 +36,7 @@ function SanityButton({
   openInNewTab,
   className,
   size,
-}: SanityButtonRenderProps) {
+}: Readonly<SanityButtonRenderProps>) {
   if (!href) {
     return <Button>Link Broken</Button>;
   }
@@ -65,7 +65,7 @@ export function SanityButtons({
   className,
   buttonClassName,
   size = "default",
-}: SanityButtonsProps) {
+}: Readonly<SanityButtonsProps>) {
   if (!buttons?.length) {
     return null;
   }
