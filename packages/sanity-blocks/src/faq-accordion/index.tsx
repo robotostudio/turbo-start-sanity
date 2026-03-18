@@ -26,6 +26,7 @@ export interface FaqLink {
 }
 
 export interface FaqAccordionProps {
+  _key?: string;
   eyebrow?: string | null;
   faqs?: FaqItem[] | null;
   link?: FaqLink | null;
@@ -34,6 +35,7 @@ export interface FaqAccordionProps {
 }
 
 export function FaqAccordion({
+  _key,
   eyebrow,
   title,
   subtitle,
@@ -41,7 +43,7 @@ export function FaqAccordion({
   link,
 }: Readonly<FaqAccordionProps>) {
   return (
-    <section className="my-8" id="faq">
+    <section className="my-8" id={_key}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex w-full flex-col items-center">
           <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">
@@ -79,12 +81,14 @@ export function FaqAccordion({
                   <AccordionTrigger className="group py-2 text-[15px] leading-6 hover:no-underline">
                     {faq.title}
                   </AccordionTrigger>
-                  <AccordionContent className="pb-2 text-muted-foreground">
-                    <RichText
-                      className="text-sm md:text-base"
-                      richText={faq?.richText ?? []}
-                    />
-                  </AccordionContent>
+                  {faq.richText?.length ? (
+                    <AccordionContent className="pb-2 text-muted-foreground">
+                      <RichText
+                        className="text-sm md:text-base"
+                        richText={faq.richText}
+                      />
+                    </AccordionContent>
+                  ) : null}
                 </AccordionItem>
               );
             })}

@@ -25,6 +25,7 @@
     "@workspace/ui": "workspace:*",
     "lucide-react": "catalog:",
     "next-sanity": "^12.1.1",
+    "sanity": "catalog:",
     "sanity-image": "^1.1.0",
     "slugify": "^1.6.8"
   },

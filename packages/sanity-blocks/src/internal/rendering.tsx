@@ -77,7 +77,8 @@ export const portableTextToPlainText = (value?: PortableTextValue) =>
   (value ?? [])
     .map((block) => {
       if (block._type === "image") {
-        return block.caption ?? block.alt ?? "";
+        const captionTrim = (block.caption ?? "").trim();
+        return captionTrim || (block.alt ?? "").trim() || "";
       }
 
       return (block.children ?? [])
@@ -92,7 +93,8 @@ export const renderPortableText = (value?: PortableTextValue) =>
   (value ?? []).map((block, index) => {
      const key = block._key ?? `block-${index}`;
     if (block._type === "image") {
-      const text = block.caption ?? block.alt;
+      const captionTrim = (block.caption ?? "").trim();
+      const text = captionTrim || (block.alt ?? "").trim() || null;
       return text ? <p key={key}>{text}</p> : null;
     }
 
@@ -119,7 +121,8 @@ export const renderButtons = (buttons?: ButtonValue[] | null) => {
   return (
     <ul>
       {buttons.map((button, index) => {
-        const text = button.text ?? `Button ${index + 1}`;
+        const raw = button.text?.trim();
+        const text = raw?.length ? raw : undefined;
         const href = getHref(button.url);
 
         return (

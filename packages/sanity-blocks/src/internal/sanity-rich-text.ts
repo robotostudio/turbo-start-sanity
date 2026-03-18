@@ -86,6 +86,15 @@ export const definePortableTextField = (
     throw new Error('definePortableTextField requires at least one member type')
   }
 
+  const invalidMemberTypes = memberTypes.filter(
+    (type) => !portableTextMemberTypes.includes(type),
+  )
+  if (invalidMemberTypes.length > 0) {
+    throw new Error(
+      `definePortableTextField received unsupported member types: ${invalidMemberTypes.join(', ')}`,
+    )
+  }
+
   const { description = '', hidden, name = 'richText' } = options ?? {}
   const selectedMembers = richTextMembers.filter(
     (member) => member.name && memberTypes.includes(member.name),
