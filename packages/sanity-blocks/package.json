@@ -1,0 +1,57 @@
+{
+  "name": "@workspace/sanity-blocks",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "format": "biome format --write .",
+    "format:check": "biome check --formatter .",
+    "lint": "biome lint .",
+    "sync-thumbnails": "node --experimental-strip-types scripts/sync-thumbnails.ts",
+    "test": "jest --config ./jest.config.cjs",
+    "test:coverage": "jest --config ./jest.config.cjs --coverage"
+  },
+  "peerDependencies": {
+    "next": ">=16",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "sanity": "catalog:"
+  },
+  "dependencies": {
+    "@sanity/icons": "^3.7.4",
+    "@workspace/env": "workspace:*",
+    "@workspace/logger": "workspace:*",
+    "@workspace/ui": "workspace:*",
+    "lucide-react": "catalog:",
+    "next-sanity": "^12.1.1",
+    "sanity": "catalog:",
+    "sanity-image": "^1.1.0",
+    "slugify": "^1.6.8"
+  },
+  "devDependencies": {
+    "@types/jest": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@workspace/typescript-config": "workspace:*",
+    "jest": "catalog:",
+    "next": "16.1.7",
+    "ts-jest": "catalog:",
+    "typescript": "catalog:"
+  },
+  "exports": {
+    ".": "./src/sanity-blocks.ts",
+    "./*/index": "./src/*/index.tsx",
+    "./*/*.schema": "./src/*/*.schema.ts",
+    "./*/*.groq": "./src/*/*.groq.ts",
+    "./internal/lucide-icon-preview": "./src/internal/lucide-icon-preview.tsx",
+    "./internal/rendering": "./src/internal/rendering.tsx",
+    "./internal/rich-text": "./src/internal/rich-text.tsx",
+    "./internal/sanity-buttons": "./src/internal/sanity-buttons.tsx",
+    "./internal/sanity-image": "./src/internal/sanity-image.tsx",
+    "./internal/sanity-icon": "./src/internal/sanity-icon.tsx",
+    "./internal/sanity-rich-text": "./src/internal/sanity-rich-text.ts",
+    "./internal/schema-fields": "./src/internal/schema-fields.ts"
+  }
+}

@@ -4,8 +4,9 @@ import { sanityFetch } from "@workspace/sanity/live";
 import { queryBlogPaths, queryBlogSlugPageData } from "@workspace/sanity/query";
 import { notFound } from "next/navigation";
 
-import { RichText } from "@/components/elements/rich-text";
-import { SanityImage } from "@/components/elements/sanity-image";
+import { RichText, type RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
+import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
+
 import { TableOfContent } from "@/components/elements/table-of-content";
 import { ArticleJsonLd } from "@/components/json-ld";
 import { getSEOMetadata } from "@/lib/seo";
@@ -106,7 +107,7 @@ export default async function BlogSlugPage({
               />
             </div>
           )}
-          <RichText richText={richText} />
+          <RichText richText={richText as RichTextValue} />
         </main>
 
         <div className="hidden lg:block">

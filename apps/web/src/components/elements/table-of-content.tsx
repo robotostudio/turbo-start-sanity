@@ -461,7 +461,7 @@ export const TableOfContent: FC<TableOfContentProps> = ({
       aria-labelledby="toc-heading"
       className={cn(
         "sticky top-8 flex w-full max-w-xs flex-col p-4",
-        "bg-gradient-to-b from-zinc-50 to-zinc-100",
+        "bg-linear-to-b from-zinc-50 to-zinc-100",
         "dark:from-zinc-800 dark:to-zinc-900",
         "rounded-lg border border-zinc-300 shadow-sm dark:border-zinc-700",
         "transition-all duration-200",

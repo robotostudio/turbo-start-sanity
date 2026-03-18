@@ -1,0 +1,36 @@
+export const imageLinkCardsGroqProjection = /* groq */ `
+  _type == "imageLinkCards" => {
+    _type,
+    eyebrow,
+    title,
+    richText[]{
+      ...,
+      children[]{
+        ...
+      }
+    },
+    buttons[]{
+      ...,
+      url{
+        ...,
+        internal->{
+          slug
+        }
+      }
+    },
+    cards[]{
+      title,
+      description,
+      image{
+        ...,
+        alt
+      },
+      url{
+        ...,
+        internal->{
+          slug
+        }
+      }
+    }
+  }
+`

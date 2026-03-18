@@ -1,7 +1,7 @@
+import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import Link from "next/link";
 
 import type { Blog } from "@/types";
-import { SanityImage } from "./elements/sanity-image";
 
 type BlogImageProps = {
   image: Blog["image"];
