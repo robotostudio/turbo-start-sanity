@@ -26,6 +26,12 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     navigationTimeout: 30_000,
+    ...(process.env.VERCEL_AUTOMATION_BYPASS_SECRET && {
+      extraHTTPHeaders: {
+        "x-vercel-protection-bypass":
+          process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
+      },
+    }),
   },
   projects: [
     {
