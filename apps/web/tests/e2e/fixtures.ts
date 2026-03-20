@@ -14,13 +14,11 @@ const sanityClient = createClient({
 });
 
 function sanitizeSlugs(slugs: string[]): string[] {
-  return [
-    ...new Set(
-      slugs
-        .filter((s) => typeof s === "string" && s.length > 0)
-        .map((s) => s.replace(/\/+$/, "")),
-    ),
-  ];
+  const cleaned = slugs
+    .filter((s) => typeof s === "string" && s.length > 0)
+    .map((s) => (s.endsWith("/") ? s.slice(0, -1) : s));
+
+  return [...new Set(cleaned)];
 }
 
 export const test = base.extend<{ slugPages: SlugPages }>({
