@@ -37,7 +37,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-is": "catalog:",
-    "sanity": "^5.16.0",
+    "sanity": "^5.17.1",
     "sanity-plugin-asset-source-unsplash": "^7.0.5",
     "sanity-plugin-lucide-icon-picker": "^1.0.3",
     "sanity-plugin-media": "^4.1.1",
