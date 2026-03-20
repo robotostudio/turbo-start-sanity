@@ -35,7 +35,7 @@
       "persistent": true
     },
     "test:e2e": {
-      "dependsOn": ["build"],
+      "cache": false,
       "inputs": ["$TURBO_DEFAULT$", ".env*", "tests/**"],
       "outputs": ["playwright-report/**", "test-results/**"]
     }

@@ -9,7 +9,11 @@ dotenv.config({
 
 const deployedURL = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL;
 const baseURL =
-  process.env.CI && deployedURL ? deployedURL : "http://localhost:3000";
+  process.env.CI && deployedURL
+    ? deployedURL.startsWith("http")
+      ? deployedURL
+      : `https://${deployedURL}`
+    : "http://localhost:3000";
 
 export default defineConfig({
   testDir: "./tests/e2e",
