@@ -33,6 +33,11 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "tests/**"],
+      "outputs": ["playwright-report/**", "test-results/**"]
     }
   }
 }

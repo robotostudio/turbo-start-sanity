@@ -10,7 +10,9 @@
     "lint": "biome lint .",
     "format": "biome format --write .",
     "format:check": "biome format .",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
     "@sanity/asset-utils": "^2.3.0",
@@ -38,11 +40,13 @@
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@sanity/codegen": "^6.0.1",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@workspace/typescript-config": "workspace:*",
-    "baseline-browser-mapping": "^2.10.8"
+    "baseline-browser-mapping": "^2.10.8",
+    "dotenv": "^17.3.1"
   }
 }
