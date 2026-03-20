@@ -43,7 +43,7 @@ jobs:
         run: pnpm --filter web exec playwright install --with-deps chromium
 
       - name: Run E2E tests
-        run: pnpm test:e2e
+        run: pnpm --filter web test:e2e
         env:
           CI: true
 
