@@ -1,8 +1,10 @@
-# Next.js Monorepo with Sanity CMS
+# Turbo Start Sanity
 
-A modern, full-stack monorepo template built with Next.js App Router, Sanity CMS, Shadcn UI, and TurboRepo.
+![Turbo Start Sanity](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/turbo-start-sanity-og.png)
 
-![Easiest way to build a webpage](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/turbo-start-sanity-og.png)
+A bare-metal, nitro-fuelled Sanity template welded in the garage of Roboto Studio. Ready to rip with pagebuilders, hyper-optimised SEO, and a need for speed.
+
+![Engine Divider](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/engine-divider.png)
 
 ## Features
 
