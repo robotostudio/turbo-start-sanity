@@ -14,5 +14,3 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate Sanity Template
         uses: sanity-io/template-validator@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
