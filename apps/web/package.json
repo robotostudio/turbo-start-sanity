@@ -19,7 +19,7 @@
     "@sanity/client": "catalog:",
     "@sanity/image-url": "^2.0.3",
     "@sanity/visual-editing": "^5.3.0",
-    "@tanstack/react-query": "^5.90.21",
+    "@tanstack/react-query": "^5.95.0",
     "@workspace/env": "workspace:*",
     "@workspace/logger": "workspace:*",
     "@workspace/sanity": "workspace:*",
