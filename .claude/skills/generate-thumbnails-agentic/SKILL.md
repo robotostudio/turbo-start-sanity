@@ -349,11 +349,29 @@ This pipeline:
 2. Crops height to 400px from top if taller (captures header + key content)
 3. Pads with white and centers vertically if shorter than 400px
 
-**Option B — sharp (Node one-liner):**
+**Option B — sharp (Node script):**
 
 ```bash
-node -e "require('sharp')('input.png').resize(600, null).extend({bottom: 400, background: 'white'}).resize(600, 400, {fit: 'cover', position: 'top'}).webp({quality:85}).toFile('output.webp')"
+node -e "
+const sharp = require('sharp');
+(async () => {
+  const buf = await sharp('input.png').resize(600, null).toBuffer();
+  const { height } = await sharp(buf).metadata();
+  const top = Math.floor((400 - height) / 2);
+  const pipeline = height >= 400
+    ? sharp(buf).extract({ left: 0, top: 0, width: 600, height: 400 })
+    : sharp(buf).extend({ top, bottom: 400 - height - top, background: 'white' });
+  await pipeline.webp({ quality: 85 }).toFile('output.webp');
+})();
+"
 ```
+
+This pipeline mirrors the ffmpeg behavior:
+1. Scales width to 600px (height proportional) — full block width preserved
+2. If scaled height ≥ 400px: extracts the top 400px (captures header + key content)
+3. Otherwise: pads with white centered vertically to reach 400px
+
+Avoids `fit: 'cover'` entirely — uses `extract` for crop and `extend` for pad, so the intent is explicit at a glance.
 
 **Batch processing example (ffmpeg):**
 
