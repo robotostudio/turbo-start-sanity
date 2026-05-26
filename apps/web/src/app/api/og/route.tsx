@@ -1,4 +1,4 @@
-/** biome-ignore-all lint/performance/noImgElement: this is a edge runtime function */
+/** biome-ignore-all lint/performance/noImgElement: OG image generation */
 import { ImageResponse } from "next/og";
 import type { ImageResponseOptions } from "next/server";
 
@@ -11,8 +11,6 @@ import {
   getHomePageOGData,
   getSlugPageOGData,
 } from "./og-data";
-
-export const runtime = "edge";
 
 const errorContent = (
   <div tw="flex flex-col w-full h-full items-center justify-center">

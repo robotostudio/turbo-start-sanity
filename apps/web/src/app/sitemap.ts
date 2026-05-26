@@ -1,4 +1,4 @@
-import { client } from "@workspace/sanity/client";
+import { sanityFetchMetadata } from "@workspace/sanity/live";
 import { querySitemapData } from "@workspace/sanity/query";
 import type { QuerySitemapDataResult } from "@workspace/sanity/types";
 import type { MetadataRoute } from "next";
@@ -10,7 +10,11 @@ type Page = QuerySitemapDataResult["slugPages"][number];
 const baseUrl = getBaseUrl();
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const { slugPages, blogPages } = await client.fetch(querySitemapData);
+  const { data } = await sanityFetchMetadata({
+    query: querySitemapData,
+    perspective: "published",
+  });
+  const { slugPages, blogPages } = data ?? { slugPages: [], blogPages: [] };
   return [
     {
       url: baseUrl,

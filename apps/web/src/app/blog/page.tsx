@@ -1,10 +1,16 @@
-import { sanityFetch } from "@workspace/sanity/live";
+import {
+  type DynamicFetchOptions,
+  getDynamicFetchOptions,
+  sanityFetch,
+  sanityFetchMetadata,
+} from "@workspace/sanity/live";
 import {
   queryBlogIndexPageBlogs,
   queryBlogIndexPageBlogsCount,
   queryBlogIndexPageData,
 } from "@workspace/sanity/query";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { BlogHeader } from "@/components/blog-card";
 import { BlogPageContent } from "@/components/blog-page-content";
@@ -16,29 +22,53 @@ import {
   handleErrors,
 } from "@/utils";
 
-async function fetchBlogIndexPageData() {
-  const res = await sanityFetch({ query: queryBlogIndexPageData });
-  return res.data;
-}
-
-async function fetchBlogIndexPageBlogs(start: number, end: number) {
+async function fetchBlogIndexPageData({
+  perspective,
+  stega,
+}: DynamicFetchOptions) {
+  "use cache";
   const res = await sanityFetch({
-    query: queryBlogIndexPageBlogs,
-    params: { start, end },
+    query: queryBlogIndexPageData,
+    perspective,
+    stega,
   });
   return res.data;
 }
 
-async function fetchBlogIndexPageBlogsCount() {
+async function fetchBlogIndexPageBlogs({
+  start,
+  end,
+  perspective,
+  stega,
+}: { start: number; end: number } & DynamicFetchOptions) {
+  "use cache";
+  const res = await sanityFetch({
+    query: queryBlogIndexPageBlogs,
+    params: { start, end },
+    perspective,
+    stega,
+  });
+  return res.data;
+}
+
+async function fetchBlogIndexPageBlogsCount({
+  perspective,
+  stega,
+}: DynamicFetchOptions) {
+  "use cache";
   const res = await sanityFetch({
     query: queryBlogIndexPageBlogsCount,
+    perspective,
+    stega,
   });
   return res.data;
 }
 
 export async function generateMetadata() {
-  const { data: result } = await sanityFetch({
+  const { perspective } = await getDynamicFetchOptions();
+  const { data: result } = await sanityFetchMetadata({
     query: queryBlogIndexPageData,
+    perspective,
   });
   return getSEOMetadata({
     title: result?.title ?? result?.seoTitle,
@@ -55,15 +85,26 @@ type BlogPageProps = {
   }>;
 };
 
-export default async function BlogIndexPage({ searchParams }: BlogPageProps) {
-  const { page } = await searchParams;
+export default function BlogIndexPage({ searchParams }: BlogPageProps) {
+  return (
+    <Suspense fallback={<BlogIndexFallback />}>
+      <DynamicBlogIndex searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
+  const [{ page }, { perspective, stega }] = await Promise.all([
+    searchParams,
+    getDynamicFetchOptions(),
+  ]);
   const currentPage = page ? Number(page) : 1;
 
   // Fetch page data and total count in parallel
   const [[indexPageData, errIndexPageData], [totalCount, errTotalCount]] =
     await Promise.all([
-      handleErrors(fetchBlogIndexPageData()),
-      handleErrors(fetchBlogIndexPageBlogsCount()),
+      handleErrors(fetchBlogIndexPageData({ perspective, stega })),
+      handleErrors(fetchBlogIndexPageBlogsCount({ perspective, stega })),
     ]);
 
   if (errIndexPageData || !indexPageData) {
@@ -107,7 +148,12 @@ export default async function BlogIndexPage({ searchParams }: BlogPageProps) {
   const blogEnd = end + featuredBlogsCount;
 
   const [blogs, errBlogs] = await handleErrors(
-    fetchBlogIndexPageBlogs(blogStart, blogEnd)
+    fetchBlogIndexPageBlogs({
+      start: blogStart,
+      end: blogEnd,
+      perspective,
+      stega,
+    })
   );
 
   if (errBlogs || !blogs) {
@@ -140,4 +186,8 @@ export default async function BlogIndexPage({ searchParams }: BlogPageProps) {
       paginationMetadata={paginationMetadata}
     />
   );
+}
+
+function BlogIndexFallback() {
+  return <main className="container mx-auto my-16 min-h-[50vh] px-4 md:px-6" />;
 }
