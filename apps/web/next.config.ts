@@ -5,10 +5,13 @@ import { env } from "@workspace/env/client";
 import { client } from "@workspace/sanity/client";
 import { queryRedirects } from "@workspace/sanity/query";
 import type { NextConfig } from "next";
+import { sanity } from "next-sanity/live/cache-life";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@workspace/ui"],
   reactCompiler: true,
+  cacheComponents: true,
+  cacheLife: { default: sanity },
   experimental: {
     inlineCss: true,
   },

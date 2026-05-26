@@ -1,5 +1,4 @@
-import { client, urlFor } from "@workspace/sanity/client";
-import { querySettingsData } from "@workspace/sanity/query";
+import { urlFor } from "@workspace/sanity/client";
 import type {
   QueryBlogSlugPageDataResult,
   QuerySettingsDataResult,
@@ -19,7 +18,8 @@ import type {
   WithContext,
 } from "schema-dts";
 
-import { getBaseUrl, handleErrors } from "@/utils";
+import { getJsonLdSettings } from "@/lib/json-ld-data";
+import { getBaseUrl } from "@/utils";
 
 type RichTextChild = {
   _type: string;
@@ -272,7 +272,7 @@ export async function CombinedJsonLd({
   includeWebsite = false,
   includeOrganization = false,
 }: CombinedJsonLdProps) {
-  const [res] = await handleErrors(client.fetch(querySettingsData));
+  const res = await getJsonLdSettings();
 
   const cleanSettings = stegaClean(res);
   return (

@@ -1,10 +1,11 @@
+import { getDynamicFetchOptions } from "@workspace/sanity/live";
 import { NextResponse } from "next/server";
 
 import { getNavigationData } from "@/lib/navigation";
 
-export const revalidate = 360; // every 5 minutes
-
 export async function GET() {
-  const data = await getNavigationData();
+  // Forward resolved stega so the navbar's SWR refresh keeps Visual Editing overlays in draft mode.
+  const { perspective, stega } = await getDynamicFetchOptions();
+  const data = await getNavigationData({ perspective, stega });
   return NextResponse.json(data);
 }

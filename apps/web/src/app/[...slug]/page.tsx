@@ -1,31 +1,34 @@
 import { Logger } from "@workspace/logger";
-import { client } from "@workspace/sanity/client";
-import { sanityFetch } from "@workspace/sanity/live";
+import {
+  type DynamicFetchOptions,
+  getDynamicFetchOptions,
+  sanityFetch,
+  sanityFetchMetadata,
+  sanityFetchStaticParams,
+} from "@workspace/sanity/live";
 import { querySlugPageData, querySlugPagePaths } from "@workspace/sanity/query";
+import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { PageBuilder } from "@/components/pagebuilder";
 import { getSEOMetadata } from "@/lib/seo";
 
 const logger = new Logger("PageSlug");
 
-async function fetchSlugPageData(slug: string) {
-  return await sanityFetch({
-    query: querySlugPageData,
-    params: { slug },
-  });
-}
+type SlugParams = { slug: string[] };
 
-async function fetchSlugPagePaths() {
+export async function generateStaticParams() {
   try {
-    const slugs = await client.fetch(querySlugPagePaths);
+    const { data: slugs } = await sanityFetchStaticParams({
+      query: querySlugPagePaths,
+    });
 
-    // If no slugs found, return empty array to prevent build errors
     if (!Array.isArray(slugs) || slugs.length === 0) {
       return [];
     }
 
-    const paths: { slug: string[] }[] = [];
+    const paths: SlugParams[] = [];
     for (const slug of slugs) {
       if (!slug) {
         continue;
@@ -44,11 +47,18 @@ async function fetchSlugPagePaths() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string[] }>;
+  params: Promise<SlugParams>;
 }) {
-  const { slug } = await params;
+  const [{ slug }, { perspective }] = await Promise.all([
+    params,
+    getDynamicFetchOptions(),
+  ]);
   const slugString = `/${slug.join("/")}`;
-  const { data: pageData } = await fetchSlugPageData(slugString);
+  const { data: pageData } = await sanityFetchMetadata({
+    query: querySlugPageData,
+    params: { slug: slugString },
+    perspective,
+  });
 
   return getSEOMetadata({
     title: pageData?.title ?? pageData?.seoTitle,
@@ -59,27 +69,65 @@ export async function generateMetadata({
   });
 }
 
-export async function generateStaticParams() {
-  const paths = await fetchSlugPagePaths();
-  return paths;
-}
-
-// Allow dynamic params for paths not generated at build time
-export const dynamicParams = true;
-
 export default async function SlugPage({
   params,
 }: {
-  params: Promise<{ slug: string[] }>;
+  params: Promise<SlugParams>;
 }) {
-  const { slug } = await params;
-  const slugString = `/${slug.join("/")}`;
-  const { data: pageData } = await fetchSlugPageData(slugString);
-
-  if (!pageData) {
-    return notFound();
+  const { isEnabled: isDraftMode } = await draftMode();
+  if (isDraftMode) {
+    return (
+      <Suspense fallback={<SlugFallback />}>
+        <DynamicSlugPage params={params} />
+      </Suspense>
+    );
   }
+  const { slug } = await params;
+  const pageData = await getCachedSlugPage({
+    slug,
+    perspective: "published",
+    stega: false,
+  });
+  if (!pageData) {
+    notFound();
+  }
+  return <SlugPageContent pageData={pageData} />;
+}
 
+async function DynamicSlugPage({ params }: { params: Promise<SlugParams> }) {
+  const [{ slug }, { perspective, stega }] = await Promise.all([
+    params,
+    getDynamicFetchOptions(),
+  ]);
+  const pageData = await getCachedSlugPage({ slug, perspective, stega });
+  if (!pageData) {
+    notFound();
+  }
+  return <SlugPageContent pageData={pageData} />;
+}
+
+// notFound() stays in the non-cached callers above — never inside `'use cache'`.
+async function getCachedSlugPage({
+  slug,
+  perspective,
+  stega,
+}: SlugParams & DynamicFetchOptions) {
+  "use cache";
+  const slugString = `/${slug.join("/")}`;
+  const { data: pageData } = await sanityFetch({
+    query: querySlugPageData,
+    params: { slug: slugString },
+    perspective,
+    stega,
+  });
+  return pageData;
+}
+
+function SlugPageContent({
+  pageData,
+}: {
+  pageData: NonNullable<Awaited<ReturnType<typeof getCachedSlugPage>>>;
+}) {
   const { title, pageBuilder, _id, _type } = pageData ?? {};
 
   return !Array.isArray(pageBuilder) || pageBuilder?.length === 0 ? (
@@ -92,4 +140,8 @@ export default async function SlugPage({
   ) : (
     <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
   );
+}
+
+function SlugFallback() {
+  return <div className="min-h-[50vh]" />;
 }
