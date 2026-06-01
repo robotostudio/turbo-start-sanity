@@ -16,6 +16,8 @@ import { getSEOMetadata } from "@/lib/seo";
 
 const logger = new Logger("PageSlug");
 
+const PLACEHOLDER_SLUG = "__placeholder__";
+
 type SlugParams = { slug: string[] };
 
 export async function generateStaticParams() {
@@ -25,7 +27,7 @@ export async function generateStaticParams() {
     });
 
     if (!Array.isArray(slugs) || slugs.length === 0) {
-      return [];
+      return [{ slug: [PLACEHOLDER_SLUG] }];
     }
 
     const paths: SlugParams[] = [];
@@ -39,8 +41,7 @@ export async function generateStaticParams() {
     return paths;
   } catch (error) {
     logger.error("Error fetching slug paths", error);
-    // Return empty array to allow build to continue
-    return [];
+    return [{ slug: [PLACEHOLDER_SLUG] }];
   }
 }
 
