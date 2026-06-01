@@ -28,7 +28,6 @@
     "@sanity/icons": "^3.7.4",
     "@sanity/orderable-document-list": "^1.5.1",
     "@sanity/ui": "^3.1.14",
-    "@sanity/uuid": "^3.0.2",
     "@sanity/vision": "^5.28.0",
     "@workspace/logger": "workspace:*",
     "dotenv": "^17.3.1",

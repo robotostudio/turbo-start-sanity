@@ -41,10 +41,10 @@ export function FaqAccordion({
             defaultValue="3"
             type="single"
           >
-            {faqs?.map((faq, index) => (
+            {faqs?.map((faq) => (
               <AccordionItem
                 className="py-2"
-                key={`AccordionItem-${faq?._id}-${index}`}
+                key={`AccordionItem-${faq?._id}`}
                 value={faq?._id}
               >
                 <AccordionTrigger className="group py-2 text-[15px] leading-6 hover:no-underline">

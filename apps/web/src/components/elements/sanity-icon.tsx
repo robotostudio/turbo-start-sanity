@@ -2,19 +2,13 @@ import { cn } from "@workspace/ui/lib/utils";
 import { TriangleAlert } from "lucide-react";
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import type { ComponentProps } from "react";
-import { memo } from "react";
 
 interface IconProps extends Omit<ComponentProps<"svg">, "src"> {
   icon?: string | null;
   alt?: string; // Add alt text prop for accessibility
 }
 
-export const SanityIcon = memo(function SanityIconUnmemorized({
-  icon,
-  className,
-  alt,
-  ...props
-}: IconProps) {
+export function SanityIcon({ icon, className, alt, ...props }: IconProps) {
   if (!icon) {
     return null;
   }
@@ -28,4 +22,4 @@ export const SanityIcon = memo(function SanityIconUnmemorized({
       size={24}
     />
   );
-});
+}

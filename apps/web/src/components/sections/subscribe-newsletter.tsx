@@ -8,7 +8,7 @@ import { RichText } from "../elements/rich-text";
 
 type SubscribeNewsletterProps = PagebuilderType<"subscribeNewsletter">;
 
-export default function SubscribeNewsletterButton() {
+function SubscribeNewsletterButton() {
   // if using useFormStatus, for the submission logic, you need to use the form action
   const { pending } = useFormStatus();
   return (
@@ -67,6 +67,7 @@ export function SubscribeNewsletter({
           >
             <div className="flex items-center justify-between rounded-xl border bg-white p-2 pl-4 drop-shadow-lg md:w-96 dark:bg-zinc-200">
               <input
+                aria-label="Email address"
                 className="w-full rounded-e-none border-e-0 bg-transparent outline-none focus-visible:ring-0 dark:text-zinc-900 dark:placeholder:text-zinc-900"
                 name="email"
                 placeholder="Enter your email address"
