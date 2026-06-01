@@ -23,7 +23,7 @@ jobs:
       SANITY_STUDIO_DATASET: ${{ secrets.SANITY_STUDIO_DATASET }}
       SANITY_STUDIO_TITLE: ${{ secrets.SANITY_STUDIO_TITLE }}
       SANITY_STUDIO_PRESENTATION_URL: ${{ inputs.presentation_url || secrets.SANITY_STUDIO_PRESENTATION_URL }}
-      SANITY_STUDIO_PRODUCTION_HOSTNAME: ${{ secrets.SANITY_STUDIO_PRODUCTION_HOSTNAME }}
+      SANITY_STUDIO_APP_ID: ${{ secrets.SANITY_STUDIO_APP_ID }}
 
     steps:
       - name: Checkout repository
