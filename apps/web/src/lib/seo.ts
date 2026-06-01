@@ -1,3 +1,8 @@
+import {
+  getDynamicFetchOptions,
+  sanityFetchMetadata,
+} from "@workspace/sanity/live";
+import { queryGlobalSeoSettings } from "@workspace/sanity/query";
 import type { Metadata } from "next";
 
 import type { Maybe } from "@/types";
@@ -29,13 +34,32 @@ type OgImageParams = {
   id?: string;
 };
 
-// Default site configuration
-const siteConfig: SiteConfig = {
+// Fallbacks used until the Settings document is populated in the Studio
+const FALLBACK_SITE_CONFIG: SiteConfig = {
   title: "Roboto Studio Demo",
   description: "Roboto Studio Demo",
   twitterHandle: "@studioroboto",
   keywords: ["roboto", "studio", "demo", "sanity", "next", "react", "template"],
 };
+
+// Pulls site-wide config from the Sanity Settings document, with fallbacks
+async function resolveSiteConfig(): Promise<SiteConfig> {
+  const { perspective } = await getDynamicFetchOptions();
+  const { data: settings } = await sanityFetchMetadata({
+    query: queryGlobalSeoSettings,
+    perspective,
+  });
+  const twitter = settings?.socialLinks?.twitter
+    ?.split("/")
+    .filter(Boolean)
+    .pop();
+  return {
+    title: settings?.siteTitle || FALLBACK_SITE_CONFIG.title,
+    description: settings?.siteDescription || FALLBACK_SITE_CONFIG.description,
+    twitterHandle: twitter ? `@${twitter}` : FALLBACK_SITE_CONFIG.twitterHandle,
+    keywords: FALLBACK_SITE_CONFIG.keywords,
+  };
+}
 
 function generateOgImageUrl(params: OgImageParams = {}): string {
   const { type, id } = params;
@@ -81,7 +105,9 @@ function extractTitle({
   return siteTitle;
 }
 
-export function getSEOMetadata(page: PageSeoData = {}): Metadata {
+export async function getSEOMetadata(
+  page: PageSeoData = {}
+): Promise<Metadata> {
   const {
     title: pageTitle,
     description: pageDescription,
@@ -94,6 +120,7 @@ export function getSEOMetadata(page: PageSeoData = {}): Metadata {
     ...pageOverrides
   } = page;
 
+  const siteConfig = await resolveSiteConfig();
   const baseUrl = getBaseUrl();
   const pageUrl = buildPageUrl({ baseUrl, slug });
 
