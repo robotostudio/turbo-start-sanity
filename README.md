@@ -109,7 +109,7 @@ The template includes a GitHub Actions workflow [`deploy-sanity.yml`](https://ra
 > - `SANITY_STUDIO_PRESENTATION_URL`
 > - `SANITY_STUDIO_APP_ID`
 
-`SANITY_STUDIO_APP_ID` identifies your deployed Studio application. Run `npx sanity deploy` from `apps/studio` once — Sanity creates the application and gives you its app ID — then set `SANITY_STUDIO_APP_ID` to that value, both locally and in your GitHub repository secrets, so every later deploy targets the same Studio. This replaces the deprecated `studioHost` / `*.sanity.studio` hostname setup ([details](https://www.sanity.io/docs/help/studio-host-user-applications)).
+`SANITY_STUDIO_APP_ID` identifies your deployed Studio application. Run `npx sanity deploy` from `apps/studio` **locally** the first time — Sanity creates the application and gives you its app ID — then set `SANITY_STUDIO_APP_ID` to that value, both locally and in your GitHub repository secrets, so every later deploy targets the same Studio. The GitHub Actions workflow runs non-interactively (`CI: true`) and can't create the app for you, so that first deploy has to happen locally; until the secret is set, the CI deploy will fail. This replaces the deprecated `studioHost` / `*.sanity.studio` hostname setup ([details](https://www.sanity.io/docs/help/studio-host-user-applications)).
 
 Set `SANITY_STUDIO_PRESENTATION_URL` to your web app front-end URL (from the Vercel deployment). This URL is required for production deployments and should be:
 
