@@ -21,6 +21,7 @@ import { Navbar, NavbarSkeleton } from "@/components/navbar";
 import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
 import { getNavigationData } from "@/lib/navigation";
+import { sanityLiveAction } from "@/lib/sanity-live-action";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -61,7 +62,7 @@ export default async function RootLayout({
           ) : (
             <CachedFooter perspective="published" stega={false} />
           )}
-          <SanityLive includeDrafts={isDraftMode} />
+          <SanityLive action={sanityLiveAction} includeDrafts={isDraftMode} />
           <CombinedJsonLd includeOrganization includeWebsite />
           {isDraftMode && (
             <>
