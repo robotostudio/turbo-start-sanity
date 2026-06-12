@@ -1,7 +1,7 @@
+import { SanityIcon } from "@workspace/sanity-blocks/internal/sanity-icon";
 import Link from "next/link";
 
 import type { MenuLinkProps } from "@/types";
-import { SanityIcon } from "./sanity-icon";
 
 export function MenuLink({
   name,
@@ -9,7 +9,7 @@ export function MenuLink({
   description,
   icon,
   onClick,
-}: MenuLinkProps) {
+}: Readonly<MenuLinkProps>) {
   if (!href) return null;
 
   return (

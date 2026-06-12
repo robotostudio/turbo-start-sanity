@@ -1,5 +1,6 @@
 "use client";
 
+import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import {
   Accordion,
   AccordionContent,
@@ -22,10 +23,9 @@ import { useState } from "react";
 
 import type { ColumnLink, NavigationData } from "@/types";
 import { MenuLink } from "./elements/menu-link";
-import { SanityButtons } from "./elements/sanity-buttons";
 import { Logo } from "./logo";
 
-export function MobileMenu({ navbarData, settingsData }: NavigationData) {
+export function MobileMenu({ navbarData, settingsData }: Readonly<NavigationData>) {
   const [isOpen, setIsOpen] = useState(false);
 
   function closeMenu() {
@@ -93,7 +93,7 @@ export function MobileMenu({ navbarData, settingsData }: NavigationData) {
                     </AccordionTrigger>
                     <AccordionContent>
                       <div className="grid gap-1 border-border border-l-2 pl-4 ml-1">
-                        {column.links?.map((link: ColumnLink) => (
+                        {column.links?.map((link: Readonly<ColumnLink>) => (
                           <MenuLink
                             description={link.description || ""}
                             href={link.href || ""}
