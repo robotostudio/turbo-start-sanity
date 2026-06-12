@@ -12,7 +12,8 @@
     "lint": "turbo run lint",
     "format": "turbo run format",
     "format:check": "turbo run format:check",
-    "check-types": "turbo run check-types"
+    "check-types": "turbo run check-types",
+    "test:e2e": "turbo run test:e2e"
   },
   "dependencies": {
     "@workspace/env": "workspace:*"
@@ -20,7 +21,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.4.7",
     "@workspace/typescript-config": "workspace:*",
-    "turbo": "^2.8.17",
+    "turbo": "^2.9.14",
     "typescript": "catalog:",
     "ultracite": "5.6.2"
   },
@@ -32,6 +33,24 @@
         "sanity-plugin-lucide-icon-picker>@sanity/ui": ">=3",
         "@csstools/css-syntax-patches-for-csstree>css-tree": ">=3"
       }
+    },
+    "overrides": {
+      "undici@<6.24.0": "^6.24.0",
+      "minimatch@<3.1.4": "^3.1.4",
+      "minimatch@>=5.0.0 <5.1.8": "^5.1.8",
+      "picomatch@<2.3.2": "^2.3.2",
+      "picomatch@>=4.0.0 <4.0.4": "^4.0.4",
+      "brace-expansion@<1.1.13": "^1.1.13",
+      "brace-expansion@>=2.0.0 <2.0.3": "^2.0.3",
+      "rollup@<4.59.0": "^4.59.0",
+      "dompurify@<3.4.0": "^3.4.0",
+      "prismjs@<1.30.0": "^1.30.0",
+      "postcss@<8.5.10": "^8.5.10",
+      "js-yaml@<3.14.2": "^3.14.2",
+      "yaml@<1.10.3": "^1.10.3",
+      "@babel/plugin-transform-modules-systemjs@<7.29.4": "^7.29.4",
+      "lodash@<4.18.0": "^4.18.0",
+      "lodash-es@<4.18.0": "^4.18.0"
     }
   },
   "packageManager": "pnpm@10.32.1",

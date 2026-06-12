@@ -30,7 +30,7 @@
     "@sanity/orderable-document-list": "^1.5.1",
     "@sanity/ui": "^3.1.14",
     "@sanity/uuid": "^3.0.2",
-    "@sanity/vision": "^5.16.0",
+    "@sanity/vision": "^5.28.0",
     "@workspace/logger": "workspace:*",
     "@workspace/sanity-blocks": "workspace:*",
     "dotenv": "^17.3.1",
@@ -39,7 +39,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-is": "catalog:",
-    "sanity": "^5.16.0",
+    "sanity": "^5.28.0",
     "sanity-plugin-asset-source-unsplash": "^7.0.5",
     "sanity-plugin-lucide-icon-picker": "^1.0.3",
     "sanity-plugin-media": "^4.1.1",
@@ -51,6 +51,6 @@
     "@types/react": "catalog:",
     "@types/styled-components": "^5.1.36",
     "typescript": "catalog:",
-    "vite": "^8.0.0"
+    "vite": "^8.0.5"
   }
 }

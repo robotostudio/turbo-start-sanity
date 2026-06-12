@@ -1,4 +1,8 @@
-import { sanityFetch } from "@workspace/sanity/live";
+import {
+  type DynamicFetchOptions,
+  getDynamicFetchOptions,
+  sanityFetch,
+} from "@workspace/sanity/live";
 import {
   queryFooterData,
   queryGlobalSeoSettings,
@@ -27,14 +31,19 @@ type FooterProps = {
   settingsData: NonNullable<QueryGlobalSeoSettingsResult>;
 };
 
-export async function FooterServer() {
+export async function DynamicFooter() {
+  const { perspective, stega } = await getDynamicFetchOptions();
+  return <CachedFooter perspective={perspective} stega={stega} />;
+}
+
+export async function CachedFooter({
+  perspective,
+  stega,
+}: DynamicFetchOptions) {
+  "use cache";
   const [response, settingsResponse] = await Promise.all([
-    sanityFetch({
-      query: queryFooterData,
-    }),
-    sanityFetch({
-      query: queryGlobalSeoSettings,
-    }),
+    sanityFetch({ query: queryFooterData, perspective, stega }),
+    sanityFetch({ query: queryGlobalSeoSettings, perspective, stega }),
   ]);
 
   if (!(response?.data && settingsResponse?.data)) {

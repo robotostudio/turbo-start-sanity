@@ -12,9 +12,9 @@
   "dependencies": {
     "@sanity/asset-utils": "^2.3.0",
     "@sanity/client": "catalog:",
-    "@sanity/image-url": "^2.0.3",
+    "@sanity/image-url": "^2.1.1",
     "@workspace/env": "workspace:*",
-    "next-sanity": "^12.1.1",
+    "next-sanity": "13.0.7",
     "react-is": "catalog:",
     "sanity-image": "^1.1.0"
   },
@@ -22,6 +22,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@workspace/typescript-config": "workspace:*",
+    "next": "16.2.6",
     "typescript": "catalog:"
   },
   "exports": {

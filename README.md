@@ -1,8 +1,10 @@
-# Next.js Monorepo with Sanity CMS
+# Turbo Start Sanity
 
-A modern, full-stack monorepo template built with Next.js App Router, Sanity CMS, Shadcn UI, and TurboRepo.
+![Turbo Start Sanity](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/tasteful-safe-option-og.png)
 
-![Easiest way to build a webpage](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/turbo-start-sanity-og.png)
+## A bare-metal, nitro-fuelled Sanity template welded in the garage of Roboto Studio. Ready to rip with pagebuilders, hyper-optimised SEO, and a need for speed.
+
+![Engine Divider](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/engine-divider.png)
 
 ## Features
 
@@ -105,9 +107,9 @@ The template includes a GitHub Actions workflow [`deploy-sanity.yml`](https://ra
 > - `SANITY_STUDIO_DATASET`
 > - `SANITY_STUDIO_TITLE`
 > - `SANITY_STUDIO_PRESENTATION_URL`
-> - `SANITY_STUDIO_PRODUCTION_HOSTNAME`
+> - `SANITY_STUDIO_APP_ID`
 
-Set `SANITY_STUDIO_PRODUCTION_HOSTNAME` to whatever you want your deployed Sanity Studio hostname to be. Eg. for `SANITY_STUDIO_PRODUCTION_HOSTNAME=my-cool-project` you'll get a studio URL of `https://my-cool-project.sanity.studio` (and `<my-branch-name>-my-cool-project.sanity.studio` for PR previews builds done automatically via the `deploy-sanity.yml` github CI workflow when you open a PR.)
+`SANITY_STUDIO_APP_ID` identifies your deployed Studio application. Run `npx sanity deploy` from `apps/studio` **locally** the first time — Sanity creates the application and gives you its app ID — then set `SANITY_STUDIO_APP_ID` to that value, both locally and in your GitHub repository secrets, so every later deploy targets the same Studio. The GitHub Actions workflow runs non-interactively (`CI: true`) and can't create the app for you, so that first deploy has to happen locally; until the secret is set, the CI deploy will fail. This replaces the deprecated `studioHost` / `*.sanity.studio` hostname setup ([details](https://www.sanity.io/docs/help/studio-host-user-applications)).
 
 Set `SANITY_STUDIO_PRESENTATION_URL` to your web app front-end URL (from the Vercel deployment). This URL is required for production deployments and should be:
 

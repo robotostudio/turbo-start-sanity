@@ -1,8 +1,15 @@
 import { Logger } from "@workspace/logger";
-import { client } from "@workspace/sanity/client";
-import { sanityFetch } from "@workspace/sanity/live";
+import {
+  type DynamicFetchOptions,
+  getDynamicFetchOptions,
+  sanityFetch,
+  sanityFetchMetadata,
+  sanityFetchStaticParams,
+} from "@workspace/sanity/live";
 import { queryBlogPaths, queryBlogSlugPageData } from "@workspace/sanity/query";
+import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { RichText, type RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
@@ -13,23 +20,21 @@ import { getSEOMetadata } from "@/lib/seo";
 
 const logger = new Logger("BlogSlug");
 
-async function fetchBlogSlugPageData(slug: string) {
-  return await sanityFetch({
-    query: queryBlogSlugPageData,
-    params: { slug },
-  });
-}
+const PLACEHOLDER_SLUG = "__placeholder__";
 
-async function fetchBlogPaths() {
+type BlogParams = { slug: string };
+
+export async function generateStaticParams() {
   try {
-    const slugs = await client.fetch(queryBlogPaths);
+    const { data: slugs } = await sanityFetchStaticParams({
+      query: queryBlogPaths,
+    });
 
-    // If no slugs found, return empty array to prevent build errors
     if (!Array.isArray(slugs) || slugs.length === 0) {
-      return [];
+      return [{ slug: PLACEHOLDER_SLUG }];
     }
 
-    const paths: { slug: string }[] = [];
+    const paths: BlogParams[] = [];
     for (const slug of slugs) {
       if (!slug) {
         continue;
@@ -42,19 +47,25 @@ async function fetchBlogPaths() {
     return paths;
   } catch (error) {
     logger.error("Error fetching blog paths", error);
-    // Return empty array to allow build to continue
-    return [];
+    return [{ slug: PLACEHOLDER_SLUG }];
   }
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<BlogParams>;
 }) {
-  const { slug } = await params;
+  const [{ slug }, { perspective }] = await Promise.all([
+    params,
+    getDynamicFetchOptions(),
+  ]);
   const slugString = `/blog/${slug}`;
-  const { data } = await fetchBlogSlugPageData(slugString);
+  const { data } = await sanityFetchMetadata({
+    query: queryBlogSlugPageData,
+    params: { slug: slugString },
+    perspective,
+  });
   return getSEOMetadata({
     title: data?.title ?? data?.seoTitle,
     description: data?.description ?? data?.seoDescription,
@@ -65,25 +76,65 @@ export async function generateMetadata({
   });
 }
 
-export async function generateStaticParams() {
-  const paths = await fetchBlogPaths();
-  return paths;
-}
-
-// Allow dynamic params for paths not generated at build time
-export const dynamicParams = true;
-
 export default async function BlogSlugPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<BlogParams>;
 }) {
-  const { slug } = await params;
-  const slugString = `/blog/${slug}`;
-  const { data } = await fetchBlogSlugPageData(slugString);
-  if (!data) {
-    return notFound();
+  const { isEnabled: isDraftMode } = await draftMode();
+  if (isDraftMode) {
+    return (
+      <Suspense fallback={<BlogFallback />}>
+        <DynamicBlogPage params={params} />
+      </Suspense>
+    );
   }
+  const { slug } = await params;
+  const data = await getCachedBlogPage({
+    slug,
+    perspective: "published",
+    stega: false,
+  });
+  if (!data) {
+    notFound();
+  }
+  return <BlogPageContent data={data} />;
+}
+
+async function DynamicBlogPage({ params }: { params: Promise<BlogParams> }) {
+  const [{ slug }, { perspective, stega }] = await Promise.all([
+    params,
+    getDynamicFetchOptions(),
+  ]);
+  const data = await getCachedBlogPage({ slug, perspective, stega });
+  if (!data) {
+    notFound();
+  }
+  return <BlogPageContent data={data} />;
+}
+
+// notFound() stays in the non-cached callers above — never inside `'use cache'`.
+async function getCachedBlogPage({
+  slug,
+  perspective,
+  stega,
+}: BlogParams & DynamicFetchOptions) {
+  "use cache";
+  const slugString = `/blog/${slug}`;
+  const { data } = await sanityFetch({
+    query: queryBlogSlugPageData,
+    params: { slug: slugString },
+    perspective,
+    stega,
+  });
+  return data;
+}
+
+function BlogPageContent({
+  data,
+}: {
+  data: NonNullable<Awaited<ReturnType<typeof getCachedBlogPage>>>;
+}) {
   const { title, description, image, richText } = data ?? {};
 
   return (
@@ -118,4 +169,8 @@ export default async function BlogSlugPage({
       </div>
     </div>
   );
+}
+
+function BlogFallback() {
+  return <div className="min-h-[50vh]" />;
 }

@@ -1,14 +1,18 @@
-import { sanityFetch } from "@workspace/sanity/live";
+import { type DynamicFetchOptions, sanityFetch } from "@workspace/sanity/live";
 import {
   queryGlobalSeoSettings,
   queryNavbarData,
 } from "@workspace/sanity/query";
 
-export const getNavigationData = async () => {
+export async function getNavigationData({
+  perspective,
+  stega,
+}: DynamicFetchOptions) {
+  "use cache";
   const [navbarData, settingsData] = await Promise.all([
-    sanityFetch({ query: queryNavbarData }),
-    sanityFetch({ query: queryGlobalSeoSettings }),
+    sanityFetch({ query: queryNavbarData, perspective, stega }),
+    sanityFetch({ query: queryGlobalSeoSettings, perspective, stega }),
   ]);
 
   return { navbarData: navbarData.data, settingsData: settingsData.data };
-};
+}
