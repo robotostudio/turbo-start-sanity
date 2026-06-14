@@ -14,18 +14,6 @@ export const getBaseUrl = () => {
   return "http://localhost:3000";
 };
 
-export const isRelativeUrl = (url: string) =>
-  url.startsWith("/") || url.startsWith("#") || url.startsWith("?");
-
-export const isValidUrl = (url: string) => {
-  try {
-    new URL(url);
-    return true;
-  } catch (_e) {
-    return isRelativeUrl(url);
-  }
-};
-
 export const capitalize = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -50,7 +38,7 @@ export async function handleErrors<T>(
   }
 }
 
-export function convertToSlug(
+function convertToSlug(
   text?: string,
   { fallback }: { fallback?: string } = { fallback: "top-level" }
 ) {

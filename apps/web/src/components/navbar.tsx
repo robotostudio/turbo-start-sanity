@@ -56,6 +56,7 @@ function DesktopColumnDropdown({
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           role="menu"
+          tabIndex={-1}
         >
           <div className="grid gap-1">
             {column.links?.map((link: ColumnLink) => (

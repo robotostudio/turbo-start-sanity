@@ -2,7 +2,7 @@
 import { cn } from "@workspace/ui/lib/utils";
 import { ChevronDown, Circle } from "lucide-react";
 import Link from "next/link";
-import { type FC, useCallback, useMemo } from "react";
+import type { FC } from "react";
 import slugify from "slugify";
 
 import type { SanityRichTextBlock, SanityRichTextProps } from "@/types";
@@ -323,38 +323,36 @@ function useTableOfContentState(
   richText?: SanityRichTextProps,
   maxDepth: number = DEFAULT_MAX_DEPTH
 ): TableOfContentState {
-  return useMemo(() => {
-    try {
-      if (!(richText && Array.isArray(richText)) || richText.length === 0) {
-        return {
-          shouldShow: false,
-          headings: [],
-        };
-      }
-
-      const headingBlocks = extractHeadingBlocks(richText);
-
-      if (headingBlocks.length < MIN_HEADINGS_TO_SHOW) {
-        return {
-          shouldShow: false,
-          headings: [],
-        };
-      }
-
-      const processedHeadings = processHeadingBlocks(headingBlocks, maxDepth);
-
-      return {
-        shouldShow: processedHeadings.length >= MIN_HEADINGS_TO_SHOW,
-        headings: processedHeadings,
-      };
-    } catch (error) {
+  try {
+    if (!(richText && Array.isArray(richText)) || richText.length === 0) {
       return {
         shouldShow: false,
         headings: [],
-        error: error instanceof Error ? error.message : "Unknown error",
       };
     }
-  }, [richText, maxDepth]);
+
+    const headingBlocks = extractHeadingBlocks(richText);
+
+    if (headingBlocks.length < MIN_HEADINGS_TO_SHOW) {
+      return {
+        shouldShow: false,
+        headings: [],
+      };
+    }
+
+    const processedHeadings = processHeadingBlocks(headingBlocks, maxDepth);
+
+    return {
+      shouldShow: processedHeadings.length >= MIN_HEADINGS_TO_SHOW,
+      headings: processedHeadings,
+    };
+  } catch (error) {
+    return {
+      shouldShow: false,
+      headings: [],
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
 }
 
 // ============================================================================
@@ -368,12 +366,6 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
 }) => {
   const { href, text, children, isChild, id } = heading;
 
-  const shouldRenderChildren = useCallback(
-    () =>
-      Array.isArray(children) && children.length > 0 && currentDepth < maxDepth,
-    [children, currentDepth, maxDepth]
-  );
-
   // Don't render if we're at max depth and this is a child
   if (currentDepth > maxDepth) {
     return null;
@@ -384,7 +376,8 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
     return null;
   }
 
-  const hasChildren = shouldRenderChildren();
+  const hasChildren =
+    Array.isArray(children) && children.length > 0 && currentDepth < maxDepth;
 
   return (
     <li

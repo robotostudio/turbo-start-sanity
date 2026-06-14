@@ -102,9 +102,6 @@ importers:
       '@sanity/ui':
         specifier: ^3.1.14
         version: 3.1.14(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.4(react@19.2.4))(react-is@19.2.4)(react@19.2.4)(styled-components@6.3.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
-      '@sanity/uuid':
-        specifier: ^3.0.2
-        version: 3.0.2
       '@sanity/vision':
         specifier: ^5.28.0
         version: 5.28.0(@babel/runtime@7.29.2)(@codemirror/lint@6.8.5)(@codemirror/theme-one-dark@6.1.2)(@emotion/is-prop-valid@1.4.0)(codemirror@6.0.1)(react-dom@19.2.4(react@19.2.4))(react-is@19.2.4)(react@19.2.4)(sanity@5.28.0(@emotion/is-prop-valid@1.4.0)(@noble/hashes@2.0.1)(@oclif/core@4.11.4)(@sanity/cli-core@1.3.2(@noble/hashes@2.0.1)(@types/node@25.5.0)(lightningcss@1.32.0)(terser@5.37.0)(yaml@2.9.0))(@types/node@25.5.0)(@types/react@19.2.14)(immer@11.0.1)(jiti@2.7.0)(lightningcss@1.32.0)(prismjs@1.30.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(styled-components@6.3.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(terser@5.37.0)(typescript@5.9.2))(styled-components@6.3.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
