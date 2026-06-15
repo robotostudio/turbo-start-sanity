@@ -8,7 +8,12 @@ interface IconProps extends Omit<ComponentProps<"svg">, "src"> {
   alt?: string; // Add alt text prop for accessibility
 }
 
-export function SanityIcon({ icon, className, alt, ...props }: IconProps) {
+export function SanityIcon({
+  icon,
+  className,
+  alt,
+  ...props
+}: Readonly<IconProps>) {
   if (!icon) {
     return null;
   }
