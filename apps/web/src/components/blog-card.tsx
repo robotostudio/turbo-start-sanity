@@ -24,43 +24,6 @@ function BlogImage({ image, title }: BlogImageProps) {
   );
 }
 
-type AuthorImageProps = {
-  author: Blog["authors"];
-};
-
-function AuthorImage({ author }: AuthorImageProps) {
-  if (!author?.image) {
-    return null;
-  }
-
-  return (
-    <SanityImage
-      alt={author.name ?? "Author image"}
-      className="size-8 flex-none rounded-full bg-gray-50"
-      height={40}
-      image={author.image}
-      width={40}
-    />
-  );
-}
-
-type BlogAuthorProps = {
-  author: Blog["authors"];
-};
-
-export function BlogAuthor({ author }: BlogAuthorProps) {
-  if (!author) {
-    return null;
-  }
-
-  return (
-    <div className="flex items-center gap-x-2.5 font-semibold text-gray-900 text-sm/6">
-      <AuthorImage author={author} />
-      {author.name}
-    </div>
-  );
-}
-
 type BlogCardProps = {
   blog: Blog;
 };
