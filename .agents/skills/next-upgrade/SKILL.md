@@ -32,7 +32,7 @@ Upgrade the current project to the requested Next.js version following official 
    - `next-request-geo-ip` - Migrates geo/ip properties (v15)
    - `next-dynamic-access-named-export` - Transforms dynamic imports (v15)
 
-5. **Update dependencies**: Upgrade Next.js and peer dependencies together, using the exact `[target-version]` passed by the user for the current step. If no target version was provided, use the next incremental version identified in Step 3 instead of jumping straight to `latest`:
+5. **Update dependencies**: Upgrade Next.js and peer dependencies together, using the exact `[target-version]` passed by the user for the current step. If no target version was provided, use the next incremental version identified in Step 3 instead of jumping straight to `latest`. Determine `<supported-react-version>` from the official upgrade guide for that target Next.js version, since React and React DOM peer requirements can change between releases:
 
    ```bash
    npm install next@<target-version> react@<supported-react-version> react-dom@<supported-react-version>
