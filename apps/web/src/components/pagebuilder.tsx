@@ -10,7 +10,6 @@ import { ImageLinkCards } from "@workspace/sanity-blocks/image-link-cards/index"
 import { RichTextBlock } from "@workspace/sanity-blocks/rich-text-block/index";
 import { SubscribeNewsletter } from "@workspace/sanity-blocks/subscribe-newsletter/index";
 import { createDataAttribute } from "next-sanity";
-import { useCallback, useMemo } from "react";
 
 import type { PageBuilderBlock, PageBuilderBlockTypes } from "@/types";
 
@@ -102,43 +101,37 @@ function useOptimisticPageBuilder(
  * Custom hook for block component rendering logic
  */
 function useBlockRenderer(id: string, type: string) {
-  const createBlockDataAttribute = useCallback(
-    (blockKey: string) =>
-      createSanityDataAttribute({
-        id,
-        type,
-        path: `pageBuilder[_key=="${blockKey}"]`,
-      }),
-    [id, type]
-  );
+  const createBlockDataAttribute = (blockKey: string) =>
+    createSanityDataAttribute({
+      id,
+      type,
+      path: `pageBuilder[_key=="${blockKey}"]`,
+    });
 
-  const renderBlock = useCallback(
-    (block: PageBuilderBlock, _index: number) => {
-      const Component =
-        BLOCK_COMPONENTS[block._type as keyof typeof BLOCK_COMPONENTS];
+  const renderBlock = (block: PageBuilderBlock, _index: number) => {
+    const Component =
+      BLOCK_COMPONENTS[block._type as keyof typeof BLOCK_COMPONENTS];
 
-      if (!Component) {
-        return (
-          <UnknownBlockError
-            blockKey={block._key}
-            blockType={block._type}
-            key={`${block._type}-${block._key}`}
-          />
-        );
-      }
-
+    if (!Component) {
       return (
-        <div
-          data-sanity={createBlockDataAttribute(block._key)}
+        <UnknownBlockError
+          blockKey={block._key}
+          blockType={block._type}
           key={`${block._type}-${block._key}`}
-        >
-          {/** biome-ignore lint/suspicious/noExplicitAny: <any is used to allow for dynamic component rendering> */}
-          <Component {...(block as any)} />
-        </div>
+        />
       );
-    },
-    [createBlockDataAttribute]
-  );
+    }
+
+    return (
+      <div
+        data-sanity={createBlockDataAttribute(block._key)}
+        key={`${block._type}-${block._key}`}
+      >
+        {/** biome-ignore lint/suspicious/noExplicitAny: <any is used to allow for dynamic component rendering> */}
+        <Component {...(block as any)} />
+      </div>
+    );
+  };
 
   return { renderBlock };
 }
@@ -154,10 +147,11 @@ export function PageBuilder({
   const blocks = useOptimisticPageBuilder(initialBlocks, id);
   const { renderBlock } = useBlockRenderer(id, type);
 
-  const containerDataAttribute = useMemo(
-    () => createSanityDataAttribute({ id, type, path: "pageBuilder" }),
-    [id, type]
-  );
+  const containerDataAttribute = createSanityDataAttribute({
+    id,
+    type,
+    path: "pageBuilder",
+  });
 
   if (!blocks.length) {
     return null;

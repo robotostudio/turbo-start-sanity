@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "ui": "stream",
+  "ui": "tui",
   "globalEnv": [
     "SANITY_API_READ_TOKEN",
     "SANITY_API_WRITE_TOKEN",

@@ -1,4 +1,5 @@
 "use client";
+
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import { Button } from "@workspace/ui/components/button";
@@ -51,7 +52,7 @@ export function SubscribeNewsletter({
     <section className="px-4 py-8 sm:py-12 md:py-16" id="subscribe">
       <div className="container relative mx-auto overflow-hidden rounded-3xl bg-gray-50 px-4 py-8 sm:py-16 md:px-8 md:py-24 lg:py-32 dark:bg-zinc-900">
         <div className="relative z-10 mx-auto text-center">
-         {title && (
+          {title && (
             <h2 className="mb-4 text-balance font-semibold text-gray-900 text-xl sm:text-3xl md:text-5xl dark:text-neutral-300">
               {title}
             </h2>
@@ -70,6 +71,7 @@ export function SubscribeNewsletter({
           >
             <div className="flex items-center justify-between rounded-xl border bg-white p-2 pl-4 drop-shadow-lg md:w-96 dark:bg-zinc-200">
               <input
+                aria-label="Email address"
                 className="w-full rounded-e-none border-e-0 bg-transparent outline-none focus-visible:ring-0 dark:text-zinc-900 dark:placeholder:text-zinc-900"
                 name="email"
                 placeholder="Enter your email address"

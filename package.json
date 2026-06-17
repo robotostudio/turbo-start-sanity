@@ -50,7 +50,9 @@
       "yaml@<1.10.3": "^1.10.3",
       "@babel/plugin-transform-modules-systemjs@<7.29.4": "^7.29.4",
       "lodash@<4.18.0": "^4.18.0",
-      "lodash-es@<4.18.0": "^4.18.0"
+      "lodash-es@<4.18.0": "^4.18.0",
+      "esbuild@<0.28.1": "^0.28.1",
+      "@trpc/server@<11.8.0": "^11.8.0"
     }
   },
   "packageManager": "pnpm@10.32.1",
