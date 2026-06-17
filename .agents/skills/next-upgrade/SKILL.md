@@ -6,7 +6,7 @@ argument-hint: "[target-version]"
 
 # Upgrade Next.js
 
-Upgrade the current project to the latest Next.js version following official migration guides.
+Upgrade the current project to the requested Next.js version following official migration guides.
 
 ## Instructions
 
@@ -32,10 +32,10 @@ Upgrade the current project to the latest Next.js version following official mig
    - `next-request-geo-ip` - Migrates geo/ip properties (v15)
    - `next-dynamic-access-named-export` - Transforms dynamic imports (v15)
 
-5. **Update dependencies**: Upgrade Next.js and peer dependencies together:
+5. **Update dependencies**: Upgrade Next.js and peer dependencies together, using the exact `[target-version]` passed by the user for the current step. If no target version was provided, use the next incremental version identified in Step 3 instead of jumping straight to `latest`:
 
    ```bash
-   npm install next@latest react@latest react-dom@latest
+   npm install next@<target-version> react@<supported-react-version> react-dom@<supported-react-version>
    ```
 
 6. **Review breaking changes**: Check the upgrade guide for manual changes needed:

@@ -51,7 +51,8 @@ function extractErrors(signals) {
   }
 
   return errors.map((e) => {
-    const total = totalByRoute.get(e.route) ?? e.total ?? 0;
+    const cacheTotal = totalByRoute.get(e.route);
+    const total = Number.isFinite(cacheTotal) && cacheTotal > 0 ? cacheTotal : (e.total ?? 0);
     return {
       ...e,
       total,
