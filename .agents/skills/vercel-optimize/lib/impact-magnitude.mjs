@@ -41,7 +41,8 @@ export function applyDollarStrip(rec) {
   let totalStripped = 0;
   for (const f of fields) {
     if (typeof rec[f] !== 'string') continue;
-    // Preserve code-fence content so example snippets aren't mangled.
+    // Preserve code-fence content so example snippets aren't mangled. This assumes
+    // code fences are well-formed, non-nested, and come from already-sanitized AI output.
     const fences = [];
     rec[f] = rec[f].replace(/```[\s\S]*?```/g, (m) => {
       fences.push(m);

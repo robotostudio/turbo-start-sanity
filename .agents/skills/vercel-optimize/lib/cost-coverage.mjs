@@ -78,7 +78,7 @@ export function computeCostCoverage(usage, gates) {
   const byFamily = new Map();
 
   for (const s of services) {
-    const billed = Number(s.billedCost ?? 0);
+    const billed = Number(s.billedCost ?? s.cost ?? 0);
     if (!Number.isFinite(billed) || billed <= 0) continue;
     total += billed;
     const c = classifyService(s.name, activeDims);

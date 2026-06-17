@@ -15,7 +15,7 @@ lifting state, and composing internals.
 
 ## Rules
 
-### Component Architecture (CRITICAL)
+### Component Architecture (HIGH)
 
 - `architecture-avoid-boolean-props.md` - Don't add boolean props to customize
   behavior

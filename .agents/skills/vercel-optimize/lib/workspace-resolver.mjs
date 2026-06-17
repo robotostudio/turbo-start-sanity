@@ -5,7 +5,7 @@
 // and falls through ("couldn't resolve") on shapes that need a full TS resolver.
 
 import { readFile, readdir, stat } from 'node:fs/promises';
-import { dirname, join, resolve as pathResolve } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve as pathResolve } from 'node:path';
 
 const DEFAULT_RESOLVE_OPTIONS = {
   pureBarrelDepth: 3,
@@ -220,7 +220,10 @@ export function extractImportSpecifiers(text) {
 }
 
 function joinPackagePath(packageDir, relativeTarget) {
-  return join(packageDir, relativeTarget.replace(/^\.\//, ''));
+  const candidate = pathResolve(packageDir, relativeTarget.replace(/^\.\//, ''));
+  const rel = relative(packageDir, candidate);
+  if (rel === '' || (!rel.startsWith('..') && !isAbsolute(rel))) return candidate;
+  return null;
 }
 
 async function expandResolvedSpecifier(startFile, importedNames, resolver, opts) {

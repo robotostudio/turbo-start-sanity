@@ -24,11 +24,13 @@ export const metadata = {
 const PRERENDER_RE = /export\s+const\s+prerender\b/;
 const SSR_RE = /export\s+const\s+ssr\b/;
 const CONFIG_RE = /export\s+const\s+config\s*=\s*\{[^}]*\b(isr|prerender|runtime|split|regions)\b/;
+const PAGE_FILE_RE = /(?:^|\/)\+page(?:\.svelte|\.server\.(?:ts|js))$/;
 
 export function scan({ files }) {
   const out = [];
   for (const { path, content } of files) {
     if (!path.includes('/routes/')) continue;
+    if (!PAGE_FILE_RE.test(path)) continue;
     if (PRERENDER_RE.test(content) || SSR_RE.test(content) || CONFIG_RE.test(content)) continue;
     out.push({
       pattern: metadata.id,

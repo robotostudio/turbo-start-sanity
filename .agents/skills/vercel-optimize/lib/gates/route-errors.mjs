@@ -51,7 +51,7 @@ function extractErrors(signals) {
   }
 
   return errors.map((e) => {
-    const total = totalByRoute.get(e.route) ?? 0;
+    const total = totalByRoute.get(e.route) ?? e.total ?? 0;
     return {
       ...e,
       total,

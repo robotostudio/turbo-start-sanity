@@ -236,7 +236,16 @@ fi
 
 # Deploy
 echo "Deploying..." >&2
-RESPONSE=$(curl -s -X POST "$DEPLOY_ENDPOINT" -F "file=@$TARBALL" -F "framework=$FRAMEWORK")
+DEPLOY_CURL_CONNECT_TIMEOUT=10
+DEPLOY_CURL_MAX_TIME=300
+POLL_CURL_MAX_TIME=15
+
+CURL_EXIT_CODE=0
+RESPONSE=$(curl -sS --connect-timeout "$DEPLOY_CURL_CONNECT_TIMEOUT" --max-time "$DEPLOY_CURL_MAX_TIME" -X POST "$DEPLOY_ENDPOINT" -F "file=@$TARBALL" -F "framework=$FRAMEWORK") || CURL_EXIT_CODE=$?
+if [ "$CURL_EXIT_CODE" -ne 0 ]; then
+    echo "Error: Deployment request failed (curl exit $CURL_EXIT_CODE)" >&2
+    exit 1
+fi
 
 # Check for error in response
 if echo "$RESPONSE" | grep -q '"error"'; then
@@ -255,6 +264,12 @@ if [ -z "$PREVIEW_URL" ]; then
     exit 1
 fi
 
+if [ -z "$CLAIM_URL" ]; then
+    echo "Error: Could not extract claim URL from response" >&2
+    echo "$RESPONSE" >&2
+    exit 1
+fi
+
 echo "Deployment started. Waiting for build to complete..." >&2
 echo "Preview URL: $PREVIEW_URL" >&2
 
@@ -263,7 +278,14 @@ MAX_ATTEMPTS=60  # 5 minutes max (60 * 5 seconds)
 ATTEMPT=0
 
 while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-    HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$PREVIEW_URL")
+    CURL_EXIT_CODE=0
+    HTTP_STATUS=$(curl -sS --connect-timeout "$DEPLOY_CURL_CONNECT_TIMEOUT" --max-time "$POLL_CURL_MAX_TIME" -o /dev/null -w "%{http_code}" "$PREVIEW_URL") || CURL_EXIT_CODE=$?
+    if [ "$CURL_EXIT_CODE" -ne 0 ]; then
+        echo "Polling preview URL failed (attempt $((ATTEMPT + 1))/$MAX_ATTEMPTS, curl exit $CURL_EXIT_CODE). Retrying..." >&2
+        sleep 5
+        ATTEMPT=$((ATTEMPT + 1))
+        continue
+    fi
 
     if [ "$HTTP_STATUS" -eq 200 ]; then
         echo "" >&2

@@ -17,7 +17,7 @@ export const metadata = {
     'https://vercel.com/docs/image-optimization',
   ],
   excludeGlobs: ['node_modules/**', '.next/**', 'dist/**', '__tests__/**', 'cypress/**', '*.test.*'],
-  includeGlobs: ['**/*.{tsx,jsx,html,svelte,astro,vue,js,mjs,ts}'],
+  includeGlobs: ['**/*.{tsx,jsx,html,svelte,astro,vue}', '**/next.config.{js,mjs,ts,cjs}'],
 };
 
 const IMG_RE = /<img\s+[^>]*src\s*=\s*["'{`]/g;

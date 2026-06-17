@@ -27,6 +27,7 @@ export async function lookupUrl(url) {
 }
 
 export async function lookupSkillRule(ref) {
+  if (typeof ref !== 'string') return undefined;
   const lib = await loadLibrary();
   const m = ref.match(/^([\w-]+):([\w-]+)$/);
   if (!m) return undefined;

@@ -43,9 +43,9 @@ export async function detectRepoRoot(probeFile, startDir, maxDepth = 10) {
 export function deriveRootFromSignals(signals, cwd = process.cwd()) {
   const dir = signals?.project?.rootDirectory;
   if (!dir || typeof dir !== 'string') return null;
-  const offset = normalize(dir).replace(/^\.\/?/, '').replace(/\/$/, '');
+  const offset = normalize(dir).replaceAll('\\', '/').replace(/^\.\//, '').replace(/\/$/, '');
   if (!offset) return null;
-  const cwdAbs = resolve(cwd);
+  const cwdAbs = resolve(cwd).replaceAll('\\', '/');
   // Match `<root>/<offset>` OR `<root>/<offset>/<more>` — orchestrator may run from a subdir.
   const parts = cwdAbs.split('/');
   const offsetParts = offset.split('/');

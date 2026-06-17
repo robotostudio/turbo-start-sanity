@@ -1,8 +1,8 @@
 // Pure async claim verifier. No LLM, no network — fs + grep only.
 
-import { readFile, access, readdir } from 'node:fs/promises';
+import { access, readFile, readdir, realpath } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
-import { dirname, isAbsolute, join, normalize } from 'node:path';
+import { dirname, isAbsolute, join, normalize, relative, resolve as resolvePath } from 'node:path';
 import { promisify } from 'node:util';
 import { isKnownUrl, sanitizeCitations } from './citations.mjs';
 import { findRecContradictions } from './project-facts.mjs';
@@ -152,9 +152,10 @@ async function verifyCodeSnippet(claim) {
 
 async function verifyRepoCount({ pattern, expected, repoRoot = '.' }) {
   if (!pattern || expected == null) return { disposition: 'unsupported', reason: 'repo_count requires pattern + expected' };
+  const boundary = await resolveRepoBoundary(repoRoot);
   let actual = 0;
   const re = compilePattern(pattern, '');
-  for await (const path of walkFiles(repoRoot)) {
+  for await (const path of walkFiles(boundary)) {
     try {
       const content = await readFile(path, 'utf-8');
       if (re.test(content)) actual++;
@@ -957,11 +958,15 @@ function dedupeCacheTags(tags) {
 }
 
 async function readCacheInvalidationFiles(repoRoot, projectRootDirectory) {
-  const cacheKey = `${normalize(repoRoot || '.')}\u0000${normalizeProjectRootDirectory(projectRootDirectory) ?? ''}`;
+  const boundary = await resolveRepoBoundary(repoRoot || '.');
+  const cacheKey = `${boundary}\u0000${normalizeProjectRootDirectory(projectRootDirectory) ?? ''}`;
   if (cacheInvalidationFileCache.has(cacheKey)) return cacheInvalidationFileCache.get(cacheKey);
-  const baseRoot = normalize(repoRoot || '.');
   const projectRoot = normalizeProjectRootDirectory(projectRootDirectory);
-  const root = projectRoot ? join(baseRoot, projectRoot) : baseRoot;
+  const root = projectRoot ? resolveRepoPath(boundary, projectRoot) : boundary;
+  if (!root) {
+    cacheInvalidationFileCache.set(cacheKey, []);
+    return [];
+  }
   try {
     await access(root);
   } catch {
@@ -1020,8 +1025,27 @@ async function rgRelevantFiles(root) {
 function tagHasMatchingInvalidation(tag, files) {
   return files.some(({ content }) => {
     if (hasLiteralInvalidation(content, tag)) return true;
-    return hasConfigDrivenInvalidation(content, tag, files);
+    return hasConfigDrivenInvalidation(content, tag);
   });
+}
+
+async function resolveRepoBoundary(repoRoot = '.') {
+  const resolved = resolvePath(repoRoot);
+  try {
+    return await realpath(resolved);
+  } catch {
+    return normalize(resolved);
+  }
+}
+
+function isWithinRepoBoundary(boundary, candidate) {
+  const rel = relative(boundary, candidate);
+  return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
+}
+
+function resolveRepoPath(boundary, ...segments) {
+  const candidate = resolvePath(boundary, ...segments);
+  return isWithinRepoBoundary(boundary, candidate) ? candidate : null;
 }
 
 function hasLiteralInvalidation(content, tag) {
@@ -1033,18 +1057,28 @@ function hasLiteralInvalidation(content, tag) {
   return new RegExp(`\\b(?:revalidateTag|updateTag)\\s*\\(\\s*\`?${escaped}`).test(content);
 }
 
-function hasConfigDrivenInvalidation(content, tag, files) {
-  if (!/\brevalidateTag\s*\(\s*\w+/.test(content)) return false;
-  return files.some((file) => configContainsTag(file.content, tag));
+function hasConfigDrivenInvalidation(content, tag) {
+  const callRe = /\b(?:revalidateTag|updateTag)\s*\(\s*([A-Za-z_$][\w$]*)\s*(?:,|\))/g;
+  for (const match of content.matchAll(callRe)) {
+    const variableName = match[1];
+    const callIdx = match.index ?? 0;
+    if (variableDefinitelyMatchesTag(content, variableName, tag, callIdx)) return true;
+  }
+  return false;
 }
 
-function configContainsTag(content, tag) {
+function variableDefinitelyMatchesTag(content, variableName, tag, callIdx) {
+  const recentScope = content.slice(Math.max(0, callIdx - 500), callIdx);
+  const escapedName = escapeRegExp(variableName);
+  const escapedValue = escapeRegExp(tag.value);
   if (tag.kind === 'exact') {
-    const escaped = escapeRegExp(tag.value);
-    return new RegExp(`\\btags\\s*:\\s*\\[[^\\]]*['"\`]${escaped}['"\`]`, 's').test(content);
+    return new RegExp(
+      `\\b(?:const|let|var)\\s+${escapedName}\\s*=\\s*(?:['"\`]${escapedValue}['"\`])`
+    ).test(recentScope);
   }
-  const escaped = escapeRegExp(tag.value);
-  return new RegExp(`\\btags\\s*:\\s*\\[[^\\]]*\`?${escaped}`, 's').test(content);
+  return new RegExp(
+    `\\b(?:const|let|var)\\s+${escapedName}\\s*=\\s*\\\`${escapedValue}\\$\\{`
+  ).test(recentScope);
 }
 
 function routeFromCandidateRef(ref) {
@@ -1176,19 +1210,15 @@ function layoutAppliesToCandidateRoute(layoutPath, targetRoute) {
   if (layoutTokens.length === 0) return true;
   if (layoutTokens.length > targetTokens.length) return false;
 
-  let literalMatches = 0;
   for (let i = 0; i < layoutTokens.length; i++) {
     const layoutToken = layoutTokens[i];
     const targetToken = targetTokens[i];
-    if (isCatchAllPlaceholder(layoutToken)) return literalMatches > 0;
-    if (layoutToken === targetToken) {
-      literalMatches += 1;
-      continue;
-    }
+    if (isCatchAllPlaceholder(layoutToken)) return true;
+    if (layoutToken === targetToken) continue;
     if (isDynamicPlaceholder(layoutToken)) continue;
     return false;
   }
-  return literalMatches > 0;
+  return true;
 }
 
 function isDynamicPlaceholder(segment) {
@@ -1219,11 +1249,21 @@ async function readClaimFile(claim) {
 }
 
 async function firstAccessiblePath({ repoRoot = '.', file, projectRootDirectory = null }) {
+  const boundary = await resolveRepoBoundary(repoRoot);
   let lastErr;
-  for (const p of repoPaths(repoRoot, file, projectRootDirectory)) {
+  for (const p of repoPaths(boundary, file, projectRootDirectory)) {
     try {
+      if (!isWithinRepoBoundary(boundary, p)) {
+        lastErr = new Error(`path escapes repo root: ${file}`);
+        continue;
+      }
       await access(p);
-      return p;
+      const resolved = await realpath(p);
+      if (!isWithinRepoBoundary(boundary, resolved)) {
+        lastErr = new Error(`path escapes repo root: ${file}`);
+        continue;
+      }
+      return resolved;
     } catch (err) {
       lastErr = err;
     }
@@ -1233,12 +1273,15 @@ async function firstAccessiblePath({ repoRoot = '.', file, projectRootDirectory 
 
 function repoPaths(repoRoot, file, projectRootDirectory = null) {
   if (!file) return [];
-  if (isAbsolute(file)) return [file];
-  const out = [join(repoRoot, file)];
+  if (isAbsolute(file)) return [];
+  const out = [];
+  const direct = resolveRepoPath(repoRoot, file);
+  if (direct) out.push(direct);
   const projectRoot = normalizeProjectRootDirectory(projectRootDirectory);
   const normalizedFile = normalizeProjectRootDirectory(file);
   if (projectRoot && normalizedFile && !normalizedFile.startsWith(`${projectRoot}/`)) {
-    out.push(join(repoRoot, projectRoot, file));
+    const nested = resolveRepoPath(repoRoot, projectRoot, file);
+    if (nested) out.push(nested);
   }
   return Array.from(new Set(out.map((p) => normalize(p))));
 }
@@ -1282,11 +1325,13 @@ async function* walkFiles(root, skip = new Set([
 }
 
 async function snippetFoundElsewhere(root, snippet, exceptFile) {
+  const boundary = await resolveRepoBoundary(root);
+  const exceptCandidates = new Set(repoPaths(boundary, exceptFile));
   const norm = (s) => s.replace(/\s+/g, ' ').trim();
   const target = norm(snippet);
   if (target.length < 20) return null;
-  for await (const path of walkFiles(root)) {
-    if (path.endsWith(exceptFile)) continue;
+  for await (const path of walkFiles(boundary)) {
+    if (exceptCandidates.has(path)) continue;
     try {
       const content = await readFile(path, 'utf-8');
       if (norm(content).includes(target)) return path;

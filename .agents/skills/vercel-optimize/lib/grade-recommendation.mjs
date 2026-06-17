@@ -146,6 +146,7 @@ function roundTo(n, d) {
 export function applyQualityFloor(recs, floor = 0.55) {
   const kept = [];
   const dropped = [];
+  if (!Array.isArray(recs)) return { kept, dropped };
   for (const rec of recs) {
     const o = rec?.quality?.overall ?? 0;
     if (o < floor) dropped.push({ rec, reason: `quality.overall=${o} < floor=${floor}` });

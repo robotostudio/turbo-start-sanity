@@ -30,6 +30,9 @@ export function resolveRateLimit() {
   if (!m[2]) return { maxCalls, windowMs: DEFAULT_RATE_WINDOW_MS };
   const unit = m[3] === 'm' ? 60_000 : 1_000;
   const windowMs = Number(m[2]) * unit;
+  if (!Number.isFinite(windowMs) || windowMs <= 0) {
+    return { maxCalls: DEFAULT_RATE_LIMIT, windowMs: DEFAULT_RATE_WINDOW_MS };
+  }
   return { maxCalls, windowMs };
 }
 
@@ -165,6 +168,8 @@ export function getMetricThrottle() {
           const afterAcquire = getDailyQuotaBlock();
           if (afterAcquire) return dailyQuotaResult(afterAcquire);
           await rateLimiter.acquire();
+          const afterRateLimit = getDailyQuotaBlock();
+          if (afterRateLimit) return dailyQuotaResult(afterRateLimit);
           const result = await fn();
           if (isDailyQuotaExceeded(result)) {
             const block = setDailyQuotaBlocked(result);

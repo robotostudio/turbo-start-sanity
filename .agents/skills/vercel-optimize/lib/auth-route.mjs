@@ -1,7 +1,7 @@
 // Auth routes carry user state and must not be cached at CDN edge.
 
 export const AUTH_ROUTE_REGEX =
-  /(login|logout|auth|account|dashboard|checkout|cart|profile|session|me)(?:\/|$)/i;
+  /(?:^|\/)(login|logout|auth|account|dashboard|checkout|cart|profile|session|me|signup|register|settings|admin|my-account|user|api\/auth|api\/user)(?:\/|$)/i;
 
 export function isAuthRoute(route) {
   return AUTH_ROUTE_REGEX.test(String(route ?? ''));

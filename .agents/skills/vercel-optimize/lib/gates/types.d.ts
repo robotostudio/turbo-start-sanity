@@ -27,12 +27,12 @@ export interface Candidate {
 }
 
 export interface Signals {
-  metrics?: Record<string, unknown>;
+  metrics?: Record<string, unknown> | null;
   codebase?: {
     findings?: Array<Record<string, unknown>>;
     routes?: Array<Record<string, unknown>>;
-  };
-  project?: Record<string, unknown>;
-  usage?: Record<string, unknown>;
-  stack?: Record<string, unknown>;
+  } | null;
+  project?: Record<string, unknown> | null;
+  usage?: Record<string, unknown> | null;
+  stack?: Record<string, unknown> | null;
 }

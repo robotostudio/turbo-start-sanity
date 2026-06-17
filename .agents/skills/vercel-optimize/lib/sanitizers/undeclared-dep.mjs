@@ -46,7 +46,6 @@ export function apply(rec, ctx = {}) {
   }
 
   const undeclared = [...importedRoots]
-    .filter((r) => !r.startsWith('.'))
     .filter((r) => !NODE_BUILTINS.has(r))
     .filter((r) => !r.startsWith('node:'))
     .filter((r) => !known.has(r));
@@ -62,7 +61,7 @@ export function apply(rec, ctx = {}) {
 
 function pkgRoot(specifier) {
   if (!specifier) return null;
-  if (specifier.startsWith('.')) return specifier;
+  if (specifier.startsWith('.')) return null;
   const m = specifier.match(PKG_ROOT_RE);
   return m ? m[1] : null;
 }

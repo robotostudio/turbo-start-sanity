@@ -11,18 +11,18 @@ const PRE_RELEASE_FEATURES = [
   },
   {
     match: /\buse cache['"]?\s*directive\b|"use cache"|'use cache'/i,
-    requires: 'next@>=15.0.0',
-    message: 'use cache directive is stable in 15+',
+    requires: 'next@>=16.0.0',
+    message: 'use cache directive is stable in 16+',
   },
   {
     match: /\bcacheLife\(/i,
-    requires: 'next@>=15.0.0',
-    message: 'cacheLife is stable in 15+',
+    requires: 'next@>=16.0.0',
+    message: 'cacheLife is stable in 16+',
   },
   {
     match: /\bcacheTag\(/i,
-    requires: 'next@>=15.0.0',
-    message: 'cacheTag is stable in 15+',
+    requires: 'next@>=16.0.0',
+    message: 'cacheTag is stable in 16+',
   },
 ];
 

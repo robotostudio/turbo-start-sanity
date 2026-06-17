@@ -69,7 +69,7 @@ export function gate(signals) {
       },
     });
   }
-  // Up to 3 SKU-specific candidates; the rest fold into 'multiple SKUs spiking' framing.
+  // Emit only the top 3 SKU-specific candidates; lower-ranked spikes are dropped here.
   const orderedSkuSpikes = skuSpikes.sort((a, b) => b.dayValue - a.dayValue).slice(0, 3);
   for (const spike of orderedSkuSpikes) {
     candidates.push({

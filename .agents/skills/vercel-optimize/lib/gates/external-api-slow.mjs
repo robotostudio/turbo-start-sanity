@@ -35,7 +35,7 @@ export function gate(signals) {
 
 function extractExternalApis(signals) {
   const m = signals.metrics?.externalApiP75;
-  if (!m?.ok && !Array.isArray(m?.rows)) return [];
+  if (!m?.ok || !Array.isArray(m?.rows)) return [];
   return (m?.rows ?? [])
     .map((r) => ({
       hostname: r.origin_hostname,

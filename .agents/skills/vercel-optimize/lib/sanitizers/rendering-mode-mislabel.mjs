@@ -34,5 +34,6 @@ export function apply(rec, ctx = {}) {
 
   const warning = `\n\n_⚠ Rendering-mode mismatch: this rec describes the route as \`${claimedModes.join(', ')}\` but the scanner classified it as \`${actualMode}\`. Verify the rendering mode before applying._`;
   if (typeof rec.fix === 'string') rec.fix += warning;
+  else rec.fix = warning.trim();
   return { tag: `rendering-mode-mislabel:${claimedModes.join(',')}!=${actualMode}`, needsReview: true };
 }

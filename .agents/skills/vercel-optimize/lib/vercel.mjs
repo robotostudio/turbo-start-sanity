@@ -438,7 +438,7 @@ export async function getProjectConfig(projectId, orgId) {
   const qs = orgId && !String(orgId).startsWith('usr_')
     ? `?teamId=${encodeURIComponent(orgId)}`
     : '';
-  const r = await runVercelJson(['api', `/v9/projects/${projectId}${qs}`]);
+  const r = await runVercelJson(['api', `/v9/projects/${encodeURIComponent(projectId)}${qs}`]);
   return r.ok ? r.data : { error: r.code, stderr: r.stderr };
 }
 

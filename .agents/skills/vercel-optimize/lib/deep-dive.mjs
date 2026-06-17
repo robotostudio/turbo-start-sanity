@@ -342,7 +342,12 @@ export function mergeIntoEvidence(results) {
 
 // Avoid leaking raw CLI payload / candidate+spec wrapper into evidence — keep summary-only.
 function simplify(r) {
-  if (!r || r.ok === false) return { error: r?.error ?? 'unknown' };
+  if (!r || r.ok === false) {
+    const nestedError = r?.error && typeof r.error === 'object' ? r.error : null;
+    const code = r?.code ?? nestedError?.code ?? 'unknown';
+    const message = r?.message ?? nestedError?.message ?? (typeof r?.error === 'string' ? r.error : 'unknown');
+    return { ok: false, code, message, error: { code, message } };
+  }
   // Check rows before value so tabular results with both stay tabular.
   if (Array.isArray(r.rows)) return r.rows;
   if ('value' in r) return r.value;

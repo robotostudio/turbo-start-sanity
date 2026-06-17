@@ -924,13 +924,16 @@ function enrichRecFromCandidates(rec, candidates) {
   // Match on raw OR canonical kind:route so pre-dedup-canonicalization refs still resolve.
   let match = null;
   if (ref) {
-    const [kind, route] = String(ref).split(':');
-    const canonical = route ? canonicalizeRoute(route) : null;
-    match = candidates.find((c) => {
-      if (!c || c.kind !== kind) return false;
-      const cRoute = c.route ?? c.hostname ?? '<account>';
-      return cRoute === route || cRoute === canonical || canonicalizeRoute(cRoute) === canonical;
-    });
+    const parsed = parseCandidateRef(String(ref));
+    if (parsed) {
+      const { kind, target: route } = parsed;
+      const canonical = route ? canonicalizeRoute(route) : null;
+      match = candidates.find((c) => {
+        if (!c || c.kind !== kind) return false;
+        const cRoute = c.route ?? c.hostname ?? '<account>';
+        return cRoute === route || cRoute === canonical || canonicalizeRoute(cRoute) === canonical;
+      });
+    }
   }
   const canonicalRef = ref ? canonicalRefOf(ref) : ref;
   const merged = { ...rec, candidateRef: canonicalRef };

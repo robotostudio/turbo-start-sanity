@@ -31,14 +31,14 @@ Never put auth tokens in shell commands. Do not type `VERCEL_TOKEN=...`, `--toke
 
 The preflight reads `package.json` and sets expectations before metric fan-out.
 
-| Framework | Status | Notes |
-|---|---|---|
-| Next.js App Router | supported | strongest route mapping, scanners, playbooks, citations |
-| Next.js Pages Router | supported | scoped to Pages Router idioms when detected |
-| SvelteKit | supported | route mapping for `src/routes` files and SvelteKit scanner |
-| Nuxt | supported | route mapping plus generic/platform checks; fewer framework-specific recs |
-| Astro | limited | route mapping plus generic checks; fewer framework-specific recs |
-| Hono / Remix / unknown | blocked by default | continue only if the user accepts a limited platform/code-only audit |
+| Framework              | Status             | Notes                                                                     |
+| ---------------------- | ------------------ | ------------------------------------------------------------------------- |
+| Next.js App Router     | supported          | strongest route mapping, scanners, playbooks, citations                   |
+| Next.js Pages Router   | supported          | scoped to Pages Router idioms when detected                               |
+| SvelteKit              | supported          | route mapping for `src/routes` files and SvelteKit scanner                |
+| Nuxt                   | supported          | route mapping plus generic/platform checks; fewer framework-specific recs |
+| Astro                  | limited            | route mapping plus generic checks; fewer framework-specific recs          |
+| Hono / Remix / unknown | blocked by default | continue only if the user accepts a limited platform/code-only audit      |
 
 If unsupported, stop and ask before scanning or gating:
 
@@ -97,7 +97,7 @@ jq '{frameworkSupportBlocker, observabilityPlus, observabilityPlusUsable, observ
 Required actions:
 
 - `frameworkSupportBlocker === "unsupported_framework"`: use the unsupported-framework prompt above.
-- `PROJECT_SCOPE_UNRESOLVED`, `SCOPE_UNRESOLVED`, or `PROJECT_SCOPE_MISMATCH`: stop and ask which Vercel project and team/personal scope the user wants audited. For team projects, rerun after `vercel link --yes --project <project-name-or-id> --team <team-slug>`; for personal projects, rerun after linking under the intended user account or after setting both `VERCEL_PROJECT_ID` and `VERCEL_ORG_ID`.
+- `PROJECT_SCOPE_UNRESOLVED`, `SCOPE_UNRESOLVED`, or `PROJECT_SCOPE_MISMATCH`: stop and ask which Vercel project and team/personal scope the user wants to audit. For team projects, rerun after `vercel link --yes --project <project-name-or-id> --team <team-slug>`; for personal projects, rerun after linking under the intended user account or after setting both `VERCEL_PROJECT_ID` and `VERCEL_ORG_ID`.
 - `observabilityPlusBlocker === null`: continue.
 - `no_traffic`: tell the user route metrics are sparse; continue only if they accept limited output.
 - `payment_required` or `no_oplus_probe`: render [references/observability-plus.md](references/observability-plus.md) verbatim and ask.

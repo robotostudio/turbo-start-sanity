@@ -3,7 +3,7 @@
 // Doctor's 4 KB triggers on favicons).
 
 import { readdir, stat } from 'node:fs/promises';
-import { join, relative, extname } from 'node:path';
+import { extname, join, posix } from 'node:path';
 
 const THRESHOLD_BYTES = 500_000;
 const TOP_N = 20;
@@ -41,7 +41,7 @@ export async function scan({ rootDir }) {
       if (entry.size < THRESHOLD_BYTES) continue;
       out.push({
         pattern: metadata.id,
-        file: join('public', entry.relPath),
+        file: posix.join('public', entry.relPath),
         line: 1,
         evidence: `${formatBytes(entry.size)} (${extname(entry.relPath) || 'no-ext'})`,
         trafficIndependent: metadata.trafficIndependent,

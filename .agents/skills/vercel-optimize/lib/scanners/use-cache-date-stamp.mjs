@@ -79,8 +79,50 @@ function collectRanges(content, hookRe) {
 
 function findMatchingParen(content, openIdx) {
   let depth = 0;
+  let stringQuote = null;
+  let escapeNext = false;
+  let inLineComment = false;
+  let inBlockComment = false;
   for (let i = openIdx; i < content.length; i++) {
     const c = content[i];
+    const next = content[i + 1];
+    if (inLineComment) {
+      if (c === '\n') inLineComment = false;
+      continue;
+    }
+    if (inBlockComment) {
+      if (c === '*' && next === '/') {
+        inBlockComment = false;
+        i++;
+      }
+      continue;
+    }
+    if (stringQuote) {
+      if (escapeNext) {
+        escapeNext = false;
+        continue;
+      }
+      if (c === '\\') {
+        escapeNext = true;
+        continue;
+      }
+      if (c === stringQuote) stringQuote = null;
+      continue;
+    }
+    if ((c === '"' || c === '\'' || c === '`')) {
+      stringQuote = c;
+      continue;
+    }
+    if (c === '/' && next === '/') {
+      inLineComment = true;
+      i++;
+      continue;
+    }
+    if (c === '/' && next === '*') {
+      inBlockComment = true;
+      i++;
+      continue;
+    }
     if (c === '(') depth++;
     else if (c === ')') {
       depth--;

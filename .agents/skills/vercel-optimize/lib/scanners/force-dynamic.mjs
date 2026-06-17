@@ -1,3 +1,5 @@
+import { lineOf } from '../util.mjs';
+
 export const metadata = {
   id: 'force-dynamic',
   title: "export const dynamic = 'force-dynamic'",
@@ -34,8 +36,6 @@ export function scan({ files }) {
   }
   return out;
 }
-
-import { lineOf } from '../util.mjs';
 
 function isApplicable(path) {
   return /(\/route|\/page)\.(tsx?|jsx?)$/.test(path);
