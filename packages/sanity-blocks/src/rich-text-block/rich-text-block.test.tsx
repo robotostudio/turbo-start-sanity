@@ -8,6 +8,7 @@ test("RichTextBlock renders headings and body text", () => {
       richText={[
         {
           _type: "block",
+          _key: "block-1",
           children: [{ _type: "span", text: "Structured text content." }],
         },
       ]}

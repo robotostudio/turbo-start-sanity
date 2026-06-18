@@ -34,6 +34,7 @@ test("FaqAccordion renders subtitle and faq trigger titles", () => {
           richText: [
             {
               _type: "block",
+              _key: "block-1",
               children: [
                 { _type: "span", text: "Inside the shared package." },
               ],

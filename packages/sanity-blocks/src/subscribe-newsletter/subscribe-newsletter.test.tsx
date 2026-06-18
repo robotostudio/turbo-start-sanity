@@ -8,6 +8,7 @@ test("SubscribeNewsletter renders text sections", () => {
       subTitle={[
         {
           _type: "block",
+          _key: "block-1",
           children: [{ _type: "span", text: "Product updates." }],
         },
       ]}

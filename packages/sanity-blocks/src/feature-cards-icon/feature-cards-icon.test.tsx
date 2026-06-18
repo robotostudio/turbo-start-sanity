@@ -13,6 +13,7 @@ test("FeatureCardsWithIcon renders the card list", () => {
           richText: [
             {
               _type: "block",
+              _key: "block-1",
               children: [
                 { _type: "span", text: "One shared implementation." },
               ],

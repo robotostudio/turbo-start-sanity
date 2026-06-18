@@ -9,6 +9,7 @@ test("HeroBlock renders the title and button content", () => {
       richText={[
         {
           _type: "block",
+          _key: "block-1",
           children: [
             { _type: "span", text: "Reusable frontend and schema code." },
           ],
