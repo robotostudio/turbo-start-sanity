@@ -4,8 +4,8 @@ import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text"
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import { Button } from "@workspace/ui/components/button";
 import { ChevronRight, LoaderCircle } from "lucide-react";
-import { useFormStatus } from "react-dom";
 import type { ComponentProps } from "react";
+import { useFormStatus } from "react-dom";
 
 export interface SubscribeNewsletterProps {
   action?: ComponentProps<"form">["action"];
@@ -73,7 +73,7 @@ export function SubscribeNewsletter({
           <form
             action={action}
             className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-2"
-            method={method}
+            method={method ?? "post"}
             onSubmit={onSubmit}
           >
             <div className="flex items-center justify-between rounded-xl border bg-white p-2 pl-4 drop-shadow-lg md:w-96 dark:bg-zinc-200">
