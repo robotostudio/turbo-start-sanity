@@ -12,7 +12,7 @@ test("RichTextBlock renders headings and body text", () => {
           children: [{ _type: "span", text: "Structured text content." }],
         },
       ]}
-    />,
+    />
   );
 
   expect(html).toMatch(/Editorial body/);

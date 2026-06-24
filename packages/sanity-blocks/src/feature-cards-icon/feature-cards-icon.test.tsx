@@ -14,14 +14,12 @@ test("FeatureCardsWithIcon renders the card list", () => {
             {
               _type: "block",
               _key: "block-1",
-              children: [
-                { _type: "span", text: "One shared implementation." },
-              ],
+              children: [{ _type: "span", text: "One shared implementation." }],
             },
           ],
         },
       ]}
-    />,
+    />
   );
 
   expect(html).toMatch(/Highlights/);
@@ -31,7 +29,7 @@ test("FeatureCardsWithIcon renders the card list", () => {
 
 test("FeatureCardsWithIcon renders with no cards", () => {
   const html = renderToStaticMarkup(
-    <FeatureCardsWithIcon title="No cards yet" />,
+    <FeatureCardsWithIcon title="No cards yet" />
   );
 
   expect(html).toMatch(/No cards yet/);

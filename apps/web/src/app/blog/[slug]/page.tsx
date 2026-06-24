@@ -11,7 +11,10 @@ import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { RichText, type RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
+import {
+  RichText,
+  type RichTextValue,
+} from "@workspace/sanity-blocks/internal/rich-text";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 
 import { TableOfContent } from "@/components/elements/table-of-content";

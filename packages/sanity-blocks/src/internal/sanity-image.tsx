@@ -1,7 +1,10 @@
 "use client";
 import { env } from "@workspace/env/client";
 import type { ElementType } from "react";
-import { SanityImage as BaseSanityImage, type WrapperProps } from "sanity-image";
+import {
+  SanityImage as BaseSanityImage,
+  type WrapperProps,
+} from "sanity-image";
 
 const SANITY_BASE_URL =
   `https://cdn.sanity.io/images/${env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${env.NEXT_PUBLIC_SANITY_DATASET}/` as const;
@@ -23,9 +26,9 @@ export type SanityImageProps = {
   image: SanityImageData;
 } & Omit<WrapperProps<"img">, "id">;
 
-const ImageWrapper = <T extends ElementType = "img">(props: WrapperProps<T>) => (
-  <BaseSanityImage baseUrl={SANITY_BASE_URL} {...props} />
-);
+const ImageWrapper = <T extends ElementType = "img">(
+  props: WrapperProps<T>
+) => <BaseSanityImage baseUrl={SANITY_BASE_URL} {...props} />;
 
 export function SanityImage({ image, ...props }: SanityImageProps) {
   if (!image?.id || typeof image.id !== "string") {

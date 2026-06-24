@@ -22,7 +22,7 @@ test("HeroBlock renders the title and button content", () => {
           text: "Start now",
         },
       ]}
-    />,
+    />
   );
 
   expect(html).toMatch(/Ship shared Sanity blocks/);

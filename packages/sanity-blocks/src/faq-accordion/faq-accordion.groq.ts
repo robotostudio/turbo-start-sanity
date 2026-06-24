@@ -1,7 +1,4 @@
-import {
-  richTextFragment,
-  urlFragment,
-} from "../internal/groq-fragments";
+import { richTextFragment, urlFragment } from "../internal/groq-fragments";
 
 export const faqAccordionGroqProjection = /* groq */ `
   _type == "faqAccordion" => {

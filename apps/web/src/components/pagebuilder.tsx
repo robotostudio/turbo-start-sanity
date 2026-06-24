@@ -63,9 +63,7 @@ function renderBlockComponent(block: PageBuilderBlock) {
         <ImageLinkCards {...(block as PagebuilderType<"imageLinkCards">)} />
       );
     case "richTextBlock":
-      return (
-        <RichTextBlock {...(block as PagebuilderType<"richTextBlock">)} />
-      );
+      return <RichTextBlock {...(block as PagebuilderType<"richTextBlock">)} />;
     default:
       return null;
   }

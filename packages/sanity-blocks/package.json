@@ -6,7 +6,7 @@
   "scripts": {
     "check-types": "tsc --noEmit",
     "format": "biome format --write .",
-    "format:check": "biome check --formatter .",
+    "format:check": "biome format .",
     "lint": "biome lint .",
     "sync-thumbnails": "node --experimental-strip-types scripts/sync-thumbnails.ts",
     "test": "vitest run",

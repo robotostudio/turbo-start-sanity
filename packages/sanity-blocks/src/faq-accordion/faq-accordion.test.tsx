@@ -15,7 +15,7 @@ test("FaqAccordion renders questions and optional link", () => {
           title: "How do I import schemas?",
         },
       ]}
-    />,
+    />
   );
 
   expect(html).toMatch(/FAQs/);
@@ -35,14 +35,12 @@ test("FaqAccordion renders subtitle and faq trigger titles", () => {
             {
               _type: "block",
               _key: "block-1",
-              children: [
-                { _type: "span", text: "Inside the shared package." },
-              ],
+              children: [{ _type: "span", text: "Inside the shared package." }],
             },
           ],
         },
       ]}
-    />,
+    />
   );
 
   expect(html).toMatch(/Helpful answers/);

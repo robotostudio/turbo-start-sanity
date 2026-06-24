@@ -25,7 +25,10 @@ import type { ColumnLink, NavigationData } from "@/types";
 import { MenuLink } from "./elements/menu-link";
 import { Logo } from "./logo";
 
-export function MobileMenu({ navbarData, settingsData }: Readonly<NavigationData>) {
+export function MobileMenu({
+  navbarData,
+  settingsData,
+}: Readonly<NavigationData>) {
   const [isOpen, setIsOpen] = useState(false);
 
   function closeMenu() {
