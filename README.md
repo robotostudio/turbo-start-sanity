@@ -2,7 +2,7 @@
 
 Turbo Start Sanity is a free, open-source Sanity template: a Next.js page builder
 starter with visual editing, hyper-optimised SEO, and a Turborepo monorepo structure.
-Built by [Roboto Studio](https://robotostudio.com) and used in production client builds.
+Built by [Roboto Studio](https://robotostudio.com/services/sanity) and used in production client builds.
 
 ![Turbo Start Sanity](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/tasteful-safe-option-og.png)
 
