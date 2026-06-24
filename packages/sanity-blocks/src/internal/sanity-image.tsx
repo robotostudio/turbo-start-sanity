@@ -1,6 +1,6 @@
 "use client";
 import { env } from "@workspace/env/client";
-import { type ElementType, memo } from "react";
+import type { ElementType } from "react";
 import { SanityImage as BaseSanityImage, type WrapperProps } from "sanity-image";
 
 const SANITY_BASE_URL =
@@ -27,7 +27,7 @@ const ImageWrapper = <T extends ElementType = "img">(props: WrapperProps<T>) => 
   <BaseSanityImage baseUrl={SANITY_BASE_URL} {...props} />
 );
 
-function SanityImageUnmemorized({ image, ...props }: SanityImageProps) {
+export function SanityImage({ image, ...props }: SanityImageProps) {
   if (!image?.id || typeof image.id !== "string") {
     return null;
   }
@@ -42,5 +42,3 @@ function SanityImageUnmemorized({ image, ...props }: SanityImageProps) {
 
   return <ImageWrapper {...props} {...processedData} />;
 }
-
-export const SanityImage = memo(SanityImageUnmemorized);

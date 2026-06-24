@@ -116,7 +116,15 @@ const components: Partial<PortableTextReactComponents> = {
   hardBreak: () => <br />,
 };
 
-export type RichTextValue = PortableTextBlock[] | null | undefined;
+// GROQ projections type block children as optional even though a real
+// block always has them, so loosen that field rather than requiring `any`
+// casts at every call site that passes raw query results in.
+type LooseRichTextBlock = Omit<PortableTextBlock, "children" | "markDefs"> & {
+  children?: PortableTextBlock["children"];
+  markDefs?: PortableTextBlock["markDefs"] | null;
+};
+
+export type RichTextValue = LooseRichTextBlock[] | null | undefined;
 
 export function RichText<T extends RichTextValue>({
   richText,

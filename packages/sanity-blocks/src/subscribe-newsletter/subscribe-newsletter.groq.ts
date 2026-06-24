@@ -1,18 +1,15 @@
+import { markDefsFragment } from "../internal/groq-fragments";
+
 export const subscribeNewsletterGroqProjection = /* groq */ `
   _type == "subscribeNewsletter" => {
-    _type,
-    title,
-    subTitle[]{
+    ...,
+    "subTitle": subTitle[]{
       ...,
-      children[]{
-        ...
-      }
+      ${markDefsFragment}
     },
-    helperText[]{
+    "helperText": helperText[]{
       ...,
-      children[]{
-        ...
-      }
+      ${markDefsFragment}
     }
   }
-`
+`;

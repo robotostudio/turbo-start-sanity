@@ -21,11 +21,9 @@ function FeatureCardItem({ card }: Readonly<{ card: FeatureCard }>) {
   const { icon, title, richText } = card;
   return (
     <div className="rounded-3xl bg-accent p-8 md:min-h-75 md:p-8">
-      {icon ? (
-        <span className="mb-9 flex w-fit items-center justify-center rounded-full bg-background p-3 drop-shadow-xl">
-          <SanityIcon icon={icon} />
-        </span>
-      ) : null}
+      <span className="mb-9 flex w-fit items-center justify-center rounded-full bg-background p-3 drop-shadow-xl">
+        <SanityIcon icon={icon} />
+      </span>
       <div>
         {title ? (
          <h3 className="mb-2 font-medium text-lg md:text-2xl">{title}</h3>

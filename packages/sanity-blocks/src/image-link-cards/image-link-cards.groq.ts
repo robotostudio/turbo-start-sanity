@@ -1,36 +1,19 @@
+import {
+  buttonsFragment,
+  imageFragment,
+  richTextFragment,
+  urlFragment,
+} from "../internal/groq-fragments";
+
 export const imageLinkCardsGroqProjection = /* groq */ `
   _type == "imageLinkCards" => {
-    _type,
-    eyebrow,
-    title,
-    richText[]{
+    ...,
+    ${richTextFragment},
+    ${buttonsFragment},
+    "cards": array::compact(cards[]{
       ...,
-      children[]{
-        ...
-      }
-    },
-    buttons[]{
-      ...,
-      url{
-        ...,
-        internal->{
-          slug
-        }
-      }
-    },
-    cards[]{
-      title,
-      description,
-      image{
-        ...,
-        alt
-      },
-      url{
-        ...,
-        internal->{
-          slug
-        }
-      }
-    }
+      ${urlFragment},
+      ${imageFragment},
+    })
   }
-`
+`;

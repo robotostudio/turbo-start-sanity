@@ -9,7 +9,7 @@
       "@workspace/sanity-blocks/*": ["./src/*"]
     },
     "rootDir": "src",
-    "types": ["node", "jest"]
+    "types": ["node", "vitest/globals"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

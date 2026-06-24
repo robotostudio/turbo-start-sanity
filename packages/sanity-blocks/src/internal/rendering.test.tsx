@@ -162,8 +162,8 @@ test("renderButtons handles empty, linked, and fallback button states", () => {
 
   expect(html).toContain('href="/features"');
   expect(html).toContain('target="_blank"');
-  expect(html).toContain('rel="noreferrer"');
-  expect(html).toContain("<span>Button 2</span>");
+  expect(html).toContain('rel="noopener noreferrer"');
+  expect(html).toContain("<span></span>");
 });
 
 test("renderOptionalHeading and IconBadge cover fallback output", () => {

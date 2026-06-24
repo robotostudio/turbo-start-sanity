@@ -43,7 +43,7 @@ export function FaqAccordion({
   link,
 }: Readonly<FaqAccordionProps>) {
   return (
-    <section className="my-8" id={_key}>
+    <section className="my-8" id="faq">
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex w-full flex-col items-center">
           <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">
@@ -62,11 +62,7 @@ export function FaqAccordion({
           <Accordion
             className="w-full"
             collapsible
-            defaultValue={
-              (faqs?.find((faq) => faq?.title)?._key ??
-                faqs?.find((faq) => faq?.title)?._id) ||
-              undefined
-            }
+            defaultValue="3"
             type="single"
           >
             {faqs?.map((faq) => {

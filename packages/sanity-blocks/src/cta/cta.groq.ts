@@ -1,22 +1,12 @@
+import {
+  buttonsFragment,
+  richTextFragment,
+} from "../internal/groq-fragments";
+
 export const ctaGroqProjection = /* groq */ `
   _type == "cta" => {
-    _type,
-    eyebrow,
-    title,
-    richText[]{
-      ...,
-      children[]{
-        ...
-      }
-    },
-    buttons[]{
-      ...,
-      url{
-        ...,
-        internal->{
-          slug
-        }
-      }
-    }
+    ...,
+    ${richTextFragment},
+    ${buttonsFragment},
   }
-`
+`;

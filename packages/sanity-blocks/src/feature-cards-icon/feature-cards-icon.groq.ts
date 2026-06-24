@@ -1,24 +1,12 @@
+import { richTextFragment } from "../internal/groq-fragments";
+
 export const featureCardsIconGroqProjection = /* groq */ `
   _type == "featureCardsIcon" => {
-    _type,
-    eyebrow,
-    title,
-    richText[]{
+    ...,
+    ${richTextFragment},
+    "cards": array::compact(cards[]{
       ...,
-      children[]{
-        ...
-      }
-    },
-    cards[]{
-      _key,
-      icon,
-      title,
-      richText[]{
-        ...,
-        children[]{
-          ...
-        }
-      }
-    }
+      ${richTextFragment},
+    })
   }
 `;

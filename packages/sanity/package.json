@@ -14,6 +14,7 @@
     "@sanity/client": "catalog:",
     "@sanity/image-url": "^2.1.1",
     "@workspace/env": "workspace:*",
+    "@workspace/sanity-blocks": "workspace:*",
     "next-sanity": "13.0.7",
     "react-is": "catalog:",
     "sanity-image": "^1.1.0"
