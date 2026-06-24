@@ -15,7 +15,7 @@ test("ImageLinkCards renders cards and links", () => {
           openInNewTab: false,
         },
       ]}
-    />,
+    />
   );
 
   expect(html).toMatch(/Blocks/);
@@ -34,11 +34,28 @@ test("ImageLinkCards renders card description", () => {
           href: "/fallback",
         },
       ]}
-    />,
+    />
   );
 
   expect(html).toMatch(/Fallback card body\./);
   expect(html).toMatch(/href="\/fallback"/);
+});
+
+test("ImageLinkCards keeps single cards fully rounded", () => {
+  const html = renderToStaticMarkup(
+    <ImageLinkCards
+      cards={[
+        {
+          _key: "card-1",
+          href: "/single",
+        },
+      ]}
+    />
+  );
+
+  expect(html).toContain("rounded-3xl");
+  expect(html).not.toContain("lg:rounded-r-none");
+  expect(html).not.toContain("lg:rounded-l-none");
 });
 
 test("ImageLinkCards renders with no cards", () => {

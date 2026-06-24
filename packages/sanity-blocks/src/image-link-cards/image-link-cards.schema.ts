@@ -4,9 +4,9 @@ import {
   imageWithAltField,
 } from "@workspace/sanity-blocks/internal/schema-fields";
 import { ImageIcon } from "lucide-react";
-import { defineField, defineType } from "sanity";
+import { defineArrayMember, defineField, defineType } from "sanity";
 
-const imageLinkCardItem = defineField({
+const imageLinkCardItem = defineArrayMember({
   name: "imageLinkCard",
   type: "object",
   icon: ImageIcon,

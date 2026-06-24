@@ -26,7 +26,7 @@ function FeatureCardItem({ card }: Readonly<{ card: FeatureCard }>) {
       </span>
       <div>
         {title ? (
-         <h3 className="mb-2 font-medium text-lg md:text-2xl">{title}</h3>
+          <h3 className="mb-2 font-medium text-lg md:text-2xl">{title}</h3>
         ) : null}
         <RichText
           className="text-balance font-normal text-black/90 text-sm leading-7 md:text-[16px] dark:text-neutral-300"
@@ -49,7 +49,7 @@ export function FeatureCardsWithIcon({
         <div className="flex w-full flex-col items-center">
           <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">
             {eyebrow && <Badge variant="secondary">{eyebrow}</Badge>}
-           {title ? (
+            {title ? (
               <h2 className="font-semibold text-3xl md:text-5xl">{title}</h2>
             ) : null}
             <RichText
@@ -59,10 +59,10 @@ export function FeatureCardsWithIcon({
           </div>
         </div>
         <div className="mx-auto mt-20 grid gap-8 lg:grid-cols-3">
-          {cards?.map((card) => (
+          {cards?.map((card, index) => (
             <FeatureCardItem
               card={card}
-              key={`FeatureCard-${card?._key}`}
+              key={card._key ?? `FeatureCard-${index}`}
             />
           ))}
         </div>

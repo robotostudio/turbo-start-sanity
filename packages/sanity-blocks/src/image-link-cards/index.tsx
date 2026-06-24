@@ -85,7 +85,7 @@ export function ImageLinkCards({
           <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">
             {eyebrow && <Badge variant="secondary">{eyebrow}</Badge>}
             {title && (
-             <h2 className="text-balance font-semibold text-3xl md:text-5xl">
+              <h2 className="text-balance font-semibold text-3xl md:text-5xl">
                 {title}
               </h2>
             )}
@@ -99,10 +99,16 @@ export function ImageLinkCards({
                   card={card}
                   className={cn(
                     "bg-muted-foreground/10 dark:bg-zinc-800",
-                    idx === 0 && "lg:rounded-r-none lg:rounded-l-3xl",
-                    idx === cards.length - 1 &&
+                    cards.length > 1 &&
+                      idx === 0 &&
+                      "lg:rounded-r-none lg:rounded-l-3xl",
+                    cards.length > 1 &&
+                      idx === cards.length - 1 &&
                       "lg:rounded-r-3xl lg:rounded-l-none",
-                    idx !== 0 && idx !== cards.length - 1 && "lg:rounded-none"
+                    cards.length > 1 &&
+                      idx !== 0 &&
+                      idx !== cards.length - 1 &&
+                      "lg:rounded-none"
                   )}
                   key={card._key}
                 />

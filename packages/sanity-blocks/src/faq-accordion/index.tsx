@@ -42,6 +42,11 @@ export function FaqAccordion({
   faqs,
   link,
 }: Readonly<FaqAccordionProps>) {
+  const defaultFaq = faqs?.find((faq) => faq?.title);
+  const defaultValue = defaultFaq
+    ? (defaultFaq._key ?? defaultFaq._id)
+    : undefined;
+
   return (
     <section className="my-8" id="faq">
       <div className="container mx-auto px-4 md:px-6">
@@ -62,7 +67,7 @@ export function FaqAccordion({
           <Accordion
             className="w-full"
             collapsible
-            defaultValue="3"
+            defaultValue={defaultValue}
             type="single"
           >
             {faqs?.map((faq) => {

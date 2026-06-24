@@ -6,6 +6,7 @@ import {
   renderOptionalHeading,
   renderPortableText,
 } from "@workspace/sanity-blocks/internal/rendering";
+import { DynamicIcon } from "lucide-react/dynamic";
 import { TriangleAlert } from "lucide-react";
 import { renderToStaticMarkup } from "react-dom/server";
 
@@ -155,6 +156,12 @@ test("renderButtons handles empty, linked, and fallback button states", () => {
             openInNewTab: true,
           },
         },
+        {
+          url: {
+            type: "external",
+            external: "https://example.com/docs",
+          },
+        },
         {},
       ])}
     </>
@@ -163,7 +170,9 @@ test("renderButtons handles empty, linked, and fallback button states", () => {
   expect(html).toContain('href="/features"');
   expect(html).toContain('target="_blank"');
   expect(html).toContain('rel="noopener noreferrer"');
-  expect(html).toContain("<span></span>");
+  expect(html).toContain('href="https://example.com/docs"');
+  expect(html).toContain(">https://example.com/docs<");
+  expect(html).not.toContain("<span></span>");
 });
 
 test("renderOptionalHeading and IconBadge cover fallback output", () => {
@@ -189,4 +198,30 @@ test("renderOptionalHeading and IconBadge cover fallback output", () => {
   expect(html).toContain('data-size="16"');
   expect(html).toContain('data-size="24"');
   expect(html).toContain("<span>boxes</span>");
+});
+
+test("icon mocks forward extra props", () => {
+  const html = renderToStaticMarkup(
+    <>
+      <TriangleAlert
+        aria-hidden="true"
+        className="icon-stub"
+        data-track="one"
+      />
+      <DynamicIcon
+        aria-label="dynamic icon"
+        className="dynamic-icon"
+        data-track="two"
+        name="boxes"
+        size={20}
+      />
+    </>
+  );
+
+  expect(html).toContain('aria-hidden="true"');
+  expect(html).toContain('class="icon-stub"');
+  expect(html).toContain('data-track="one"');
+  expect(html).toContain('aria-label="dynamic icon"');
+  expect(html).toContain('class="dynamic-icon"');
+  expect(html).toContain('data-track="two"');
 });

@@ -38,10 +38,11 @@ const VALID_VARIANTS = [
   "link",
 ] as const;
 
-function isValidVariant(v: string | null | undefined): v is Exclude<ButtonVariant, null | undefined> {
+function isValidVariant(
+  v: string | null | undefined
+): v is Exclude<ButtonVariant, null | undefined> {
   return v != null && (VALID_VARIANTS as readonly string[]).includes(v);
 }
-
 
 function SanityButton({
   text,
@@ -86,11 +87,11 @@ export function SanityButtons({
 
   return (
     <div className={cn("flex flex-col gap-4 sm:flex-row", className)}>
-      {buttons.map((button) => (
+      {buttons.map((button, index) => (
         <SanityButton
           className={buttonClassName}
           href={button.href}
-          key={`button-${button._key}`}
+          key={button._key ?? `button-${index}`}
           openInNewTab={button.openInNewTab}
           size={size}
           text={button.text}

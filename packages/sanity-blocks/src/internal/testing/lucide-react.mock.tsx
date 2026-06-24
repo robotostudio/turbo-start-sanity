@@ -1,7 +1,8 @@
 const IconStub =
   (name: string) =>
-  ({ size }: { size?: number }) =>
-    <span data-icon={name} data-size={size} />;
+  ({ size, ...props }: { size?: number; [key: string]: unknown }) => (
+    <span data-icon={name} data-size={size} {...props} />
+  );
 
 export const TriangleAlert = IconStub("triangle-alert");
 export const ChevronRight = IconStub("chevron-right");

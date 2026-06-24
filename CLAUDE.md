@@ -55,7 +55,7 @@ packages/
 
 ### Data Flow: Sanity → Next.js
 
-1. **Schema** block types defined in `packages/sanity-blocks/src/` and re-exported via `@workspace/sanity-blocks`. Studio registers them via `apps/studio/schemaTypes/blocks/index.ts`
+1. **Schema** block types defined in `packages/sanity-blocks/src/` and re-exported via `@workspace/sanity-blocks`. Studio registers them via `apps/studio/schemaTypes/index.ts`
 2. **Type generation**: `pnpm type` in studio extracts schema → generates TS types at `packages/sanity/src/sanity.types.ts`
 3. **GROQ queries** live in `packages/sanity/src/query.ts` using `defineQuery` from `next-sanity`, with reusable fragments
 4. **Data fetching** uses `sanityFetch` from `packages/sanity/src/live.ts` (wraps `defineLive` for automatic revalidation)
@@ -66,18 +66,18 @@ packages/
 The core content model is a **page builder** — an array of typed blocks:
 
 - **Schema source**: `packages/sanity-blocks/src/<block>/` — each block has a `.schema.ts`, `.groq.ts`, and headless `index.tsx`. All schemas are exported as `blockSchemas` from the package root
-- **Studio side**: `apps/studio/schemaTypes/blocks/index.ts` re-exports `blockSchemas` from `@workspace/sanity-blocks` → fed to `definitions/pagebuilder.ts`
-- **Frontend side**: `apps/web/src/components/pagebuilder.tsx` — maps `_type` to React component via `BLOCK_COMPONENTS` record. Includes Sanity visual editing data attributes and optimistic updates
+- **Studio side**: `apps/studio/schemaTypes/index.ts` merges `blockSchemas` into the exported `schemaTypes`, and `apps/studio/schemaTypes/definitions/pagebuilder.ts` maps those schema names into the page builder array definition
+- **Frontend side**: `apps/web/src/components/pagebuilder.tsx` — renders each `_type` via `renderBlockComponent`. Includes Sanity visual editing data attributes and optimistic updates
 - **Block components**: `apps/web/src/components/sections/` — styled implementations using Tailwind + `@workspace/ui`. These are the project-specific rendering layer; `@workspace/sanity-blocks` exports headless versions used for testing
 
 To add a new page builder block:
 
 1. Create `packages/sanity-blocks/src/<new-block>/` with `.schema.ts`, `.groq.ts`, and `index.tsx`
-2. Export from `packages/sanity-blocks/src/sanity-blocks.ts` and add to `blockSchemas` array
+2. Export from `packages/sanity-blocks/src/sanity-blocks.ts` and add to `blockSchemas` so Studio picks it up through `apps/studio/schemaTypes/index.ts` and `definitions/pagebuilder.ts`
 3. Run `pnpm type` in studio to regenerate Sanity types
 4. Add GROQ fragment in `packages/sanity/src/query.ts` and include in `pageBuilderFragment`
 5. Create styled component in `apps/web/src/components/sections/`
-6. Register in `BLOCK_COMPONENTS` in `apps/web/src/components/pagebuilder.tsx`
+6. Register in `renderBlockComponent` in `apps/web/src/components/pagebuilder.tsx`
 
 ### Sanity Document Types
 

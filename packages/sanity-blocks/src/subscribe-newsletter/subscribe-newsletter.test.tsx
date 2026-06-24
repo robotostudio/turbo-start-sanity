@@ -4,6 +4,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 test("SubscribeNewsletter renders text sections", () => {
   const html = renderToStaticMarkup(
     <SubscribeNewsletter
+      action="/api/subscribe"
+      method="post"
       title="Subscribe"
       subTitle={[
         {
@@ -12,9 +14,11 @@ test("SubscribeNewsletter renders text sections", () => {
           children: [{ _type: "span", text: "Product updates." }],
         },
       ]}
-    />,
+    />
   );
 
   expect(html).toMatch(/Subscribe/);
   expect(html).toMatch(/Product updates/);
+  expect(html).toContain('action="/api/subscribe"');
+  expect(html).toContain('method="post"');
 });

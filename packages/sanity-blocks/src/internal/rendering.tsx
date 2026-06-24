@@ -66,7 +66,7 @@ export const getHref = (url?: CustomUrlValue | null) => {
     return slug ? `/${slug.replace(/^\/+/, "")}` : undefined;
   }
 
-const external = url.external?.trim();
+  const external = url.external?.trim();
   if (!external) {
     return undefined;
   }
@@ -91,7 +91,7 @@ export const portableTextToPlainText = (value?: PortableTextValue) =>
 
 export const renderPortableText = (value?: PortableTextValue) =>
   (value ?? []).map((block, index) => {
-     const key = block._key ?? `block-${index}`;
+    const key = block._key ?? `block-${index}`;
     if (block._type === "image") {
       const captionTrim = (block.caption ?? "").trim();
       const text = captionTrim || (block.alt ?? "").trim() || null;
@@ -121,9 +121,13 @@ export const renderButtons = (buttons?: ButtonValue[] | null) => {
   return (
     <ul>
       {buttons.map((button, index) => {
-        const raw = button.text?.trim();
-        const text = raw?.length ? raw : undefined;
         const href = getHref(button.url);
+        const raw = button.text?.trim();
+        const text = raw?.length ? raw : href;
+
+        if (!text) {
+          return null;
+        }
 
         return (
           <li key={button._key ?? `button-${index}`}>

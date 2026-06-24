@@ -83,8 +83,12 @@ const syncThumbnails = async () => {
           if (!thumbnailStats.isFile()) {
             return
           }
-        } catch {
-          return
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+            return
+          }
+
+          throw error
         }
 
         const targetFile = join(targetRoot, generatedFileName(entry.name))

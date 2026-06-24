@@ -5,9 +5,13 @@ import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import { Button } from "@workspace/ui/components/button";
 import { ChevronRight, LoaderCircle } from "lucide-react";
 import { useFormStatus } from "react-dom";
+import type { ComponentProps } from "react";
 
 export interface SubscribeNewsletterProps {
+  action?: ComponentProps<"form">["action"];
   helperText?: RichTextValue;
+  method?: ComponentProps<"form">["method"];
+  onSubmit?: ComponentProps<"form">["onSubmit"];
   subTitle?: RichTextValue;
   title?: string | null;
 }
@@ -44,9 +48,12 @@ function SubscribeNewsletterButton() {
 }
 
 export function SubscribeNewsletter({
+  action,
   title,
   subTitle,
   helperText,
+  method,
+  onSubmit,
 }: Readonly<SubscribeNewsletterProps>) {
   return (
     <section className="px-4 py-8 sm:py-12 md:py-16" id="subscribe">
@@ -64,10 +71,10 @@ export function SubscribeNewsletter({
             />
           )}
           <form
+            action={action}
             className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-2"
-            onSubmit={(e) => {
-              e.preventDefault();
-            }}
+            method={method}
+            onSubmit={onSubmit}
           >
             <div className="flex items-center justify-between rounded-xl border bg-white p-2 pl-4 drop-shadow-lg md:w-96 dark:bg-zinc-200">
               <input
