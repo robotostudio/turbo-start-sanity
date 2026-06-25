@@ -63,7 +63,9 @@ export default async function RootLayout({
             <CachedFooter perspective="published" stega={false} />
           )}
           <SanityLive action={sanityLiveAction} includeDrafts={isDraftMode} />
-          <CombinedJsonLd includeOrganization includeWebsite />
+          <Suspense fallback={null}>
+            <CombinedJsonLd includeOrganization includeWebsite />
+          </Suspense>
           {isDraftMode && (
             <>
               <PreviewBar />
