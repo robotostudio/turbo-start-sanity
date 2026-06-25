@@ -1,9 +1,10 @@
-import { pageBuilderBlocks } from "@/schemaTypes/blocks/index";
+import { blockSchemas } from "@workspace/sanity-blocks";
+
 import { definitions } from "@/schemaTypes/definitions/index";
 import { documents, singletons } from "@/schemaTypes/documents/index";
 
 // Creating a new constant 'schemaTypes' which is a copy of the 'documents' array
-export const schemaTypes = [...documents, ...definitions, ...pageBuilderBlocks];
+export const schemaTypes = [...documents, ...definitions, ...blockSchemas];
 
 // Creating a new constant 'schemaNames' which is an array of names extracted from the 'documents' array
 export const schemaNames = [...documents].map((doc) => doc.name);

@@ -1,3 +1,10 @@
+import { ctaGroqProjection } from "@workspace/sanity-blocks/cta/cta.groq";
+import { faqAccordionGroqProjection } from "@workspace/sanity-blocks/faq-accordion/faq-accordion.groq";
+import { featureCardsIconGroqProjection } from "@workspace/sanity-blocks/feature-cards-icon/feature-cards-icon.groq";
+import { heroGroqProjection } from "@workspace/sanity-blocks/hero/hero.groq";
+import { imageLinkCardsGroqProjection } from "@workspace/sanity-blocks/image-link-cards/image-link-cards.groq";
+import { richTextBlockGroqProjection } from "@workspace/sanity-blocks/rich-text-block/rich-text-block.groq";
+import { subscribeNewsletterGroqProjection } from "@workspace/sanity-blocks/subscribe-newsletter/subscribe-newsletter.groq";
 import { defineQuery } from "next-sanity";
 
 const imageFields = /* groq */ `
@@ -96,110 +103,20 @@ const buttonsFragment = /* groq */ `
   }
 `;
 
-// Page builder block fragments
-const ctaBlock = /* groq */ `
-  _type == "cta" => {
-    ...,
-    ${richTextFragment},
-    ${buttonsFragment},
-  }
-`;
-const imageLinkCardsBlock = /* groq */ `
-  _type == "imageLinkCards" => {
-    ...,
-    ${richTextFragment},
-    ${buttonsFragment},
-    "cards": array::compact(cards[]{
-      ...,
-      "openInNewTab": url.openInNewTab,
-      "href": select(
-        url.type == "internal" => url.internal->slug.current,
-        url.type == "external" => url.external,
-        url.href
-      ),
-      ${imageFragment},
-    })
-  }
-`;
-
-const heroBlock = /* groq */ `
-  _type == "hero" => {
-    ...,
-    ${imageFragment},
-    ${buttonsFragment},
-    ${richTextFragment}
-  }
-`;
-
-const faqFragment = /* groq */ `
-  "faqs": array::compact(faqs[]->{
-    title,
-    _id,
-    _type,
-    ${richTextFragment}
-  })
-`;
-
-const faqAccordionBlock = /* groq */ `
-  _type == "faqAccordion" => {
-    ...,
-    "eyebrow": coalesce(eyebrow, null),
-    ${faqFragment},
-    link{
-      ...,
-      "openInNewTab": url.openInNewTab,
-      "href": select(
-        url.type == "internal" => url.internal->slug.current,
-        url.type == "external" => url.external,
-        url.href
-      )
-    }
-  }
-`;
-
-const subscribeNewsletterBlock = /* groq */ `
-  _type == "subscribeNewsletter" => {
-    ...,
-    "subTitle": subTitle[]{
-      ...,
-      ${markDefsFragment}
-    },
-    "helperText": helperText[]{
-      ...,
-      ${markDefsFragment}
-    }
-  }
-`;
-
-const featureCardsIconBlock = /* groq */ `
-  _type == "featureCardsIcon" => {
-    ...,
-    ${richTextFragment},
-    "cards": array::compact(cards[]{
-      ...,
-      ${richTextFragment},
-    })
-  }
-`;
-
-const richTextBlockFragment = /* groq */ `
-  _type == "richTextBlock" => {
-    ...,
-    ${richTextFragment}
-  }
-`;
-
+// Page builder block fragments are owned by their respective block packages
+// in @workspace/sanity-blocks, imported above, so the GROQ projection and
+// the component that reads it stay in lockstep.
 const pageBuilderFragment = /* groq */ `
   pageBuilder[]{
     ...,
     _type,
-    ${ctaBlock},
-    ${heroBlock},
-    ${faqAccordionBlock},
-    ${featureCardsIconBlock},
-    ${subscribeNewsletterBlock},
-    ${imageLinkCardsBlock},
-    ${richTextBlockFragment}
+    ${ctaGroqProjection},
+    ${heroGroqProjection},
+    ${faqAccordionGroqProjection},
+    ${featureCardsIconGroqProjection},
+    ${subscribeNewsletterGroqProjection},
+    ${imageLinkCardsGroqProjection},
+    ${richTextBlockGroqProjection}
   }
 `;
 

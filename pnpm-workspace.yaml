@@ -12,7 +12,9 @@ catalog:
   react: ^19.2.4
   react-dom: ^19.2.4
   react-is: ^19.2.4
+  sanity: ^5.16.0
   typescript: 5.9.2
+  vitest: ^3.2.4
   zod: ^4.3.6
 
 onlyBuiltDependencies:

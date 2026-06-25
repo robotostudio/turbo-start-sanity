@@ -8,7 +8,7 @@ import type { NextConfig } from "next";
 import { sanity } from "next-sanity/live/cache-life";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@workspace/ui"],
+  transpilePackages: ["@workspace/ui", "@workspace/sanity-blocks"],
   reactCompiler: true,
   cacheComponents: true,
   cacheLife: { default: sanity },

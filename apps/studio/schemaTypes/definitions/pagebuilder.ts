@@ -1,8 +1,7 @@
+import { blockSchemas } from "@workspace/sanity-blocks";
 import { defineArrayMember, defineType } from "sanity";
 
-import { pageBuilderBlocks } from "@/schemaTypes/blocks/index";
-
-export const pagebuilderBlockTypes = pageBuilderBlocks.map(({ name }) => ({
+export const pagebuilderBlockTypes = blockSchemas.map(({ name }) => ({
   type: name,
 }));
 

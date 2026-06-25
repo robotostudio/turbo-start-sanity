@@ -2,16 +2,17 @@
 
 import { useOptimistic } from "@sanity/visual-editing/react";
 import { env } from "@workspace/env/client";
+import { CTABlock } from "@workspace/sanity-blocks/cta/index";
+import { FaqAccordion } from "@workspace/sanity-blocks/faq-accordion/index";
+import { FeatureCardsWithIcon } from "@workspace/sanity-blocks/feature-cards-icon/index";
+import { HeroBlock } from "@workspace/sanity-blocks/hero/index";
+import { ImageLinkCards } from "@workspace/sanity-blocks/image-link-cards/index";
+import { RichTextBlock } from "@workspace/sanity-blocks/rich-text-block/index";
+import { SubscribeNewsletter } from "@workspace/sanity-blocks/subscribe-newsletter/index";
 import { createDataAttribute } from "next-sanity";
 
-import type { PageBuilderBlock, PageBuilderBlockTypes } from "@/types";
-import { CTABlock } from "./sections/cta";
-import { FaqAccordion } from "./sections/faq-accordion";
-import { FeatureCardsWithIcon } from "./sections/feature-cards-with-icon";
-import { HeroBlock } from "./sections/hero";
-import { ImageLinkCards } from "./sections/image-link-cards";
-import { RichTextBlock } from "./sections/rich-text-block";
-import { SubscribeNewsletter } from "./sections/subscribe-newsletter";
+import { FaqJsonLd } from "@/components/json-ld";
+import type { PageBuilderBlock, PagebuilderType } from "@/types";
 
 export type PageBuilderProps = {
   readonly pageBuilder?: PageBuilderBlock[];
@@ -25,17 +26,48 @@ type SanityDataAttributeConfig = {
   readonly path: string;
 };
 
-// Strongly typed component mapping with proper component signatures
-const BLOCK_COMPONENTS = {
-  cta: CTABlock,
-  faqAccordion: FaqAccordion,
-  hero: HeroBlock,
-  featureCardsIcon: FeatureCardsWithIcon,
-  subscribeNewsletter: SubscribeNewsletter,
-  imageLinkCards: ImageLinkCards,
-  richTextBlock: RichTextBlock,
-  // biome-ignore lint/suspicious/noExplicitAny: <any is used to allow for dynamic component rendering>
-} as const satisfies Record<PageBuilderBlockTypes, React.ComponentType<any>>;
+/**
+ * Renders the component for a single block, asserting the query result
+ * against its PagebuilderType so a GROQ or schema rename breaks the build
+ * instead of silently passing through `any`.
+ */
+function renderBlockComponent(block: PageBuilderBlock) {
+  switch (block?._type) {
+    case "cta":
+      return <CTABlock {...(block as PagebuilderType<"cta">)} />;
+    case "faqAccordion": {
+      const props = block as PagebuilderType<"faqAccordion">;
+      return (
+        <>
+          <FaqJsonLd faqs={props.faqs ?? []} />
+          <FaqAccordion {...props} />
+        </>
+      );
+    }
+    case "hero":
+      return <HeroBlock {...(block as PagebuilderType<"hero">)} />;
+    case "featureCardsIcon":
+      return (
+        <FeatureCardsWithIcon
+          {...(block as PagebuilderType<"featureCardsIcon">)}
+        />
+      );
+    case "subscribeNewsletter":
+      return (
+        <SubscribeNewsletter
+          {...(block as PagebuilderType<"subscribeNewsletter">)}
+        />
+      );
+    case "imageLinkCards":
+      return (
+        <ImageLinkCards {...(block as PagebuilderType<"imageLinkCards">)} />
+      );
+    case "richTextBlock":
+      return <RichTextBlock {...(block as PagebuilderType<"richTextBlock">)} />;
+    default:
+      return null;
+  }
+}
 
 /**
  * Helper function to create consistent Sanity data attributes
@@ -108,16 +140,15 @@ function useBlockRenderer(id: string, type: string) {
       path: `pageBuilder[_key=="${blockKey}"]`,
     });
 
-  const renderBlock = (block: PageBuilderBlock, _index: number) => {
-    const Component =
-      BLOCK_COMPONENTS[block._type as keyof typeof BLOCK_COMPONENTS];
+  const renderBlock = (block: PageBuilderBlock) => {
+    const content = block && renderBlockComponent(block);
 
-    if (!Component) {
+    if (!content) {
       return (
         <UnknownBlockError
-          blockKey={block._key}
-          blockType={block._type}
-          key={`${block._type}-${block._key}`}
+          blockKey={block?._key ?? ""}
+          blockType={block?._type ?? "unknown"}
+          key={`${block?._type}-${block?._key}`}
         />
       );
     }
@@ -127,8 +158,7 @@ function useBlockRenderer(id: string, type: string) {
         data-sanity={createBlockDataAttribute(block._key)}
         key={`${block._type}-${block._key}`}
       >
-        {/** biome-ignore lint/suspicious/noExplicitAny: <any is used to allow for dynamic component rendering> */}
-        <Component {...(block as any)} />
+        {content}
       </div>
     );
   };
