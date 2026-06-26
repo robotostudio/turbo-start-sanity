@@ -1,18 +1,17 @@
 "use server";
 
-import { revalidateTag, updateTag } from "next/cache";
-import { draftMode } from "next/headers";
+import { updateTag } from "next/cache";
 import { parseTags } from "next-sanity/live";
 
-// Invalidate cache tags on live events so non-preview visitors see edits without refresh.
+// Runs every time Sanity reports a content change to <SanityLive>.
+// We use `updateTag` (not `revalidateTag`) so the page the user is currently
+// viewing re-renders with the new content right away — `revalidateTag` would
+// only mark the cache stale for the next request, leaving the open page
+// unchanged until a manual reload. This keeps both the Presentation (draft)
+// preview and regular published pages updating live.
 export async function sanityLiveAction(unsafeTags: unknown) {
-  const { isEnabled: isDraftMode } = await draftMode();
   const { tags } = parseTags(unsafeTags);
   for (const tag of tags) {
-    if (isDraftMode) {
-      revalidateTag(tag, "max");
-    } else {
-      updateTag(tag);
-    }
+    updateTag(tag);
   }
 }
