@@ -1,5 +1,5 @@
 import { Logger } from "@workspace/logger";
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 import {
   PortableText,

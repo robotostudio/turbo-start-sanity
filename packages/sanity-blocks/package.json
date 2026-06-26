@@ -22,6 +22,7 @@
     "@sanity/icons": "^3.7.4",
     "@workspace/env": "workspace:*",
     "@workspace/logger": "workspace:*",
+    "@workspace/tailwind-config": "workspace:*",
     "@workspace/ui": "workspace:*",
     "lucide-react": "catalog:",
     "next-sanity": "^12.1.1",

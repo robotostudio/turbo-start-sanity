@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "@workspace/ui/components/input";
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@workspace/tailwind-config/utils";
 import { Search, X } from "lucide-react";
 
 export function SearchInput({

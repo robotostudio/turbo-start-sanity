@@ -436,8 +436,6 @@ export type Navbar = {
   >;
 };
 
-export type LucideIcon = string;
-
 export type Footer = {
   _id: string;
   _type: "footer";
@@ -608,6 +606,8 @@ export type Page = {
   ogTitle?: string;
   ogDescription?: string;
 };
+
+export type LucideIcon = string;
 
 export type AuthorReference = {
   _ref: string;
@@ -916,7 +916,6 @@ export type AllSanitySchemaTypes =
   | Redirect
   | Slug
   | Navbar
-  | LucideIcon
   | Footer
   | Settings
   | SanityImageCrop
@@ -926,6 +925,7 @@ export type AllSanitySchemaTypes =
   | Author
   | Faq
   | Page
+  | LucideIcon
   | AuthorReference
   | Blog
   | SanityAssistInstructionTask

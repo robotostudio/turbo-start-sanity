@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@workspace/tailwind-config/utils";
 
 import { BlogList } from "@/components/blog-list";
 import type { Blog } from "@/types";

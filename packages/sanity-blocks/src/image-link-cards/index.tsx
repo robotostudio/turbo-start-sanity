@@ -3,7 +3,7 @@ import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import { Badge } from "@workspace/ui/components/badge";
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 
 export interface ImageLinkCard {
