@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@tailwindcss/postcss": "catalog:",
     "clsx": "^2.1.1",
+    "tailwindcss": "catalog:",
     "tailwind-merge": "^3.5.0",
     "tw-animate-css": "catalog:"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "catalog:",
     "@workspace/typescript-config": "workspace:*",
-    "tailwindcss": "catalog:",
     "typescript": "catalog:"
   },
   "exports": {
