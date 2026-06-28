@@ -31,13 +31,13 @@ function sanitizeSlugs(slugs: string[]): string[] {
 }
 
 export const test = base.extend<{ slugPages: SlugPages }>({
-  slugPages: async ({}, use) => {
+  slugPages: async ({}, provide) => {
     const result = await sanityClient.fetch<SlugPages>(`{
       "pages": *[_type == "page" && defined(slug.current)].slug.current,
       "blogs": *[_type == "blog" && defined(slug.current)].slug.current
     }`);
 
-    await use({
+    await provide({
       pages: sanitizeSlugs(result.pages ?? []),
       blogs: sanitizeSlugs(result.blogs ?? []),
     });

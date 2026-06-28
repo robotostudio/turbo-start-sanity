@@ -85,7 +85,9 @@ type BlogPageProps = {
   }>;
 };
 
-export default function BlogIndexPage({ searchParams }: BlogPageProps) {
+export default function BlogIndexPage({
+  searchParams,
+}: Readonly<BlogPageProps>) {
   return (
     <Suspense fallback={<BlogIndexFallback />}>
       <DynamicBlogIndex searchParams={searchParams} />
@@ -93,7 +95,7 @@ export default function BlogIndexPage({ searchParams }: BlogPageProps) {
   );
 }
 
-async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
+async function DynamicBlogIndex({ searchParams }: Readonly<BlogPageProps>) {
   const [{ page }, { perspective, stega }] = await Promise.all([
     searchParams,
     getDynamicFetchOptions(),
