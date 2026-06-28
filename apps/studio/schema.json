@@ -3036,13 +3036,6 @@
     }
   },
   {
-    "name": "lucide-icon",
-    "type": "type",
-    "value": {
-      "type": "string"
-    }
-  },
-  {
     "name": "footer",
     "type": "document",
     "attributes": {
@@ -4157,6 +4150,13 @@
         },
         "optional": true
       }
+    }
+  },
+  {
+    "name": "lucide-icon",
+    "type": "type",
+    "value": {
+      "type": "string"
     }
   },
   {

@@ -24,6 +24,7 @@
     "@workspace/logger": "workspace:*",
     "@workspace/sanity": "workspace:*",
     "@workspace/sanity-blocks": "workspace:*",
+    "@workspace/tailwind-config": "workspace:*",
     "@workspace/ui": "workspace:*",
     "babel-plugin-react-compiler": "19.1.0-rc.2",
     "fuse.js": "^7.1.0",
