@@ -63,21 +63,35 @@ function extractPlainTextFromRichText(
     .trim();
 }
 
-// Utility function to safely render JSON-LD
+// Escape <, >, & to \uXXXX so a "</script>" in any CMS field can't break out of
+// the tag. JSON-LD is parsed as data (not executed), so escaping < is what
+// matters; the result stays valid JSON for crawlers.
+function serializeJsonLd<T>(data: T): string {
+  return JSON.stringify(data)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
+}
+
 export function JsonLdScript<T>({ data, id }: { data: T; id: string }) {
   return (
-    <script id={id} type="application/ld+json">
-      {JSON.stringify(data, null, 0)}
-    </script>
+    <script
+      // Raw injection is required so the JSON-LD reaches crawlers unescaped;
+      // serializeJsonLd already escapes <, >, & to prevent script breakout.
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }}
+      id={id}
+      type="application/ld+json"
+    />
   );
 }
 
 // FAQ JSON-LD Component
 type FaqJsonLdProps = {
   faqs: FlexibleFaq[];
+  id?: string;
 };
 
-export function FaqJsonLd({ faqs }: FaqJsonLdProps) {
+export function FaqJsonLd({ faqs, id = "faq-json-ld" }: FaqJsonLdProps) {
   if (!faqs?.length) {
     return null;
   }
@@ -105,7 +119,7 @@ export function FaqJsonLd({ faqs }: FaqJsonLdProps) {
     ),
   };
 
-  return <JsonLdScript data={faqJsonLd} id="faq-json-ld" />;
+  return <JsonLdScript data={faqJsonLd} id={id} />;
 }
 
 const IMAGE_SIZE_WIDTH = 1920;

@@ -39,7 +39,7 @@ function renderBlockComponent(block: PageBuilderBlock) {
       const props = block as PagebuilderType<"faqAccordion">;
       return (
         <>
-          <FaqJsonLd faqs={props.faqs ?? []} />
+          <FaqJsonLd faqs={props.faqs ?? []} id={`faq-json-ld-${props._key}`} />
           <FaqAccordion {...props} />
         </>
       );

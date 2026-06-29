@@ -135,3 +135,25 @@ img {
   object-fit: cover;
   border-radius: var(--radius-md);
 }
+
+/* FAQ disclosure: smooth open/close, instant fallback where unsupported. */
+@media (prefers-reduced-motion: no-preference) {
+  .faq-disclosure {
+    interpolate-size: allow-keywords;
+  }
+
+  .faq-disclosure::details-content {
+    overflow: hidden;
+    block-size: 0;
+    opacity: 0;
+    transition:
+      block-size 0.2s ease,
+      opacity 0.2s ease,
+      content-visibility 0.2s ease allow-discrete;
+  }
+
+  .faq-disclosure[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+  }
+}
