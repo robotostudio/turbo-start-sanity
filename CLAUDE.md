@@ -31,9 +31,9 @@ pnpm check-types      # TypeScript type checking
 cd apps/web && pnpm lint
 cd apps/studio && pnpm format
 
-# Sanity type generation (run from apps/studio after schema changes)
-pnpm type             # Extracts schema + generates types
-pnpm extract          # Schema extract only
+# Sanity type generation (run after schema changes)
+pnpm type             # Generates types — works from root (turbo) or apps/studio
+cd apps/studio && pnpm extract   # Schema extract only (studio-scoped)
 ```
 
 ## Monorepo Structure
@@ -56,7 +56,7 @@ packages/
 ### Data Flow: Sanity → Next.js
 
 1. **Schema** block types defined in `packages/sanity-blocks/src/` and re-exported via `@workspace/sanity-blocks`. Studio registers them via `apps/studio/schemaTypes/index.ts`
-2. **Type generation**: `pnpm type` in studio extracts schema → generates TS types at `packages/sanity/src/sanity.types.ts`
+2. **Type generation**: `pnpm type` (from repo root via turbo, or in `apps/studio`) generates TS types at `packages/sanity/src/sanity.types.ts`
 3. **GROQ queries** live in `packages/sanity/src/query.ts` using `defineQuery` from `next-sanity`, with reusable fragments
 4. **Data fetching** uses `sanityFetch` from `packages/sanity/src/live.ts` (wraps `defineLive` for automatic revalidation)
 5. **Client** configured in `packages/sanity/src/client.ts` with stega for visual editing
@@ -74,7 +74,7 @@ To add a new page builder block:
 
 1. Create `packages/sanity-blocks/src/<new-block>/` with `.schema.ts`, `.groq.ts`, and `index.tsx`
 2. Export from `packages/sanity-blocks/src/sanity-blocks.ts` and add to `blockSchemas` so Studio picks it up through `apps/studio/schemaTypes/index.ts` and `definitions/pagebuilder.ts`
-3. Run `pnpm type` in studio to regenerate Sanity types
+3. Run `pnpm type` (from repo root or `apps/studio`) to regenerate Sanity types
 4. Add GROQ fragment in `packages/sanity/src/query.ts` and include in `pageBuilderFragment`
 5. Create styled component in `apps/web/src/components/sections/`
 6. Register in `renderBlockComponent` in `apps/web/src/components/pagebuilder.tsx`
