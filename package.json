@@ -13,6 +13,7 @@
     "format": "turbo run format",
     "format:check": "turbo run format:check",
     "check-types": "turbo run check-types",
+    "type": "turbo run type",
     "test:e2e": "turbo run test:e2e"
   },
   "dependencies": {

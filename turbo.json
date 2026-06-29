@@ -30,6 +30,9 @@
     "check-types": {
       "dependsOn": ["transit"]
     },
+    "type": {
+      "cache": false
+    },
     "dev": {
       "cache": false,
       "persistent": true
