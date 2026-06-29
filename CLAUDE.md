@@ -78,6 +78,11 @@ To add a new page builder block:
 4. Add GROQ fragment in `packages/sanity/src/query.ts` and include in `pageBuilderFragment`
 5. Create styled component in `apps/web/src/components/sections/`
 6. Register in `renderBlockComponent` in `apps/web/src/components/pagebuilder.tsx`
+7. Add a Markdown serializer case in `packages/sanity-blocks/src/internal/page-builder-to-markdown.ts` (the `blockToMarkdown` switch) so the block degrades to semantic Markdown — reuse `headingToMarkdown` / `portableTextToMarkdown` and add a test asserting no JSX leaks. Without this, the new block renders blank in `.md` output
+
+### Markdown content negotiation
+
+Any page is also served as Markdown for LLMs/agents: append `.md` to the URL (`/about.md`, `/blog/post.md`, `/index.md`) or send `Accept: text/markdown`. `apps/web/src/middleware.ts` rewrites those requests to `apps/web/src/app/api/markdown/route.ts`, which fetches the page's Sanity data and serializes it via `pageBuilderToMarkdown` — the Markdown counterpart of `renderBlockComponent`. Because it serializes structured data (never React), components can't leak as raw `<Component/>` tags; unknown block types return `""`. See step 7 above to support a new block.
 
 ### Sanity Document Types
 
