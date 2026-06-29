@@ -28,7 +28,10 @@ const PUBLISHED = { perspective: "published", stega: false } as const;
 
 async function fetchHome() {
   "use cache";
-  const { data } = await sanityFetch({ query: queryHomePageData, ...PUBLISHED });
+  const { data } = await sanityFetch({
+    query: queryHomePageData,
+    ...PUBLISHED,
+  });
   return data;
 }
 
