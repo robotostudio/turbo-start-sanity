@@ -46,6 +46,8 @@
     "./*.schema": "./src/*.schema.ts",
     "./*.groq": "./src/*.groq.ts",
     "./internal/lucide-icon-preview": "./src/internal/lucide-icon-preview.tsx",
+    "./internal/page-builder-to-markdown": "./src/internal/page-builder-to-markdown.ts",
+    "./internal/portable-text-to-markdown": "./src/internal/portable-text-to-markdown.ts",
     "./internal/rendering": "./src/internal/rendering.tsx",
     "./internal/rich-text": "./src/internal/rich-text.tsx",
     "./internal/sanity-buttons": "./src/internal/sanity-buttons.tsx",
