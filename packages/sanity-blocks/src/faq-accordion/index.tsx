@@ -1,13 +1,7 @@
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@workspace/ui/components/accordion";
 import { Badge } from "@workspace/ui/components/badge";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ChevronDownIcon } from "lucide-react";
 import Link from "next/link";
 
 export interface FaqItem {
@@ -43,7 +37,7 @@ export function FaqAccordion({
   link,
 }: Readonly<FaqAccordionProps>) {
   const defaultFaq = faqs?.find((faq) => faq?.title);
-  const defaultValue = defaultFaq
+  const defaultOpenId = defaultFaq
     ? (defaultFaq._key ?? defaultFaq._id)
     : undefined;
 
@@ -64,36 +58,36 @@ export function FaqAccordion({
           </div>
         </div>
         <div className="mx-auto my-16 max-w-xl">
-          <Accordion
-            className="w-full"
-            collapsible
-            defaultValue={defaultValue}
-            type="single"
-          >
+          <div className="w-full">
             {faqs?.map((faq) => {
               // Skip items without a title
               if (!faq?.title) return null;
+              const itemId = faq._key ?? faq._id;
               return (
-                <AccordionItem
-                  className="py-2"
-                  key={`AccordionItem-${faq._key ?? faq._id}`}
-                  value={faq._key ?? faq._id}
+                <details
+                  className="faq-disclosure group border-b py-2 last:border-b-0"
+                  key={`faq-${itemId}`}
+                  name={`faq-${_key}`}
+                  open={itemId === defaultOpenId}
                 >
-                  <AccordionTrigger className="group py-2 text-[15px] leading-6 hover:no-underline">
-                    {faq.title}
-                  </AccordionTrigger>
+                  <summary className="flex cursor-default list-none items-start justify-between gap-4 rounded-md py-2 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
+                    <h3 className="font-medium text-[15px] leading-6">
+                      {faq.title}
+                    </h3>
+                    <ChevronDownIcon className="pointer-events-none mt-0.5 size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
+                  </summary>
                   {faq.richText?.length ? (
-                    <AccordionContent className="pb-2 text-muted-foreground">
+                    <div className="pb-2 text-muted-foreground">
                       <RichText
                         className="text-sm md:text-base"
                         richText={faq.richText}
                       />
-                    </AccordionContent>
+                    </div>
                   ) : null}
-                </AccordionItem>
+                </details>
               );
             })}
-          </Accordion>
+          </div>
 
           {link?.href && (link?.description || link?.title) && (
             <div className="w-full py-6">
