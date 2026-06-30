@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-import { acceptsMarkdown, normalizeMarkdownPath } from "@/lib/markdown-path";
+import { normalizeMarkdownPath, prefersMarkdown } from "@/lib/markdown-path";
 
 /**
  * Content negotiation for Markdown output.
@@ -18,7 +18,7 @@ export function middleware(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
   const hasMdSuffix = pathname.endsWith(".md");
   const wantsMarkdown =
-    hasMdSuffix || acceptsMarkdown(request.headers.get("accept") ?? "");
+    hasMdSuffix || prefersMarkdown(request.headers.get("accept") ?? "");
 
   if (!wantsMarkdown) {
     return NextResponse.next();

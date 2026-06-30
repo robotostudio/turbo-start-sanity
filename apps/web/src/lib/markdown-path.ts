@@ -24,20 +24,45 @@ export function normalizeMarkdownPath(raw: string): string {
 }
 
 /**
- * True when an `Accept` header explicitly requests `text/markdown` with a
- * non-zero q-value. `text/markdown;q=0` (an explicit refusal) returns false.
+ * Parses an `Accept` header into `{ type, q }` entries. Media types and the
+ * `q` parameter are matched case-insensitively; entries whose `q` is not a
+ * finite number within [0, 1] are dropped as invalid (e.g. `q=2`).
  */
-export function acceptsMarkdown(accept: string): boolean {
-  return accept
-    .split(",")
-    .map((part) => part.trim())
-    .some((entry) => {
-      const [mediaType, ...params] = entry.split(";").map((p) => p.trim());
-      if (mediaType !== MARKDOWN_MEDIA_TYPE) {
-        return false;
-      }
-      const qParam = params.find((p) => p.startsWith("q="));
-      const q = qParam ? Number.parseFloat(qParam.slice(2)) : 1;
-      return Number.isFinite(q) && q > 0;
-    });
+function parseAccept(accept: string): Array<{ type: string; q: number }> {
+  const entries: Array<{ type: string; q: number }> = [];
+  for (const part of accept.split(",")) {
+    const [media, ...params] = part
+      .trim()
+      .split(";")
+      .map((p) => p.trim());
+    if (!media) {
+      continue;
+    }
+    const qParam = params.find((p) => p.toLowerCase().startsWith("q="));
+    const q = qParam ? Number.parseFloat(qParam.slice(2)) : 1;
+    if (!Number.isFinite(q) || q < 0 || q > 1) {
+      continue;
+    }
+    entries.push({ type: media.toLowerCase(), q });
+  }
+  return entries;
+}
+
+/**
+ * True when `text/markdown` is the client's preferred representation — its
+ * q-value is > 0 and at least as high as every other accepted type. So
+ * `Accept: text/markdown` wins; `text/markdown;q=0` and
+ * `text/html, text/markdown;q=0.1` (HTML preferred) do not.
+ */
+export function prefersMarkdown(accept: string): boolean {
+  let markdownQ = 0;
+  let otherQ = 0;
+  for (const { type, q } of parseAccept(accept)) {
+    if (type === MARKDOWN_MEDIA_TYPE) {
+      markdownQ = Math.max(markdownQ, q);
+    } else {
+      otherQ = Math.max(otherQ, q);
+    }
+  }
+  return markdownQ > 0 && markdownQ >= otherQ;
 }
