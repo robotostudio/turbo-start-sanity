@@ -157,9 +157,9 @@ export async function GET(request: Request): Promise<Response> {
       // Same-origin only: a protocol-relative `//evil.com` (allowed by the
       // schema's `startsWith("/")`) would redirect off-site. External → 404.
       if (target.origin === requestUrl.origin) {
-        if (!target.pathname.endsWith(".md")) {
-          target.pathname = `${target.pathname}.md`;
-        }
+        // Map the destination to its `.md` form (root → `/index.md`).
+        const normalized = normalizeMarkdownPath(target.pathname);
+        target.pathname = normalized === "/" ? "/index.md" : `${normalized}.md`;
         return new Response(null, {
           status: redirect.permanent ? 308 : 307,
           headers: {
@@ -171,7 +171,16 @@ export async function GET(request: Request): Promise<Response> {
       }
     }
   } catch (error) {
+    // A redirect-lookup failure is a transient upstream error, not a missing page.
     logger.error("Redirect lookup failed", error);
+    return new Response("Upstream content fetch failed\n", {
+      status: 503,
+      headers: {
+        "content-type": "text/plain; charset=utf-8",
+        vary: "Accept",
+        "x-content-type-options": "nosniff",
+      },
+    });
   }
 
   return new Response(`Not found: ${path}\n`, {
