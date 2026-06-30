@@ -212,8 +212,8 @@ function Footer({ data, settingsData }: FooterProps) {
               </div>
             )}
           </div>
-          <div className="container mt-20 border-t pt-8">
-            <div className="flex flex-col justify-between gap-4 text-center font-normal text-muted-foreground text-sm lg:flex-row lg:items-center lg:text-left">
+          <div className="container mt-20">
+            <div className="flex flex-col justify-between gap-4 border-t pt-8 text-center font-normal text-muted-foreground text-sm lg:flex-row lg:items-center lg:text-left">
               <p>
                 © {year} {siteTitle}. All rights reserved.
               </p>
