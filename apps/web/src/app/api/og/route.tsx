@@ -51,10 +51,11 @@ const dominantColorSeoImageRender = ({
       <div tw="flex text-white text-2xl font-semibold">
         {siteTitle ?? "Turbo Start"}
       </div>
-      {_type && (
+      {/* Type pill: blog posts only */}
+      {_type === "blog" && (
         <div
           style={{
-            borderColor: "rgba(255,255,255,0.2)",
+            borderColor: "#ffffff",
             letterSpacing: "0.1em",
             textTransform: "uppercase",
           }}
@@ -66,8 +67,8 @@ const dominantColorSeoImageRender = ({
     </div>
 
     <h1
-      style={{ lineHeight: 1.05 }}
-      tw="flex text-7xl font-bold max-w-[85%] text-white"
+      style={{ lineHeight: 1.05, letterSpacing: "-0.02em", fontWeight: 400 }}
+      tw="flex text-[76px] max-w-[90%] text-white"
     >
       {title ?? siteTitle ?? "Turbo Start"}
     </h1>
