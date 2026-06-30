@@ -113,7 +113,7 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
 
   if (errTotalCount || totalCount === null || totalCount === undefined) {
     return (
-      <main className="container mx-auto my-16 px-4 md:px-6">
+      <main className="container my-16">
         <BlogHeader
           description={indexPageData.description}
           title={indexPageData.title}
@@ -158,7 +158,7 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
 
   if (errBlogs || !blogs) {
     return (
-      <main className="container mx-auto my-16 px-4 md:px-6">
+      <main className="container my-16">
         <BlogHeader
           description={indexPageData.description}
           title={indexPageData.title}
@@ -189,5 +189,5 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
 }
 
 function BlogIndexFallback() {
-  return <main className="container mx-auto my-16 min-h-[50vh] px-4 md:px-6" />;
+  return <main className="container my-16 min-h-[50vh]" />;
 }

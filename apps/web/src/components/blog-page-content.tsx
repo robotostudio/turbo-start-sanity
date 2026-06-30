@@ -56,7 +56,7 @@ export function BlogPageContent({
 
   return (
     <main className="bg-background">
-      <div className="container mx-auto my-16 px-4 md:px-6">
+      <div className="container my-16">
         <BlogHeader description={description} title={title} />
 
         <SearchInput

@@ -47,7 +47,7 @@ export function FeatureCardsWithIcon({
 }: Readonly<FeatureCardsIconProps>) {
   return (
     <section className="my-6 md:my-16" id="features">
-      <div className="container mx-auto px-4 md:px-6">
+      <div className="container">
         <div className="flex w-full flex-col items-center">
           <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">
             {eyebrow && <Badge variant="secondary">{eyebrow}</Badge>}

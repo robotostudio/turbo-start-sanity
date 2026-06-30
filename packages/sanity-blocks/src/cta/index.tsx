@@ -19,7 +19,7 @@ export function CTABlock({
 }: Readonly<CtaBlockProps>) {
   return (
     <section className="my-6 md:my-16" id="cta">
-      <div className="container mx-auto px-4 md:px-8">
+      <div className="container">
         <div className="rounded-3xl bg-muted px-4 py-16">
           <div className="mx-auto max-w-3xl space-y-8 text-center">
             {eyebrow && (

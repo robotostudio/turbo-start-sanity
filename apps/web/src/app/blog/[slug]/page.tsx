@@ -141,7 +141,7 @@ function BlogPageContent({
   const { title, description, image, richText } = data ?? {};
 
   return (
-    <div className="container mx-auto my-16 px-4 md:px-6">
+    <div className="container my-16">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
         <main>
           <ArticleJsonLd article={data} />
