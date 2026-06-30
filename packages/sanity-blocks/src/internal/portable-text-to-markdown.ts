@@ -77,8 +77,8 @@ const isHeadingStyle = (style: string): boolean => /^h[1-6]$/.test(style);
 export function escapeMarkdown(text: string): string {
   return text
     .replace(/([\\`*_[\]<>~|#])/g, String.raw`\$1`)
-    .replace(/^(\s*)([-+]) /gm, String.raw`$1\$2 `)
-    .replace(/^(\s*\d+)([.)]) /gm, String.raw`$1\$2 `)
+    .replace(/^([-+]) /gm, String.raw`\$1 `)
+    .replace(/^(\d+)([.)]) /gm, String.raw`$1\$2 `)
     .replace(/^(-{3,})$/gm, String.raw`\$1`);
 }
 
