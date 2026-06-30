@@ -9,11 +9,13 @@ import {
   queryBlogIndexPageBlogsCount,
   queryBlogIndexPageData,
 } from "@workspace/sanity/query";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { BlogHeader } from "@/components/blog-card";
 import { BlogPageContent } from "@/components/blog-page-content";
+import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
 import { getSEOMetadata } from "@/lib/seo";
 import {
@@ -64,7 +66,7 @@ async function fetchBlogIndexPageBlogsCount({
   return res.data;
 }
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   const { perspective } = await getDynamicFetchOptions();
   const { data: result } = await sanityFetchMetadata({
     query: queryBlogIndexPageData,
@@ -124,11 +126,14 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
           </p>
         </div>
         {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
-          <PageBuilder
-            id={indexPageData._id}
-            pageBuilder={indexPageData.pageBuilder}
-            type={indexPageData._type}
-          />
+          <>
+            <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
+            <PageBuilder
+              id={indexPageData._id}
+              pageBuilder={indexPageData.pageBuilder}
+              type={indexPageData._type}
+            />
+          </>
         )}
       </main>
     );
@@ -169,22 +174,28 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
           </p>
         </div>
         {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
-          <PageBuilder
-            id={indexPageData._id}
-            pageBuilder={indexPageData.pageBuilder}
-            type={indexPageData._type}
-          />
+          <>
+            <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
+            <PageBuilder
+              id={indexPageData._id}
+              pageBuilder={indexPageData.pageBuilder}
+              type={indexPageData._type}
+            />
+          </>
         )}
       </main>
     );
   }
 
   return (
-    <BlogPageContent
-      blogs={blogs}
-      indexPageData={indexPageData}
-      paginationMetadata={paginationMetadata}
-    />
+    <>
+      <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
+      <BlogPageContent
+        blogs={blogs}
+        indexPageData={indexPageData}
+        paginationMetadata={paginationMetadata}
+      />
+    </>
   );
 }
 

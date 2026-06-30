@@ -19,6 +19,7 @@
     "sanity": "catalog:"
   },
   "dependencies": {
+    "@portabletext/markdown": "^1.4.2",
     "@sanity/icons": "^3.7.4",
     "@workspace/env": "workspace:*",
     "@workspace/logger": "workspace:*",
@@ -28,6 +29,7 @@
     "next-sanity": "^12.1.1",
     "sanity": "catalog:",
     "sanity-image": "^1.1.0",
+    "schema-dts": "^1.1.5",
     "slugify": "^1.6.8"
   },
   "devDependencies": {
@@ -43,9 +45,12 @@
   "exports": {
     ".": "./src/sanity-blocks.ts",
     "./*/index": "./src/*/index.tsx",
+    "./*/json-ld": "./src/*/json-ld.ts",
     "./*.schema": "./src/*.schema.ts",
     "./*.groq": "./src/*.groq.ts",
     "./internal/lucide-icon-preview": "./src/internal/lucide-icon-preview.tsx",
+    "./internal/page-builder-to-markdown": "./src/internal/page-builder-to-markdown.ts",
+    "./internal/portable-text-to-markdown": "./src/internal/portable-text-to-markdown.ts",
     "./internal/rendering": "./src/internal/rendering.tsx",
     "./internal/rich-text": "./src/internal/rich-text.tsx",
     "./internal/sanity-buttons": "./src/internal/sanity-buttons.tsx",
