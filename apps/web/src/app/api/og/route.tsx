@@ -69,7 +69,7 @@ const dominantColorSeoImageRender = ({
       style={{ lineHeight: 1.05 }}
       tw="flex text-7xl font-bold max-w-[85%] text-white"
     >
-      {title}
+      {title ?? siteTitle ?? "Turbo Start"}
     </h1>
   </div>
 );
