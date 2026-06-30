@@ -7,6 +7,7 @@ import {
   sanityFetchStaticParams,
 } from "@workspace/sanity/live";
 import { queryBlogPaths, queryBlogSlugPageData } from "@workspace/sanity/query";
+import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -58,7 +59,7 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<BlogParams>;
-}) {
+}): Promise<Metadata> {
   const [{ slug }, { perspective }] = await Promise.all([
     params,
     getDynamicFetchOptions(),

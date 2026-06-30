@@ -73,7 +73,8 @@ test("nests bullet and numbered lists and keeps them grouped", () => {
     },
   ]);
 
-  expect(md).toBe("- First\n  - Nested\n1. Step");
+  // Official lib uses 3-space indent per level (CommonMark-compliant).
+  expect(md).toBe("- First\n   - Nested\n1. Step");
 });
 
 test("renders images via the resolver and falls back to text without one", () => {
@@ -133,21 +134,9 @@ test("wraps link URLs containing parens or spaces in angle brackets", () => {
   expect(md).toBe("[link](</foo_(bar)>)");
 });
 
-test("neutralizes block-leading markers on every line of multiline text", () => {
-  const md = portableTextToMarkdown([
-    {
-      _type: "block",
-      style: "normal",
-      children: [
-        { _type: "span", text: "Intro\n- not a list\n1. nor this\n---" },
-      ],
-    },
-  ]);
-
-  expect(md).toBe("Intro\n\\- not a list\n1\\. nor this\n\\---");
-});
-
-test("escapes literal Markdown metacharacters in span text", () => {
+test("passes span text through without escaping Markdown metacharacters", () => {
+  // The official library does not escape raw body text — callers that need
+  // escaped plain-string output should use `escapeMarkdown` directly.
   const md = portableTextToMarkdown([
     {
       _type: "block",
@@ -156,7 +145,125 @@ test("escapes literal Markdown metacharacters in span text", () => {
     },
   ]);
 
-  expect(md).toBe("user\\_name\\_field and foo\\[bar\\]");
+  expect(md).toBe("user_name_field and foo[bar]");
+});
+
+// ─── block-leading escaping ───────────────────────────────────────────────────
+// The official lib does not escape block-leading markers, so a normal paragraph
+// whose text starts with `- x`, `> x`, etc. would render as a list / blockquote
+// / heading / thematic break. Our custom `block.normal` renderer escapes them.
+
+test("block-leading: escapes bullet, plus, and star markers at paragraph start", () => {
+  for (const [text, expected] of [
+    ["- x", "\\- x"],
+    ["+ item", "\\+ item"],
+    ["* star", "\\* star"],
+  ] as const) {
+    expect(
+      portableTextToMarkdown([
+        {
+          _type: "block",
+          style: "normal",
+          children: [{ _type: "span", text }],
+        },
+      ])
+    ).toBe(expected);
+  }
+});
+
+test("block-leading: escapes ordered-list markers (period and paren) at paragraph start", () => {
+  for (const [text, expected] of [
+    ["1. x", "1\\. x"],
+    ["2) y", "2\\) y"],
+    ["10. z", "10\\. z"],
+  ] as const) {
+    expect(
+      portableTextToMarkdown([
+        {
+          _type: "block",
+          style: "normal",
+          children: [{ _type: "span", text }],
+        },
+      ])
+    ).toBe(expected);
+  }
+});
+
+test("block-leading: escapes blockquote marker at paragraph start", () => {
+  expect(
+    portableTextToMarkdown([
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "> quoted" }],
+      },
+    ])
+  ).toBe("\\> quoted");
+});
+
+test("block-leading: escapes ATX heading markers at paragraph start", () => {
+  for (const [text, expected] of [
+    ["# H1", "\\# H1"],
+    ["## H2", "\\## H2"],
+    ["###### H6", "\\###### H6"],
+  ] as const) {
+    expect(
+      portableTextToMarkdown([
+        {
+          _type: "block",
+          style: "normal",
+          children: [{ _type: "span", text }],
+        },
+      ])
+    ).toBe(expected);
+  }
+});
+
+test("block-leading: escapes thematic break sequences in normal paragraphs", () => {
+  for (const text of ["---", "***", "___"]) {
+    expect(
+      portableTextToMarkdown([
+        {
+          _type: "block",
+          style: "normal",
+          children: [{ _type: "span", text }],
+        },
+      ])
+    ).toMatch(/^\\/);
+  }
+});
+
+test("block-leading: real bullet and number listItems still render as list markers (not escaped)", () => {
+  const md = portableTextToMarkdown([
+    {
+      _type: "block",
+      listItem: "bullet",
+      level: 1,
+      children: [{ _type: "span", text: "Bullet" }],
+    },
+    {
+      _type: "block",
+      listItem: "number",
+      level: 1,
+      children: [{ _type: "span", text: "Step" }],
+    },
+  ]);
+  expect(md).toContain("- Bullet");
+  expect(md).toContain("1. Step");
+});
+
+test("block-leading: inline underscores in normal paragraphs are not over-escaped (guard)", () => {
+  // The block.normal wrapper must only touch block-leading markers, never
+  // inline characters like underscores that the lib deliberately leaves raw.
+  expect(
+    portableTextToMarkdown([
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "user_name_field" }],
+      },
+    ])
+  ).toBe("user_name_field");
 });
 
 test("never emits raw JSX-style tags", () => {

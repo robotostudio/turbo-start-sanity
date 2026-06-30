@@ -143,6 +143,12 @@ export async function getSEOMetadata(
       ? defaultTitle
       : `${defaultTitle} | ${siteConfig.title}`;
 
+  const markdownUrl =
+    slug && slug !== "/" ? `${pageUrl}.md` : `${baseUrl}/index.md`;
+  const markdownTypes = seoNoIndex
+    ? undefined
+    : { "text/markdown": [{ url: markdownUrl, title: fullTitle }] };
+
   // Build default metadata object
   const defaultMetadata: Metadata = {
     title: fullTitle,
@@ -164,6 +170,7 @@ export async function getSEOMetadata(
     },
     alternates: {
       canonical: pageUrl,
+      types: markdownTypes,
     },
     openGraph: {
       type: pageType ?? "website",
@@ -184,8 +191,10 @@ export async function getSEOMetadata(
   };
 
   // Override any defaults with page-specific metadata
+  const { alternates: alternatesOverride, ...restOverrides } = pageOverrides;
   return {
     ...defaultMetadata,
-    ...pageOverrides,
+    ...restOverrides,
+    alternates: { ...defaultMetadata.alternates, ...alternatesOverride },
   };
 }

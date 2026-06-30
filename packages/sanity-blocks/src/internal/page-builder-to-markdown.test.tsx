@@ -126,6 +126,7 @@ test("treats '#' href as no link (plain text fallback)", () => {
       cards: [{ _key: "c", title: "Card", href: "#", description: "d" }],
     },
   ]);
+  // "#" href cards are kept as plain-text headings (no link).
   expect(cards).toContain("### Card");
   expect(cards).not.toContain("](#)");
 });

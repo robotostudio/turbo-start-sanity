@@ -5,13 +5,15 @@ import {
   sanityFetchMetadata,
 } from "@workspace/sanity/live";
 import { queryHomePageData } from "@workspace/sanity/query";
+import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { Suspense } from "react";
 
+import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
 import { getSEOMetadata } from "@/lib/seo";
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   const { perspective } = await getDynamicFetchOptions();
   const { data: homePageData } = await sanityFetchMetadata({
     query: queryHomePageData,
@@ -57,7 +59,12 @@ async function CachedHome({ perspective, stega }: DynamicFetchOptions) {
 
   const { _id, _type, pageBuilder } = homePageData ?? {};
 
-  return <PageBuilder id={_id} pageBuilder={pageBuilder ?? []} type={_type} />;
+  return (
+    <>
+      <PageBuilderJsonLd pageBuilder={pageBuilder} />
+      <PageBuilder id={_id} pageBuilder={pageBuilder ?? []} type={_type} />
+    </>
+  );
 }
 
 function HomeFallback() {
