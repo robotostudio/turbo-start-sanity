@@ -69,10 +69,16 @@ function wrapInlineCode(text: string): string {
 
 const isHeadingStyle = (style: string): boolean => /^h[1-6]$/.test(style);
 
-// Escape inline Markdown metacharacters so literal author text (e.g.
-// `user_name_field`) isn't reinterpreted as italics/bold/links.
+// Escape Markdown metacharacters so literal author text stays literal: inline
+// ones everywhere (e.g. `user_name_field`), plus block-leading list/ordered/hr
+// markers so a paragraph starting with `- `, `1. `, or `---` isn't parsed as a
+// list or thematic break. (`*`, `_`, `>`, `#` markers are already covered above.)
 export function escapeMarkdown(text: string): string {
-  return text.replace(/([\\`*_[\]<>~|#])/g, String.raw`\$1`);
+  return text
+    .replace(/([\\`*_[\]<>~|#])/g, String.raw`\$1`)
+    .replace(/^(\s*)([-+]) /, String.raw`$1\$2 `)
+    .replace(/^(\s*\d+)([.)]) /, String.raw`$1\$2 `)
+    .replace(/^(-{3,})$/, String.raw`\$1`);
 }
 
 // Format a URL for a Markdown link/image target. Spaces or parens would close
