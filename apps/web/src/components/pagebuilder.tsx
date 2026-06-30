@@ -11,7 +11,6 @@ import { RichTextBlock } from "@workspace/sanity-blocks/rich-text-block/index";
 import { SubscribeNewsletter } from "@workspace/sanity-blocks/subscribe-newsletter/index";
 import { createDataAttribute } from "next-sanity";
 
-import { FaqJsonLd } from "@/components/json-ld";
 import type { PageBuilderBlock, PagebuilderType } from "@/types";
 
 export type PageBuilderProps = {
@@ -35,15 +34,8 @@ function renderBlockComponent(block: PageBuilderBlock) {
   switch (block?._type) {
     case "cta":
       return <CTABlock {...(block as PagebuilderType<"cta">)} />;
-    case "faqAccordion": {
-      const props = block as PagebuilderType<"faqAccordion">;
-      return (
-        <>
-          <FaqJsonLd faqs={props.faqs ?? []} id={`faq-json-ld-${props._key}`} />
-          <FaqAccordion {...props} />
-        </>
-      );
-    }
+    case "faqAccordion":
+      return <FaqAccordion {...(block as PagebuilderType<"faqAccordion">)} />;
     case "hero":
       return <HeroBlock {...(block as PagebuilderType<"hero">)} />;
     case "featureCardsIcon":

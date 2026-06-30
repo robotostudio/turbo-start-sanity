@@ -7,10 +7,12 @@ import {
   sanityFetchStaticParams,
 } from "@workspace/sanity/live";
 import { querySlugPageData, querySlugPagePaths } from "@workspace/sanity/query";
+import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
 import { getSEOMetadata } from "@/lib/seo";
 
@@ -49,7 +51,7 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<SlugParams>;
-}) {
+}): Promise<Metadata> {
   const [{ slug }, { perspective }] = await Promise.all([
     params,
     getDynamicFetchOptions(),
@@ -131,15 +133,22 @@ function SlugPageContent({
 }) {
   const { title, pageBuilder, _id, _type } = pageData ?? {};
 
-  return !Array.isArray(pageBuilder) || pageBuilder?.length === 0 ? (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center p-4 text-center">
-      <h1 className="mb-4 font-semibold text-2xl capitalize">{title}</h1>
-      <p className="mb-6 text-muted-foreground">
-        This page has no content blocks yet.
-      </p>
-    </div>
-  ) : (
-    <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
+  if (!Array.isArray(pageBuilder) || pageBuilder?.length === 0) {
+    return (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center p-4 text-center">
+        <h1 className="mb-4 font-semibold text-2xl capitalize">{title}</h1>
+        <p className="mb-6 text-muted-foreground">
+          This page has no content blocks yet.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <PageBuilderJsonLd pageBuilder={pageBuilder} />
+      <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
+    </>
   );
 }
 

@@ -5,14 +5,11 @@ import type {
 } from "@workspace/sanity/types";
 import { stegaClean } from "next-sanity";
 import type {
-  Answer,
   Article,
   ContactPoint,
-  FAQPage,
   ImageObject,
   Organization,
   Person,
-  Question,
   WebPage,
   WebSite,
   WithContext,
@@ -20,48 +17,6 @@ import type {
 
 import { getJsonLdSettings } from "@/lib/json-ld-data";
 import { getBaseUrl } from "@/utils";
-
-type RichTextChild = {
-  _type: string;
-  text?: string;
-  marks?: string[];
-  _key: string;
-};
-
-type RichTextBlock = {
-  _type: string;
-  children?: RichTextChild[];
-  style?: string;
-  _key: string;
-};
-
-// Flexible FAQ type that can accept different rich text structures
-type FlexibleFaq = {
-  _id: string;
-  title: string;
-  richText?: RichTextBlock[] | null;
-};
-
-// Utility function to safely extract plain text from rich text blocks
-function extractPlainTextFromRichText(
-  richText: RichTextBlock[] | null | undefined
-): string {
-  if (!Array.isArray(richText)) {
-    return "";
-  }
-
-  return richText
-    .filter((block) => block._type === "block" && Array.isArray(block.children))
-    .map(
-      (block) =>
-        block.children
-          ?.filter((child) => child._type === "span" && Boolean(child.text))
-          .map((child) => child.text)
-          .join("") ?? ""
-    )
-    .join(" ")
-    .trim();
-}
 
 // Escape <, >, & to \uXXXX so a "</script>" in any CMS field can't break out of
 // the tag. JSON-LD is parsed as data (not executed), so escaping < is what
@@ -83,43 +38,6 @@ export function JsonLdScript<T>({ data, id }: { data: T; id: string }) {
       type="application/ld+json"
     />
   );
-}
-
-// FAQ JSON-LD Component
-type FaqJsonLdProps = {
-  faqs: FlexibleFaq[];
-  id?: string;
-};
-
-export function FaqJsonLd({ faqs, id = "faq-json-ld" }: FaqJsonLdProps) {
-  if (!faqs?.length) {
-    return null;
-  }
-
-  const validFaqs = stegaClean(
-    faqs.filter((faq) => faq?.title && faq?.richText)
-  );
-
-  if (!validFaqs.length) {
-    return null;
-  }
-
-  const faqJsonLd: WithContext<FAQPage> = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: validFaqs.map(
-      (faq): Question => ({
-        "@type": "Question",
-        name: faq.title,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: extractPlainTextFromRichText(faq.richText),
-        } as Answer,
-      })
-    ),
-  };
-
-  return <JsonLdScript data={faqJsonLd} id={id} />;
 }
 
 const IMAGE_SIZE_WIDTH = 1920;
@@ -277,7 +195,6 @@ export function WebSiteJsonLd({ settings }: WebSiteJsonLdProps) {
 type CombinedJsonLdProps = {
   settings?: QuerySettingsDataResult;
   article?: QueryBlogSlugPageDataResult;
-  faqs?: FlexibleFaq[];
   includeWebsite?: boolean;
   includeOrganization?: boolean;
 };

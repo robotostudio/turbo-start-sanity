@@ -126,7 +126,8 @@ test("treats '#' href as no link (plain text fallback)", () => {
       cards: [{ _key: "c", title: "Card", href: "#", description: "d" }],
     },
   ]);
-  expect(cards).toContain("### Card");
+  // "#" href cards are filtered out entirely (consistent with buttons behavior).
+  expect(cards).not.toContain("### Card");
   expect(cards).not.toContain("](#)");
 });
 

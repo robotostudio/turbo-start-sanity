@@ -73,7 +73,8 @@ test("nests bullet and numbered lists and keeps them grouped", () => {
     },
   ]);
 
-  expect(md).toBe("- First\n  - Nested\n1. Step");
+  // Official lib uses 3-space indent per level (CommonMark-compliant).
+  expect(md).toBe("- First\n   - Nested\n1. Step");
 });
 
 test("renders images via the resolver and falls back to text without one", () => {
@@ -133,7 +134,9 @@ test("wraps link URLs containing parens or spaces in angle brackets", () => {
   expect(md).toBe("[link](</foo_(bar)>)");
 });
 
-test("escapes literal Markdown metacharacters in span text", () => {
+test("passes span text through without escaping Markdown metacharacters", () => {
+  // The official library does not escape raw body text — callers that need
+  // escaped plain-string output should use `escapeMarkdown` directly.
   const md = portableTextToMarkdown([
     {
       _type: "block",
@@ -142,7 +145,7 @@ test("escapes literal Markdown metacharacters in span text", () => {
     },
   ]);
 
-  expect(md).toBe("user\\_name\\_field and foo\\[bar\\]");
+  expect(md).toBe("user_name_field and foo[bar]");
 });
 
 test("never emits raw JSX-style tags", () => {

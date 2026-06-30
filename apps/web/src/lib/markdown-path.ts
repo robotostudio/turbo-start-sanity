@@ -7,20 +7,14 @@ export const MARKDOWN_MEDIA_TYPE = "text/markdown";
 
 /** Canonicalizes a path: strips `.md` and trailing slash, maps `/index` → `/`. */
 export function normalizeMarkdownPath(raw: string): string {
-  let path = raw.trim();
-  if (!path.startsWith("/")) {
-    path = `/${path}`;
-  }
-  if (path.endsWith(".md")) {
-    path = path.slice(0, -3);
-  }
-  if (path.length > 1 && path.endsWith("/")) {
-    path = path.slice(0, -1);
-  }
-  if (path === "/index") {
-    path = "/";
-  }
-  return path;
+  const trimmed = raw.trim();
+  const slashed = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  const withoutMd = slashed.endsWith(".md") ? slashed.slice(0, -3) : slashed;
+  const withoutTrailing =
+    withoutMd.length > 1 && withoutMd.endsWith("/")
+      ? withoutMd.slice(0, -1)
+      : withoutMd;
+  return withoutTrailing === "/index" ? "/" : withoutTrailing;
 }
 
 /**
@@ -52,14 +46,12 @@ function parseAccept(accept: string): Array<{ type: string; q: number }> {
  * type's q). So `text/markdown` wins; `;q=0` and HTML-preferred lists do not.
  */
 export function prefersMarkdown(accept: string): boolean {
-  let markdownQ = 0;
-  let otherQ = 0;
-  for (const { type, q } of parseAccept(accept)) {
-    if (type === MARKDOWN_MEDIA_TYPE) {
-      markdownQ = Math.max(markdownQ, q);
-    } else {
-      otherQ = Math.max(otherQ, q);
-    }
-  }
+  const entries = parseAccept(accept);
+  const markdownQ = entries
+    .filter(({ type }) => type === MARKDOWN_MEDIA_TYPE)
+    .reduce((max, { q }) => Math.max(max, q), 0);
+  const otherQ = entries
+    .filter(({ type }) => type !== MARKDOWN_MEDIA_TYPE)
+    .reduce((max, { q }) => Math.max(max, q), 0);
   return markdownQ > 0 && markdownQ >= otherQ;
 }
