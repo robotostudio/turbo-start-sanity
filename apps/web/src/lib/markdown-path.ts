@@ -1,6 +1,6 @@
 /**
- * Pure path/negotiation helpers shared by the Markdown middleware and route.
- * Kept free of heavy imports so the middleware bundle stays light.
+ * Pure path/negotiation helpers shared by the Markdown proxy and route.
+ * Kept free of heavy imports so the proxy bundle stays light.
  */
 
 export const MARKDOWN_MEDIA_TYPE = "text/markdown";
@@ -17,16 +17,15 @@ export function normalizeMarkdownPath(raw: string): string {
   if (path.length > 1 && path.endsWith("/")) {
     path = path.slice(0, -1);
   }
-  if (path === "/index" || path === "") {
+  if (path === "/index") {
     path = "/";
   }
   return path;
 }
 
 /**
- * Parses an `Accept` header into `{ type, q }` entries. Media types and the
- * `q` parameter are matched case-insensitively; entries whose `q` is not a
- * finite number within [0, 1] are dropped as invalid (e.g. `q=2`).
+ * Parses an `Accept` header into `{ type, q }` entries (type + `q` matched
+ * case-insensitively; entries with `q` outside [0, 1] dropped, e.g. `q=2`).
  */
 function parseAccept(accept: string): Array<{ type: string; q: number }> {
   const entries: Array<{ type: string; q: number }> = [];
@@ -49,10 +48,8 @@ function parseAccept(accept: string): Array<{ type: string; q: number }> {
 }
 
 /**
- * True when `text/markdown` is the client's preferred representation — its
- * q-value is > 0 and at least as high as every other accepted type. So
- * `Accept: text/markdown` wins; `text/markdown;q=0` and
- * `text/html, text/markdown;q=0.1` (HTML preferred) do not.
+ * True when `text/markdown` is the preferred type (q > 0 and >= every other
+ * type's q). So `text/markdown` wins; `;q=0` and HTML-preferred lists do not.
  */
 export function prefersMarkdown(accept: string): boolean {
   let markdownQ = 0;
