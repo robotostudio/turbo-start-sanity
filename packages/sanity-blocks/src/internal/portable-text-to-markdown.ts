@@ -53,15 +53,26 @@ const DECORATOR_WRAPPERS: Record<string, [string, string]> = {
   strong: ["**", "**"],
   em: ["_", "_"],
   "strike-through": ["~~", "~~"],
-  code: ["`", "`"],
 };
+
+// Inline code span: fence with one more backtick than the longest inner run,
+// padded when the content borders a backtick (CommonMark).
+function wrapInlineCode(text: string): string {
+  const longestRun = (text.match(/`+/g) ?? []).reduce(
+    (max, run) => Math.max(max, run.length),
+    0
+  );
+  const fence = "`".repeat(longestRun + 1);
+  const body = text.startsWith("`") || text.endsWith("`") ? ` ${text} ` : text;
+  return `${fence}${body}${fence}`;
+}
 
 const isHeadingStyle = (style: string): boolean => /^h[1-6]$/.test(style);
 
 // Escape inline Markdown metacharacters so literal author text (e.g.
 // `user_name_field`) isn't reinterpreted as italics/bold/links.
 export function escapeMarkdown(text: string): string {
-  return text.replace(/([\\`*_[\]<>~|#])/g, "\\$1");
+  return text.replace(/([\\`*_[\]<>~|#])/g, String.raw`\$1`);
 }
 
 // Format a URL for a Markdown link/image target. Spaces or parens would close
@@ -83,11 +94,14 @@ function serializeSpan(
     return "";
   }
 
-  let text = escapeMarkdown(rawText);
   const marks = span.marks ?? [];
 
-  // Decorators wrap the text first (innermost), so a linked span becomes
-  // `[**text**](href)` rather than `**[text](href)**`.
+  // `code` keeps raw text (escaping would show literal backslashes); other marks
+  // wrap escaped text innermost, so a linked span becomes `[**text**](href)`.
+  let text = marks.includes("code")
+    ? wrapInlineCode(rawText)
+    : escapeMarkdown(rawText);
+
   for (const mark of marks) {
     const wrapper = DECORATOR_WRAPPERS[mark];
     if (wrapper) {

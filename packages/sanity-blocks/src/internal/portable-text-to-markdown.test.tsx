@@ -98,6 +98,28 @@ test("renders images via the resolver and falls back to text without one", () =>
   expect(withoutUrl).toBe("A diagram");
 });
 
+test("keeps code-span text raw and fences embedded backticks", () => {
+  expect(
+    portableTextToMarkdown([
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "a_b", marks: ["code"] }],
+      },
+    ])
+  ).toBe("`a_b`");
+
+  expect(
+    portableTextToMarkdown([
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "a`b", marks: ["code"] }],
+      },
+    ])
+  ).toBe("``a`b``");
+});
+
 test("wraps link URLs containing parens or spaces in angle brackets", () => {
   const md = portableTextToMarkdown([
     {
