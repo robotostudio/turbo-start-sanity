@@ -126,9 +126,33 @@ test("treats '#' href as no link (plain text fallback)", () => {
       cards: [{ _key: "c", title: "Card", href: "#", description: "d" }],
     },
   ]);
-  // "#" href cards are filtered out entirely (consistent with buttons behavior).
-  expect(cards).not.toContain("### Card");
+  // "#" href cards are kept as plain-text headings (no link).
+  expect(cards).toContain("### Card");
   expect(cards).not.toContain("](#)");
+});
+
+test("keeps no-href links and cards as plain text instead of dropping them", () => {
+  const faq = pageBuilderToMarkdown([
+    {
+      _type: "faqAccordion",
+      title: "Q",
+      faqs: [{ _id: "1", title: "x", richText: para("y") }],
+      link: { title: "All questions" },
+    },
+  ]);
+  expect(faq).toContain("All questions");
+  expect(faq).not.toContain("](");
+
+  const cards = pageBuilderToMarkdown([
+    {
+      _type: "imageLinkCards",
+      title: "T",
+      cards: [{ _key: "c", title: "Solo Card", description: "Details" }],
+    },
+  ]);
+  expect(cards).toContain("### Solo Card");
+  expect(cards).toContain("Details");
+  expect(cards).not.toContain("](");
 });
 
 test("separates blocks with a blank line", () => {

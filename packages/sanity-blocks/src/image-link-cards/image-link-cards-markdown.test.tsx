@@ -20,7 +20,7 @@ test("imageLinkCardsToMarkdown renders linked card headings", () => {
   expect(result).toContain("### [Hero](/hero)");
 });
 
-test("imageLinkCardsToMarkdown filters cards without an href", () => {
+test("imageLinkCardsToMarkdown keeps cards without an href as plain-text headings", () => {
   const result = imageLinkCardsToMarkdown(
     {
       cards: [
@@ -30,7 +30,7 @@ test("imageLinkCardsToMarkdown filters cards without an href", () => {
     },
     {}
   );
-  expect(result).not.toContain("No link");
+  expect(result).toContain("### No link");
   expect(result).toContain("### [Has link](/page)");
 });
 
@@ -103,13 +103,14 @@ test("imageLinkCardsToMarkdown falls back to alt text for card image when no res
   expect(result).not.toContain("![");
 });
 
-test("imageLinkCardsToMarkdown drops '#' placeholder-href cards entirely", () => {
-  // href="#" is now filtered out (consistent with how buttons treat "#").
+test("imageLinkCardsToMarkdown keeps '#' href cards as plain-text headings", () => {
+  // href="#" is treated as no link — card kept with plain heading, no `](` link.
   const result = imageLinkCardsToMarkdown(
     { cards: [{ _key: "c1", title: "Hash card", href: "#" }] },
     {}
   );
-  expect(result).toBe("");
+  expect(result).toContain("### Hash card");
+  expect(result).not.toContain("](");
 });
 
 test("imageLinkCardsToMarkdown emits no HTML or JSX tags", () => {

@@ -12,7 +12,10 @@
  *   - Unknown block types (silenced to `""`)
  */
 
-import { portableTextToMarkdown as officialPortableTextToMarkdown } from "@portabletext/markdown";
+import {
+  DefaultNormalRenderer,
+  portableTextToMarkdown as officialPortableTextToMarkdown,
+} from "@portabletext/markdown";
 
 export interface PortableTextSpan {
   _type?: string;
@@ -104,6 +107,22 @@ export function portableTextToMarkdown(
   }
 
   return officialPortableTextToMarkdown(blocks as AnyBlock[], {
+    // Escape block-leading Markdown markers in plain paragraphs so a normal
+    // paragraph whose text starts with `- x`, `1. x`, `> x`, `# x`, or `---`
+    // is emitted verbatim instead of being re-parsed as a list / blockquote /
+    // heading / thematic break. The official lib's DefaultNormalRenderer just
+    // returns `children`, so we wrap it and apply the escaping after.
+    // List items produced by real `listItem` blocks are NOT touched here —
+    // they go through the lib's list renderer, not through `block.normal`.
+    block: {
+      normal: (opts) =>
+        DefaultNormalRenderer(opts)
+          .replace(/^([-+*]) /gm, String.raw`\$1 `)
+          .replace(/^(\d+)([.)]) /gm, String.raw`$1\$2 `)
+          .replace(/^(>) /gm, String.raw`\$1 `)
+          .replace(/^(#{1,6}) /gm, String.raw`\$1 `)
+          .replace(/^([-*_]{3,})$/gm, String.raw`\$1`),
+    },
     marks: {
       // Sanity schema convention: links use `customLink`, not the standard `link`.
       customLink: ({ value, children }) => {

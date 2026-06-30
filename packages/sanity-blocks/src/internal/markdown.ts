@@ -108,7 +108,10 @@ export function imageToMarkdown(
   const url = image?.id ? options.resolveImageUrl?.(image) : undefined;
   // Mirror portable-text: image when a URL resolves, else caption/alt text.
   if (url) {
-    return `![${escapeMarkdown(alt)}](${formatUrl(url)})`;
+    const img = `![${escapeMarkdown(alt)}](${formatUrl(url)})`;
+    return caption && caption !== alt
+      ? `${img}\n\n_${escapeMarkdown(caption)}_`
+      : img;
   }
   return escapeMarkdown(caption || alt);
 }

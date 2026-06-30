@@ -239,6 +239,39 @@ test("imageToMarkdown skips the resolver when id is null", () => {
   expect(imageToMarkdown(img, { resolveImageUrl })).toBe("No id");
 });
 
+test("imageToMarkdown appends caption as italic paragraph when caption differs from alt", () => {
+  const img: MarkdownImage = {
+    id: "abc123",
+    alt: "A diagram",
+    caption: "Figure 1",
+  };
+  expect(imageToMarkdown(img, { resolveImageUrl })).toBe(
+    "![A diagram](https://cdn.example.com/abc123.webp)\n\n_Figure 1_"
+  );
+});
+
+test("imageToMarkdown does not append caption when caption equals alt", () => {
+  const img: MarkdownImage = {
+    id: "abc123",
+    alt: "Same text",
+    caption: "Same text",
+  };
+  expect(imageToMarkdown(img, { resolveImageUrl })).toBe(
+    "![Same text](https://cdn.example.com/abc123.webp)"
+  );
+});
+
+test("imageToMarkdown escapes markdown chars in caption", () => {
+  const img: MarkdownImage = {
+    id: "abc123",
+    alt: "Photo",
+    caption: "_Caption_",
+  };
+  expect(imageToMarkdown(img, { resolveImageUrl })).toBe(
+    "![Photo](https://cdn.example.com/abc123.webp)\n\n_\\_Caption\\__"
+  );
+});
+
 // ─── mdLink ──────────────────────────────────────────────────────────────────
 
 test("mdLink returns a Markdown link for a valid href", () => {
