@@ -188,6 +188,8 @@ export function PageBuilder({
   }
 
   return (
+    // Full-bleed by design: each block owns its own `container` rail (see
+    // renderBlockComponent). A block that omits one renders edge-to-edge.
     <main
       className="my-16 flex flex-col gap-16"
       data-sanity={containerDataAttribute}
