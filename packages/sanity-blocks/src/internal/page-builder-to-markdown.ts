@@ -104,9 +104,13 @@ export function imageToMarkdown(
   const alt = (image?.alt ?? "").trim();
   const caption = (image?.caption ?? "").trim();
   const url = image?.id ? options.resolveImageUrl?.(image) : undefined;
-  // Mirror portable-text: image when a URL resolves, else caption/alt text.
+  // Mirror portable-text: image (with caption) when a URL resolves, else
+  // caption/alt text.
   if (url) {
-    return `![${escapeMarkdown(alt)}](${formatUrl(url)})`;
+    const image = `![${escapeMarkdown(alt)}](${formatUrl(url)})`;
+    return caption && caption !== alt
+      ? `${image}\n\n_${escapeMarkdown(caption)}_`
+      : image;
   }
   return escapeMarkdown(caption || alt);
 }
@@ -181,17 +185,17 @@ function imageLinkCardsToMarkdown(
   block: MarkdownBlock,
   options: MarkdownOptions
 ): string {
-  const cards = (block.cards ?? [])
-    .filter((card) => card.href)
-    .map((card) => {
-      const title = (card.title ?? "").trim();
-      const description = (card.description ?? "").trim();
-      return joinSections([
-        cardHeading(title, card.href),
-        description ? escapeMarkdown(description) : "",
-        imageToMarkdown(card.image, options),
-      ]);
-    });
+  // Keep cards without an href: cardHeading degrades them to plain text rather
+  // than dropping their title/description/image content.
+  const cards = (block.cards ?? []).map((card) => {
+    const title = (card.title ?? "").trim();
+    const description = (card.description ?? "").trim();
+    return joinSections([
+      cardHeading(title, card.href),
+      description ? escapeMarkdown(description) : "",
+      imageToMarkdown(card.image, options),
+    ]);
+  });
 
   return joinSections([
     eyebrowToMarkdown(block.eyebrow),
