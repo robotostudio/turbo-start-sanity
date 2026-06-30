@@ -100,11 +100,10 @@ export function imageToMarkdown(
   image: MarkdownImage | null | undefined,
   options: MarkdownOptions
 ): string {
-  if (!image?.id) {
-    return "";
-  }
-  const url = options.resolveImageUrl?.(image);
-  const alt = escapeMarkdown((image.alt ?? "").trim());
+  const alt = escapeMarkdown((image?.alt ?? "").trim());
+  const url = image?.id ? options.resolveImageUrl?.(image) : undefined;
+  // Mirror the portable-text image fallback: emit the alt text when there's no
+  // resolvable URL, and only "" when both URL and alt are absent.
   if (url) {
     return `![${alt}](${url})`;
   }
