@@ -118,14 +118,17 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+@media (width >= 48rem) {
+  :root {
+    --container-px: 1.5rem; /* md:px-6 */
+  }
+}
+
 @utility container {
   margin-inline: auto;
   width: 100%;
   max-width: 80rem; /* max-w-7xl */
-  padding-inline: 1rem; /* px-4 */
-  @media (width >= 48rem) {
-    padding-inline: 1.5rem; /* md:px-6 */
-  }
+  padding-inline: var(--container-px, 1rem); /* px-4, md:px-6 from breakpoint */
 }
 
 @layer base {
