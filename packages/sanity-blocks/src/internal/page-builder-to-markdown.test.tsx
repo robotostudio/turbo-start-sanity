@@ -107,6 +107,29 @@ test("unknown blocks contribute nothing", () => {
   expect(md).toContain("Body.");
 });
 
+test("treats '#' href as no link (plain text fallback)", () => {
+  const faq = pageBuilderToMarkdown([
+    {
+      _type: "faqAccordion",
+      title: "Q",
+      faqs: [{ _id: "1", title: "x", richText: para("y") }],
+      link: { title: "More", href: "#" },
+    },
+  ]);
+  expect(faq).toContain("More");
+  expect(faq).not.toContain("(#)");
+
+  const cards = pageBuilderToMarkdown([
+    {
+      _type: "imageLinkCards",
+      title: "T",
+      cards: [{ _key: "c", title: "Card", href: "#", description: "d" }],
+    },
+  ]);
+  expect(cards).toContain("### Card");
+  expect(cards).not.toContain("](#)");
+});
+
 test("separates blocks with a blank line", () => {
   const md = pageBuilderToMarkdown([
     { _type: "richTextBlock", title: "One" },
