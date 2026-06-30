@@ -133,6 +133,20 @@ test("wraps link URLs containing parens or spaces in angle brackets", () => {
   expect(md).toBe("[link](</foo_(bar)>)");
 });
 
+test("neutralizes block-leading markers on every line of multiline text", () => {
+  const md = portableTextToMarkdown([
+    {
+      _type: "block",
+      style: "normal",
+      children: [
+        { _type: "span", text: "Intro\n- not a list\n1. nor this\n---" },
+      ],
+    },
+  ]);
+
+  expect(md).toBe("Intro\n\\- not a list\n1\\. nor this\n\\---");
+});
+
 test("escapes literal Markdown metacharacters in span text", () => {
   const md = portableTextToMarkdown([
     {
