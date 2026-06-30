@@ -145,6 +145,12 @@ img {
   border-radius: var(--radius-md);
 }
 
+/* Render the `sanity-image` LQIP placeholder as crisp pixel blocks
+   (nearest-neighbor upscale) so images load in pixelated rather than blurred. */
+img[data-lqip] {
+  image-rendering: pixelated;
+}
+
 /* FAQ disclosure: smooth open/close, instant fallback where unsupported. */
 @media (prefers-reduced-motion: no-preference) {
   .faq-disclosure {
