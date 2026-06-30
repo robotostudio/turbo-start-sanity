@@ -95,7 +95,7 @@ function DesktopColumnLink({
 export function NavbarSkeleton() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
-      <div className="container mx-auto px-4">
+      <div className="container">
         <div className="flex h-16 items-center justify-between">
           {/* Logo skeleton - matches Logo component dimensions: width={120} height={40} */}
           {/* <div className="flex items-center">
@@ -165,7 +165,7 @@ export function Navbar({
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
-      <div className="container mx-auto px-4">
+      <div className="container">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex h-10 w-40 items-center">

@@ -118,6 +118,15 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+/* Overrides Tailwind's built-in `container`. Both rules are emitted; this
+ * `max-width` wins by source order (equal specificity), not by replacement.
+ * Correct on the pinned Tailwind version — if an upgrade reorders emission, the
+ * built-in's larger 2xl max-width could reassert. Revisit (or move to a distinct
+ * utility name) when upgrading Tailwind. */
+@utility container {
+  @apply mx-auto w-full max-w-7xl px-4 md:px-6;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

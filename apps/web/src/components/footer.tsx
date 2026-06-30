@@ -109,7 +109,7 @@ function SocialLinks({ data }: SocialLinksProps) {
 export function FooterSkeleton() {
   return (
     <footer className="mt-16 pb-8">
-      <section className="container mx-auto px-4 md:px-6">
+      <section className="container">
         <div className="h-[500px] lg:h-auto">
           <div className="flex flex-col items-center justify-between gap-10 text-center lg:flex-row lg:text-left">
             <div className="flex w-full max-w-96 shrink flex-col items-center justify-between gap-6 lg:items-start">
@@ -164,9 +164,9 @@ function Footer({ data, settingsData }: FooterProps) {
 
   return (
     <footer className="mt-20 pb-8">
-      <section className="container mx-auto">
+      <section>
         <div className="h-[500px] lg:h-auto">
-          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-10 px-4 text-center md:px-6 lg:flex-row lg:text-left">
+          <div className="container flex flex-col items-center justify-between gap-10 text-center lg:flex-row lg:text-left">
             <div className="flex w-full max-w-96 shrink flex-col items-center justify-between gap-6 md:gap-8 lg:items-start">
               <div>
                 <span className="flex items-center justify-center gap-4 lg:justify-start">
@@ -212,8 +212,8 @@ function Footer({ data, settingsData }: FooterProps) {
               </div>
             )}
           </div>
-          <div className="mt-20 border-t pt-8">
-            <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 px-4 text-center font-normal text-muted-foreground text-sm md:px-6 lg:flex-row lg:items-center lg:text-left">
+          <div className="container mt-20">
+            <div className="flex flex-col justify-between gap-4 border-t pt-8 text-center font-normal text-muted-foreground text-sm lg:flex-row lg:items-center lg:text-left">
               <p>
                 © {year} {siteTitle}. All rights reserved.
               </p>
