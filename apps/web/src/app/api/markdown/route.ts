@@ -122,7 +122,7 @@ export async function GET(request: Request): Promise<Response> {
     logger.error("Markdown build failed", error);
     return new Response("Upstream content fetch failed\n", {
       status: 503,
-      headers: { "content-type": "text/plain; charset=utf-8" },
+      headers: { "content-type": "text/plain; charset=utf-8", vary: "Accept" },
     });
   }
 
@@ -148,13 +148,16 @@ export async function GET(request: Request): Promise<Response> {
   try {
     const redirect = await findRedirect(path);
     if (redirect) {
-      const target = redirect.destination.endsWith(".md")
-        ? redirect.destination
-        : `${redirect.destination}.md`;
-      return Response.redirect(
-        new URL(target, request.url),
-        redirect.permanent ? 308 : 307
-      );
+      // Parse first so a destination with a query/hash keeps them — only the
+      // pathname gets the `.md` suffix.
+      const target = new URL(redirect.destination, request.url);
+      if (!target.pathname.endsWith(".md")) {
+        target.pathname = `${target.pathname}.md`;
+      }
+      return new Response(null, {
+        status: redirect.permanent ? 308 : 307,
+        headers: { location: target.toString(), vary: "Accept" },
+      });
     }
   } catch (error) {
     logger.error("Redirect lookup failed", error);
@@ -162,6 +165,6 @@ export async function GET(request: Request): Promise<Response> {
 
   return new Response(`Not found: ${path}\n`, {
     status: 404,
-    headers: { "content-type": "text/plain; charset=utf-8" },
+    headers: { "content-type": "text/plain; charset=utf-8", vary: "Accept" },
   });
 }
