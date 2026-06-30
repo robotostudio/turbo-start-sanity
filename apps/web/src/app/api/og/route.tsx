@@ -27,13 +27,9 @@ type SeoImageRenderProps = {
 type ContentProps = Record<string, string>;
 
 type DominantColorSeoImageRenderProps = {
-  image?: Maybe<string>;
   title?: Maybe<string>;
-  logo?: Maybe<string>;
-  dominantColor?: Maybe<string>;
-  date?: Maybe<string>;
   _type?: Maybe<string>;
-  description?: Maybe<string>;
+  siteTitle?: Maybe<string>;
 };
 
 const seoImageRender = ({ seoImage }: SeoImageRenderProps) => (
@@ -42,104 +38,39 @@ const seoImageRender = ({ seoImage }: SeoImageRenderProps) => (
   </div>
 );
 
-const FallbackImage = ({ logo }: { logo: Maybe<string> }) => {
-  if (logo) {
-    return (
-      <div tw="flex items-center justify-center h-full w-full">
-        <img alt="Logo" height={400} src={logo} width={400} />
-      </div>
-    );
-  }
-
-  return (
-    <div tw="flex items-center justify-center h-full w-full">
-      <img
-        alt="Logo"
-        height={400}
-        src={"https://picsum.photos/566/566"}
-        width={400}
-      />
-    </div>
-  );
-};
-
 const dominantColorSeoImageRender = ({
-  image,
   title,
-  logo,
-  dominantColor,
-  date,
-  description,
   _type,
+  siteTitle,
 }: DominantColorSeoImageRenderProps) => (
   <div
-    style={{ fontFamily: "Inter" }}
-    tw={`bg-[${
-      dominantColor ?? "#12061F"
-    }] flex flex-row overflow-hidden relative w-full`}
+    style={{ backgroundColor: "#0A0A0A", fontFamily: "Inter" }}
+    tw="flex flex-col justify-between w-full h-full p-[70px]"
   >
-    <svg
-      aria-hidden="true"
-      height="100%"
-      style={{ position: "absolute", top: 0, left: 0 }}
-      width="100%"
-    >
-      <defs>
-        <linearGradient id="gradient" x1="0%" x2="100%" y1="100%" y2="0%">
-          <stop offset="0%" style={{ stopColor: "transparent" }} />
-          <stop offset="100%" style={{ stopColor: "white" }} />
-        </linearGradient>
-      </defs>
-      <rect fill="url(#gradient)" height="100%" opacity="0.2" width="100%" />
-    </svg>
-
-    <div tw="flex-1 p-10 flex flex-col justify-between relative z-10">
-      <div tw="flex justify-between items-start w-full">
-        {logo && <img alt="Logo" height={48} src={logo} width={48} />}
-        <div tw="bg-white flex bg-opacity-20 text-white px-4 py-2 rounded-full text-sm font-medium">
-          {new Date(date ?? new Date()).toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          })}
-        </div>
+    <div tw="flex items-center justify-between w-full">
+      <div tw="flex text-white text-2xl font-semibold">
+        {siteTitle ?? "Turbo Start"}
       </div>
-
-      <h1 tw="text-5xl font-bold leading-tight max-w-[90%] text-white">
-        {title}
-      </h1>
-      {description && <p tw="text-lg text-white">{description}</p>}
       {_type && (
         <div
-          tw={`bg-white text-[${
-            dominantColor ?? "#12061F"
-          }] flex px-5 py-2 rounded-full text-base font-semibold self-start`}
+          style={{
+            borderColor: "rgba(255,255,255,0.2)",
+            letterSpacing: "0.1em",
+            textTransform: "uppercase",
+          }}
+          tw="flex border text-white px-6 py-3 rounded-full text-xl font-medium"
         >
           {getTitleCase(_type)}
         </div>
       )}
     </div>
 
-    <div tw="w-[630px] h-[630px] flex items-center justify-center p-8 relative z-10">
-      <div tw="w-[566px] h-[566px] bg-white bg-opacity-20 flex flex-col justify-center items-center rounded-3xl shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_2px_4px_-1px_rgba(0,0,0,0.03),0_4px_6px_-1px_rgba(0,0,0,0.05),0_8px_10px_-1px_rgba(0,0,0,0.05)] overflow-hidden">
-        <div tw="flex relative w-full h-full">
-          {image ? (
-            <img
-              alt="Content preview"
-              height={566}
-              src={image}
-              style={{
-                objectFit: "cover",
-              }}
-              tw="w-full h-full rounded-3xl shadow-2xl"
-              width={566}
-            />
-          ) : (
-            <FallbackImage logo={logo} />
-          )}
-        </div>
-      </div>
-    </div>
+    <h1
+      style={{ lineHeight: 1.05 }}
+      tw="flex text-7xl font-bold max-w-[85%] text-white"
+    >
+      {title}
+    </h1>
   </div>
 );
 
