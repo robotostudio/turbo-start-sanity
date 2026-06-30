@@ -15,7 +15,6 @@ export interface PortableTextMarkDef {
   _key?: string | null;
   _type?: string | null;
   href?: string | null;
-  openInNewTab?: boolean | null;
 }
 
 export interface PortableTextNode {
@@ -65,6 +64,16 @@ export function escapeMarkdown(text: string): string {
   return text.replace(/([\\`*_[\]<>~|#])/g, "\\$1");
 }
 
+// Format a URL for a Markdown link/image target. Spaces or parens would close
+// the `(...)` early, so wrap those in CommonMark's angle-bracket form.
+export function formatUrl(href: string | null | undefined): string {
+  const url = (href ?? "").trim();
+  if (!url) {
+    return "";
+  }
+  return /[\s()]/.test(url) ? `<${url}>` : url;
+}
+
 function serializeSpan(
   span: PortableTextSpan,
   markDefs: PortableTextMarkDef[]
@@ -91,7 +100,7 @@ function serializeSpan(
     .find((def): def is PortableTextMarkDef => Boolean(def));
 
   if (linkDef?._type === "customLink" && linkDef.href && linkDef.href !== "#") {
-    text = `[${text}](${linkDef.href})`;
+    text = `[${text}](${formatUrl(linkDef.href)})`;
   }
 
   return text;
@@ -106,7 +115,7 @@ function renderImage(
   const url = node.id ? options.resolveImageUrl?.(node) : undefined;
 
   if (url) {
-    const image = `![${escapeMarkdown(alt)}](${url})`;
+    const image = `![${escapeMarkdown(alt)}](${formatUrl(url)})`;
     return {
       md:
         caption && caption !== alt

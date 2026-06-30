@@ -7,6 +7,7 @@
 
 import {
   escapeMarkdown,
+  formatUrl,
   type MarkdownImage,
   type MarkdownOptions,
   type PortableTextValue,
@@ -17,7 +18,6 @@ interface MarkdownButton {
   _key?: string | null;
   text?: string | null;
   href?: string | null;
-  openInNewTab?: boolean | null;
 }
 
 interface MarkdownCard {
@@ -25,6 +25,7 @@ interface MarkdownCard {
   title?: string | null;
   description?: string | null;
   href?: string | null;
+  // Feature-card icon — intentionally dropped from Markdown (a test guards this).
   icon?: string | null;
   image?: MarkdownImage | null;
   richText?: PortableTextValue;
@@ -88,7 +89,7 @@ function buttonsToMarkdown(buttons?: MarkdownButton[] | null): string {
       const text = (button.text ?? "").trim();
       const href = button.href;
       if (href && href !== "#") {
-        return `- [${escapeMarkdown(text || href)}](${href})`;
+        return `- [${escapeMarkdown(text || href)}](${formatUrl(href)})`;
       }
       return text ? `- ${escapeMarkdown(text)}` : null;
     })
@@ -105,7 +106,7 @@ export function imageToMarkdown(
   // Mirror the portable-text image fallback: emit the alt text when there's no
   // resolvable URL, and only "" when both URL and alt are absent.
   if (url) {
-    return `![${alt}](${url})`;
+    return `![${alt}](${formatUrl(url)})`;
   }
   return alt;
 }
@@ -171,8 +172,8 @@ function imageLinkCardsToMarkdown(
     .map((card) => {
       const title = (card.title ?? "").trim();
       const heading = title
-        ? `### [${escapeMarkdown(title)}](${card.href})`
-        : `### ${card.href}`;
+        ? `### [${escapeMarkdown(title)}](${formatUrl(card.href)})`
+        : `### ${escapeMarkdown(card.href ?? "")}`;
       const description = (card.description ?? "").trim();
       return joinSections([
         heading,
@@ -206,7 +207,7 @@ function faqAccordionToMarkdown(
   const linkLabel = (link?.description || link?.title || "").trim();
   const linkMarkdown =
     link?.href && linkLabel
-      ? `[${escapeMarkdown(linkLabel)}](${link.href})`
+      ? `[${escapeMarkdown(linkLabel)}](${formatUrl(link.href)})`
       : "";
 
   const subtitle = (block.subtitle ?? "").trim();

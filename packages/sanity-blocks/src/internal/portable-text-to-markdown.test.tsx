@@ -98,6 +98,19 @@ test("renders images via the resolver and falls back to text without one", () =>
   expect(withoutUrl).toBe("A diagram");
 });
 
+test("wraps link URLs containing parens or spaces in angle brackets", () => {
+  const md = portableTextToMarkdown([
+    {
+      _type: "block",
+      style: "normal",
+      markDefs: [{ _key: "l", _type: "customLink", href: "/foo_(bar)" }],
+      children: [{ _type: "span", text: "link", marks: ["l"] }],
+    },
+  ]);
+
+  expect(md).toBe("[link](</foo_(bar)>)");
+});
+
 test("escapes literal Markdown metacharacters in span text", () => {
   const md = portableTextToMarkdown([
     {
