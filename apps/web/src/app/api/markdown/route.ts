@@ -102,13 +102,13 @@ async function findRedirect(
   const data = await fetchRedirects();
   const match = (data ?? []).find((redirect) => redirect.source === path);
   return match
-    ? { destination: match.destination, permanent: match.permanent ?? false }
+    ? { destination: match.destination, permanent: match.permanent }
     : null;
 }
 
 export async function GET(request: Request): Promise<Response> {
-  // The middleware forwards the requested page path as a header (reliable
-  // across a rewrite). The `?path=` query is a fallback for direct calls.
+  // Path comes from the proxy header (survives the rewrite); `?path=` is a
+  // fallback for direct calls.
   const headerPath = request.headers.get("x-markdown-path");
   const queryPath = new URL(request.url).searchParams.get("path");
   const path = normalizeMarkdownPath(headerPath ?? queryPath ?? "/");
@@ -117,12 +117,15 @@ export async function GET(request: Request): Promise<Response> {
   try {
     markdown = await buildMarkdown(path);
   } catch (error) {
-    // A fetch/transport failure must not masquerade as a missing page (which
-    // crawlers and CDNs would treat as permanently deleted).
+    // A fetch failure must not look like a missing page (crawlers treat 404 as gone).
     logger.error("Markdown build failed", error);
     return new Response("Upstream content fetch failed\n", {
       status: 503,
-      headers: { "content-type": "text/plain; charset=utf-8", vary: "Accept" },
+      headers: {
+        "content-type": "text/plain; charset=utf-8",
+        vary: "Accept",
+        "x-content-type-options": "nosniff",
+      },
     });
   }
 
@@ -131,33 +134,41 @@ export async function GET(request: Request): Promise<Response> {
       status: 200,
       headers: {
         "content-type": "text/markdown; charset=utf-8",
-        // The same URL serves HTML or Markdown depending on `Accept`, so the
-        // cache key must include it to avoid serving one variant for the other.
+        // Same URL serves HTML or Markdown by Accept — cache must key on it.
         vary: "Accept",
-        // Point bots at the canonical HTML page and keep the Markdown twin out
-        // of search results so it doesn't compete with it.
+        // Canonical HTML page; keep the Markdown twin out of search.
         "content-location": path,
         "x-robots-tag": "noindex, nofollow",
-        "cache-control": "public, s-maxage=3600, stale-while-revalidate=86400",
+        "x-content-type-options": "nosniff",
+        // Short TTL: the Sanity fetch is tag-revalidated via `"use cache"`, but
+        // this rendered response isn't tag-purged, so bound CDN drift.
+        "cache-control": "public, s-maxage=60, stale-while-revalidate=300",
       },
     });
   }
 
-  // No document for this path — honor Sanity-managed redirects (whose source
-  // paths never carry a `.md` suffix) before returning 404.
+  // No document for this path — honor Sanity redirects before returning 404.
   try {
     const redirect = await findRedirect(path);
     if (redirect) {
-      // Parse first so a destination with a query/hash keeps them — only the
-      // pathname gets the `.md` suffix.
-      const target = new URL(redirect.destination, request.url);
-      if (!target.pathname.endsWith(".md")) {
-        target.pathname = `${target.pathname}.md`;
+      // Parse so a destination's query/hash survive; only the pathname gets `.md`.
+      const requestUrl = new URL(request.url);
+      const target = new URL(redirect.destination, requestUrl);
+      // Same-origin only: a protocol-relative `//evil.com` (allowed by the
+      // schema's `startsWith("/")`) would redirect off-site. External → 404.
+      if (target.origin === requestUrl.origin) {
+        if (!target.pathname.endsWith(".md")) {
+          target.pathname = `${target.pathname}.md`;
+        }
+        return new Response(null, {
+          status: redirect.permanent ? 308 : 307,
+          headers: {
+            location: target.toString(),
+            vary: "Accept",
+            "x-content-type-options": "nosniff",
+          },
+        });
       }
-      return new Response(null, {
-        status: redirect.permanent ? 308 : 307,
-        headers: { location: target.toString(), vary: "Accept" },
-      });
     }
   } catch (error) {
     logger.error("Redirect lookup failed", error);
@@ -165,6 +176,10 @@ export async function GET(request: Request): Promise<Response> {
 
   return new Response(`Not found: ${path}\n`, {
     status: 404,
-    headers: { "content-type": "text/plain; charset=utf-8", vary: "Accept" },
+    headers: {
+      "content-type": "text/plain; charset=utf-8",
+      vary: "Accept",
+      "x-content-type-options": "nosniff",
+    },
   });
 }
