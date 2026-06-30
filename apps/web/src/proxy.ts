@@ -3,15 +3,14 @@ import { type NextRequest, NextResponse } from "next/server";
 import { normalizeMarkdownPath, prefersMarkdown } from "@/lib/markdown-path";
 
 /**
- * Content negotiation for Markdown output.
- *
- * A request is served Markdown when it targets a `.md` URL (e.g. `/about.md`,
- * `/blog/post.md`, `/index.md`) or sends `Accept: text/markdown`. Matching
- * requests are rewritten to the `/api/markdown` route handler; everything else
- * passes through untouched, so normal HTML rendering is unaffected.
+ * Content negotiation for Markdown: a `.md` URL or `Accept: text/markdown` is
+ * rewritten to the `/api/markdown` route handler; everything else passes through.
+ * The Markdown route sets `Vary: Accept` so a shared cache never serves Markdown
+ * to a browser; App Router HTML pages can't carry it (Next owns that header), so
+ * the `.md` suffix is the cache-safe surface.
  */
-export function middleware(request: NextRequest): NextResponse {
-  if (request.method !== "GET") {
+export function proxy(request: NextRequest): NextResponse {
+  if (request.method !== "GET" && request.method !== "HEAD") {
     return NextResponse.next();
   }
 
@@ -26,8 +25,7 @@ export function middleware(request: NextRequest): NextResponse {
 
   const rawPath = hasMdSuffix ? pathname.slice(0, -3) : pathname;
 
-  // For header-based negotiation, ignore requests for asset files (e.g. a
-  // `.png` requested with a broad Accept header) — only handle content paths.
+  // Header negotiation: skip asset files (e.g. a `.png` with a broad Accept).
   const lastSegment = rawPath.split("/").pop() ?? "";
   if (!hasMdSuffix && lastSegment.includes(".")) {
     return NextResponse.next();
@@ -35,9 +33,8 @@ export function middleware(request: NextRequest): NextResponse {
 
   const contentPath = normalizeMarkdownPath(rawPath);
 
-  // Forward the content path as a header. A rewrite's added query params are
-  // not reliably visible on `request.url` in the destination route handler
-  // (it still reflects the original URL), but request headers are delivered.
+  // Forward the path as a header — a rewrite's query params aren't reliably
+  // visible on `request.url` downstream, but request headers are.
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-markdown-path", contentPath);
 
@@ -49,7 +46,5 @@ export function middleware(request: NextRequest): NextResponse {
 }
 
 export const config = {
-  // Skip API routes, Next internals, and well-known static files. The
-  // `/api/markdown` rewrite target is reached internally and bypasses this.
   matcher: ["/((?!api/|_next/|favicon.ico|robots.txt|sitemap.xml).*)"],
 };

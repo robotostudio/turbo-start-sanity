@@ -82,7 +82,7 @@ To add a new page builder block:
 
 ### Markdown content negotiation
 
-Any page is also served as Markdown for LLMs/agents: append `.md` to the URL (`/about.md`, `/blog/post.md`, `/index.md`) or send `Accept: text/markdown`. `apps/web/src/middleware.ts` rewrites those requests to `apps/web/src/app/api/markdown/route.ts`, which fetches the page's Sanity data and serializes it via `pageBuilderToMarkdown` — the Markdown counterpart of `renderBlockComponent`. Because it serializes structured data (never React), components can't leak as raw `<Component/>` tags; unknown block types return `""`. See step 7 above to support a new block.
+Any page is also served as Markdown for LLMs/agents: append `.md` to the URL (`/about.md`, `/blog/post.md`, `/index.md`) or send `Accept: text/markdown`. `apps/web/src/proxy.ts` rewrites those requests to `apps/web/src/app/api/markdown/route.ts`, which fetches the page's Sanity data and serializes it via `pageBuilderToMarkdown` — the Markdown counterpart of `renderBlockComponent`. Because it serializes structured data (never React), components can't leak as raw `<Component/>` tags; unknown block types return `""`. See step 7 above to support a new block.
 
 ### Sanity Document Types
 
