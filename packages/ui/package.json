@@ -10,19 +10,14 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@radix-ui/react-accordion": "^1.2.12",
-    "@radix-ui/react-dialog": "^1.1.15",
-    "@radix-ui/react-dropdown-menu": "^2.1.16",
-    "@radix-ui/react-navigation-menu": "^1.2.14",
+    "@base-ui/react": "^1.3.0",
     "@radix-ui/react-slot": "^1.2.4",
     "@workspace/tailwind-config": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "lucide-react": "catalog:",
-    "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "tw-animate-css": "catalog:",
-    "zod": "catalog:"
+    "tw-animate-css": "catalog:"
   },
   "devDependencies": {
     "@turbo/gen": "^2.8.17",
