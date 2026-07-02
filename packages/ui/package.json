@@ -15,9 +15,11 @@
     "@workspace/tailwind-config": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "lucide-react": "catalog:",
+    "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "tw-animate-css": "catalog:"
+    "tw-animate-css": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@turbo/gen": "^2.8.17",
