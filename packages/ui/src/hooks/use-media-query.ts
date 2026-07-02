@@ -16,8 +16,7 @@ interface MediaQueryListLike {
   removeListener?: (listener: (event: MediaQueryListEvent) => void) => void;
 }
 
-const canMatchMedia = () =>
-  typeof window !== "undefined" && typeof window.matchMedia === "function";
+const canMatchMedia = () => typeof globalThis.matchMedia === "function";
 
 // One MediaQueryList per query, shared by subscribe and getSnapshot.
 const mediaQueryCache = new Map<string, MediaQueryListLike>();
@@ -28,7 +27,7 @@ function getMediaQueryList(query: string): MediaQueryListLike | null {
   }
   let media = mediaQueryCache.get(query);
   if (!media) {
-    media = window.matchMedia(query);
+    media = globalThis.matchMedia(query);
     mediaQueryCache.set(query, media);
   }
   return media;
