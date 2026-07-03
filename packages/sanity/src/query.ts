@@ -28,7 +28,6 @@ const imageFields = /* groq */ `
     top
   }
 `;
-// Base fragments for reusable query parts
 const imageFragment = /* groq */ `
   image {
     ${imageFields}
@@ -120,11 +119,7 @@ const pageBuilderFragment = /* groq */ `
   }
 `;
 
-/**
- * Query to extract a single image from a page document
- * This is used as a type reference only and not for actual data fetching
- * Helps with TypeScript inference for image objects
- */
+/** Type-reference only — never fetched; drives TS inference for image objects. */
 export const queryImageType = defineQuery(`
   *[_type == "page" && defined(image)][0]{
     ${imageFragment}
@@ -250,6 +245,21 @@ export const queryFooterData = defineQuery(`
           url.href
         ),
       }
+    },
+    poweredBy,
+    credit,
+    "creditUrl": creditUrl,
+    copyright,
+    watermark {
+      ${imageFields}
+    },
+    credits[]{
+      _key,
+      label,
+      "url": url,
+      logo {
+        ${imageFields}
+      }
     }
   }
 `);
@@ -315,7 +325,8 @@ export const queryGlobalSeoSettings = defineQuery(`
       facebook,
       twitter,
       instagram,
-      youtube
+      youtube,
+      reddit
     }
   }
 `);

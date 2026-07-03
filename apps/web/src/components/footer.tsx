@@ -11,13 +11,16 @@ import type {
   QueryFooterDataResult,
   QueryGlobalSeoSettingsResult,
 } from "@workspace/sanity/types";
+import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import Link from "next/link";
+import { Fragment } from "react";
 
 import { Logo } from "./logo";
 import {
   FacebookIcon,
   InstagramIcon,
   LinkedinIcon,
+  RedditIcon,
   XIcon,
   YoutubeIcon,
 } from "./social-icons";
@@ -57,7 +60,7 @@ function SocialLinks({ data }: SocialLinksProps) {
     return null;
   }
 
-  const { facebook, twitter, instagram, youtube, linkedin } = data;
+  const { facebook, twitter, instagram, youtube, linkedin, reddit } = data;
 
   const socialLinks = [
     {
@@ -81,6 +84,11 @@ function SocialLinks({ data }: SocialLinksProps) {
       Icon: YoutubeIcon,
       label: "Subscribe to our YouTube channel",
     },
+    {
+      url: reddit,
+      Icon: RedditIcon,
+      label: "Join us on Reddit",
+    },
   ].filter((link) => link.url);
 
   return (
@@ -92,7 +100,6 @@ function SocialLinks({ data }: SocialLinksProps) {
         >
           <Link
             aria-label={label}
-            className="inline-block rounded-md outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             href={url ?? "#"}
             prefetch={false}
             rel="noopener noreferrer"
@@ -111,12 +118,12 @@ export function FooterSkeleton() {
   return (
     <footer className="mt-16 pb-8">
       <section className="container">
-        <div className="h-[500px] lg:h-auto">
+        <div className="h-125 lg:h-auto">
           <div className="flex flex-col items-center justify-between gap-10 text-center lg:flex-row lg:text-left">
             <div className="flex w-full max-w-96 shrink flex-col items-center justify-between gap-6 lg:items-start">
               <div>
                 <span className="flex items-center justify-center gap-4 lg:justify-start">
-                  <div className="h-[40px] w-[80px] animate-pulse rounded bg-muted" />
+                  <div className="h-10 w-20 animate-pulse rounded bg-muted" />
                 </span>
                 <div className="mt-6 h-16 w-full animate-pulse rounded bg-muted" />
               </div>
@@ -159,16 +166,24 @@ export function FooterSkeleton() {
 }
 
 function Footer({ data, settingsData }: FooterProps) {
-  const { subtitle, columns } = data;
+  const {
+    subtitle,
+    columns,
+    credit,
+    creditUrl,
+    copyright,
+    watermark,
+    credits,
+  } = data;
   const { siteTitle, logo, socialLinks } = settingsData;
   const year = new Date().getFullYear();
 
   return (
     <footer className="mt-20 pb-8">
       <section>
-        <div className="h-[500px] lg:h-auto">
-          <div className="container flex flex-col items-center justify-between gap-10 text-center lg:flex-row lg:text-left">
-            <div className="flex w-full max-w-96 shrink flex-col items-center justify-between gap-6 md:gap-8 lg:items-start">
+        <div className="h-125 lg:h-auto">
+          <div className="container flex flex-col items-center justify-between gap-10 text-center lg:flex-row lg:items-start lg:text-left">
+            <div className="flex w-full max-w-96 shrink flex-col items-center gap-6 md:gap-8 lg:items-start">
               <div>
                 <span className="flex items-center justify-center gap-4 lg:justify-start">
                   <Logo alt={siteTitle} image={logo} priority />
@@ -182,19 +197,20 @@ function Footer({ data, settingsData }: FooterProps) {
               {socialLinks && <SocialLinks data={socialLinks} />}
             </div>
             {Array.isArray(columns) && columns?.length > 0 && (
-              <div className="grid grid-cols-3 gap-6 lg:mr-20 lg:gap-28">
+              <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:grid-cols-4 lg:gap-16">
                 {columns.map((column, index) => (
                   <div key={`column-${column?._key}-${index}`}>
-                    <h3 className="mb-6 font-semibold">{column?.title}</h3>
+                    <h3 className="mb-4 font-normal text-base text-zinc-400 leading-6 tracking-[0.24px]">
+                      {column?.title}
+                    </h3>
                     {column?.links && column?.links?.length > 0 && (
-                      <ul className="space-y-4 text-muted-foreground text-sm dark:text-zinc-400">
+                      <ul className="space-y-3 text-base text-zinc-600 leading-6 tracking-[0.24px] dark:text-zinc-100">
                         {column?.links?.map((link, columnIndex) => (
                           <li
-                            className="font-medium hover:text-primary"
+                            className="font-normal transition-colors hover:text-foreground"
                             key={`${link?._key}-${columnIndex}-column-${column?._key}`}
                           >
                             <Link
-                              className="rounded-sm outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                               href={link.href ?? "#"}
                               rel={
                                 link.openInNewTab
@@ -214,29 +230,68 @@ function Footer({ data, settingsData }: FooterProps) {
               </div>
             )}
           </div>
-          <div className="container mt-20">
-            <div className="flex flex-col justify-between gap-4 border-t pt-8 text-center font-normal text-muted-foreground text-sm lg:flex-row lg:items-center lg:text-left">
-              <p>
-                © {year} {siteTitle}. All rights reserved.
+          <div className="container relative z-10 mt-40 pt-8">
+            <div className="flex flex-col items-center justify-between gap-6 text-center lg:flex-row lg:gap-4 lg:text-left">
+              <p className="order-2 text-sm text-zinc-600 tracking-[0.24px] lg:order-none dark:text-zinc-100">
+                {copyright ?? `© ${year} ${siteTitle}. All rights reserved.`}
               </p>
-              <ul className="flex justify-center gap-4 lg:justify-start">
-                <li className="hover:text-primary">
-                  <Link
-                    className="rounded-sm outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                    href="/terms"
-                  >
-                    Terms and Conditions
-                  </Link>
-                </li>
-                <li className="hover:text-primary">
-                  <Link
-                    className="rounded-sm outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                    href="/privacy"
-                  >
-                    Privacy Policy
-                  </Link>
-                </li>
-              </ul>
+              {credit && (
+                <div className="relative order-1 lg:order-none">
+                  {creditUrl ? (
+                    <a
+                      className="font-mono text-foreground text-sm uppercase tracking-[1.68px]"
+                      href={creditUrl}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      {credit}
+                    </a>
+                  ) : (
+                    <span className="font-mono text-foreground text-sm uppercase tracking-[1.68px]">
+                      {credit}
+                    </span>
+                  )}
+                  {watermark?.id && (
+                    <SanityImage
+                      className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute -top-15 left-1/2 min-w-66 max-w-none select-none object-fill opacity-50 lg:left-[58%]"
+                      height={240}
+                      htmlHeight={240}
+                      htmlWidth={264}
+                      image={watermark}
+                      loading="lazy"
+                      width={264}
+                    />
+                  )}
+                </div>
+              )}
+              {credits && credits.length > 0 && (
+                <div className="order-3 flex items-center gap-4 text-sm text-zinc-600 lg:order-none dark:text-zinc-100">
+                  {credits.map((item, index) => (
+                    <Fragment key={item._key}>
+                      {index > 0 && (
+                        <span
+                          aria-hidden="true"
+                          className="h-4 w-px bg-zinc-400"
+                        />
+                      )}
+                      <span className="flex items-center gap-1.5">
+                        {item.label}
+                        {item.logo?.id && (
+                          <span className="flex shrink-0 items-center">
+                            <SanityImage
+                              className="h-auto w-28 rounded-none! object-contain invert dark:invert-0"
+                              height={16}
+                              image={item.logo}
+                              loading="lazy"
+                              width={75}
+                            />
+                          </span>
+                        )}
+                      </span>
+                    </Fragment>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

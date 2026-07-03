@@ -37,6 +37,12 @@ const socialLinks = defineField({
       description: "Full URL to your YouTube channel",
       type: "string",
     }),
+    defineField({
+      name: "reddit",
+      title: "Reddit URL",
+      description: "Full URL to your Reddit profile/subreddit",
+      type: "string",
+    }),
   ],
 });
 
