@@ -61,9 +61,6 @@ function renderBlockComponent(block: PageBuilderBlock) {
   }
 }
 
-/**
- * Helper function to create consistent Sanity data attributes
- */
 function createSanityDataAttribute(config: SanityDataAttributeConfig): string {
   return createDataAttribute({
     id: config.id,
@@ -75,9 +72,6 @@ function createSanityDataAttribute(config: SanityDataAttributeConfig): string {
   }).toString();
 }
 
-/**
- * Error fallback component for unknown block types
- */
 function UnknownBlockError({
   blockType,
   blockKey,
@@ -102,9 +96,6 @@ function UnknownBlockError({
   );
 }
 
-/**
- * Hook to handle optimistic updates for page builder blocks
- */
 function useOptimisticPageBuilder(
   initialBlocks: PageBuilderBlock[],
   documentId: string
@@ -121,9 +112,6 @@ function useOptimisticPageBuilder(
   );
 }
 
-/**
- * Custom hook for block component rendering logic
- */
 function useBlockRenderer(id: string, type: string) {
   const createBlockDataAttribute = (blockKey: string) =>
     createSanityDataAttribute({
@@ -158,9 +146,6 @@ function useBlockRenderer(id: string, type: string) {
   return { renderBlock };
 }
 
-/**
- * PageBuilder component for rendering dynamic content blocks from Sanity CMS
- */
 export function PageBuilder({
   pageBuilder: initialBlocks = [],
   id,
@@ -182,10 +167,7 @@ export function PageBuilder({
   return (
     // Full-bleed by design: each block owns its own `container` rail (see
     // renderBlockComponent). A block that omits one renders edge-to-edge.
-    <main
-      className="my-16 flex flex-col gap-16"
-      data-sanity={containerDataAttribute}
-    >
+    <main className="flex flex-col" data-sanity={containerDataAttribute}>
       {blocks.map(renderBlock)}
     </main>
   );

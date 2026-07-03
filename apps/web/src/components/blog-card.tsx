@@ -16,7 +16,7 @@ function BlogImage({ image, title }: BlogImageProps) {
   return (
     <SanityImage
       alt={title ?? "Blog post image"}
-      className="aspect-video w-full rounded-2xl bg-gray-100 object-cover sm:aspect-2/1 lg:aspect-3/2"
+      className="aspect-video w-full rounded-2xl bg-muted object-cover sm:aspect-2/1 lg:aspect-3/2"
       height={400}
       image={image}
       width={800}
@@ -57,13 +57,16 @@ function BlogContent({
 }) {
   const HeadingTag = isFeatured ? "h2" : "h3";
   const headingClasses = isFeatured
-    ? "mt-3 text-3xl font-semibold leading-tight"
-    : "mt-3 text-lg font-semibold leading-6";
+    ? "mt-3 text-3xl font-medium leading-tight tracking-tight"
+    : "mt-3 text-lg font-medium leading-6";
 
   return (
     <div className="group relative">
       <HeadingTag className={headingClasses}>
-        <Link href={slug ?? "#"}>
+        <Link
+          className="transition-colors group-hover:text-muted-foreground"
+          href={slug ?? "#"}
+        >
           <span className="absolute inset-0" />
           {title}
         </Link>
@@ -114,7 +117,7 @@ export function BlogCard({ blog }: BlogCardProps) {
     <article className="grid w-full grid-cols-1 gap-4">
       <div className="relative aspect-video h-auto w-full overflow-hidden rounded-2xl">
         <BlogImage image={image} title={title} />
-        <div className="absolute inset-0 rounded-2xl ring-1 ring-gray-900/10 ring-inset" />
+        <div className="absolute inset-0 rounded-2xl ring-1 ring-border ring-inset" />
       </div>
       <div className="w-full space-y-4">
         <BlogMeta publishedAt={publishedAt} />
@@ -133,7 +136,9 @@ export function BlogHeader({
 }) {
   return (
     <div className="mx-auto max-w-2xl text-center">
-      <h1 className="font-bold text-3xl sm:text-4xl">{title}</h1>
+      <h1 className="font-medium text-4xl tracking-tight sm:text-5xl">
+        {title}
+      </h1>
       <p className="mt-4 text-lg text-muted-foreground leading-8">
         {description}
       </p>

@@ -2,19 +2,13 @@
 
 import { env } from "@workspace/env/client";
 import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
-import { SanityIcon } from "@workspace/sanity-blocks/internal/sanity-icon";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@workspace/ui/components/navigation-menu";
+import { ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import useSWR from "swr";
 
-import type { ColumnLink, NavigationData } from "@/types";
+import type { ColumnLink, NavColumn, NavigationData } from "@/types";
+import { MenuLink } from "./elements/menu-link";
 import { Logo } from "./logo";
 import { MobileMenu } from "./mobile-menu";
 import { ModeToggle } from "./mode-toggle";
@@ -27,19 +21,86 @@ const fetcher = async (url: string): Promise<NavigationData> => {
   return response.json();
 };
 
-const TRIGGER_CLASS =
-  "h-auto bg-transparent px-3 py-2 text-muted-foreground hover:bg-transparent hover:text-foreground focus:bg-transparent focus:text-muted-foreground data-popup-open:bg-transparent data-popup-open:text-foreground";
+function DesktopColumnDropdown({
+  column,
+}: {
+  column: Extract<NavColumn, { type: "column" }>;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="group relative">
+      <button
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        className="flex items-center gap-1 px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        type="button"
+      >
+        {column.title}
+        <ChevronDown className="size-3 transition-transform group-hover:rotate-180" />
+      </button>
+      {isOpen ? (
+        <div
+          className="fade-in-0 zoom-in-95 absolute top-full left-0 z-50 min-w-70 animate-in rounded-lg border bg-popover p-2 shadow-lg"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          role="menu"
+          tabIndex={-1}
+        >
+          <div className="grid gap-1">
+            {column.links?.map((link: ColumnLink) => (
+              <MenuLink
+                description={link.description || ""}
+                href={link.href || ""}
+                icon={link.icon}
+                key={link._key}
+                name={link.name || ""}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function DesktopColumnLink({
+  column,
+}: {
+  column: Extract<NavColumn, { type: "link" }>;
+}) {
+  if (!column.href) return null;
+
+  return (
+    <Link
+      className="px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
+      href={column.href}
+    >
+      {column.name}
+    </Link>
+  );
+}
 
 export function NavbarSkeleton() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 w-full bg-background/70 backdrop-blur-md">
       <div className="container">
         <div className="flex h-16 items-center justify-between">
           <div className="flex h-10 w-40 items-center">
             <div className="h-10 w-40 animate-pulse rounded bg-muted/50" />
           </div>
 
-          <div className="h-10 w-10 animate-pulse rounded bg-muted/50 lg:hidden" />
+          <div className="h-10 w-10 animate-pulse rounded bg-muted/50 md:hidden" />
         </div>
       </div>
     </header>
@@ -75,13 +136,12 @@ export function Navbar({
   const { columns, buttons } = navbarData || {};
   const { logo, siteTitle } = settingsData || {};
 
-  // Show skeleton only on initial mount when no fallback data is available
   if (isLoading && !data && !(initialNavbarData && initialSettingsData)) {
     return <NavbarSkeleton />;
   }
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 w-full bg-background/70 backdrop-blur-md">
       <div className="container">
         <div className="flex h-16 items-center justify-between">
           <div className="flex h-10 w-40 items-center">
@@ -96,83 +156,30 @@ export function Navbar({
             )}
           </div>
 
-          <NavigationMenu
-            aria-label="Main"
-            className="hidden lg:flex"
-            closeDelay={150}
-            viewport
-          >
-            <NavigationMenuList>
-              {columns?.map((column) => {
-                if (column.type === "column") {
-                  return (
-                    <NavigationMenuItem key={column._key}>
-                      <NavigationMenuTrigger className={TRIGGER_CLASS}>
-                        {column.title}
-                      </NavigationMenuTrigger>
-                      <NavigationMenuContent>
-                        <ul className="grid w-[320px] gap-1 p-1">
-                          {column.links?.map((link: ColumnLink) => (
-                            <li key={link._key}>
-                              <NavigationMenuLink
-                                className="group flex items-start gap-3 rounded-sm p-3 transition-colors hover:bg-accent"
-                                closeOnClick
-                                render={<Link href={link.href ?? "#"} />}
-                              >
-                                {link.icon ? (
-                                  <SanityIcon
-                                    className="mt-0.5 size-4 shrink-0 text-muted-foreground"
-                                    icon={link.icon}
-                                  />
-                                ) : null}
-                                <div className="grid gap-1">
-                                  <div className="font-medium leading-none group-hover:text-accent-foreground">
-                                    {link.name}
-                                  </div>
-                                  {link.description ? (
-                                    <div className="line-clamp-2 text-muted-foreground text-sm">
-                                      {link.description}
-                                    </div>
-                                  ) : null}
-                                </div>
-                              </NavigationMenuLink>
-                            </li>
-                          ))}
-                        </ul>
-                      </NavigationMenuContent>
-                    </NavigationMenuItem>
-                  );
-                }
-                if (column.type === "link") {
-                  if (!column.href) {
-                    return null;
-                  }
-                  return (
-                    <NavigationMenuItem key={column._key}>
-                      <NavigationMenuLink
-                        className="flex h-auto items-center rounded-md px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
-                        render={<Link href={column.href} />}
-                      >
-                        {column.name}
-                      </NavigationMenuLink>
-                    </NavigationMenuItem>
-                  );
-                }
-                return null;
-              })}
-            </NavigationMenuList>
-          </NavigationMenu>
+          <nav className="-translate-x-1/2 absolute left-1/2 hidden items-center gap-1 md:flex">
+            {columns?.map((column) => {
+              if (column.type === "column") {
+                return (
+                  <DesktopColumnDropdown column={column} key={column._key} />
+                );
+              }
+              if (column.type === "link") {
+                return <DesktopColumnLink column={column} key={column._key} />;
+              }
+              return null;
+            })}
+          </nav>
 
-          <div className="hidden items-center gap-4 lg:flex">
-            <ModeToggle />
+          <div className="hidden items-center gap-3 md:flex">
             <SanityButtons
-              buttonClassName="rounded-lg"
               buttons={buttons || []}
               className="flex items-center gap-2"
+              size="sm"
             />
+            <ModeToggle />
           </div>
 
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex items-center gap-2 md:hidden">
             <ModeToggle />
             <MobileMenu navbarData={navbarData} settingsData={settingsData} />
           </div>
