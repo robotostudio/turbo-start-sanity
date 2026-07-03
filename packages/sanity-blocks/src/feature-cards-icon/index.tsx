@@ -20,18 +20,18 @@ export interface FeatureCardsIconProps {
 function FeatureCardItem({ card }: Readonly<{ card: FeatureCard }>) {
   const { icon, title, richText } = card;
   return (
-    <div className="rounded-3xl bg-accent p-8 md:min-h-75 md:p-8">
+    <div className="flex flex-col gap-8 bg-muted px-8 py-6 md:min-h-72">
       {icon && (
-        <span className="mb-9 flex w-fit items-center justify-center rounded-full bg-background p-3 drop-shadow-xl">
-          <SanityIcon icon={icon} />
+        <span className="flex size-12 items-center justify-center bg-accent-green text-accent-green-foreground">
+          <SanityIcon className="size-6" icon={icon} />
         </span>
       )}
-      <div>
+      <div className="flex flex-col gap-3">
         {title ? (
-          <h3 className="mb-2 font-medium text-lg md:text-2xl">{title}</h3>
+          <h3 className="font-medium text-xl leading-8">{title}</h3>
         ) : null}
         <RichText
-          className="text-balance font-normal text-black/90 text-sm leading-7 md:text-[16px] dark:text-neutral-300"
+          className="text-balance font-normal text-lg text-muted-foreground leading-7"
           richText={richText}
         />
       </div>
@@ -46,21 +46,23 @@ export function FeatureCardsWithIcon({
   cards,
 }: Readonly<FeatureCardsIconProps>) {
   return (
-    <section className="my-6 md:my-16" id="features">
+    <section className="py-12 md:py-20" id="features">
       <div className="container">
         <div className="flex w-full flex-col items-center">
-          <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">
+          <div className="flex flex-col items-center space-y-5 text-center">
             {eyebrow && <Badge variant="secondary">{eyebrow}</Badge>}
             {title ? (
-              <h2 className="font-semibold text-3xl md:text-5xl">{title}</h2>
+              <h2 className="font-medium text-3xl tracking-tight md:text-5xl">
+                {title}
+              </h2>
             ) : null}
             <RichText
-              className="max-w-3xl text-balance text-base md:text-lg"
+              className="max-w-xl text-balance text-base text-muted-foreground md:text-lg"
               richText={richText}
             />
           </div>
         </div>
-        <div className="mx-auto mt-20 grid gap-8 lg:grid-cols-3">
+        <div className="mx-auto mt-14 grid gap-6 md:mt-16 lg:grid-cols-3 lg:gap-12">
           {cards?.map((card, index) => (
             <FeatureCardItem
               card={card}

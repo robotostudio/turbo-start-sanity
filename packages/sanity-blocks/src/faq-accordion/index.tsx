@@ -1,7 +1,7 @@
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import { Badge } from "@workspace/ui/components/badge";
-import { ArrowUpRight, ChevronDownIcon } from "lucide-react";
+import { ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
 
 export interface FaqItem {
@@ -42,42 +42,41 @@ export function FaqAccordion({
     : undefined;
 
   return (
-    <section className="my-8" id="faq">
+    <section className="py-12 md:py-20" id="faq">
       <div className="container">
-        <div className="flex w-full flex-col items-center">
-          <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">
+        <div className="mx-auto flex max-w-3xl flex-col items-center gap-12">
+          <div className="flex w-full flex-col items-center gap-4 text-center">
             {eyebrow && <Badge variant="secondary">{eyebrow}</Badge>}
             {title && (
-              <h2 className="font-semibold text-3xl md:text-5xl">{title}</h2>
+              <h2 className="font-medium text-3xl tracking-tight md:text-5xl">
+                {title}
+              </h2>
             )}
             {subtitle && (
-              <h3 className="text-balance font-normal text-[#374151] text-lg dark:text-zinc-400">
+              <h3 className="w-full font-normal text-lg text-muted-foreground">
                 {subtitle}
               </h3>
             )}
           </div>
-        </div>
-        <div className="mx-auto my-16 max-w-xl">
-          <div className="w-full">
+          <div className="grid w-full gap-4">
             {faqs?.map((faq) => {
-              // Skip items without a title
               if (!faq?.title) return null;
               const itemId = faq._key ?? faq._id;
               return (
                 <details
-                  className="faq-disclosure group border-b py-2 last:border-b-0"
+                  className="faq-disclosure group bg-muted px-4"
                   key={`faq-${itemId}`}
                   name={`faq-${_key}`}
                   open={itemId === defaultOpenId}
                 >
-                  <summary className="flex cursor-default list-none items-start justify-between gap-4 rounded-md px-3 py-2 outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background [&::-webkit-details-marker]:hidden">
-                    <h3 className="font-medium text-[15px] leading-6">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-2.5 rounded-[4px] py-4 focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-zinc-600 focus-visible:ring-0 [&::-webkit-details-marker]:hidden">
+                    <h3 className="font-normal text-foreground text-lg leading-6">
                       {faq.title}
                     </h3>
-                    <ChevronDownIcon className="pointer-events-none mt-0.5 size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
+                    <Plus className="pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-200 group-open:rotate-45 dark:text-accent-green" />
                   </summary>
                   {faq.richText?.length ? (
-                    <div className="px-3 pb-2 text-muted-foreground">
+                    <div className="pb-4 text-muted-foreground">
                       <RichText
                         className="text-sm md:text-base"
                         richText={faq.richText}
@@ -90,8 +89,10 @@ export function FaqAccordion({
           </div>
 
           {link?.href && (link?.description || link?.title) && (
-            <div className="w-full py-6">
-              {link?.title && <p className="mb-1 text-xs">{link.title}</p>}
+            <div className="flex flex-col items-center gap-3 text-center">
+              {link?.title && (
+                <p className="text-lg text-muted-foreground">{link.title}</p>
+              )}
               <Link
                 className="flex items-center gap-2"
                 href={link.href}
@@ -100,15 +101,12 @@ export function FaqAccordion({
                 aria-label={link.description ?? link.title ?? "Learn more"}
               >
                 {link?.description && (
-                  <p className="font-medium text-[15px] leading-6">
+                  <p className="font-medium text-foreground text-lg leading-7">
                     {link.description}
                   </p>
                 )}
-                <span className="rounded-full border p-1">
-                  <ArrowUpRight
-                    className="text-[#374151] dark:text-neutral-300"
-                    size={16}
-                  />
+                <span className="flex items-center justify-center rounded-full bg-accent-green p-1.5 text-accent-green-foreground">
+                  <ArrowUpRight size={16} />
                 </span>
               </Link>
             </div>

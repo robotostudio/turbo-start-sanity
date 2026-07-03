@@ -14,6 +14,15 @@ export interface HeroBlockProps {
   title?: string | null;
 }
 
+function HeroGraphic() {
+  return (
+    <div
+      aria-hidden="true"
+      className="mx-auto aspect-[720/525] w-full max-w-xl select-none bg-center bg-contain bg-no-repeat [background-image:url('/hero-artwork-light.svg')] dark:[background-image:url('/hero-artwork-dark.svg')]"
+    />
+  );
+}
+
 export function HeroBlock({
   title,
   buttons,
@@ -22,28 +31,32 @@ export function HeroBlock({
   richText,
 }: Readonly<HeroBlockProps>) {
   return (
-    <section className="mt-4 md:my-16" id="hero">
+    <section className="relative overflow-hidden py-16 md:py-24" id="hero">
       <div className="container">
-        <div className="grid items-center gap-8 lg:grid-cols-2">
-          <div className="grid h-full grid-rows-[auto_1fr_auto] items-center justify-items-center gap-4 text-center lg:items-start lg:justify-items-start lg:text-left">
-            {badge && <Badge variant="secondary">{badge}</Badge>}
-            <div className="grid gap-4">
-              <h1 className="text-balance font-semibold text-4xl lg:text-6xl">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div className="grid justify-items-center gap-6 text-center lg:justify-items-start lg:text-left">
+            {badge && (
+              <Badge className="border-foreground" variant="secondary">
+                {badge}
+              </Badge>
+            )}
+            <div className="grid gap-6">
+              <h1 className="max-w-xl text-balance font-medium text-5xl leading-[1.15] tracking-[-0.24px] md:text-6xl lg:text-7xl">
                 {title}
               </h1>
               <RichText
-                className="font-normal text-base md:text-lg"
+                className="max-w-md text-balance text-lg text-muted-foreground leading-7"
                 richText={richText}
               />
             </div>
             <SanityButtons
               buttonClassName="w-full sm:w-auto"
               buttons={buttons}
-              className="mb-8 grid w-full gap-2 sm:w-fit sm:grid-flow-col lg:justify-start"
+              className="grid w-full gap-3 sm:w-fit sm:grid-flow-col lg:justify-start"
             />
           </div>
 
-          {image && (
+          {image?.id ? (
             <div className="h-96 w-full">
               <SanityImage
                 className="max-h-96 w-full rounded-3xl object-cover"
@@ -54,6 +67,8 @@ export function HeroBlock({
                 width={800}
               />
             </div>
+          ) : (
+            <HeroGraphic />
           )}
         </div>
       </div>

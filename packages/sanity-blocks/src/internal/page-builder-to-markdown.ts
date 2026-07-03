@@ -1,22 +1,18 @@
-/**
- * Page builder → Markdown serializer: thin dispatcher. Each block type's
- * serializer lives co-located in its block directory. To support a new block,
- * add a `case` here and create a `markdown.ts` in that block's directory.
- * Unknown types return "".
- */
+/** Thin dispatcher: each block's Markdown serializer is co-located in its block
+ * directory (add a `case` + `markdown.ts` for new blocks). Unknown types return "". */
 
 import { ctaToMarkdown } from "../cta/markdown";
 import { faqAccordionToMarkdown } from "../faq-accordion/markdown";
 import { featureCardsIconToMarkdown } from "../feature-cards-icon/markdown";
 import { heroToMarkdown } from "../hero/markdown";
 import { imageLinkCardsToMarkdown } from "../image-link-cards/markdown";
-import {
-  type MarkdownBlock,
-  type MarkdownOptions,
-  imageToMarkdown,
-} from "./markdown";
 import { richTextBlockToMarkdown } from "../rich-text-block/markdown";
 import { subscribeNewsletterToMarkdown } from "../subscribe-newsletter/markdown";
+import {
+  imageToMarkdown,
+  type MarkdownBlock,
+  type MarkdownOptions,
+} from "./markdown";
 
 export type { MarkdownBlock };
 export { imageToMarkdown };

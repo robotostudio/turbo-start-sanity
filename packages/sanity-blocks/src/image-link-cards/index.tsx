@@ -3,7 +3,6 @@ import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import { Badge } from "@workspace/ui/components/badge";
-import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 
 export interface ImageLinkCard {
@@ -22,14 +21,8 @@ export interface ImageLinkCardsProps {
   title?: string | null;
 }
 
-function CTACard({
-  card,
-  className,
-}: Readonly<{
-  card: ImageLinkCard;
-  className?: string;
-}>) {
-  const { image, description, title, href, openInNewTab } = card;
+function CTACard({ card }: Readonly<{ card: ImageLinkCard }>) {
+  const { image, title, href, openInNewTab } = card;
 
   if (!href) {
     return null;
@@ -37,37 +30,36 @@ function CTACard({
 
   return (
     <Link
-      className={cn(
-        "group relative flex flex-col justify-end overflow-hidden rounded-3xl p-4 transition-colors md:p-8 xl:h-[400px]",
-        className
-      )}
+      className="group relative flex h-62 items-center justify-center overflow-hidden border border-border bg-muted transition-colors"
       href={href}
       rel={openInNewTab ? "noopener noreferrer" : undefined}
       target={openInNewTab ? "_blank" : undefined}
     >
-      {image?.id && (
-        <div className="absolute inset-0 z-1 mix-blend-multiply">
-          <SanityImage
-            className="pointer-events-none object-cover opacity-40 grayscale duration-1000 group-hover:opacity-100 group-hover:transition-opacity dark:opacity-60 dark:saturate-200 dark:hover:opacity-[2]"
-            height={1080}
-            image={image}
-            loading="eager"
-            width={1920}
-          />
-        </div>
-      )}
-      <div className="z-2 mb-4 flex flex-col space-y-2 pt-64 duration-500 group-hover:top-8 xl:absolute xl:inset-x-8 xl:top-24">
-        {title && (
-          <h3 className="font-medium text-[#111827] text-xl dark:text-neutral-300">
-            {title}
-          </h3>
-        )}
-        {description && (
-          <p className="text-[#374151] text-sm transition-opacity delay-150 duration-300 xl:opacity-0 xl:group-hover:opacity-100 dark:text-neutral-300">
-            {description}
-          </p>
-        )}
+      <div className="absolute inset-0 text-foreground opacity-15 [background-image:radial-gradient(currentColor_1px,transparent_1px)] [background-size:16px_16px]" />
+
+      <div className="relative">
+        <span className="pointer-events-none absolute -top-3 -left-3 size-2 border-zinc-950 border-r border-b dark:border-accent-green" />
+        <span className="pointer-events-none absolute -top-3 -right-3 size-2 border-zinc-950 border-b border-l dark:border-accent-green" />
+        <span className="pointer-events-none absolute -bottom-3 -left-3 size-2 border-zinc-950 border-t border-r dark:border-accent-green" />
+        <span className="pointer-events-none absolute -right-3 -bottom-3 size-2 border-zinc-950 border-t border-l dark:border-accent-green" />
+        <span className="flex size-16 items-center justify-center bg-accent-green p-2 transition-transform duration-300 group-hover:scale-105">
+          {image?.id && (
+            <SanityImage
+              className="pointer-events-none size-8 object-contain"
+              height={64}
+              image={image}
+              loading="eager"
+              width={64}
+            />
+          )}
+        </span>
       </div>
+
+      {title && (
+        <span className="absolute bottom-1 left-1 bg-background px-2 py-1 font-mono text-base text-foreground uppercase">
+          {title}
+        </span>
+      )}
     </Link>
   );
 }
@@ -79,39 +71,26 @@ export function ImageLinkCards({
   cards,
 }: Readonly<ImageLinkCardsProps>) {
   return (
-    <section className="my-16" id="image-link-cards">
+    <section className="py-12 md:py-20" id="image-link-cards">
       <div className="container">
         <div className="flex w-full flex-col items-center">
-          <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">
+          <div className="flex flex-col items-center space-y-5 text-center">
             {eyebrow && <Badge variant="secondary">{eyebrow}</Badge>}
             {title && (
-              <h2 className="text-balance font-semibold text-3xl md:text-5xl">
+              <h2 className="text-balance font-medium text-3xl tracking-tight md:text-5xl">
                 {title}
               </h2>
             )}
-            <RichText className="text-balance" richText={richText} />
+            <RichText
+              className="max-w-xl text-balance text-base text-muted-foreground md:text-lg"
+              richText={richText}
+            />
           </div>
 
           {Array.isArray(cards) && cards.length > 0 && (
-            <div className="mt-16 grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-1">
-              {cards.map((card, idx) => (
-                <CTACard
-                  card={card}
-                  className={cn(
-                    "bg-muted-foreground/10 dark:bg-zinc-800",
-                    cards.length > 1 &&
-                      idx === 0 &&
-                      "lg:rounded-r-none lg:rounded-l-3xl",
-                    cards.length > 1 &&
-                      idx === cards.length - 1 &&
-                      "lg:rounded-r-3xl lg:rounded-l-none",
-                    cards.length > 1 &&
-                      idx !== 0 &&
-                      idx !== cards.length - 1 &&
-                      "lg:rounded-none"
-                  )}
-                  key={card._key}
-                />
+            <div className="mt-12 grid w-full grid-cols-1 gap-6 sm:grid-cols-2 md:mt-14 lg:grid-cols-4">
+              {cards.map((card) => (
+                <CTACard card={card} key={card._key} />
               ))}
             </div>
           )}
