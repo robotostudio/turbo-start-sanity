@@ -15,7 +15,7 @@ export const button = defineType({
       name: "variant",
       type: "string",
       description:
-        "Choose the button's visual style - default is solid, secondary is less prominent, outline has a border, and link looks like regular text",
+        "Choose the button's visual style - default is solid, secondary is the accent color, outline has a border, and link looks like regular text",
       initialValue: () => "default",
       options: createRadioListLayout(buttonVariants, {
         direction: "horizontal",

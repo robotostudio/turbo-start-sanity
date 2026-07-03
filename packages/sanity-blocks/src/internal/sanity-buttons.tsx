@@ -59,7 +59,7 @@ function SanityButton({
   return (
     <Button
       asChild
-      className={cn("rounded-[10px]", className)}
+      className={cn("rounded-full", className)}
       size={size ?? "default"}
       variant={variant ?? "default"}
     >
