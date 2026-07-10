@@ -100,6 +100,7 @@ function SocialLinks({ data }: SocialLinksProps) {
         >
           <Link
             aria-label={label}
+            className="focus-ring inline-block"
             href={url ?? "#"}
             prefetch={false}
             rel="noopener noreferrer"

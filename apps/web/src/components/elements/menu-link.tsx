@@ -14,7 +14,7 @@ export function MenuLink({
 
   return (
     <Link
-      className="group flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-accent outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+      className="group flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-accent focus-ring"
       href={href}
       onClick={onClick}
     >

@@ -29,8 +29,7 @@ import type { ColumnLink, NavigationData } from "@/types";
 import { MenuLink } from "./elements/menu-link";
 import { Logo } from "./logo";
 
-const FOCUS_RING =
-  "outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset";
+const FOCUS_RING = "focus-ring";
 
 const TABLET_QUERY = "(min-width: 768px) and (max-width: 1024px)";
 
