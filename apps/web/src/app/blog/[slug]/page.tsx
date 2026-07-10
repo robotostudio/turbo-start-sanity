@@ -162,7 +162,7 @@ function BlogPageContent({
               />
             </div>
           )}
-          <RichText richText={richText as RichTextValue} />
+          <RichText className="prose-lg" richText={richText as RichTextValue} />
         </main>
 
         <div className="hidden lg:block">
