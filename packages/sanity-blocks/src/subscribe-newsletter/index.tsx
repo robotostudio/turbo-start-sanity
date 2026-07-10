@@ -70,7 +70,7 @@ export function SubscribeNewsletter({
             <div className="flex w-full flex-col items-center gap-3">
               <form
                 action={action}
-                className="flex w-full max-w-96 flex-col gap-2 bg-black p-2 has-[input:focus-visible]:rounded-[4px] has-[input:focus-visible]:outline-1 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-zinc-600 sm:flex-row sm:items-center sm:gap-1.5 sm:py-1 sm:pr-1 sm:pl-4"
+                className="flex w-full max-w-96 flex-col gap-2 bg-black p-2 has-[input:focus-visible]:rounded-[4px] has-[input:focus-visible]:outline-1 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-foreground sm:flex-row sm:items-center sm:gap-1.5 sm:py-1 sm:pr-1 sm:pl-4"
                 method={method ?? "post"}
                 onSubmit={onSubmit}
               >

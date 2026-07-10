@@ -64,12 +64,12 @@ export function FaqAccordion({
               const itemId = faq._key ?? faq._id;
               return (
                 <details
-                  className="faq-disclosure group bg-muted px-4"
+                  className="faq-disclosure group bg-muted px-4 has-[summary:focus-visible]:outline-1 has-[summary:focus-visible]:outline-offset-2 has-[summary:focus-visible]:outline-foreground"
                   key={`faq-${itemId}`}
                   name={`faq-${_key}`}
                   open={itemId === defaultOpenId}
                 >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-2.5 rounded-[4px] py-4 focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-zinc-600 focus-visible:ring-0 [&::-webkit-details-marker]:hidden">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-2.5 py-4 outline-none [&::-webkit-details-marker]:hidden">
                     <h3 className="font-normal text-foreground text-lg leading-6">
                       {faq.title}
                     </h3>
