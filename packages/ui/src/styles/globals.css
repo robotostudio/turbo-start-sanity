@@ -139,6 +139,17 @@
   background-size: 16px 16px;
 }
 
+/* Keyboard focus indicator: thin foreground hairline (white in dark mode)
+ * hugging the element's own shape. Same look as the global `:focus-visible`
+ * base rule — use on elements that need to re-enable or scope it. */
+@utility focus-ring {
+  outline: none;
+  &:focus-visible {
+    outline: 1px solid var(--foreground);
+    outline-offset: 2px;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -146,9 +157,12 @@
   body {
     @apply bg-background text-foreground;
   }
-  /* Global keyboard focus ring; components opt out with `focus-visible:ring-0`. */
+  /* Global keyboard focus indicator: thin foreground hairline (white in dark
+   * mode) following the element's own shape. Matches the `focus-ring`
+   * utility; components opt out with `outline-none`. */
   :focus-visible {
-    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+    outline: 1px solid var(--foreground);
+    outline-offset: 2px;
   }
 }
 
