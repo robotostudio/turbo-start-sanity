@@ -37,7 +37,9 @@
   "js/ts.tsdk.path": "node_modules/typescript/lib",
   "emmet.showExpandedAbbreviation": "never",
   "cSpell.words": [
+    "GROQ",
     "hotspot",
+    "llms",
     "optimised",
     "pagebuilders",
     "robotostudio",

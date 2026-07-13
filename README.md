@@ -145,7 +145,7 @@ To load the included sample content:
 
 ```sh
 cd apps/studio
-npx sanity dataset import ./seed-data.tar.gz production --replace
+npx sanity dataset import ./seed-data.tar.gz dataset --replace
 ```
 
 After schema changes, regenerate types with:
