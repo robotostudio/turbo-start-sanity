@@ -1,5 +1,4 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "editor.codeActionsOnSave": {
@@ -35,9 +34,13 @@
   "[graphql]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
   "emmet.showExpandedAbbreviation": "never",
   "cSpell.words": [
-    "hotspot"
+    "hotspot",
+    "optimised",
+    "pagebuilders",
+    "robotostudio",
+    "Turborepo"
   ]
 }
