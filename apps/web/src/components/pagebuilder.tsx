@@ -7,7 +7,9 @@ import { FaqAccordion } from "@workspace/sanity-blocks/faq-accordion/index";
 import { FeatureCardsWithIcon } from "@workspace/sanity-blocks/feature-cards-icon/index";
 import { HeroBlock } from "@workspace/sanity-blocks/hero/index";
 import { ImageLinkCards } from "@workspace/sanity-blocks/image-link-cards/index";
+import { LogoCloud } from "@workspace/sanity-blocks/logo-cloud/index";
 import { RichTextBlock } from "@workspace/sanity-blocks/rich-text-block/index";
+import { SocialGrid } from "@workspace/sanity-blocks/social-grid/index";
 import { SubscribeNewsletter } from "@workspace/sanity-blocks/subscribe-newsletter/index";
 import { createDataAttribute } from "next-sanity";
 
@@ -54,6 +56,10 @@ function renderBlockComponent(block: PageBuilderBlock) {
       return (
         <ImageLinkCards {...(block as PagebuilderType<"imageLinkCards">)} />
       );
+    case "logoCloud":
+      return <LogoCloud {...(block as PagebuilderType<"logoCloud">)} />;
+    case "socialGrid":
+      return <SocialGrid {...(block as PagebuilderType<"socialGrid">)} />;
     case "richTextBlock":
       return <RichTextBlock {...(block as PagebuilderType<"richTextBlock">)} />;
     default:

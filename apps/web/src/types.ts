@@ -6,6 +6,8 @@ import type {
   QueryHomePageDataResult,
   QueryImageTypeResult,
   QueryNavbarDataResult,
+  QueryShowcaseItemsResult,
+  QueryShowcasePageDataResult,
 } from "@workspace/sanity/types";
 
 export type PageBuilderBlock = Get<
@@ -34,9 +36,12 @@ export type SanityRichTextBlock = FilterByType<
 
 export type Blog = Get<QueryBlogIndexPageBlogsResult, number>;
 
+export type ShowcasePageData = QueryShowcasePageDataResult;
+
+export type ShowcaseItemData = NonNullable<QueryShowcaseItemsResult>[number];
+
 export type Maybe<T> = T | null | undefined;
 
-// Navigation types
 export type NavigationData = {
   navbarData: QueryNavbarDataResult;
   settingsData: QueryGlobalSeoSettingsResult;

@@ -58,15 +58,30 @@ export function parseChildrenToSlug(children: PortableTextBlock["children"]) {
   return convertToSlug(children.map((child) => child.text).join(""));
 }
 
-const BLOG_ITEMS_PER_PAGE = 10;
+// Number of blog cards rendered in the grid list on every page. On page 1 the
+// full-width featured card sits above these, so page 1 consumes one extra
+// document (1 featured + BLOG_LIST_PAGE_SIZE list = 10 docs). Every later page
+// shows BLOG_LIST_PAGE_SIZE (9) list docs only.
+export const BLOG_LIST_PAGE_SIZE = 9;
 
-export function getBlogPaginationStartEnd(page: number): {
-  start: number;
-  end: number;
-} {
-  const start = (page - 1) * BLOG_ITEMS_PER_PAGE;
-  const end = start + BLOG_ITEMS_PER_PAGE;
-  return { start, end };
+/**
+ * GROQ slice window `[start, end)` into the full ordered blog list for a given
+ * page. When `hasFeatured` is true the featured card occupies document 0 on
+ * page 1, so page 1 fetches BLOG_LIST_PAGE_SIZE + 1 documents and every later
+ * page is offset by that single featured document.
+ */
+export function getBlogPaginationRange(
+  page: number,
+  hasFeatured: boolean
+): { start: number; end: number } {
+  const featuredOffset = hasFeatured ? 1 : 0;
+
+  if (page <= 1) {
+    return { start: 0, end: featuredOffset + BLOG_LIST_PAGE_SIZE };
+  }
+
+  const start = featuredOffset + (page - 1) * BLOG_LIST_PAGE_SIZE;
+  return { start, end: start + BLOG_LIST_PAGE_SIZE };
 }
 
 export type PaginationMetadata = {
@@ -78,12 +93,19 @@ export type PaginationMetadata = {
   hasPreviousPage: boolean;
 };
 
-export function calculatePaginationMetadata(
+/**
+ * Derive pagination metadata for the blog index. The featured card (when
+ * present) is one of the total documents but is not a list item, so the page
+ * count is based on the remaining list documents at BLOG_LIST_PAGE_SIZE each.
+ */
+export function calculateBlogPaginationMetadata(
   totalItems: number,
-  currentPage = 1,
-  itemsPerPage = BLOG_ITEMS_PER_PAGE
+  currentPage: number,
+  hasFeatured: boolean
 ): PaginationMetadata {
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const featuredOffset = hasFeatured ? 1 : 0;
+  const listItems = Math.max(totalItems - featuredOffset, 0);
+  const totalPages = Math.max(1, Math.ceil(listItems / BLOG_LIST_PAGE_SIZE));
   const hasNextPage = currentPage < totalPages;
   const hasPreviousPage = currentPage > 1;
 
@@ -91,7 +113,7 @@ export function calculatePaginationMetadata(
     currentPage,
     totalPages,
     totalItems,
-    itemsPerPage,
+    itemsPerPage: BLOG_LIST_PAGE_SIZE,
     hasNextPage,
     hasPreviousPage,
   };

@@ -66,6 +66,7 @@ export async function generateMetadata({
   return getSEOMetadata({
     title: pageData?.title ?? pageData?.seoTitle,
     description: pageData?.description ?? pageData?.seoDescription,
+    ogDescription: pageData?.ogDescription,
     slug: slugString,
     contentId: pageData?._id,
     contentType: pageData?._type,

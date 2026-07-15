@@ -22,6 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return getSEOMetadata({
     title: homePageData?.title ?? homePageData?.seoTitle,
     description: homePageData?.description ?? homePageData?.seoDescription,
+    ogDescription: homePageData?.ogDescription,
     slug: "/",
     contentId: homePageData?._id,
     contentType: homePageData?._type,
