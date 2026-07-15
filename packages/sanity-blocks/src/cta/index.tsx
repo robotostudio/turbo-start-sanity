@@ -2,13 +2,65 @@ import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text"
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import type { ButtonProps } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
+import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
+import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import { Badge } from "@workspace/ui/components/badge";
+import Link from "next/link";
+
+export interface CtaUsedByTeamsLogo {
+  _key: string;
+  href?: string | null;
+  image?: SanityImageData | null;
+  openInNewTab?: boolean | null;
+}
+
+export interface CtaUsedByTeams {
+  logos?: CtaUsedByTeamsLogo[] | null;
+  title?: string | null;
+}
 
 export interface CtaBlockProps {
   buttons?: ButtonProps[] | null;
   eyebrow?: string | null;
   richText?: RichTextValue;
   title?: string | null;
+  usedByTeams?: CtaUsedByTeams | null;
+}
+
+function UsedByTeamsLogo({ logo }: Readonly<{ logo: CtaUsedByTeamsLogo }>) {
+  const { image, href, openInNewTab } = logo;
+
+  if (!image?.id) {
+    return null;
+  }
+
+  const media = (
+    <SanityImage
+      className="h-8 w-auto max-w-full object-contain md:h-6 dark:invert"
+      height={24}
+      image={image}
+      loading="lazy"
+      width={156}
+    />
+  );
+
+  const cellClassName =
+    "flex h-16 items-center justify-center bg-background p-2 md:w-[165px] md:p-4";
+
+  if (href) {
+    return (
+      <Link
+        className={cellClassName}
+        href={href}
+        rel={openInNewTab ? "noopener noreferrer" : undefined}
+        target={openInNewTab ? "_blank" : undefined}
+      >
+        {media}
+      </Link>
+    );
+  }
+
+  return <div className={cellClassName}>{media}</div>;
 }
 
 export function CTABlock({
@@ -16,27 +68,45 @@ export function CTABlock({
   title,
   eyebrow,
   buttons,
+  usedByTeams,
 }: Readonly<CtaBlockProps>) {
+  const logos = usedByTeams?.logos?.filter((logo) => logo.image?.id) ?? [];
+  const hasLogos = logos.length > 0;
+
   return (
-    <section className="py-12 md:py-20" id="cta">
+    <section className="py-20 sm:py-28 lg:py-[136px]" id="cta">
       <div className="container">
-        <div className="bg-muted px-4 py-16 md:py-20">
-          <div className="mx-auto max-w-3xl space-y-6 text-center">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
+          <div className="max-w-lg space-y-5">
             {eyebrow && <Badge variant="secondary">{eyebrow}</Badge>}
-            <h2 className="text-balance font-medium text-3xl tracking-tight md:text-5xl">
+            <h2 className="text-balance font-normal text-3xl text-foreground leading-tight tracking-tight md:text-4xl lg:text-5xl">
               {title}
             </h2>
             <div className="text-lg text-muted-foreground">
-              <RichText className="text-balance" richText={richText} />
-            </div>
-            <div className="flex justify-center pt-2">
-              <SanityButtons
-                buttonClassName="w-full sm:w-auto"
-                buttons={buttons}
-                className="grid w-full gap-3 sm:w-fit sm:grid-flow-col"
-              />
+              <RichText richText={richText} />
             </div>
           </div>
+          {hasLogos && (
+            <div className="flex flex-col items-start gap-2">
+              {usedByTeams?.title && (
+                <p className="font-mono text-muted-foreground text-sm uppercase tracking-wide">
+                  {usedByTeams.title}
+                </p>
+              )}
+              <div className="grid w-full grid-cols-3 gap-[15.6px] bg-grid-dots-dense p-[15.6px] text-foreground md:w-auto">
+                {logos.map((logo) => (
+                  <UsedByTeamsLogo key={logo._key} logo={logo} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="mt-20 sm:mt-28 lg:mt-[136px]">
+          <SanityButtons
+            buttonClassName="h-auto flex-1 px-8 py-4 font-normal text-xl sm:text-2xl lg:px-[72px] lg:py-6 lg:text-5xl lg:leading-[60px]"
+            buttons={buttons}
+            className="flex w-full flex-col gap-4 sm:flex-row"
+          />
         </div>
       </div>
     </section>

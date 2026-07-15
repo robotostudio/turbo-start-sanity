@@ -1,9 +1,9 @@
 import {
-  type MarkdownBlock,
-  type MarkdownOptions,
   eyebrowToMarkdown,
   headingToMarkdown,
   joinSections,
+  type MarkdownBlock,
+  type MarkdownOptions,
   mdLink,
 } from "../internal/markdown";
 import {
@@ -15,7 +15,8 @@ export function faqAccordionToMarkdown(
   block: MarkdownBlock,
   options: MarkdownOptions
 ): string {
-  const faqs = (block.faqs ?? [])
+  const faqs = (block.categories ?? [])
+    .flatMap((category) => category?.faqs ?? [])
     .filter((faq) => faq?.title)
     .map((faq) =>
       joinSections([

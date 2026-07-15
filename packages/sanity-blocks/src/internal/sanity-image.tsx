@@ -35,8 +35,18 @@ export function SanityImage({ image, ...props }: SanityImageProps) {
     return null;
   }
 
+  // Selecting an existing asset via the media library can write the ref with a
+  // stray `drafts.` prefix (assets have no draft/published split), which the
+  // image library can't parse. Normalize it back to the real asset id, and bail
+  // out on anything that still isn't a valid `image-…` ref so a malformed value
+  // degrades to nothing instead of throwing "Could not parse image ID".
+  const id = image.id.replace(/^drafts\./, "");
+  if (!id.startsWith("image-")) {
+    return null;
+  }
+
   const processedData = {
-    id: image.id,
+    id,
     alt: image.alt ?? "",
     ...(image.preview && { preview: image.preview }),
     ...(image.hotspot && { hotspot: image.hotspot }),
