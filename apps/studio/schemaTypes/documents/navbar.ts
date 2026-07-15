@@ -159,6 +159,28 @@ export const navbar = defineType({
         "Build your navigation menu using columns and links. Add either a column of links or individual links.",
       of: [navbarColumn, navbarLink],
     }),
+    defineField({
+      name: "gitHubUrl",
+      type: "url",
+      title: "GitHub Repository URL",
+      description:
+        "Public GitHub repository URL. The navbar shows this repo's live star count (e.g. https://github.com/owner/repo). Leave empty to hide the star badge.",
+      validation: (rule) =>
+        rule.uri({ scheme: ["https"] }).custom((value) => {
+          if (!value) {
+            return true;
+          }
+          try {
+            const { hostname } = new URL(value);
+            if (hostname === "github.com" || hostname === "www.github.com") {
+              return true;
+            }
+          } catch {
+            return "Please enter a valid URL";
+          }
+          return "Please enter a github.com repository URL";
+        }),
+    }),
     buttonsField,
   ],
   preview: {
