@@ -1,20 +1,25 @@
 "use client";
 import { cn } from "@workspace/tailwind-config/utils";
-import { ChevronDown, Circle } from "lucide-react";
+import {
+  Check,
+  Copy,
+  Facebook,
+  Linkedin,
+  type LucideIcon,
+  MessageCircle,
+  Twitter,
+} from "lucide-react";
 import Link from "next/link";
-import type { FC } from "react";
+import { type FC, useEffect, useState } from "react";
 import slugify from "slugify";
 
 import type { SanityRichTextBlock, SanityRichTextProps } from "@/types";
-
-// ============================================================================
-// TYPES & INTERFACES
-// ============================================================================
 
 type TableOfContentProps = {
   richText?: SanityRichTextProps;
   className?: string;
   maxDepth?: number;
+  shareTitle?: string;
 };
 
 type ProcessedHeading = {
@@ -30,6 +35,7 @@ type ProcessedHeading = {
 
 type AnchorProps = {
   readonly heading: ProcessedHeading;
+  readonly activeSlug: string | null;
   readonly maxDepth?: number;
   readonly currentDepth?: number;
 };
@@ -53,10 +59,6 @@ type HeadingBlock = Extract<SanityRichTextBlock, { _type: "block" }> & {
   style: HeadingStyle;
   children: readonly SanityTextChild[];
 };
-
-// ============================================================================
-// CONSTANTS
-// ============================================================================
 
 const HEADING_STYLES: Record<HeadingStyle, string> = {
   h2: "pl-0",
@@ -82,10 +84,6 @@ const SLUGIFY_OPTIONS = {
 
 const DEFAULT_MAX_DEPTH = 6;
 const MIN_HEADINGS_TO_SHOW = 1;
-
-// ============================================================================
-// TYPE GUARDS & VALIDATORS
-// ============================================================================
 
 function isValidHeadingStyle(style: unknown): style is HeadingStyle {
   return typeof style === "string" && style in HEADING_STYLES;
@@ -130,10 +128,6 @@ function isHeadingBlock(block: unknown): block is HeadingBlock {
   );
 }
 
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
 function createSlug(text: string): string {
   if (!text?.trim()) {
     return "";
@@ -165,10 +159,6 @@ function generateUniqueId(text: string, index: number, _key?: string): string {
   const baseId = _key || createSlug(text) || `heading-${index}`;
   return `toc-${baseId}`;
 }
-
-// ============================================================================
-// CORE BUSINESS LOGIC
-// ============================================================================
 
 function extractHeadingBlocks(richText: SanityRichTextProps): HeadingBlock[] {
   if (!(richText && Array.isArray(richText))) {
@@ -315,9 +305,19 @@ function processHeadingBlocks(
   }
 }
 
-// ============================================================================
-// CUSTOM HOOKS
-// ============================================================================
+function flattenSlugs(headings: ProcessedHeading[]): string[] {
+  const result: string[] = [];
+  const walk = (items: ProcessedHeading[]) => {
+    for (const item of items) {
+      result.push(item.href.replace(/^#/, ""));
+      if (item.children.length > 0) {
+        walk(item.children);
+      }
+    }
+  };
+  walk(headings);
+  return result.filter(Boolean);
+}
 
 function useTableOfContentState(
   richText?: SanityRichTextProps,
@@ -355,68 +355,99 @@ function useTableOfContentState(
   }
 }
 
-// ============================================================================
-// COMPONENTS
-// ============================================================================
+// Highlights the heading currently in view, matching the active "On this page"
+// state in the design. Depends on a stable string key so the observer is only
+// rebuilt when the set of headings changes.
+function useActiveHeading(slugKey: string): string | null {
+  const [activeSlug, setActiveSlug] = useState<string | null>(null);
+
+  useEffect(() => {
+    const slugs = slugKey ? slugKey.split("|") : [];
+    if (slugs.length === 0) {
+      return;
+    }
+
+    setActiveSlug((prev) => prev ?? slugs[0] ?? null);
+
+    const elements = slugs
+      .map((slug) => document.getElementById(slug))
+      .filter((element): element is HTMLElement => element !== null);
+
+    if (elements.length === 0) {
+      return;
+    }
+
+    const visible = new Set<string>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            visible.add(entry.target.id);
+          } else {
+            visible.delete(entry.target.id);
+          }
+        }
+        const firstVisible = slugs.find((slug) => visible.has(slug));
+        if (firstVisible) {
+          setActiveSlug(firstVisible);
+        }
+      },
+      { rootMargin: "0px 0px -70% 0px", threshold: 0 }
+    );
+
+    for (const element of elements) {
+      observer.observe(element);
+    }
+
+    return () => observer.disconnect();
+  }, [slugKey]);
+
+  return activeSlug;
+}
 
 const TableOfContentAnchor: FC<AnchorProps> = ({
   heading,
+  activeSlug,
   maxDepth = DEFAULT_MAX_DEPTH,
   currentDepth = 1,
 }) => {
-  const { href, text, children, isChild, id } = heading;
+  const { href, text, children, id } = heading;
 
   // Don't render if we're at max depth and this is a child
   if (currentDepth > maxDepth) {
     return null;
   }
 
-  // Don't render if text or href is invalid
   if (!(text?.trim() && href?.trim())) {
     return null;
   }
 
+  const slug = href.replace(/^#/, "");
+  const isActive = activeSlug !== null && activeSlug === slug;
   const hasChildren =
     Array.isArray(children) && children.length > 0 && currentDepth < maxDepth;
 
   return (
-    <li
-      className={cn(
-        "my-2 list-inside transition-all duration-200",
-        // paddingClass,
-        isChild && "ml-1.5"
-      )}
-    >
-      <div className="flex items-center gap-2">
-        <Circle
-          aria-hidden="true"
-          className={cn(
-            "size-1.5 min-h-1.5 min-w-1.5 transition-colors duration-200",
-            isChild
-              ? "fill-zinc-600 dark:fill-zinc-400"
-              : "fill-zinc-900 dark:fill-zinc-100"
-          )}
-        />
-        <Link
-          aria-describedby={`${id}-level`}
-          className={cn(
-            "line-clamp-1 hover:text-blue-500 hover:underline",
-            "transition-colors duration-200 focus:outline-none",
-            "rounded-sm px-1 py-0.5"
-          )}
-          href={href}
-        >
-          {text}
-        </Link>
-        <span className="sr-only" id={`${id}-level`}>
-          Heading level {heading.level}
-        </span>
-      </div>
+    <li className={cn(currentDepth > 1 && "ml-3")}>
+      <Link
+        aria-current={isActive ? "location" : undefined}
+        className={cn(
+          "focus-ring block rounded-none px-2 py-0.5 text-base leading-6 tracking-[0.01em] transition-colors",
+          isActive
+            ? "bg-accent-green font-medium text-accent-green-foreground"
+            : "text-muted-foreground hover:text-foreground"
+        )}
+        href={href}
+        id={id}
+      >
+        {text}
+      </Link>
 
       {hasChildren && (
-        <ul className="mt-1">
+        <ul className="mt-1 flex flex-col gap-1">
           {children.map((child, index) => (
             <TableOfContentAnchor
+              activeSlug={activeSlug}
               currentDepth={currentDepth + 1}
               heading={child}
               key={child.id || `${child.text}-${index}-${currentDepth}`}
@@ -429,64 +460,130 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
   );
 };
 
+type ShareTarget = {
+  readonly network: string;
+  readonly label: string;
+  readonly icon: LucideIcon;
+  readonly url: (encodedUrl: string, encodedTitle: string) => string;
+};
+
+const SHARE_TARGETS: readonly ShareTarget[] = [
+  {
+    network: "X",
+    label: "Post",
+    icon: Twitter,
+    url: (u, t) => `https://twitter.com/intent/tweet?url=${u}&text=${t}`,
+  },
+  {
+    network: "LinkedIn",
+    label: "Post",
+    icon: Linkedin,
+    url: (u) => `https://www.linkedin.com/sharing/share-offsite/?url=${u}`,
+  },
+  {
+    network: "Facebook",
+    label: "Share",
+    icon: Facebook,
+    url: (u) => `https://www.facebook.com/sharer/sharer.php?u=${u}`,
+  },
+  {
+    network: "Reddit",
+    label: "Post",
+    icon: MessageCircle,
+    url: (u, t) => `https://www.reddit.com/submit?url=${u}&title=${t}`,
+  },
+] as const;
+
+function ShareOptions({ title }: { title?: string }) {
+  const [url, setUrl] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setUrl(window.location.href);
+  }, []);
+
+  const encodedUrl = encodeURIComponent(url);
+  const encodedTitle = encodeURIComponent(title ?? "");
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url || window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (_error) {
+      // Clipboard access can be denied; fail silently.
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-between gap-2 border-border border-t pt-4">
+      {SHARE_TARGETS.map((target) => (
+        <a
+          aria-label={`Share on ${target.network}`}
+          className="focus-ring flex flex-col items-center gap-1 rounded-sm text-muted-foreground transition-colors hover:text-foreground"
+          href={target.url(encodedUrl, encodedTitle)}
+          key={target.network}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <target.icon aria-hidden="true" className="size-[18px]" />
+          <span className="text-xs">{target.label}</span>
+        </a>
+      ))}
+      <button
+        className="focus-ring flex flex-col items-center gap-1 rounded-sm text-muted-foreground transition-colors hover:text-foreground"
+        onClick={handleCopy}
+        type="button"
+      >
+        {copied ? (
+          <Check aria-hidden="true" className="size-[18px]" />
+        ) : (
+          <Copy aria-hidden="true" className="size-[18px]" />
+        )}
+        <span className="text-xs">{copied ? "Copied" : "Copy"}</span>
+      </button>
+    </div>
+  );
+}
+
 export const TableOfContent: FC<TableOfContentProps> = ({
   richText,
   className,
   maxDepth = DEFAULT_MAX_DEPTH,
+  shareTitle,
 }) => {
   const { shouldShow, headings, error } = useTableOfContentState(
     richText,
     maxDepth
   );
 
-  // Early return for error state
+  const slugKey = flattenSlugs(headings).join("|");
+  const activeSlug = useActiveHeading(slugKey);
+
   if (error) {
     return null;
   }
 
-  // Early return if nothing to show
   if (!shouldShow || headings.length === 0) {
     return null;
   }
 
   return (
-    <aside
-      aria-labelledby="toc-heading"
-      className={cn(
-        "sticky top-8 flex w-full max-w-xs flex-col p-4",
-        "bg-linear-to-b from-zinc-50 to-zinc-100",
-        "dark:from-zinc-800 dark:to-zinc-900",
-        "rounded-lg border border-zinc-300 shadow-sm dark:border-zinc-700",
-        "transition-all duration-200",
-        className
-      )}
-      //   role="complementary"
+    <div
+      className={cn("bg-grid-dots-dense p-6 text-muted-foreground", className)}
     >
-      <details className="group" open>
-        <summary
-          className={cn(
-            "flex cursor-pointer items-center justify-between",
-            "font-semibold text-lg text-zinc-800 dark:text-zinc-200",
-            "hover:text-blue-600 dark:hover:text-blue-400",
-            "transition-colors duration-200 focus:outline-none",
-            "rounded-sm p-1"
-          )}
-          id="toc-heading"
-        >
-          <span>Table of Contents</span>
-          <ChevronDown
-            aria-hidden="true"
-            className={cn(
-              "h-5 w-5 transform transition-transform duration-200",
-              "group-open:rotate-180"
-            )}
-          />
-        </summary>
-
+      <aside
+        aria-labelledby="toc-heading"
+        className="flex flex-col gap-12 bg-background p-4"
+      >
         <nav aria-labelledby="toc-heading">
-          <ul className="mt-4 ml-3 space-y-1 text-sm">
+          <p className="text-foreground text-lg" id="toc-heading">
+            On this page
+          </p>
+          <ul className="mt-6 flex flex-col gap-2">
             {headings.map((heading, index) => (
               <TableOfContentAnchor
+                activeSlug={activeSlug}
                 currentDepth={1}
                 heading={heading}
                 key={heading.id || `${heading.text}-${index}`}
@@ -495,7 +592,9 @@ export const TableOfContent: FC<TableOfContentProps> = ({
             ))}
           </ul>
         </nav>
-      </details>
-    </aside>
+
+        <ShareOptions title={shareTitle} />
+      </aside>
+    </div>
   );
 };
