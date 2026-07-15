@@ -1,11 +1,13 @@
 "use client";
 
 import type { QueryBlogIndexPageDataResult } from "@workspace/sanity/types";
+import { useSearchParams } from "next/navigation";
 
-import { BlogHeader } from "@/components/blog-card";
+import { BlogHeader, FeaturedBlogCard } from "@/components/blog-card";
+import { BlogCategoryFilter } from "@/components/blog-category-filter";
+import { BlogList } from "@/components/blog-list";
 import { BlogPagination } from "@/components/blog-pagination";
 import { BlogSearchResults } from "@/components/blog-search-results";
-import { BlogSection } from "@/components/blog-section";
 import { PageBuilder } from "@/components/pagebuilder";
 import { useBlogSearch } from "@/hooks/use-blog-search";
 import type { Blog } from "@/types";
@@ -29,75 +31,88 @@ export function BlogPageContent({
     pageBuilder = [],
     _id,
     _type,
-    featuredBlogsCount,
     displayFeaturedBlogs,
   } = indexPageData;
 
   const { searchQuery, setSearchQuery, results, isSearching, hasQuery, error } =
     useBlogSearch();
 
-  const validFeaturedBlogsCount = featuredBlogsCount
-    ? Number.parseInt(featuredBlogsCount, 10)
-    : 0;
+  const searchParams = useSearchParams();
+  const hasCategory = (searchParams.get("category") ?? "").length > 0;
 
+  // The featured card is a single, page-1-only element: post[0] renders as the
+  // full-width card and the rest fill the grid list.
   const shouldDisplayFeaturedBlogs =
-    displayFeaturedBlogs &&
-    validFeaturedBlogsCount > 0 &&
+    Boolean(displayFeaturedBlogs) &&
     paginationMetadata.currentPage === 1 &&
-    !hasQuery;
+    !hasQuery &&
+    !hasCategory;
 
-  const featuredBlogs = shouldDisplayFeaturedBlogs
-    ? blogs.slice(0, validFeaturedBlogsCount)
-    : [];
+  const featuredBlogs = shouldDisplayFeaturedBlogs ? blogs.slice(0, 1) : [];
 
-  const remainingBlogs = shouldDisplayFeaturedBlogs
-    ? blogs.slice(validFeaturedBlogsCount)
-    : blogs;
+  const remainingBlogs = shouldDisplayFeaturedBlogs ? blogs.slice(1) : blogs;
 
   return (
     <main className="bg-background">
       <div className="container my-16">
         <BlogHeader description={description} title={title} />
 
-        <SearchInput
-          className="mt-8 mb-12"
-          onChange={setSearchQuery}
-          onClear={() => setSearchQuery("")}
-          placeholder="Search blogs..."
-          value={searchQuery}
-        />
-
-        {hasQuery ? (
-          <BlogSearchResults
-            error={error}
-            hasQuery={hasQuery}
-            isSearching={isSearching}
-            results={results}
-            searchQuery={searchQuery}
-          />
-        ) : (
-          <>
-            <BlogSection
-              blogs={featuredBlogs}
-              isFeatured
-              title="Featured Posts"
-            />
-            <BlogSection blogs={remainingBlogs} title="All Posts" />
-            {paginationMetadata?.totalPages > 1 && (
-              <BlogPagination
-                className="mt-12 flex justify-center"
-                currentPage={paginationMetadata.currentPage}
-                hasNextPage={paginationMetadata.hasNextPage}
-                hasPreviousPage={paginationMetadata.hasPreviousPage}
-                totalPages={paginationMetadata.totalPages}
-              />
-            )}
-          </>
+        {featuredBlogs.length > 0 && (
+          <section aria-label="Featured posts" className="mt-10 grid gap-8">
+            {featuredBlogs.map((blog) => (
+              <FeaturedBlogCard blog={blog} key={blog._id} />
+            ))}
+          </section>
         )}
+
+        <div className="mt-10 grid gap-8 lg:mt-14 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
+          {/* The dotted lattice frames the section: it lives on the outer
+              padding only while the inner container paints a solid background
+              so no dots show behind the search input or category buttons. */}
+          <aside className="h-max bg-grid-dots-dense p-4 text-muted-foreground">
+            <div className="flex flex-col gap-6 bg-background p-4">
+              <SearchInput
+                className="max-w-none"
+                onChange={setSearchQuery}
+                onClear={() => setSearchQuery("")}
+                placeholder="Search…"
+                value={searchQuery}
+              />
+              <BlogCategoryFilter />
+            </div>
+          </aside>
+
+          <div className="text-foreground">
+            {hasQuery ? (
+              <BlogSearchResults
+                error={error}
+                hasQuery={hasQuery}
+                isSearching={isSearching}
+                results={results}
+                searchQuery={searchQuery}
+              />
+            ) : (
+              <>
+                <BlogList blogs={remainingBlogs} />
+                {paginationMetadata?.totalPages > 1 && (
+                  <BlogPagination
+                    className="mt-12"
+                    currentPage={paginationMetadata.currentPage}
+                    hasNextPage={paginationMetadata.hasNextPage}
+                    hasPreviousPage={paginationMetadata.hasPreviousPage}
+                    totalPages={paginationMetadata.totalPages}
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       {pageBuilder && pageBuilder.length > 0 && (
-        <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
+        <div className="pb-16">
+          <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
+        </div>
       )}
     </main>
   );

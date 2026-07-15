@@ -7,16 +7,16 @@ import {
   sanityFetchStaticParams,
 } from "@workspace/sanity/live";
 import { queryBlogPaths, queryBlogSlugPageData } from "@workspace/sanity/query";
-import type { Metadata } from "next";
-import { draftMode } from "next/headers";
-import { notFound } from "next/navigation";
-import { Suspense } from "react";
-
 import {
   RichText,
   type RichTextValue,
 } from "@workspace/sanity-blocks/internal/rich-text";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
+import type { Metadata } from "next";
+import { draftMode } from "next/headers";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import { TableOfContent } from "@/components/elements/table-of-content";
 import { ArticleJsonLd } from "@/components/json-ld";
@@ -73,6 +73,7 @@ export async function generateMetadata({
   return getSEOMetadata({
     title: data?.title ?? data?.seoTitle,
     description: data?.description ?? data?.seoDescription,
+    ogDescription: data?.ogDescription,
     slug: slugString,
     contentId: data?._id,
     contentType: data?._type,
@@ -134,44 +135,113 @@ async function getCachedBlogPage({
   return data;
 }
 
+function formatDate(value?: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 function BlogPageContent({
   data,
 }: {
   data: NonNullable<Awaited<ReturnType<typeof getCachedBlogPage>>>;
 }) {
-  const { title, description, image, richText } = data ?? {};
+  const { title, richText, publishedAt, _updatedAt } = data ?? {};
+  const author = data?.authors;
+  const publishedDate = formatDate(publishedAt);
+  const updatedDate = formatDate(_updatedAt);
 
   return (
-    <div className="container my-16">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
-        <main>
-          <ArticleJsonLd article={data} />
-          <header className="mb-8">
-            <h1 className="mt-2 font-bold text-4xl">{title}</h1>
-            <p className="mt-4 text-lg text-muted-foreground">{description}</p>
-          </header>
-          {image && (
-            <div className="mb-12">
-              <SanityImage
-                alt={title}
-                className="h-auto w-full rounded-lg"
-                height={900}
-                image={image}
-                loading="eager"
-                width={1600}
-              />
-            </div>
-          )}
-          <RichText className="prose-lg" richText={richText as RichTextValue} />
-        </main>
+    <main className="bg-background">
+      <ArticleJsonLd article={data} />
+      <div className="container flex flex-col gap-16 pt-12 pb-20 md:gap-24 md:pt-16">
+        <div className="flex flex-col gap-6">
+          <nav aria-label="Breadcrumb" className="text-sm tracking-[0.01em]">
+            <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-muted-foreground">
+              <li>
+                <Link className="focus-ring hover:text-foreground" href="/">
+                  Home
+                </Link>
+              </li>
+              <li aria-hidden="true">/</li>
+              <li>
+                <Link className="focus-ring hover:text-foreground" href="/blog">
+                  Blog
+                </Link>
+              </li>
+              <li aria-hidden="true">/</li>
+              <li className="line-clamp-1 text-foreground/90">{title}</li>
+            </ol>
+          </nav>
 
-        <div className="hidden lg:block">
-          <div className="sticky top-4 rounded-lg">
-            <TableOfContent richText={richText ?? []} />
+          <header className="flex flex-col gap-6">
+            <h1 className="max-w-[52rem] text-balance font-normal text-4xl tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.1]">
+              {title}
+            </h1>
+
+            <div className="flex flex-col gap-4">
+              <dl className="flex flex-col text-sm">
+                {publishedDate && (
+                  <div className="flex gap-1.5">
+                    <dt className="text-muted-foreground">Published At:</dt>
+                    <dd className="text-foreground/90">{publishedDate}</dd>
+                  </div>
+                )}
+                {updatedDate && (
+                  <div className="flex gap-1.5">
+                    <dt className="text-muted-foreground">Last Updated At:</dt>
+                    <dd className="text-foreground/90">{updatedDate}</dd>
+                  </div>
+                )}
+              </dl>
+
+              {author?.name && (
+                <div className="flex items-center gap-2">
+                  {author.image?.id && (
+                    <span className="inline-block size-6 overflow-hidden rounded-full">
+                      <SanityImage
+                        alt={author.name}
+                        className="size-6 rounded-full object-cover"
+                        height={48}
+                        image={author.image}
+                        width={48}
+                      />
+                    </span>
+                  )}
+                  <span className="text-muted-foreground text-sm">
+                    {author.name}
+                  </span>
+                </div>
+              )}
+            </div>
+          </header>
+        </div>
+
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-20">
+          <article className="min-w-0">
+            <RichText
+              className="prose-lg"
+              richText={richText as RichTextValue}
+            />
+          </article>
+
+          <div className="hidden lg:block">
+            <div className="sticky top-24">
+              <TableOfContent richText={richText ?? []} shareTitle={title} />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

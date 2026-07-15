@@ -22,8 +22,10 @@ function SearchResultsHeader({
   count: number;
 }) {
   return (
-    <div className="mb-6">
-      <h2 className="font-semibold text-lg">Search Results for "{query}"</h2>
+    <div className="mb-6 flex flex-col gap-1">
+      <h2 className="font-normal text-2xl tracking-tight">
+        Search results for “{query}”
+      </h2>
       <p className="text-muted-foreground text-sm">
         {count === 0
           ? "No articles found"
@@ -97,16 +99,17 @@ function LoadingState() {
         <div className="mb-2 h-6 w-48 animate-pulse rounded bg-muted" />
         <div className="h-4 w-32 animate-pulse rounded bg-muted" />
       </div>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {LOADING_SKELETONS.map((id) => (
-          <div className="space-y-4" key={id}>
-            <div className="aspect-video animate-pulse rounded-2xl bg-muted" />
-            <div className="space-y-2">
-              <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-              <div className="h-6 w-full animate-pulse rounded bg-muted" />
-              <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
-            </div>
-          </div>
+          <article
+            className="flex h-full flex-col gap-4 border border-border p-6"
+            key={id}
+          >
+            <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+            <div className="mt-2 h-6 w-full animate-pulse rounded bg-muted" />
+            <div className="h-6 w-2/3 animate-pulse rounded bg-muted" />
+            <div className="mt-auto h-6 w-28 animate-pulse rounded bg-muted" />
+          </article>
         ))}
       </div>
     </div>

@@ -91,6 +91,25 @@ export const blog = defineType({
         "The date when your blog post will appear to have been published",
       group: GROUP.MAIN_CONTENT,
     }),
+    defineField({
+      name: "category",
+      type: "string",
+      title: "Category",
+      description:
+        "The topic this post belongs to. Used to group and filter posts in the sidebar on the blog listing page.",
+      group: GROUP.MAIN_CONTENT,
+      options: {
+        list: [
+          { title: "Sanity", value: "sanity" },
+          { title: "Skills", value: "skills" },
+          { title: "Next.js", value: "nextjs" },
+          { title: "SEO", value: "seo" },
+          { title: "AEO", value: "aeo" },
+          { title: "Changelog", value: "changelog" },
+        ],
+        layout: "dropdown",
+      },
+    }),
     imageWithAltField({
       title: "Image",
       description:
@@ -127,7 +146,6 @@ export const blog = defineType({
       slug,
       publishDate,
     }) => {
-      // Status indicators
       let visibility = "🌎 Public";
       if (isPrivate) {
         visibility = "🔒 Private";
@@ -135,7 +153,6 @@ export const blog = defineType({
         visibility = "🙈 Hidden";
       }
 
-      // Author and date
       const authorInfo = author ? `✍️ ${author}` : "👻 No author";
       const dateInfo = publishDate
         ? `📅 ${new Date(publishDate).toLocaleDateString()}`

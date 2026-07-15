@@ -9,18 +9,16 @@ export type BlogListProps = {
 export function BlogList({ blogs, isLoading = false }: BlogListProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-8 md:gap-12 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, index) => (
           <article
-            className="grid w-full grid-cols-1 gap-4"
+            className="flex h-full flex-col gap-4 border border-border p-6"
             key={`skeleton-${index.toString()}`}
           >
-            <div className="h-48 animate-pulse rounded-2xl bg-muted" />
-            <div className="space-y-2">
-              <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-              <div className="h-6 w-full animate-pulse rounded bg-muted" />
-              <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
-            </div>
+            <div className="h-4 w-24 animate-pulse rounded bg-muted" />
+            <div className="mt-2 h-6 w-full animate-pulse rounded bg-muted" />
+            <div className="h-6 w-2/3 animate-pulse rounded bg-muted" />
+            <div className="mt-auto h-6 w-28 animate-pulse rounded bg-muted" />
           </article>
         ))}
       </div>
@@ -29,7 +27,7 @@ export function BlogList({ blogs, isLoading = false }: BlogListProps) {
 
   if (blogs.length === 0) {
     return (
-      <div className="py-12 text-center">
+      <div className="border border-border py-12 text-center">
         <p className="text-muted-foreground">
           No blog posts available at the moment.
         </p>
@@ -38,7 +36,7 @@ export function BlogList({ blogs, isLoading = false }: BlogListProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-8 md:gap-12 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {blogs.map((blog) => (
         <BlogCard blog={blog} key={blog._id} />
       ))}

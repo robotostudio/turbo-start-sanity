@@ -19,8 +19,8 @@ import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
 import { getSEOMetadata } from "@/lib/seo";
 import {
-  calculatePaginationMetadata,
-  getBlogPaginationStartEnd,
+  calculateBlogPaginationMetadata,
+  getBlogPaginationRange,
   handleErrors,
 } from "@/utils";
 
@@ -40,13 +40,14 @@ async function fetchBlogIndexPageData({
 async function fetchBlogIndexPageBlogs({
   start,
   end,
+  category,
   perspective,
   stega,
-}: { start: number; end: number } & DynamicFetchOptions) {
+}: { start: number; end: number; category: string } & DynamicFetchOptions) {
   "use cache";
   const res = await sanityFetch({
     query: queryBlogIndexPageBlogs,
-    params: { start, end },
+    params: { start, end, category },
     perspective,
     stega,
   });
@@ -54,12 +55,14 @@ async function fetchBlogIndexPageBlogs({
 }
 
 async function fetchBlogIndexPageBlogsCount({
+  category,
   perspective,
   stega,
-}: DynamicFetchOptions) {
+}: { category: string } & DynamicFetchOptions) {
   "use cache";
   const res = await sanityFetch({
     query: queryBlogIndexPageBlogsCount,
+    params: { category },
     perspective,
     stega,
   });
@@ -75,6 +78,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return getSEOMetadata({
     title: result?.title ?? result?.seoTitle,
     description: result?.description ?? result?.seoDescription,
+    ogDescription: result?.ogDescription,
     slug: "/blog",
     contentId: result?._id,
     contentType: result?._type,
@@ -84,6 +88,7 @@ export async function generateMetadata(): Promise<Metadata> {
 type BlogPageProps = {
   searchParams: Promise<{
     page?: string;
+    category?: string;
   }>;
 };
 
@@ -96,17 +101,23 @@ export default function BlogIndexPage({ searchParams }: BlogPageProps) {
 }
 
 async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
-  const [{ page }, { perspective, stega }] = await Promise.all([
+  const [{ page, category }, { perspective, stega }] = await Promise.all([
     searchParams,
     getDynamicFetchOptions(),
   ]);
   const currentPage = page ? Number(page) : 1;
+  const activeCategory = category ?? "";
 
-  // Fetch page data and total count in parallel
   const [[indexPageData, errIndexPageData], [totalCount, errTotalCount]] =
     await Promise.all([
       handleErrors(fetchBlogIndexPageData({ perspective, stega })),
-      handleErrors(fetchBlogIndexPageBlogsCount({ perspective, stega })),
+      handleErrors(
+        fetchBlogIndexPageBlogsCount({
+          category: activeCategory,
+          perspective,
+          stega,
+        })
+      ),
     ]);
 
   if (errIndexPageData || !indexPageData) {
@@ -139,23 +150,28 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
     );
   }
 
-  const featuredBlogsCount = indexPageData.displayFeaturedBlogs
-    ? Number(indexPageData.featuredBlogsCount) || 0
-    : 0;
+  // A single full-width featured card sits on page 1 only, and never when a
+  // category filter is active. It consumes the first document, shifting the
+  // list pagination window by one.
+  const hasFeatured =
+    Boolean(indexPageData.displayFeaturedBlogs) && !activeCategory;
 
-  const paginationMetadata = calculatePaginationMetadata(
+  const paginationMetadata = calculateBlogPaginationMetadata(
     totalCount,
-    currentPage
+    currentPage,
+    hasFeatured
   );
 
-  const { start, end } = getBlogPaginationStartEnd(currentPage);
-  const blogStart = currentPage === 1 ? 0 : start + featuredBlogsCount;
-  const blogEnd = end + featuredBlogsCount;
+  const { start: blogStart, end: blogEnd } = getBlogPaginationRange(
+    currentPage,
+    hasFeatured
+  );
 
   const [blogs, errBlogs] = await handleErrors(
     fetchBlogIndexPageBlogs({
       start: blogStart,
       end: blogEnd,
+      category: activeCategory,
       perspective,
       stega,
     })
