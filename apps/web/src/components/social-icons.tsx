@@ -61,7 +61,7 @@ export function FacebookIcon({ className }: { className?: string }) {
   );
 }
 
-export function RedditIcon({ className }: { className?: string }) {
+export function RedditIcon({ className }: Readonly<{ className?: string }>) {
   return (
     <svg
       className={className}

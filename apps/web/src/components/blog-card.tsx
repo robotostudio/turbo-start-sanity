@@ -11,7 +11,7 @@ type BlogImageProps = {
   className?: string;
 };
 
-function BlogImage({ image, title, className }: BlogImageProps) {
+function BlogImage({ image, title, className }: Readonly<BlogImageProps>) {
   if (!image?.id) {
     return null;
   }
@@ -49,10 +49,10 @@ function formatBlogDate(publishedAt: string | null) {
 function BlogDate({
   publishedAt,
   className,
-}: {
+}: Readonly<{
   publishedAt: string | null;
   className?: string;
-}) {
+}>) {
   const formatted = formatBlogDate(publishedAt);
 
   if (!formatted) {
@@ -69,7 +69,7 @@ function BlogDate({
   );
 }
 
-function BlogAuthor({ author }: { author: Blog["authors"] }) {
+function BlogAuthor({ author }: Readonly<{ author: Blog["authors"] }>) {
   if (!author?.name) {
     return null;
   }
@@ -94,7 +94,7 @@ function BlogAuthor({ author }: { author: Blog["authors"] }) {
   );
 }
 
-function BlogCategoryTag({ category }: { category?: string | null }) {
+function BlogCategoryTag({ category }: Readonly<{ category?: string | null }>) {
   const label = getBlogCategoryLabel(category);
 
   if (!label) {
@@ -107,10 +107,10 @@ function BlogCategoryTag({ category }: { category?: string | null }) {
 function BlogMeta({
   publishedAt,
   category,
-}: {
+}: Readonly<{
   publishedAt: string | null;
   category?: string | null;
-}) {
+}>) {
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
       <BlogDate publishedAt={publishedAt} />

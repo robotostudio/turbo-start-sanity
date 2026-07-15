@@ -78,11 +78,11 @@ function ScreenshotImage({
   screenshot,
   name,
   sizes,
-}: {
+}: Readonly<{
   screenshot: ImageSource;
   name: string;
   sizes: string;
-}) {
+}>) {
   if (screenshot.kind !== "sanity") {
     return null;
   }
@@ -98,7 +98,10 @@ function ScreenshotImage({
   );
 }
 
-function AttributionLogo({ logo, name }: { logo: LogoSource; name: string }) {
+function AttributionLogo({
+  logo,
+  name,
+}: Readonly<{ logo: LogoSource; name: string }>) {
   if (logo.kind === "sanity") {
     return (
       <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden">
@@ -134,7 +137,7 @@ function BuiltByRobotoBadge() {
   );
 }
 
-function ShowcaseCard({ item }: { item: CardView }) {
+function ShowcaseCard({ item }: Readonly<{ item: CardView }>) {
   return (
     <article className="flex flex-col gap-2">
       <div className="relative aspect-video min-h-[249px] w-full overflow-hidden bg-muted">
@@ -166,11 +169,11 @@ function ShowcaseHero({
   headline,
   description,
   featured,
-}: {
+}: Readonly<{
   headline: string;
   description: string;
   featured: CardView;
-}) {
+}>) {
   return (
     <section className="grid gap-12 lg:grid-cols-2 lg:items-stretch">
       <div className="flex flex-col justify-between gap-10">
@@ -225,10 +228,10 @@ function ShowcaseHero({
 export function ShowcasePageContent({
   data,
   items,
-}: {
+}: Readonly<{
   data?: ShowcasePageData;
   items?: ShowcaseItemData[];
-}) {
+}>) {
   const cmsItems = items ?? [];
   const featuredItem = cmsItems.find((item) => item.featured) ?? cmsItems[0];
 

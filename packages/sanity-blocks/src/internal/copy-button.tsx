@@ -3,32 +3,6 @@
 import { Check, Copy } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-async function copyToClipboard(text: string): Promise<boolean> {
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-      return true;
-    }
-  } catch {
-    // Fall through to the legacy path (e.g. insecure context / denied API).
-  }
-
-  try {
-    const textarea = document.createElement("textarea");
-    textarea.value = text;
-    textarea.setAttribute("readonly", "");
-    textarea.style.position = "fixed";
-    textarea.style.opacity = "0";
-    document.body.appendChild(textarea);
-    textarea.select();
-    const ok = document.execCommand("copy");
-    document.body.removeChild(textarea);
-    return ok;
-  } catch {
-    return false;
-  }
-}
-
 export function CopyButton({ code }: Readonly<{ code: string }>) {
   const [copied, setCopied] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -43,15 +17,16 @@ export function CopyButton({ code }: Readonly<{ code: string }>) {
   );
 
   const handleCopy = useCallback(async () => {
-    const ok = await copyToClipboard(code);
-    if (!ok) {
-      return;
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
     }
-    setCopied(true);
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setTimeout(() => setCopied(false), 2000);
   }, [code]);
 
   return (

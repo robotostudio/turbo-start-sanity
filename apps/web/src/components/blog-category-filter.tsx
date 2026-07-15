@@ -6,7 +6,9 @@ import { useSearchParams } from "next/navigation";
 
 import { BLOG_CATEGORIES } from "@/lib/blog-categories";
 
-export function BlogCategoryFilter({ className }: { className?: string }) {
+export function BlogCategoryFilter({
+  className,
+}: Readonly<{ className?: string }>) {
   const searchParams = useSearchParams();
   const activeCategory = searchParams.get("category") ?? "";
 

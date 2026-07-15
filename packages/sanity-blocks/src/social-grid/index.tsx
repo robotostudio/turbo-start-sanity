@@ -78,6 +78,20 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
   const Icon = platform ? PLATFORM_ICONS[platform] : undefined;
   const displayLabel = label ?? platform ?? "";
 
+  const iconMedia = Icon ? <Icon className="size-[70px]" /> : null;
+  const media = logo?.id ? (
+    <span className="flex size-[70px] shrink-0 items-center justify-center overflow-hidden">
+      <SanityImage
+        className="h-full w-full object-contain dark:invert"
+        height={70}
+        image={logo}
+        width={70}
+      />
+    </span>
+  ) : (
+    iconMedia
+  );
+
   const card = (
     <div className="group relative flex min-h-[248px] flex-col justify-end overflow-hidden bg-grid-dots-dense bg-background p-2 text-foreground transition-colors hover:bg-accent-green hover:[background-image:none]">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -98,18 +112,7 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
             aria-hidden="true"
             className="-right-[14px] -bottom-[14px] absolute size-2.5 border-accent-green-foreground border-t border-l opacity-0 transition-opacity duration-200 group-hover:opacity-100"
           />
-          {logo?.id ? (
-            <span className="flex size-[70px] shrink-0 items-center justify-center overflow-hidden">
-              <SanityImage
-                className="h-full w-full object-contain dark:invert"
-                height={70}
-                image={logo}
-                width={70}
-              />
-            </span>
-          ) : Icon ? (
-            <Icon className="size-[70px]" />
-          ) : null}
+          {media}
         </span>
       </div>
       <span className="relative inline-flex items-center self-start bg-background px-1.5 py-0.5 font-mono text-foreground text-sm uppercase tracking-wide">

@@ -13,8 +13,13 @@ interface BlogPaginationProps extends PaginationProps {
   className?: string;
 }
 
-function generatePaginationItems(currentPage: number, totalPages: number) {
-  const items: (number | "ellipsis")[] = [];
+type PaginationItem = number | "ellipsis-start" | "ellipsis-end";
+
+function generatePaginationItems(
+  currentPage: number,
+  totalPages: number
+): PaginationItem[] {
+  const items: PaginationItem[] = [];
   const delta = 2; // Number of pages to show around current page
 
   if (totalPages <= 7) {
@@ -25,7 +30,7 @@ function generatePaginationItems(currentPage: number, totalPages: number) {
     items.push(1);
 
     if (currentPage - delta > 2) {
-      items.push("ellipsis");
+      items.push("ellipsis-start");
     }
 
     const start = Math.max(2, currentPage - delta);
@@ -36,7 +41,7 @@ function generatePaginationItems(currentPage: number, totalPages: number) {
     }
 
     if (currentPage + delta < totalPages - 1) {
-      items.push("ellipsis");
+      items.push("ellipsis-end");
     }
 
     if (totalPages > 1) {
@@ -86,13 +91,13 @@ export function BlogPagination({
         </Link>
       ) : null}
 
-      {paginationItems.map((item, index) => {
-        if (item === "ellipsis") {
+      {paginationItems.map((item) => {
+        if (item === "ellipsis-start" || item === "ellipsis-end") {
           return (
             <span
               aria-hidden="true"
               className="text-sm font-light text-zinc-500 leading-5"
-              key={`ellipsis-${index}`}
+              key={item}
             >
               &hellip;
             </span>

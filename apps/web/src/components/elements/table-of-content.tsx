@@ -494,7 +494,7 @@ const SHARE_TARGETS: readonly ShareTarget[] = [
   },
 ] as const;
 
-function ShareOptions({ title }: { title?: string }) {
+function ShareOptions({ title }: Readonly<{ title?: string }>) {
   const [url, setUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -510,8 +510,9 @@ function ShareOptions({ title }: { title?: string }) {
       await navigator.clipboard.writeText(url || window.location.href);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (_error) {
-      // Clipboard access can be denied; fail silently.
+    } catch {
+      // Clipboard access can be denied; reset so the UI reflects the failure.
+      setCopied(false);
     }
   };
 

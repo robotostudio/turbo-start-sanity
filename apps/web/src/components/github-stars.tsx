@@ -4,7 +4,7 @@ import useSWR from "swr";
 
 // Official GitHub mark (octocat) — the recognizable brand logo, rather than
 // lucide's simplified glyph.
-function GithubIcon({ className }: { className?: string }) {
+function GithubIcon({ className }: Readonly<{ className?: string }>) {
   return (
     <svg
       aria-hidden="true"
@@ -67,10 +67,10 @@ function parseRepo(gitHubUrl: string): string | null {
 export function GithubStars({
   className,
   gitHubUrl,
-}: {
+}: Readonly<{
   className?: string;
   gitHubUrl?: string | null;
-}) {
+}>) {
   const repo = gitHubUrl ? parseRepo(gitHubUrl) : null;
 
   const { data } = useSWR<GithubStarsResponse>(
