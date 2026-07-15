@@ -80,7 +80,7 @@ export async function GET(): Promise<Response> {
   const posts =
     postsResult.status === "fulfilled" ? (postsResult.value ?? []) : [];
 
-  const siteTitle = settings?.siteTitle ?? "Site";
+  const siteTitle = settings?.siteTitle ?? "Turbo Start Sanity";
   const siteDescription = settings?.siteDescription ?? "";
 
   const pageLines = [

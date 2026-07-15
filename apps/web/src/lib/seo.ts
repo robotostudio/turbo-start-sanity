@@ -8,7 +8,6 @@ import type { Metadata } from "next";
 import type { Maybe } from "@/types";
 import { capitalize, getBaseUrl } from "@/utils";
 
-// Site-wide configuration interface
 type SiteConfig = {
   title: string;
   description: string;
@@ -16,10 +15,10 @@ type SiteConfig = {
   keywords: string[];
 };
 
-// Page-specific SEO data interface
 interface PageSeoData extends Metadata {
   title?: string;
   description?: string;
+  ogDescription?: Maybe<string>;
   slug?: string;
   contentId?: string;
   contentType?: string;
@@ -28,7 +27,6 @@ interface PageSeoData extends Metadata {
   pageType?: Extract<Metadata["openGraph"], { type: string }>["type"];
 }
 
-// OpenGraph image generation parameters
 type OgImageParams = {
   type?: string;
   id?: string;
@@ -36,8 +34,8 @@ type OgImageParams = {
 
 // Fallbacks used until the Settings document is populated in the Studio
 const FALLBACK_SITE_CONFIG: SiteConfig = {
-  title: "Roboto Studio Demo",
-  description: "Roboto Studio Demo",
+  title: "Turbo Start Sanity",
+  description: "Turbo Start Sanity",
   twitterHandle: "@studioroboto",
   keywords: ["roboto", "studio", "demo", "sanity", "next", "react", "template"],
 };
@@ -111,6 +109,7 @@ export async function getSEOMetadata(
   const {
     title: pageTitle,
     description: pageDescription,
+    ogDescription,
     slug = "/",
     contentId,
     contentType,
@@ -124,13 +123,16 @@ export async function getSEOMetadata(
   const baseUrl = getBaseUrl();
   const pageUrl = buildPageUrl({ baseUrl, slug });
 
-  // Build default metadata values
   const defaultTitle = extractTitle({
     pageTitle,
     slug,
     siteTitle: siteConfig.title,
   });
   const defaultDescription = pageDescription || siteConfig.description;
+  // Open graph description override: falls back to the page description when
+  // the `ogDescription` field is left blank. Only affects social (OG/Twitter)
+  // metadata — the top-level `description` stays the page description.
+  const socialDescription = ogDescription || defaultDescription;
   const allKeywords = [...siteConfig.keywords, ...pageKeywords];
 
   const ogImage = generateOgImageUrl({
@@ -149,7 +151,6 @@ export async function getSEOMetadata(
     ? undefined
     : { "text/markdown": [{ url: markdownUrl, title: fullTitle }] };
 
-  // Build default metadata object
   const defaultMetadata: Metadata = {
     title: fullTitle,
     description: defaultDescription,
@@ -166,7 +167,7 @@ export async function getSEOMetadata(
       images: [ogImage],
       creator: siteConfig.twitterHandle,
       title: defaultTitle,
-      description: defaultDescription,
+      description: socialDescription,
     },
     alternates: {
       canonical: pageUrl,
@@ -175,7 +176,7 @@ export async function getSEOMetadata(
     openGraph: {
       type: pageType ?? "website",
       countryName: "UK",
-      description: defaultDescription,
+      description: socialDescription,
       title: defaultTitle,
       images: [
         {
@@ -190,7 +191,6 @@ export async function getSEOMetadata(
     },
   };
 
-  // Override any defaults with page-specific metadata
   const { alternates: alternatesOverride, ...restOverrides } = pageOverrides;
   return {
     ...defaultMetadata,

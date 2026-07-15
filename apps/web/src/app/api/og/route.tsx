@@ -28,6 +28,7 @@ type ContentProps = Record<string, string>;
 
 type DominantColorSeoImageRenderProps = {
   title?: Maybe<string>;
+  description?: Maybe<string>;
   _type?: Maybe<string>;
   siteTitle?: Maybe<string>;
 };
@@ -40,6 +41,7 @@ const seoImageRender = ({ seoImage }: SeoImageRenderProps) => (
 
 const dominantColorSeoImageRender = ({
   title,
+  description,
   _type,
   siteTitle,
 }: DominantColorSeoImageRenderProps) => (
@@ -49,7 +51,7 @@ const dominantColorSeoImageRender = ({
   >
     <div tw="flex items-center justify-between w-full">
       <div tw="flex text-white text-2xl font-semibold">
-        {siteTitle ?? "Turbo Start"}
+        {siteTitle ?? "Turbo Start Sanity"}
       </div>
       {/* Type pill: blog posts only */}
       {_type === "blog" && (
@@ -66,12 +68,22 @@ const dominantColorSeoImageRender = ({
       )}
     </div>
 
-    <h1
-      style={{ lineHeight: 1.05, letterSpacing: "-0.02em", fontWeight: 400 }}
-      tw="flex text-[76px] max-w-[90%] text-white"
-    >
-      {title ?? siteTitle ?? "Turbo Start"}
-    </h1>
+    <div tw="flex flex-col max-w-[90%]">
+      <h1
+        style={{ lineHeight: 1.05, letterSpacing: "-0.02em", fontWeight: 400 }}
+        tw="flex text-[76px] text-white"
+      >
+        {title ?? siteTitle ?? "Turbo Start Sanity"}
+      </h1>
+      {description && (
+        <p
+          style={{ lineHeight: 1.3, color: "#A1A1A1" }}
+          tw="flex text-[32px] mt-8"
+        >
+          {description}
+        </p>
+      )}
+    </div>
   </div>
 );
 

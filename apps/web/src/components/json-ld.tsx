@@ -56,7 +56,6 @@ function buildSafeImageUrl(image?: { id?: string | null }) {
     .url();
 }
 
-// Article JSON-LD Component
 type ArticleJsonLdProps = {
   article: QueryBlogSlugPageDataResult;
   settings?: QuerySettingsDataResult;
@@ -97,7 +96,7 @@ export function ArticleJsonLd({
       : [],
     publisher: {
       "@type": "Organization",
-      name: settings?.siteTitle || "Website",
+      name: settings?.siteTitle || "Turbo Start Sanity",
       logo: settings?.logo
         ? ({
             "@type": "ImageObject",
@@ -123,7 +122,6 @@ export function ArticleJsonLd({
   );
 }
 
-// Organization JSON-LD Component
 type OrganizationJsonLdProps = {
   settings: QuerySettingsDataResult;
 };
@@ -164,7 +162,6 @@ export function OrganizationJsonLd({ settings }: OrganizationJsonLdProps) {
   return <JsonLdScript data={organizationJsonLd} id="organization-json-ld" />;
 }
 
-// Website JSON-LD Component
 type WebSiteJsonLdProps = {
   settings: QuerySettingsDataResult;
 };
