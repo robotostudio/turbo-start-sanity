@@ -32,7 +32,6 @@
   --border: oklch(0.92 0.004 286.32);
   --input: var(--border);
   --ring: oklch(0.705 0.015 286.067);
-  --grid-line: oklch(0.21 0.006 285.885 / 0.06);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -50,7 +49,7 @@
 }
 
 .dark {
-  --background: oklch(0.19 0 0);
+  --background: oklch(0 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.21 0.006 285.885);
   --card-foreground: var(--foreground);
@@ -70,7 +69,6 @@
   --border: var(--muted);
   --input: var(--border);
   --ring: oklch(0.442 0.017 285.786);
-  --grid-line: oklch(0.985 0 0 / 0.06);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -89,6 +87,8 @@
 @theme inline {
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --animate-marquee: marquee 40s linear infinite;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -130,25 +130,69 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Overrides Tailwind's built-in `container`; wins by source order on the
- * pinned Tailwind version — revisit if an upgrade reorders emission. */
+/* Overrides Tailwind's built-in `container`; wins by source order. */
 @utility container {
   @apply mx-auto w-full max-w-7xl px-4 md:px-6;
 }
 
-@utility bg-grid-dots {
-  background-image: radial-gradient(var(--grid-line) 1.2px, transparent 1.2px);
-  background-size: 16px 16px;
+/* Dense dot lattice on a 5.2px grid. */
+@utility bg-grid-dots-dense {
+  background-image: radial-gradient(
+    color-mix(in oklch, currentColor 70%, transparent) 0.6px,
+    transparent 0.7px
+  );
+  background-size: 5.2px 5.2px;
 }
 
-/* Keyboard focus indicator: thin foreground hairline (white in dark mode)
- * hugging the element's own shape. Same look as the global `:focus-visible`
- * base rule — use on elements that need to re-enable or scope it. */
+/* Fine stipple for the footer top-bar motifs; background-position: center
+ * keeps the lattice symmetric so rows aren't clipped at the edges. */
+@utility bg-grid-dots-stipple {
+  background-image: radial-gradient(
+    color-mix(in oklch, currentColor 85%, transparent) 0.75px,
+    transparent 1px
+  );
+  background-size: 3px 3px;
+  background-position: center;
+}
+
+/* Medium dot lattice (7px grid) for the feature-card icon boxes; uses
+ * currentColor so dots invert on the green highlighted card. */
+@utility bg-grid-dots-md {
+  background-image: radial-gradient(
+    color-mix(in oklch, currentColor 50%, transparent) 0.9px,
+    transparent 1.1px
+  );
+  background-size: 7px 7px;
+}
+
+/* Translate a duplicated track by half its width for a seamless loop. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Keyboard focus indicator; matches the global `:focus-visible` base rule,
+ * for elements that need to re-enable or scope it. */
 @utility focus-ring {
   outline: none;
   &:focus-visible {
     outline: 1px solid var(--foreground);
     outline-offset: 2px;
+  }
+}
+
+/* Inset variant: the outline is drawn INSIDE the element (negative offset) so
+   it can't be clipped by an overflow-hidden ancestor or painted over by a
+   flush-packed sibling. Use on tightly-packed cards / edge-hugging links. */
+@utility focus-ring-inset {
+  outline: none;
+  &:focus-visible {
+    outline: 2px solid var(--foreground);
+    outline-offset: -3px;
   }
 }
 
@@ -159,27 +203,27 @@
   body {
     @apply bg-background text-foreground;
   }
-  /* Global keyboard focus indicator: thin foreground hairline (white in dark
-   * mode) following the element's own shape. Matches the `focus-ring`
-   * utility; components opt out with `outline-none`. */
+  /* Global keyboard focus indicator; components opt out with `outline-none`. */
   :focus-visible {
     outline: 1px solid var(--foreground);
     outline-offset: 2px;
   }
-}
 
-img {
-  display: block;
-  max-width: 100%;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  border-radius: var(--radius-md);
-}
+  /* Base image defaults live inside @layer base so utility classes
+     (w-40, dark:hidden, object-contain, …) can still override them. An
+     unlayered rule here would beat every Tailwind utility in v4's cascade. */
+  img {
+    display: block;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
 
-/* Nearest-neighbor upscale so LQIP placeholders load in pixelated, not blurred. */
-img[data-lqip] {
-  image-rendering: pixelated;
+  /* Nearest-neighbor upscale so LQIP placeholders load in pixelated, not blurred. */
+  img[data-lqip] {
+    image-rendering: pixelated;
+  }
 }
 
 /* FAQ disclosure: smooth open/close, instant fallback where unsupported. */
@@ -202,4 +246,34 @@ img[data-lqip] {
     block-size: auto;
     opacity: 1;
   }
+}
+
+/* Code blocks (rich-text). Plain, unhighlighted monospace with a line-number
+   gutter — no syntax coloring, tabs preserved. */
+.rich-code-pre {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  /* max-content + min-width keeps the background spanning the full scroll
+     width when long lines overflow the container. */
+  width: max-content;
+  min-width: 100%;
+  white-space: pre;
+  tab-size: 2;
+  color: var(--foreground);
+}
+
+/* Line-number gutter — a fixed column beside the horizontally-scrolling code. */
+.rich-code-gutter {
+  flex: none;
+  padding: 1rem 0.75rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklab, var(--muted-foreground) 60%, transparent);
+  user-select: none;
+  border-right: 1px solid var(--border);
+  background-color: color-mix(in oklab, var(--muted) 40%, transparent);
+}
+
+.rich-code-gutter span {
+  display: block;
 }
