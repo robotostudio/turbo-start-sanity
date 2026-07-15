@@ -135,7 +135,12 @@ function fenceCodeBlock(code: string, language?: string | null): string {
   );
   const fence = "`".repeat(Math.max(3, longestRun + 1));
   const info = (language ?? "").trim();
-  const body = code.replace(/\n+$/, "");
+  // Trim trailing newlines with a linear scan; a `/\n+$/` regex backtracks.
+  let end = code.length;
+  while (end > 0 && code.charCodeAt(end - 1) === 10) {
+    end--;
+  }
+  const body = code.slice(0, end);
   return `${fence}${info}\n${body}\n${fence}`;
 }
 

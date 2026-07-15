@@ -1,44 +1,8 @@
 import { ImagesIcon } from "@sanity/icons";
-import { imageWithAltField } from "@workspace/sanity-blocks/internal/schema-fields";
-import { defineArrayMember, defineField, defineType } from "sanity";
+import { logoLinkItem } from "@workspace/sanity-blocks/internal/schema-fields";
+import { defineField, defineType } from "sanity";
 
-const logoCloudItem = defineArrayMember({
-  name: "logoCloudItem",
-  type: "object",
-  icon: ImagesIcon,
-  fields: [
-    imageWithAltField({
-      title: "Logo",
-      description:
-        "The partner or brand logo to display. Use a transparent PNG or SVG for the cleanest result",
-    }),
-    defineField({
-      name: "url",
-      title: "Link URL",
-      type: "customUrl",
-      description:
-        "Optional link opened when a visitor clicks this logo, for example the brand's website",
-    }),
-  ],
-  preview: {
-    select: {
-      media: "image",
-      alt: "image.alt",
-      externalUrl: "url.external",
-      internalUrl: "url.internal.slug.current",
-      urlType: "url.type",
-    },
-    prepare: ({ media, alt, externalUrl, internalUrl, urlType }) => {
-      const url = urlType === "external" ? externalUrl : internalUrl;
-
-      return {
-        title: alt || "Logo",
-        subtitle: url || "No link",
-        media,
-      };
-    },
-  },
-});
+const logoCloudItem = logoLinkItem("logoCloudItem");
 
 export const logoCloudSchema = defineType({
   name: "logoCloud",

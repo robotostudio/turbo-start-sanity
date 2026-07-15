@@ -176,20 +176,22 @@
 
 /* Keyboard focus indicator; matches the global `:focus-visible` base rule,
  * for elements that need to re-enable or scope it. */
-@utility focus-ring {
-  outline: none;
-  &:focus-visible {
+@layer utilities {
+  .focus-ring {
+    outline: none;
+  }
+  .focus-ring:focus-visible {
     outline: 1px solid var(--foreground);
     outline-offset: 2px;
   }
-}
 
-/* Inset variant: the outline is drawn INSIDE the element (negative offset) so
-   it can't be clipped by an overflow-hidden ancestor or painted over by a
-   flush-packed sibling. Use on tightly-packed cards / edge-hugging links. */
-@utility focus-ring-inset {
-  outline: none;
-  &:focus-visible {
+  /* Inset variant: the outline is drawn INSIDE the element (negative offset) so
+     it can't be clipped by an overflow-hidden ancestor or painted over by a
+     flush-packed sibling. Use on tightly-packed cards / edge-hugging links. */
+  .focus-ring-inset {
+    outline: none;
+  }
+  .focus-ring-inset:focus-visible {
     outline: 2px solid var(--foreground);
     outline-offset: -3px;
   }

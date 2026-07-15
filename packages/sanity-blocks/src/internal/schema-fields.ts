@@ -1,4 +1,6 @@
+import { ImagesIcon } from "@sanity/icons";
 import {
+  defineArrayMember,
   defineField,
   type ImageRule,
   type ImageValue,
@@ -64,4 +66,47 @@ export const imageWithAltField = ({
           }),
       }),
     ],
+  });
+
+/**
+ * A logo-with-optional-link array member, shared by the CTA "used by teams"
+ * strip and the Logo Cloud block. Only the member `name` differs.
+ */
+export const logoLinkItem = (name: string) =>
+  defineArrayMember({
+    name,
+    type: "object",
+    icon: ImagesIcon,
+    fields: [
+      imageWithAltField({
+        title: "Logo",
+        description:
+          "The partner or brand logo to display. Use a transparent PNG or SVG for the cleanest result",
+      }),
+      defineField({
+        name: "url",
+        title: "Link URL",
+        type: "customUrl",
+        description:
+          "Optional link opened when a visitor clicks this logo, for example the brand's website",
+      }),
+    ],
+    preview: {
+      select: {
+        media: "image",
+        alt: "image.alt",
+        externalUrl: "url.external",
+        internalUrl: "url.internal.slug.current",
+        urlType: "url.type",
+      },
+      prepare: ({ media, alt, externalUrl, internalUrl, urlType }) => {
+        const url = urlType === "external" ? externalUrl : internalUrl;
+
+        return {
+          title: alt || "Logo",
+          subtitle: url || "No link",
+          media,
+        };
+      },
+    },
   });
