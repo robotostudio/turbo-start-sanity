@@ -61,6 +61,7 @@ export default defineConfig({
               "footer",
               "settings",
               "blogIndex",
+              "showcasePage",
               "assist.instruction.context",
               "media.tag",
             ].includes(template?.templateId)

@@ -4,8 +4,6 @@
 
 import slugify from "slugify";
 
-// --- Types ---
-
 export type SlugValidationResult = {
   errors: string[];
   warnings: string[];
@@ -27,8 +25,6 @@ export type SlugValidationOptions = {
   /** Custom validators returning error strings */
   customValidators?: Array<(slug: string) => string[]>;
 };
-
-// --- Constants ---
 
 const SEGMENT_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MIN_LEN = 3;
@@ -52,8 +48,6 @@ export const SLUG_WARNING_MESSAGES = {
   TOO_LONG: `Slug can't be longer than ${MAX_LEN} characters.`,
 } as const;
 
-// --- Document type configs ---
-
 const CONFIGS: Record<string, SlugValidationOptions> = {
   blog: {
     documentType: "Blog post",
@@ -68,6 +62,15 @@ const CONFIGS: Record<string, SlugValidationOptions> = {
     sanityDocumentType: "blogIndex",
     customValidators: [
       (s) => (s !== "/blog" ? ["Blog index must be exactly '/blog'"] : []),
+    ],
+  },
+  showcasePage: {
+    documentType: "Showcase page",
+    requireSlash: true,
+    sanityDocumentType: "showcasePage",
+    customValidators: [
+      (s) =>
+        s !== "/showcase" ? ["Showcase page must be exactly '/showcase'"] : [],
     ],
   },
   homePage: {
@@ -100,8 +103,6 @@ const CONFIGS: Record<string, SlugValidationOptions> = {
     ],
   },
 };
-
-// --- Core validation ---
 
 /** Validate a single path segment (no slashes). */
 function validateSegment(seg: string): SlugValidationResult {
@@ -215,8 +216,6 @@ export function validateSlug(
 
   return { errors: [...new Set(errors)], warnings: [...new Set(warnings)] };
 }
-
-// --- Public API for schema & components ---
 
 /** Get validation config for a document type. */
 export function getDocumentTypeConfig(docType: string): SlugValidationOptions {

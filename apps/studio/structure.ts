@@ -5,6 +5,8 @@ import {
   File,
   FileText,
   HomeIcon,
+  Images,
+  LayoutGrid,
   type LucideIcon,
   MessageCircle,
   PanelBottom,
@@ -45,11 +47,6 @@ const createSingleTon = ({ S, type, title, icon }: CreateSingleTon) => {
 type CreateList = {
   S: StructureBuilder;
 } & Base;
-
-// This function creates a list item for a type. It takes a StructureBuilder instance (S),
-// a type, an icon, and a title as parameters. It generates a title for the type if not provided,
-// and uses a default icon if not provided. It then returns a list item with the generated or
-// provided title and icon.
 
 const createList = ({ S, type, icon, title, id }: CreateList) => {
   const newTitle = title ?? getTitleCase(type);
@@ -129,6 +126,12 @@ export const structure = (
         type: "redirect",
         title: "Redirects",
         icon: TrendingUpDown,
+      }),
+      createIndexListWithOrderableItems({
+        S,
+        index: { type: "showcasePage", title: "Showcase", icon: LayoutGrid },
+        list: { type: "showcaseItem", title: "Showcase Items", icon: Images },
+        context,
       }),
       S.divider(),
       S.listItem()
