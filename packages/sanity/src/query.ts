@@ -3,7 +3,9 @@ import { faqAccordionGroqProjection } from "@workspace/sanity-blocks/faq-accordi
 import { featureCardsIconGroqProjection } from "@workspace/sanity-blocks/feature-cards-icon/feature-cards-icon.groq";
 import { heroGroqProjection } from "@workspace/sanity-blocks/hero/hero.groq";
 import { imageLinkCardsGroqProjection } from "@workspace/sanity-blocks/image-link-cards/image-link-cards.groq";
+import { logoCloudGroqProjection } from "@workspace/sanity-blocks/logo-cloud/logo-cloud.groq";
 import { richTextBlockGroqProjection } from "@workspace/sanity-blocks/rich-text-block/rich-text-block.groq";
+import { socialGridGroqProjection } from "@workspace/sanity-blocks/social-grid/social-grid.groq";
 import { subscribeNewsletterGroqProjection } from "@workspace/sanity-blocks/subscribe-newsletter/subscribe-newsletter.groq";
 import { defineQuery } from "next-sanity";
 
@@ -82,6 +84,7 @@ const blogCardFragment = /* groq */ `
   description,
   "slug":slug.current,
   orderRank,
+  category,
   ${imageFragment},
   publishedAt,
   ${blogAuthorFragment}
@@ -115,6 +118,8 @@ const pageBuilderFragment = /* groq */ `
     ${featureCardsIconGroqProjection},
     ${subscribeNewsletterGroqProjection},
     ${imageLinkCardsGroqProjection},
+    ${logoCloudGroqProjection},
+    ${socialGridGroqProjection},
     ${richTextBlockGroqProjection}
   }
 `;
@@ -164,7 +169,7 @@ export const queryBlogIndexPageData = defineQuery(`
 `);
 
 export const queryBlogIndexPageBlogs = defineQuery(`
-  *[_type == "blog" && (seoHideFromLists != true)] | order(orderRank asc) [$start...$end]{
+  *[_type == "blog" && (seoHideFromLists != true) && ($category == "" || category == $category)] | order(orderRank asc) [$start...$end]{
     ${blogCardFragment}
   }
 `);
@@ -176,7 +181,7 @@ export const queryAllBlogDataForSearch = defineQuery(`
 `);
 
 export const queryBlogIndexPageBlogsCount = defineQuery(`
-  count(*[_type == "blog" && (seoHideFromLists != true)])
+  count(*[_type == "blog" && (seoHideFromLists != true) && ($category == "" || category == $category)])
 `);
 export const queryBlogSlugPageData = defineQuery(`
   *[_type == "blog" && slug.current == $slug][0]{
@@ -199,6 +204,11 @@ const ogFieldsFragment = /* groq */ `
     defined(ogTitle) => ogTitle,
     defined(seoTitle) => seoTitle,
     title
+  ),
+  "description": select(
+    defined(ogDescription) => ogDescription,
+    defined(seoDescription) => seoDescription,
+    description
   ),
   "seoImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
   "siteTitle": *[_type == "settings"][0].siteTitle
@@ -246,17 +256,11 @@ export const queryFooterData = defineQuery(`
         ),
       }
     },
-    poweredBy,
-    credit,
-    "creditUrl": creditUrl,
     copyright,
-    watermark {
-      ${imageFields}
-    },
     credits[]{
       _key,
       label,
-      "url": url,
+      url,
       logo {
         ${imageFields}
       }
@@ -298,6 +302,7 @@ export const queryNavbarData = defineQuery(`
       }
     },
     ${buttonsFragment},
+    gitHubUrl,
   }
 `);
 
@@ -316,8 +321,16 @@ export const queryGlobalSeoSettings = defineQuery(`
     _id,
     _type,
     siteTitle,
-    logo {
-      ${imageFields}
+    logos {
+      logo {
+        ${imageFields}
+      },
+      logoDark {
+        ${imageFields}
+      },
+      footerLogo {
+        ${imageFields}
+      }
     },
     siteDescription,
     socialLinks{
@@ -337,9 +350,36 @@ export const querySettingsData = defineQuery(`
     _type,
     siteTitle,
     siteDescription,
-    "logo": logo.asset->url + "?w=80&h=40&dpr=3&fit=max",
+    "logo": logos.logo.asset->url + "?w=80&h=40&dpr=3&fit=max",
     "socialLinks": socialLinks,
     "contactEmail": contactEmail,
+  }
+`);
+
+export const queryShowcasePageData =
+  defineQuery(`*[_type == "showcasePage" && _id == "showcasePage"][0]{
+    _id,
+    _type,
+    headline,
+    description,
+    "slug": slug.current
+  }`);
+
+export const queryShowcaseItems = defineQuery(`
+  *[_type == "showcaseItem"] | order(orderRank asc){
+    _id,
+    _type,
+    siteName,
+    url,
+    "screenshot": screenshot{
+      ${imageFields}
+    },
+    attributionName,
+    "attributionLogo": attributionLogo{
+      ${imageFields}
+    },
+    builtByRoboto,
+    featured
   }
 `);
 

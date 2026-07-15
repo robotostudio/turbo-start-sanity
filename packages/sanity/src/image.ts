@@ -5,7 +5,6 @@ import type { QueryImageTypeResult } from "./sanity.types";
 
 type SanityImageData = NonNullable<QueryImageTypeResult>;
 
-// Types
 type ImageHotspot = {
   readonly x: number;
   readonly y: number;
@@ -30,11 +29,9 @@ export type SanityImageProps = {
   readonly image: SanityImageData;
 } & Omit<WrapperProps<"img">, "id">;
 
-// Base URL construction
 export const SANITY_BASE_URL =
   `https://cdn.sanity.io/images/${env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${env.NEXT_PUBLIC_SANITY_DATASET}/` as const;
 
-// Type guards
 function isValidNumber(value: unknown): value is number {
   return typeof value === "number" && !Number.isNaN(value);
 }
@@ -60,7 +57,6 @@ function isValidCrop(crop: unknown): crop is ImageCrop {
   );
 }
 
-// Pure functions for data processing
 function extractHotspot(image: SanityImageData): ImageHotspot | undefined {
   if (!isValidHotspot(image?.hotspot)) {
     return;
@@ -87,11 +83,9 @@ function hasPreview(preview: unknown): preview is string {
   return typeof preview === "string" && preview.length > 0;
 }
 
-// Main image processing function
 export function processImageData(
   image: SanityImageData
 ): ProcessedImageData | null {
-  // Early return for invalid image data
   if (!image?.id || typeof image.id !== "string") {
     return null;
   }
