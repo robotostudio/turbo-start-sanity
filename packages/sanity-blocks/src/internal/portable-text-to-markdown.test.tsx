@@ -121,6 +121,37 @@ test("keeps code-span text raw and fences embedded backticks", () => {
   ).toBe("``a`b``");
 });
 
+test("serializes a code block as a fenced code block with language", () => {
+  const md = portableTextToMarkdown([
+    {
+      _type: "code",
+      language: "ts",
+      filename: "callout.schema.ts",
+      code: "export const x = {\n  name: 'x',\n};",
+    },
+  ]);
+
+  expect(md).toBe("```ts\nexport const x = {\n  name: 'x',\n};\n```");
+});
+
+test("code block without a language omits the info string", () => {
+  const md = portableTextToMarkdown([
+    { _type: "code", code: "line one\n  line two" },
+  ]);
+
+  expect(md).toBe("```\nline one\n  line two\n```");
+});
+
+test("code block fence grows past embedded backtick runs", () => {
+  const md = portableTextToMarkdown([{ _type: "code", code: "a ``` b" }]);
+
+  expect(md).toBe("````\na ``` b\n````");
+});
+
+test("empty code block serializes to nothing", () => {
+  expect(portableTextToMarkdown([{ _type: "code", code: "   " }])).toBe("");
+});
+
 test("wraps link URLs containing parens or spaces in angle brackets", () => {
   const md = portableTextToMarkdown([
     {

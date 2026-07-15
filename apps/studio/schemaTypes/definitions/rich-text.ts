@@ -1,10 +1,20 @@
-import { ImageIcon, LinkIcon } from "@sanity/icons";
+import { CodeBlockIcon, ImageIcon, LinkIcon } from "@sanity/icons";
 import {
   type ConditionalProperty,
   defineArrayMember,
   defineField,
   defineType,
 } from "sanity";
+
+const CODE_LANGUAGES = [
+  { title: "TypeScript", value: "ts" },
+  { title: "TSX", value: "tsx" },
+  { title: "JavaScript", value: "js" },
+  { title: "GROQ", value: "groq" },
+  { title: "Bash", value: "bash" },
+  { title: "JSON", value: "json" },
+  { title: "CSS", value: "css" },
+];
 
 const richTextMembers = [
   defineArrayMember({
@@ -55,11 +65,64 @@ const richTextMembers = [
     },
     fields: [
       defineField({
+        name: "alt",
+        type: "string",
+        title: "Alternative text",
+        description: "Describe the image for screen readers and search engines",
+      }),
+      defineField({
         name: "caption",
         type: "string",
         title: "Caption Text",
       }),
     ],
+  }),
+  defineArrayMember({
+    name: "code",
+    title: "Code Block",
+    type: "object",
+    icon: CodeBlockIcon,
+    description:
+      "A multi-line code snippet with preserved indentation. Use this for code examples instead of the inline Code style.",
+    fields: [
+      defineField({
+        name: "code",
+        title: "Code",
+        type: "text",
+        rows: 8,
+        description: "The code snippet. Indentation and line breaks are kept.",
+        validation: (rule) => rule.required(),
+      }),
+      defineField({
+        name: "language",
+        title: "Language",
+        type: "string",
+        description: "Optional language label shown in the code block header.",
+        options: {
+          list: CODE_LANGUAGES,
+        },
+      }),
+      defineField({
+        name: "filename",
+        title: "Filename",
+        type: "string",
+        description: "Optional filename shown in the code block header.",
+      }),
+    ],
+    preview: {
+      select: {
+        filename: "filename",
+        language: "language",
+        code: "code",
+      },
+      prepare({ filename, language, code }) {
+        const firstLine = (code ?? "").split("\n")[0]?.trim();
+        return {
+          title: filename || firstLine || "Code Block",
+          subtitle: language ?? "Code",
+        };
+      },
+    },
   }),
 ];
 

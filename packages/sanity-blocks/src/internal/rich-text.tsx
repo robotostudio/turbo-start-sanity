@@ -8,6 +8,7 @@ import {
 } from "next-sanity";
 import slugify from "slugify";
 
+import { CodeBlock } from "./code-block";
 import { SanityImage } from "./sanity-image";
 
 const logger = new Logger("RichText");
@@ -92,6 +93,18 @@ const components: Partial<PortableTextReactComponents> = {
     },
   },
   types: {
+    code: ({ value }) => {
+      if (!value?.code) {
+        return null;
+      }
+      return (
+        <CodeBlock
+          code={value.code}
+          filename={value.filename}
+          language={value.language}
+        />
+      );
+    },
     image: ({ value }) => {
       if (!value?.id) {
         return null;

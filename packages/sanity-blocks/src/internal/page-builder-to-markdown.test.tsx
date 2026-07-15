@@ -20,9 +20,15 @@ test("serializes an FAQ block as semantic markdown, not a component tag", () => 
       title: "Questions",
       eyebrow: "FAQ",
       subtitle: "Helpful answers",
-      faqs: [
-        { _id: "1", title: "What is this?", richText: para("An answer.") },
-        { _id: "2", title: "" }, // skipped — no title
+      categories: [
+        {
+          _key: "cat-1",
+          title: "General",
+          faqs: [
+            { _id: "1", title: "What is this?", richText: para("An answer.") },
+            { _id: "2", title: "" }, // skipped — no title
+          ],
+        },
       ],
       link: { title: "More", description: "See all", href: "/faq" },
     },
@@ -112,7 +118,13 @@ test("treats '#' href as no link (plain text fallback)", () => {
     {
       _type: "faqAccordion",
       title: "Q",
-      faqs: [{ _id: "1", title: "x", richText: para("y") }],
+      categories: [
+        {
+          _key: "cat-1",
+          title: "General",
+          faqs: [{ _id: "1", title: "x", richText: para("y") }],
+        },
+      ],
       link: { title: "More", href: "#" },
     },
   ]);
@@ -136,7 +148,13 @@ test("keeps no-href links and cards as plain text instead of dropping them", () 
     {
       _type: "faqAccordion",
       title: "Q",
-      faqs: [{ _id: "1", title: "x", richText: para("y") }],
+      categories: [
+        {
+          _key: "cat-1",
+          title: "General",
+          faqs: [{ _id: "1", title: "x", richText: para("y") }],
+        },
+      ],
       link: { title: "All questions" },
     },
   ]);

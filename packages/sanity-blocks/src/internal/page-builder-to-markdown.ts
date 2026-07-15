@@ -6,7 +6,9 @@ import { faqAccordionToMarkdown } from "../faq-accordion/markdown";
 import { featureCardsIconToMarkdown } from "../feature-cards-icon/markdown";
 import { heroToMarkdown } from "../hero/markdown";
 import { imageLinkCardsToMarkdown } from "../image-link-cards/markdown";
+import { logoCloudToMarkdown } from "../logo-cloud/markdown";
 import { richTextBlockToMarkdown } from "../rich-text-block/markdown";
+import { socialGridToMarkdown } from "../social-grid/markdown";
 import { subscribeNewsletterToMarkdown } from "../subscribe-newsletter/markdown";
 import {
   imageToMarkdown,
@@ -32,6 +34,10 @@ function blockToMarkdown(
       return featureCardsIconToMarkdown(block, options);
     case "imageLinkCards":
       return imageLinkCardsToMarkdown(block, options);
+    case "logoCloud":
+      return logoCloudToMarkdown(block, options);
+    case "socialGrid":
+      return socialGridToMarkdown(block, options);
     case "faqAccordion":
       return faqAccordionToMarkdown(block, options);
     case "subscribeNewsletter":

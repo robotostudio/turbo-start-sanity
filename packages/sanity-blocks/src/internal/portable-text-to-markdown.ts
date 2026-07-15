@@ -42,6 +42,10 @@ export interface PortableTextNode {
   id?: string | null;
   alt?: string | null;
   caption?: string | null;
+  // Code block fields.
+  code?: string | null;
+  language?: string | null;
+  filename?: string | null;
 }
 
 export interface MarkdownImage {
@@ -91,6 +95,20 @@ function wrapInlineCode(text: string): string {
 
 type AnyBlock = { _type: string; [key: string]: unknown };
 
+// Fenced code block: open with a backtick run at least one longer than the
+// longest run inside the code (min 3, CommonMark §4.5) so embedded fences
+// don't close the block early. The language, if any, is the info string.
+function fenceCodeBlock(code: string, language?: string | null): string {
+  const longestRun = (code.match(/`+/g) ?? []).reduce(
+    (max, run) => Math.max(max, run.length),
+    0
+  );
+  const fence = "`".repeat(Math.max(3, longestRun + 1));
+  const info = (language ?? "").trim();
+  const body = code.replace(/\n+$/, "");
+  return `${fence}${info}\n${body}\n${fence}`;
+}
+
 /**
  * Converts a portable-text array to a Markdown string.
  *
@@ -138,6 +156,15 @@ export function portableTextToMarkdown(
       underline: ({ children }) => children,
     },
     types: {
+      // Multi-line code block → fenced code block with an optional info string.
+      code: ({ value }) => {
+        const node = value as PortableTextNode;
+        const code = node.code ?? "";
+        if (!code.trim()) {
+          return "";
+        }
+        return fenceCodeBlock(code, node.language);
+      },
       // Sanity images carry `{id, alt, caption}`, not `{src, alt, title}`.
       // Resolve the CDN URL via the caller-supplied resolver when available.
       image: ({ value, isInline }) => {

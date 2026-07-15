@@ -44,6 +44,25 @@ export interface MarkdownLink {
   href?: string | null;
 }
 
+export interface MarkdownLogo {
+  _key?: string | null;
+  href?: string | null;
+  image?: MarkdownImage | null;
+}
+
+export interface MarkdownSocial {
+  _key?: string | null;
+  platform?: string | null;
+  label?: string | null;
+  href?: string | null;
+}
+
+export interface MarkdownFaqCategory {
+  _key?: string | null;
+  title?: string | null;
+  faqs?: MarkdownFaq[] | null;
+}
+
 export interface MarkdownBlock {
   _type?: string;
   _key?: string;
@@ -56,8 +75,10 @@ export interface MarkdownBlock {
   helperText?: PortableTextValue;
   buttons?: MarkdownButton[] | null;
   cards?: MarkdownCard[] | null;
-  faqs?: MarkdownFaq[] | null;
+  categories?: MarkdownFaqCategory[] | null;
   link?: MarkdownLink | null;
+  logos?: MarkdownLogo[] | null;
+  socials?: MarkdownSocial[] | null;
   image?: MarkdownImage | null;
 }
 
