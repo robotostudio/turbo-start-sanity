@@ -1,11 +1,11 @@
 import {
-  type MarkdownBlock,
-  type MarkdownOptions,
   cardHeading,
   eyebrowToMarkdown,
   headingToMarkdown,
   imageToMarkdown,
   joinSections,
+  type MarkdownBlock,
+  type MarkdownOptions,
 } from "../internal/markdown";
 import {
   escapeMarkdown,
@@ -20,7 +20,7 @@ export function imageLinkCardsToMarkdown(
     const title = (card.title ?? "").trim();
     const description = (card.description ?? "").trim();
     return joinSections([
-      cardHeading(title, card.href),
+      cardHeading(title, card.href, options),
       description ? escapeMarkdown(description) : "",
       imageToMarkdown(card.image, options),
     ]);

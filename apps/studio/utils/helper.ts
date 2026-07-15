@@ -125,7 +125,7 @@ export function pathnameToTitle(pathname: string): string {
   return lastSegment
     .charAt(0)
     .toUpperCase()
-    .concat(lastSegment.slice(1).replace(/-/g, " "));
+    .concat(lastSegment.slice(1).replaceAll("-", " "));
 }
 
 export const getTemplateName = (template: string) => `${template}-with-slug`;

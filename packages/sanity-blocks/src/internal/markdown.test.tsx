@@ -11,9 +11,9 @@ import {
   headingToMarkdown,
   imageToMarkdown,
   joinSections,
-  mdLink,
   type MarkdownImage,
   type MarkdownOptions,
+  mdLink,
 } from "./markdown";
 
 // ─── joinSections ────────────────────────────────────────────────────────────
@@ -130,6 +130,24 @@ test("buttonsToMarkdown renders plain text when href is '#'", () => {
   expect(buttonsToMarkdown([{ text: "Click me", href: "#" }])).toBe(
     "- Click me"
   );
+});
+
+test("buttonsToMarkdown absolutizes internal hrefs when baseUrl is set", () => {
+  expect(
+    buttonsToMarkdown([{ text: "Get started", href: "/start" }], {
+      baseUrl: "https://example.com",
+    })
+  ).toBe("- [Get started](https://example.com/start)");
+});
+
+test("mdLink absolutizes internal hrefs when baseUrl is set", () => {
+  expect(mdLink("About", "/about", { baseUrl: "https://example.com" })).toBe(
+    "[About](https://example.com/about)"
+  );
+  // external href untouched
+  expect(
+    mdLink("Ext", "https://other.com", { baseUrl: "https://example.com" })
+  ).toBe("[Ext](https://other.com)");
 });
 
 test("buttonsToMarkdown renders plain text when href is absent", () => {

@@ -1,4 +1,7 @@
-import { portableTextToMarkdown } from "@workspace/sanity-blocks/internal/portable-text-to-markdown";
+import {
+  absolutizeUrl,
+  portableTextToMarkdown,
+} from "@workspace/sanity-blocks/internal/portable-text-to-markdown";
 
 test("returns empty string for missing or empty input", () => {
   expect(portableTextToMarkdown(undefined)).toBe("");
@@ -49,6 +52,76 @@ test("applies decorators and custom links", () => {
   ]);
 
   expect(md).toBe("**Bold **`and code` and [a link](/features)");
+});
+
+test("absolutizeUrl rewrites only root-relative internal paths", () => {
+  const base = "https://example.com";
+  // root-relative → absolute
+  expect(absolutizeUrl("/about", base)).toBe("https://example.com/about");
+  // trailing slash on base is normalized
+  expect(absolutizeUrl("/about", "https://example.com/")).toBe(
+    "https://example.com/about"
+  );
+  // already absolute / protocol-relative / scheme / anchor are untouched
+  expect(absolutizeUrl("https://other.com/x", base)).toBe(
+    "https://other.com/x"
+  );
+  expect(absolutizeUrl("//cdn.example.com/x", base)).toBe(
+    "//cdn.example.com/x"
+  );
+  expect(absolutizeUrl("mailto:a@b.com", base)).toBe("mailto:a@b.com");
+  expect(absolutizeUrl("#section", base)).toBe("#section");
+  // no baseUrl → left relative
+  expect(absolutizeUrl("/about", undefined)).toBe("/about");
+});
+
+test("custom links become absolute when baseUrl is provided", () => {
+  const md = portableTextToMarkdown(
+    [
+      {
+        _type: "block",
+        style: "normal",
+        markDefs: [{ _key: "l", _type: "customLink", href: "/features" }],
+        children: [{ _type: "span", text: "a link", marks: ["l"] }],
+      },
+    ],
+    { baseUrl: "https://example.com" }
+  );
+
+  expect(md).toBe("[a link](https://example.com/features)");
+});
+
+test("custom links with an unsafe scheme drop to an empty target", () => {
+  const md = portableTextToMarkdown([
+    {
+      _type: "block",
+      style: "normal",
+      markDefs: [
+        { _key: "l", _type: "customLink", href: "javascript:alert(1)" },
+      ],
+      children: [{ _type: "span", text: "click me", marks: ["l"] }],
+    },
+  ]);
+
+  // The `javascript:` scheme is stripped by formatUrl, so no executable target
+  // is emitted.
+  expect(md).toBe("[click me]()");
+});
+
+test("unsafe scheme with embedded control chars is still blocked", () => {
+  const md = portableTextToMarkdown([
+    {
+      _type: "block",
+      style: "normal",
+      markDefs: [
+        { _key: "l", _type: "customLink", href: "java\nscript:alert(1)" },
+      ],
+      children: [{ _type: "span", text: "click me", marks: ["l"] }],
+    },
+  ]);
+
+  // Browsers ignore the newline, so `java\nscript:` resolves to `javascript:`.
+  expect(md).toBe("[click me]()");
 });
 
 test("nests bullet and numbered lists and keeps them grouped", () => {

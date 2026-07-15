@@ -11,8 +11,10 @@ import slugify from "slugify";
 import { API_VERSION } from "@/utils/constant";
 import type { PathnameParams } from "@/utils/types";
 
+const DEFAULT_SLUG_SCHEMA: PathnameParams = { name: "slug" };
+
 export function defineSlug(
-  schema: PathnameParams = { name: "slug" }
+  schema: PathnameParams = DEFAULT_SLUG_SCHEMA
 ): FieldDefinition<"slug"> {
   const slugOptions = schema?.options;
 

@@ -60,15 +60,45 @@ export interface MarkdownOptions {
    * their alt/caption text rather than emitting broken `![]()` markup.
    */
   resolveImageUrl?: (image: MarkdownImage) => string | null | undefined;
+  /**
+   * Site origin (e.g. `https://example.com`) used to make root-relative internal
+   * links absolute, so `.md` output is self-contained. Omitted → links stay relative.
+   */
+  baseUrl?: string;
 }
 
 export type PortableTextValue = PortableTextNode[] | null | undefined;
 
-// Format a URL for a Markdown link/image target. Spaces or parens would close
-// the `(...)` early, so wrap those in CommonMark's angle-bracket form.
-export function formatUrl(href: string | null | undefined): string {
+// Prefix a root-relative path (`/about`) with `baseUrl`. Absolute, `//`, `#`,
+// and scheme links (`mailto:`) pass through; no-op without `baseUrl`.
+export function absolutizeUrl(
+  href: string | null | undefined,
+  baseUrl: string | null | undefined
+): string {
   const url = (href ?? "").trim();
-  if (!url) {
+  if (!(url && baseUrl) || !url.startsWith("/") || url.startsWith("//")) {
+    return url;
+  }
+  // Strip trailing slashes (loop, not a ReDoS-prone regex).
+  let base = baseUrl;
+  while (base.endsWith("/")) {
+    base = base.slice(0, -1);
+  }
+  return `${base}${url}`;
+}
+
+// Script-executing schemes dropped so a link href can't smuggle XSS.
+const UNSAFE_URL_SCHEME = /^\s*(?:javascript|vbscript|data):/i;
+
+// Format a URL for a Markdown link/image target. Spaces or parens would close
+// the `(...)` early, so wrap those in CommonMark's angle-bracket form. Unsafe
+// schemes return an empty target.
+export function formatUrl(href: string | null | undefined): string {
+  // Strip ASCII control chars (browsers ignore them) so `java\nscript:` can't
+  // slip past the scheme check.
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: intentional — stripping them is the fix
+  const url = (href ?? "").replace(/[\u0000-\u001F]/g, "").trim();
+  if (!url || UNSAFE_URL_SCHEME.test(url)) {
     return "";
   }
   return /[\s()]/.test(url) ? `<${url}>` : url;
@@ -148,7 +178,7 @@ export function portableTextToMarkdown(
         if (!href || href === "#") {
           return children;
         }
-        return `[${children}](${formatUrl(href)})`;
+        return `[${children}](${formatUrl(absolutizeUrl(href, options.baseUrl))})`;
       },
       // Use CommonMark-compliant fencing (handles embedded backticks).
       code: ({ children }) => wrapInlineCode(children),

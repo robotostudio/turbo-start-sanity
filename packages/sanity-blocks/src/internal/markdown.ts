@@ -5,6 +5,7 @@
  */
 
 import {
+  absolutizeUrl,
   escapeMarkdown,
   formatUrl,
   type MarkdownImage,
@@ -102,7 +103,10 @@ export function headingToMarkdown(
   return text ? `${"#".repeat(level)} ${escapeMarkdown(text)}` : "";
 }
 
-export function buttonsToMarkdown(buttons?: MarkdownButton[] | null): string {
+export function buttonsToMarkdown(
+  buttons?: MarkdownButton[] | null,
+  options: MarkdownOptions = {}
+): string {
   if (!Array.isArray(buttons)) {
     return "";
   }
@@ -112,7 +116,8 @@ export function buttonsToMarkdown(buttons?: MarkdownButton[] | null): string {
       const text = (button.text ?? "").trim();
       const href = button.href;
       if (href && href !== "#") {
-        return `- [${escapeMarkdown(text || href)}](${formatUrl(href)})`;
+        const url = formatUrl(absolutizeUrl(href, options.baseUrl));
+        return `- [${escapeMarkdown(text || href)}](${url})`;
       }
       return text ? `- ${escapeMarkdown(text)}` : null;
     })
@@ -138,18 +143,25 @@ export function imageToMarkdown(
 }
 
 /** A Markdown link, or plain escaped text when the href is missing or `#`. */
-export function mdLink(label: string, href: string | null | undefined): string {
+export function mdLink(
+  label: string,
+  href: string | null | undefined,
+  options: MarkdownOptions = {}
+): string {
   return href && href !== "#"
-    ? `[${escapeMarkdown(label)}](${formatUrl(href)})`
+    ? `[${escapeMarkdown(label)}](${formatUrl(absolutizeUrl(href, options.baseUrl))})`
     : escapeMarkdown(label);
 }
 
 export function cardHeading(
   title: string,
-  href: string | null | undefined
+  href: string | null | undefined,
+  options: MarkdownOptions = {}
 ): string {
   if (title) {
-    return `### ${mdLink(title, href)}`;
+    return `### ${mdLink(title, href, options)}`;
   }
-  return href && href !== "#" ? `### ${formatUrl(href)}` : "";
+  return href && href !== "#"
+    ? `### ${formatUrl(absolutizeUrl(href, options.baseUrl))}`
+    : "";
 }

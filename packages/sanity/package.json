@@ -15,7 +15,7 @@
     "@sanity/image-url": "^2.1.1",
     "@workspace/env": "workspace:*",
     "@workspace/sanity-blocks": "workspace:*",
-    "next-sanity": "13.0.7",
+    "next-sanity": "13.1.0",
     "react-is": "catalog:",
     "sanity-image": "^1.1.0"
   },
@@ -23,7 +23,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@workspace/typescript-config": "workspace:*",
-    "next": "16.2.6",
+    "next": "16.2.9",
     "typescript": "catalog:"
   },
   "exports": {

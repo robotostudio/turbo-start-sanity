@@ -1,3 +1,4 @@
+import { env } from "@workspace/env/client";
 import { Logger } from "@workspace/logger";
 import { sanityFetch } from "@workspace/sanity/live";
 import {
@@ -5,8 +6,16 @@ import {
   queryGlobalSeoSettings,
   querySlugPagePaths,
 } from "@workspace/sanity/query";
+import { absolutizeUrl } from "@workspace/sanity-blocks/internal/portable-text-to-markdown";
 
 const logger = new Logger("LlmsTxt");
+
+const BASE_URL = env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL;
+
+function mdHref(slug: string): string {
+  const path = slug.startsWith("/") ? slug : `/${slug}`;
+  return absolutizeUrl(`${path}.md`, BASE_URL);
+}
 
 const PUBLISHED = { perspective: "published", stega: false } as const;
 
@@ -84,12 +93,12 @@ export async function GET(): Promise<Response> {
   const siteDescription = settings?.siteDescription ?? "";
 
   const pageLines = [
-    "- [Home](/index.md)",
+    `- [Home](${mdHref("/index")})`,
     ...slugs
       .filter((s): s is string => Boolean(s))
       .map((slug) => {
         const path = slug.startsWith("/") ? slug : `/${slug}`;
-        return `- [${slugToTitle(path)}](${path}.md)`;
+        return `- [${slugToTitle(path)}](${mdHref(path)})`;
       }),
   ];
 
@@ -99,7 +108,7 @@ export async function GET(): Promise<Response> {
 
   const blogLines = sortedPosts.flatMap((post) =>
     post.slug
-      ? [`- [${post.title ?? slugToTitle(post.slug)}](${post.slug}.md)`]
+      ? [`- [${post.title ?? slugToTitle(post.slug)}](${mdHref(post.slug)})`]
       : []
   );
 

@@ -1,11 +1,11 @@
 import {
-  type MarkdownBlock,
-  type MarkdownOptions,
   buttonsToMarkdown,
   eyebrowToMarkdown,
   headingToMarkdown,
   imageToMarkdown,
   joinSections,
+  type MarkdownBlock,
+  type MarkdownOptions,
 } from "../internal/markdown";
 import { portableTextToMarkdown } from "../internal/portable-text-to-markdown";
 
@@ -18,6 +18,6 @@ export function heroToMarkdown(
     headingToMarkdown(block.title, 2),
     portableTextToMarkdown(block.richText, options),
     imageToMarkdown(block.image, options),
-    buttonsToMarkdown(block.buttons),
+    buttonsToMarkdown(block.buttons, options),
   ]);
 }

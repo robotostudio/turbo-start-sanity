@@ -38,9 +38,11 @@ export async function handleErrors<T>(
   }
 }
 
+const DEFAULT_SLUG_OPTIONS: { fallback?: string } = { fallback: "top-level" };
+
 function convertToSlug(
   text?: string,
-  { fallback }: { fallback?: string } = { fallback: "top-level" }
+  { fallback }: { fallback?: string } = DEFAULT_SLUG_OPTIONS
 ) {
   if (!text) {
     return fallback;

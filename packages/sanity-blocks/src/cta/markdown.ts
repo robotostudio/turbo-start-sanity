@@ -16,6 +16,6 @@ export function ctaToMarkdown(
     eyebrowToMarkdown(block.eyebrow),
     headingToMarkdown(block.title, 2),
     portableTextToMarkdown(block.richText, options),
-    buttonsToMarkdown(block.buttons),
+    buttonsToMarkdown(block.buttons, options),
   ]);
 }
