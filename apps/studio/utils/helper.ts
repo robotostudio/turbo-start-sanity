@@ -95,6 +95,7 @@ export async function retryPromise<T>(
 
   while (attempt < maxRetries) {
     try {
+      // Attempt the async operation
       return await promiseFn;
     } catch (e) {
       const error = e instanceof Error ? e : new Error("Unknown error");
@@ -117,6 +118,9 @@ export async function retryPromise<T>(
   throw lastError ?? new Error("Promise retry failed");
 }
 
+/**
+ * Converts a URL pathname to a human-readable title
+ */
 export function pathnameToTitle(pathname: string): string {
   if (pathname === "/") {
     return "Home";
