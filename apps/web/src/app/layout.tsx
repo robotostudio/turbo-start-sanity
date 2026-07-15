@@ -20,6 +20,7 @@ import { CombinedJsonLd } from "@/components/json-ld";
 import { Navbar, NavbarSkeleton } from "@/components/navbar";
 import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import { getNavigationData } from "@/lib/navigation";
 import { sanityLiveAction } from "@/lib/sanity-live-action";
 
@@ -47,6 +48,7 @@ export default async function RootLayout({
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
         <Providers>
+          <ScrollToTop />
           {isDraftMode ? (
             <Suspense fallback={<NavbarSkeleton />}>
               <DynamicNavbar />
