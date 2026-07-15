@@ -1,6 +1,8 @@
 import { BadgeCheck, LayoutPanelLeft, Link, PanelBottom } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+import { imageWithAltField } from "@/schemaTypes/common";
+
 const footerCreditItem = defineArrayMember({
   name: "footerCredit",
   type: "object",
@@ -12,18 +14,18 @@ const footerCreditItem = defineArrayMember({
       title: "Label",
       description: "Text before the logo, e.g. 'Powered by' or 'Hosted on'",
     }),
-    defineField({
+    imageWithAltField({
       name: "logo",
-      type: "image",
       title: "Logo",
       description: "Brand logo shown after the label",
-      options: { hotspot: true },
     }),
     defineField({
       name: "url",
       type: "url",
       title: "Link",
-      description: "Optional link the credit points to (opens in a new tab)",
+      description:
+        "Optional website the logo links to, e.g. the brand's homepage.",
+      validation: (rule) => rule.uri({ scheme: ["http", "https"] }),
     }),
   ],
   preview: {
@@ -133,27 +135,6 @@ export const footer = defineType({
       of: [footerColumn],
     }),
     defineField({
-      name: "poweredBy",
-      type: "string",
-      title: "Powered by text",
-      description:
-        "Credit shown on the left of the bottom bar, e.g. 'Powered by Vercel & Sanity'",
-      initialValue: "Powered by Vercel & Sanity",
-    }),
-    defineField({
-      name: "credit",
-      type: "string",
-      title: "Studio credit",
-      description: "Highlighted credit shown in the center of the bottom bar",
-      initialValue: "Roboto Studio",
-    }),
-    defineField({
-      name: "creditUrl",
-      type: "url",
-      title: "Studio credit link",
-      description: "Optional link for the center credit (opens in a new tab)",
-    }),
-    defineField({
       name: "copyright",
       type: "string",
       title: "Copyright text",
@@ -161,19 +142,11 @@ export const footer = defineType({
       initialValue: "© 2025 Turbo Start",
     }),
     defineField({
-      name: "watermark",
-      type: "image",
-      title: "Watermark image",
-      description:
-        "Optional faded graphic shown above the center credit (defaults to the Turbo mark)",
-      options: { hotspot: true },
-    }),
-    defineField({
       name: "credits",
       type: "array",
       title: "Footer credits",
       description:
-        "Credits shown on the right of the footer bar — each has a label and a logo (e.g. 'Powered by Sanity', 'Hosted on Vercel')",
+        "Credits shown on the right of the footer bar. Each has a label and a logo (e.g. 'Powered by Sanity', 'Hosted on Vercel')",
       of: [footerCreditItem],
     }),
   ],

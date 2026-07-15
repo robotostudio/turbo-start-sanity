@@ -15,6 +15,7 @@ import Link from "next/link";
 import useSWR from "swr";
 
 import type { ColumnLink, NavigationData } from "@/types";
+import { GithubStars } from "./github-stars";
 import { Logo } from "./logo";
 import { MobileMenu } from "./mobile-menu";
 import { ModeToggle } from "./mode-toggle";
@@ -28,14 +29,17 @@ const fetcher = async (url: string): Promise<NavigationData> => {
 };
 
 const TRIGGER_CLASS =
-  "h-auto bg-transparent px-3 py-2 text-muted-foreground hover:bg-transparent hover:text-foreground focus:bg-transparent focus:text-muted-foreground data-popup-open:bg-transparent data-popup-open:text-foreground";
+  "h-auto bg-transparent px-2 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:bg-transparent focus:bg-transparent focus:text-foreground data-popup-open:bg-transparent data-popup-open:text-foreground";
+
+const NAV_BUTTON_CLASS =
+  "h-9 px-4 font-mono font-normal text-sm uppercase tracking-wide";
 
 export function NavbarSkeleton() {
   return (
-    <header className="sticky top-0 z-40 w-full bg-background/70 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md">
       <div className="container">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex h-10 w-40 items-center">
+          <div className="flex h-10 flex-1 items-center">
             <div className="h-10 w-40 animate-pulse rounded bg-muted/50" />
           </div>
 
@@ -72,8 +76,8 @@ export function Navbar({
     settingsData: initialSettingsData,
   };
   const { navbarData, settingsData } = navigationData;
-  const { columns, buttons } = navbarData || {};
-  const { logo, siteTitle } = settingsData || {};
+  const { columns, buttons, gitHubUrl } = navbarData || {};
+  const { siteTitle, logos } = settingsData || {};
 
   // Show skeleton only on initial mount when no fallback data is available
   if (isLoading && !data && !(initialNavbarData && initialSettingsData)) {
@@ -81,19 +85,16 @@ export function Navbar({
   }
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-background/70 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md">
       <div className="container">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex h-10 w-40 items-center">
-            {logo && (
-              <Logo
-                alt={siteTitle || ""}
-                height={40}
-                image={logo}
-                priority
-                width={120}
-              />
-            )}
+          <div className="flex h-10 flex-1 items-center">
+            <Logo
+              alt={siteTitle ?? "Turbo Start Sanity"}
+              className="w-44"
+              image={logos?.logo}
+              imageDark={logos?.logoDark}
+            />
           </div>
 
           <NavigationMenu
@@ -102,7 +103,7 @@ export function Navbar({
             closeDelay={150}
             viewport
           >
-            <NavigationMenuList>
+            <NavigationMenuList className="gap-8">
               {columns?.map((column) => {
                 if (column.type === "column") {
                   return (
@@ -111,11 +112,11 @@ export function Navbar({
                         {column.title}
                       </NavigationMenuTrigger>
                       <NavigationMenuContent>
-                        <ul className="grid w-[320px] gap-1 p-1">
+                        <ul className="grid w-72 gap-1 bg-background p-2">
                           {column.links?.map((link: ColumnLink) => (
                             <li key={link._key}>
                               <NavigationMenuLink
-                                className="group flex items-start gap-3 rounded-sm p-3 transition-colors hover:bg-accent"
+                                className="group flex items-start gap-3 rounded-md px-2 py-2 transition-colors hover:bg-accent"
                                 closeOnClick
                                 render={<Link href={link.href ?? "#"} />}
                               >
@@ -125,8 +126,8 @@ export function Navbar({
                                     icon={link.icon}
                                   />
                                 ) : null}
-                                <div className="grid gap-1">
-                                  <div className="font-medium leading-none group-hover:text-accent-foreground">
+                                <div className="grid gap-0.5">
+                                  <div className="font-light font-mono text-foreground text-sm uppercase tracking-wide">
                                     {link.name}
                                   </div>
                                   {link.description ? (
@@ -150,7 +151,7 @@ export function Navbar({
                   return (
                     <NavigationMenuItem key={column._key}>
                       <NavigationMenuLink
-                        className="flex h-auto items-center rounded-md px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
+                        className="flex h-auto items-center rounded-md px-2 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal"
                         render={<Link href={column.href} />}
                       >
                         {column.name}
@@ -163,8 +164,10 @@ export function Navbar({
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="hidden flex-1 items-center justify-end gap-4 lg:flex">
+            <GithubStars className="mr-1" gitHubUrl={gitHubUrl} />
             <SanityButtons
+              buttonClassName={NAV_BUTTON_CLASS}
               buttons={buttons || []}
               className="flex items-center gap-2"
               size="sm"
@@ -172,7 +175,7 @@ export function Navbar({
             <ModeToggle />
           </div>
 
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
             <ModeToggle />
             <MobileMenu navbarData={navbarData} settingsData={settingsData} />
           </div>
