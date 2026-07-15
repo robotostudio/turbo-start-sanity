@@ -1,49 +1,69 @@
-import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
-import Image from "next/image";
+import {
+  SanityImage,
+  type SanityImageData,
+} from "@workspace/sanity-blocks/internal/sanity-image";
+import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 
-import type { Maybe, SanityImageProps } from "@/types";
-
-const LOGO_URL =
-  "https://cdn.sanity.io/images/s6kuy1ts/production/68c438f68264717e93c7ba1e85f1d0c4b58b33c2-1200x621.svg";
-
 type LogoProps = {
-  src?: Maybe<string>;
-  image?: Maybe<SanityImageProps>;
-  alt?: Maybe<string>;
-  width?: number;
-  height?: number;
+  // The Sanity-managed site logo (from `settings.logo`). When absent, nothing
+  // renders — the surrounding markup provides its own text fallback.
+  image?: SanityImageData | null;
+  // Optional dark-mode variant (from `settings.logoDark`). When present, this is
+  // shown on dark backgrounds and `image` is hidden, so a colored icon is
+  // preserved in both themes without CSS brightness hacks.
+  imageDark?: SanityImageData | null;
+  alt?: string | null;
+  className?: string;
+  // Extra classes for the wrapping link (e.g. to tune the focus outline color
+  // on colored backgrounds such as the footer's green).
+  linkClassName?: string;
   priority?: boolean;
 };
 
 export function Logo({
-  src,
-  alt = "logo",
   image,
-  width = 170,
-  height = 40,
+  imageDark,
+  alt = "logo",
+  className,
+  linkClassName,
   priority = true,
 }: LogoProps) {
+  if (!image?.id) {
+    return null;
+  }
+
+  const loading = priority ? "eager" : "lazy";
+
   return (
-    <Link className="inline-block rounded-md focus-ring" href="/">
-      {image ? (
-        <SanityImage
-          alt={alt ?? "logo"}
-          className="w-40 dark:filter-[invert(1)_saturate(0)_brightness(1.15)]"
-          decoding="sync"
-          image={image}
-          loading="eager"
-        />
+    <Link
+      className={cn("inline-block rounded-md focus-ring", linkClassName)}
+      href="/"
+    >
+      {imageDark ? (
+        <>
+          <SanityImage
+            className={cn("h-auto w-44 dark:hidden", className)}
+            height={32}
+            image={{ ...image, alt: alt ?? image.alt }}
+            loading={loading}
+            width={210}
+          />
+          <SanityImage
+            className={cn("hidden h-auto w-44 dark:block", className)}
+            height={32}
+            image={{ ...imageDark, alt: alt ?? imageDark.alt }}
+            loading={loading}
+            width={210}
+          />
+        </>
       ) : (
-        <Image
-          alt={alt ?? "logo"}
-          className="h-10 w-40 dark:filter-[invert(1)_saturate(0)_brightness(1.15)]"
-          decoding="sync"
-          height={height}
-          loading="eager"
-          priority={priority}
-          src={src ?? LOGO_URL}
-          width={width}
+        <SanityImage
+          className={cn("h-auto w-44", className)}
+          height={32}
+          image={{ ...image, alt: alt ?? image.alt }}
+          loading={loading}
+          width={210}
         />
       )}
     </Link>

@@ -1,6 +1,8 @@
 import { CogIcon } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
+import { imageWithAltField } from "@/schemaTypes/common";
+
 const socialLinks = defineField({
   name: "socialLinks",
   title: "Social Media Links",
@@ -77,13 +79,35 @@ export const settings = defineType({
       validation: (rule) => rule.required().min(50).max(160),
     }),
     defineField({
-      name: "logo",
-      type: "image",
-      title: "Site Logo",
-      description: "Upload your website logo",
-      options: {
-        hotspot: true,
-      },
+      name: "logos",
+      type: "object",
+      title: "Logos",
+      description: "The logo variants used across the site",
+      options: { collapsible: true, collapsed: false },
+      fields: [
+        imageWithAltField({
+          name: "logo",
+          title: "Logo (light mode)",
+          description:
+            "The site logo shown on light backgrounds, such as the navbar in light mode. Its alt text is reused for the other logo variants.",
+        }),
+        defineField({
+          name: "logoDark",
+          type: "image",
+          title: "Logo (dark mode)",
+          description:
+            "Optional logo variant for dark backgrounds, such as the navbar in dark mode. Reuses the light logo's alt text; if left empty, the light logo is used everywhere.",
+          options: { hotspot: true },
+        }),
+        defineField({
+          name: "footerLogo",
+          type: "image",
+          title: "Footer logo",
+          description:
+            "Optional logo for the footer's colored background, where the main logo may not have enough contrast. Reuses the main logo's alt text; if left empty, the main logo is used.",
+          options: { hotspot: true },
+        }),
+      ],
     }),
     defineField({
       name: "contactEmail",

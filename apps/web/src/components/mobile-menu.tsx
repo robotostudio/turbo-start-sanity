@@ -69,7 +69,7 @@ export function MobileMenu({
   }
 
   const { columns, buttons } = navbarData || {};
-  const { logo, siteTitle } = settingsData || {};
+  const { siteTitle, logos } = settingsData || {};
 
   return (
     <Drawer
@@ -97,14 +97,16 @@ export function MobileMenu({
           >
             <DrawerContent>
               <div className="flex flex-row items-center justify-between border-b px-6 py-4">
-                <DrawerTitle className={logo ? "sr-only" : "font-semibold"}>
+                <DrawerTitle className="sr-only">
                   {siteTitle || "Menu"}
                 </DrawerTitle>
-                {logo ? (
-                  <div className="[&_img]:h-6 [&_img]:w-auto [&_img]:rounded-none">
-                    <Logo alt={siteTitle || ""} image={logo} />
-                  </div>
-                ) : null}
+                <div className="[&_img]:h-6 [&_img]:w-auto [&_img]:rounded-none">
+                  <Logo
+                    alt="Turbo Start Sanity"
+                    image={logos?.logo}
+                    imageDark={logos?.logoDark}
+                  />
+                </div>
                 <DrawerClose
                   className={cn(
                     "rounded-sm opacity-70 transition-opacity hover:opacity-100",
