@@ -1,5 +1,6 @@
 import { env } from "@workspace/env/server";
 import { cookies, draftMode } from "next/headers";
+import { connection } from "next/server";
 import type { QueryParams } from "next-sanity";
 import {
   defineLive,
@@ -27,22 +28,25 @@ export type DynamicFetchOptions = {
   stega: boolean;
 };
 
-/**
- * When true, a preview deployment renders draft content on the plain URL (no
- * draft-mode cookie). Pages and the layout use this to take the dynamic (draft)
- * render path instead of the static published one; `getDynamicFetchOptions`
- * then resolves the `drafts` perspective. Never enable in production.
- */
-export const previewForceDrafts = env.SANITY_PREVIEW_FORCE_DRAFTS;
+// TEMP(preview-drafts): render draft content on ALL Vercel Preview deployments
+// so the shared preview URL can be reviewed without Presentation / draft-mode.
+// `VERCEL_ENV` is set by Vercel at build AND runtime ("preview" | "production" |
+// "development"); production stays on published. The manual
+// SANITY_PREVIEW_FORCE_DRAFTS flag still works (e.g. locally). REMOVE this whole
+// force-drafts mechanism (this const, the getDynamicFetchOptions branch, and the
+// `previewForceDrafts` uses in pages/layout) before merging.
+export const previewForceDrafts =
+  process.env.SANITY_PREVIEW_FORCE_DRAFTS === "true" ||
+  process.env.VERCEL_ENV === "preview";
 
 /** Resolves perspective/stega outside any `'use cache'` boundary (reads draftMode/cookies). */
 export async function getDynamicFetchOptions(): Promise<DynamicFetchOptions> {
   const { isEnabled: isDraftMode } = await draftMode();
   if (!isDraftMode) {
-    // Preview deployments can opt into rendering drafts on the plain URL (no
-    // Presentation / draft-mode cookie) so the link can be shared for review.
-    // Guarded by a Preview-only env flag — never enable this in production.
-    if (env.SANITY_PREVIEW_FORCE_DRAFTS) {
+    if (previewForceDrafts) {
+      // TEMP(preview-drafts): opt out of the published prerender and render this
+      // request dynamically so the preview reflects the CURRENT drafts.
+      await connection();
       return { perspective: "drafts", stega: false };
     }
     return { perspective: "published", stega: false };
