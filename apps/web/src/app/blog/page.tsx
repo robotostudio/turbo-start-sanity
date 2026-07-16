@@ -9,6 +9,7 @@ import {
   queryBlogIndexPageBlogsCount,
   queryBlogIndexPageData,
 } from "@workspace/sanity/query";
+import type { QueryBlogIndexPageDataResult } from "@workspace/sanity/types";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -23,6 +24,36 @@ import {
   getBlogPaginationRange,
   handleErrors,
 } from "@/utils";
+
+function BlogIndexError({
+  indexPageData,
+  message,
+}: Readonly<{
+  indexPageData: NonNullable<QueryBlogIndexPageDataResult>;
+  message: string;
+}>) {
+  return (
+    <main className="container my-16">
+      <BlogHeader
+        description={indexPageData.description}
+        title={indexPageData.title}
+      />
+      <div className="py-12 text-center">
+        <p className="text-muted-foreground">{message}</p>
+      </div>
+      {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
+        <>
+          <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
+          <PageBuilder
+            id={indexPageData._id}
+            pageBuilder={indexPageData.pageBuilder}
+            type={indexPageData._type}
+          />
+        </>
+      )}
+    </main>
+  );
+}
 
 async function fetchBlogIndexPageData({
   perspective,
@@ -128,27 +159,10 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
 
   if (errTotalCount || totalCount === null || totalCount === undefined) {
     return (
-      <main className="container my-16">
-        <BlogHeader
-          description={indexPageData.description}
-          title={indexPageData.title}
-        />
-        <div className="py-12 text-center">
-          <p className="text-muted-foreground">
-            Unable to load blog posts at the moment.
-          </p>
-        </div>
-        {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
-          <>
-            <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
-            <PageBuilder
-              id={indexPageData._id}
-              pageBuilder={indexPageData.pageBuilder}
-              type={indexPageData._type}
-            />
-          </>
-        )}
-      </main>
+      <BlogIndexError
+        indexPageData={indexPageData}
+        message="Unable to load blog posts at the moment."
+      />
     );
   }
 
@@ -181,27 +195,10 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
 
   if (errBlogs || !blogs) {
     return (
-      <main className="container my-16">
-        <BlogHeader
-          description={indexPageData.description}
-          title={indexPageData.title}
-        />
-        <div className="py-12 text-center">
-          <p className="text-muted-foreground">
-            No blog posts available at the moment.
-          </p>
-        </div>
-        {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
-          <>
-            <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
-            <PageBuilder
-              id={indexPageData._id}
-              pageBuilder={indexPageData.pageBuilder}
-              type={indexPageData._type}
-            />
-          </>
-        )}
-      </main>
+      <BlogIndexError
+        indexPageData={indexPageData}
+        message="No blog posts available at the moment."
+      />
     );
   }
 

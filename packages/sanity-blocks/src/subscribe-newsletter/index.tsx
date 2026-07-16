@@ -1,5 +1,6 @@
 "use client";
 
+import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
@@ -60,14 +61,7 @@ function TestimonialPanel({
   return (
     <div className="bg-grid-dots-dense p-8">
       <div className="flex h-full flex-col gap-12 border border-border bg-background p-8">
-        {eyebrow && (
-          <span className="inline-flex items-center gap-2 self-start rounded-md border border-border px-3 py-1.5">
-            <span className="size-2 shrink-0 rounded-[1px] bg-accent-green" />
-            <span className="font-mono text-muted-foreground text-sm uppercase leading-5 tracking-widest">
-              {eyebrow}
-            </span>
-          </span>
-        )}
+        <BlockEyebrow eyebrow={eyebrow} />
         <div className="flex flex-col gap-8">
           <RichText
             className="text-pretty text-lg text-muted-foreground leading-7 [&_strong]:font-normal [&_strong]:text-foreground"

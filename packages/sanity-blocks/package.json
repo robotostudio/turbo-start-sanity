@@ -48,6 +48,7 @@
     "./*/json-ld": "./src/*/json-ld.ts",
     "./*.schema": "./src/*.schema.ts",
     "./*.groq": "./src/*.groq.ts",
+    "./internal/block-eyebrow": "./src/internal/block-eyebrow.tsx",
     "./internal/lucide-icon-preview": "./src/internal/lucide-icon-preview.tsx",
     "./internal/page-builder-to-markdown": "./src/internal/page-builder-to-markdown.ts",
     "./internal/portable-text-to-markdown": "./src/internal/portable-text-to-markdown.ts",

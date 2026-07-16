@@ -1,3 +1,4 @@
+import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import { SanityIcon } from "@workspace/sanity-blocks/internal/sanity-icon";
@@ -91,14 +92,7 @@ export function FeatureCardsWithIcon({
     >
       <div className="container">
         <div className="flex flex-col items-start gap-6">
-          {eyebrow && (
-            <span className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-1.5">
-              <span className="size-2 shrink-0 rounded-[1px] bg-accent-green" />
-              <span className="font-mono text-muted-foreground text-sm uppercase leading-5 tracking-widest">
-                {eyebrow}
-              </span>
-            </span>
-          )}
+          <BlockEyebrow eyebrow={eyebrow} />
           <div className="flex flex-col items-start gap-5">
             {title ? (
               <h2 className="max-w-2xl text-balance font-normal text-4xl text-foreground tracking-tight md:text-5xl">
