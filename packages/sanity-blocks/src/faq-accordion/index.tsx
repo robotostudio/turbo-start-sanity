@@ -43,25 +43,26 @@ function FaqList({ faqs, name }: Readonly<{ faqs: FaqItem[]; name: string }>) {
     : undefined;
 
   return (
-    <div className="grid animate-in content-start gap-4 fade-in duration-300">
-      {faqs.map((faq) => {
+    <div className="grid content-start gap-4">
+      {faqs.map((faq, index) => {
         if (!faq?.title) return null;
         const itemId = faq._key ?? faq._id;
         return (
           <details
-            className="faq-disclosure group border border-border bg-background px-4 transition-colors hover:border-foreground/20 has-[summary:focus-visible]:[outline:1px_solid_var(--foreground)] has-[summary:focus-visible]:outline-offset-2"
+            className="faq-disclosure hover-surface group fade-in slide-in-from-bottom-2 animate-in border border-border bg-background px-4 fill-mode-both duration-300 ease-out has-[summary:focus-visible]:[outline:1px_solid_var(--foreground)] has-[summary:focus-visible]:outline-offset-2"
             key={`faq-${itemId}`}
             name={name}
             open={itemId === defaultOpenId}
+            style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
           >
             <summary className="flex cursor-pointer list-none items-center justify-between gap-2.5 py-4 outline-none [&::-webkit-details-marker]:hidden">
               <h3 className="font-normal text-foreground text-lg leading-6">
                 {faq.title}
               </h3>
-              <Plus className="pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-200 group-open:rotate-45 dark:text-accent-green" />
+              <Plus className="pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-open:rotate-45 dark:text-accent-green" />
             </summary>
             {faq.richText?.length ? (
-              <div className="pb-4 text-muted-foreground">
+              <div className="min-h-0 overflow-hidden pb-4 text-muted-foreground">
                 <RichText
                   className="text-sm md:text-base"
                   richText={faq.richText}
@@ -94,7 +95,7 @@ function CategoryTabs({
             <li key={`faq-category-${category._key ?? index}`}>
               <button
                 aria-pressed={isActive}
-                className="focus-ring flex items-start gap-2 rounded-md px-1 py-0.5 text-left"
+                className="focus-ring flex items-start gap-2 rounded-none px-1 py-0.5 text-left"
                 onClick={() => onSelect(index)}
                 type="button"
               >
@@ -108,7 +109,7 @@ function CategoryTabs({
                   {number}
                 </span>
                 <span
-                  className={`font-mono text-sm uppercase tracking-wider ${
+                  className={`font-mono text-sm capitalize tracking-wider ${
                     isActive ? "text-foreground" : "text-muted-foreground"
                   }`}
                 >
@@ -135,9 +136,9 @@ function FaqHeader({
   return (
     <div className="flex flex-col items-start gap-6">
       {eyebrow && (
-        <div className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-1.5">
+        <div className="inline-flex items-center gap-2 rounded-none border border-border px-3 py-1.5">
           <span className="size-2 shrink-0 rounded-[1px] bg-accent-green" />
-          <span className="font-mono text-muted-foreground text-sm uppercase tracking-wider">
+          <span className="font-light font-mono text-muted-foreground text-sm uppercase tracking-[0.28px]">
             {eyebrow}
           </span>
         </div>
@@ -145,7 +146,7 @@ function FaqHeader({
       {(title || subtitle) && (
         <div className="flex flex-col gap-5">
           {title && (
-            <h2 className="font-normal text-4xl text-foreground tracking-tight md:text-5xl">
+            <h2 className="font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] md:text-5xl">
               {title}
             </h2>
           )}
@@ -170,7 +171,7 @@ function FaqContactLink({ link }: Readonly<{ link: FaqLink }>) {
       )}
       <Link
         aria-label={link.description ?? link.title ?? "Learn more"}
-        className="focus-ring-inset flex items-center gap-2 rounded-md px-1 py-0.5"
+        className="focus-ring-inset group flex items-center gap-2 rounded-none px-1 py-0.5"
         href={link.href}
         rel={link.openInNewTab ? "noopener noreferrer" : undefined}
         target={link.openInNewTab ? "_blank" : "_self"}
@@ -180,8 +181,11 @@ function FaqContactLink({ link }: Readonly<{ link: FaqLink }>) {
             {link.description}
           </p>
         )}
-        <span className="flex items-center justify-center rounded-full bg-accent-green p-1.5 text-accent-green-foreground">
-          <ArrowUpRight size={14} />
+        <span className="flex items-center justify-center overflow-hidden rounded-full bg-accent-green p-1.5 text-accent-green-foreground">
+          <ArrowUpRight
+            className="transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:rotate-45"
+            size={14}
+          />
         </span>
       </Link>
     </div>
