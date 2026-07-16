@@ -15,16 +15,16 @@ import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import Link from "next/link";
 import { Fragment } from "react";
 
-import { FooterThemeToggle } from "./footer-theme-toggle";
-import { Logo } from "./logo";
 import {
   FacebookIcon,
-  InstagramIcon,
-  LinkedinIcon,
-  RedditIcon,
-  XIcon,
+  InstagramBrandIcon,
+  LinkedinBrandIcon,
+  RedditBrandIcon,
+  XBrandIcon,
   YoutubeIcon,
-} from "./social-icons";
+} from "@/components/icons";
+import { FooterThemeToggle } from "./footer-theme-toggle";
+import { Logo } from "./logo";
 
 type SocialLinksProps = {
   data: NonNullable<QueryGlobalSeoSettingsResult>["socialLinks"];
@@ -66,7 +66,7 @@ function SocialLinks({ data }: SocialLinksProps) {
   const socialLinks = [
     {
       url: instagram,
-      Icon: InstagramIcon,
+      Icon: InstagramBrandIcon,
       label: "Follow us on Instagram",
     },
     {
@@ -74,10 +74,10 @@ function SocialLinks({ data }: SocialLinksProps) {
       Icon: FacebookIcon,
       label: "Follow us on Facebook",
     },
-    { url: twitter, Icon: XIcon, label: "Follow us on Twitter" },
+    { url: twitter, Icon: XBrandIcon, label: "Follow us on Twitter" },
     {
       url: linkedin,
-      Icon: LinkedinIcon,
+      Icon: LinkedinBrandIcon,
       label: "Follow us on LinkedIn",
     },
     {
@@ -87,7 +87,7 @@ function SocialLinks({ data }: SocialLinksProps) {
     },
     {
       url: reddit,
-      Icon: RedditIcon,
+      Icon: RedditBrandIcon,
       label: "Join us on Reddit",
     },
   ].filter((link) => link.url);
@@ -98,7 +98,7 @@ function SocialLinks({ data }: SocialLinksProps) {
         <li key={`social-link-${url}-${index.toString()}`}>
           <Link
             aria-label={label}
-            className="focus-ring inline-block focus-visible:outline-accent-green-foreground!"
+            className="focus-ring inline-block transition-opacity hover:opacity-70 focus-visible:outline-accent-green-foreground!"
             href={url ?? "#"}
             prefetch={false}
             rel="noopener noreferrer"
@@ -127,17 +127,18 @@ function SystemsOperationalPill() {
   );
 }
 
-// Alternating vertical offsets give the indicator squares a subtle zig-zag.
-const FOOTER_TOP_BAR_SQUARES = [
-  { key: "a", offset: "-translate-y-px" },
-  { key: "b", offset: "translate-y-px" },
-  { key: "c", offset: "-translate-y-px" },
-  { key: "d", offset: "translate-y-px" },
+// Alternating ±2px vertical offsets give the ░ (U+2591 LIGHT SHADE) indicator
+// glyphs a zig-zag, matching the Figma "ready indicator" (node 2193:2411).
+const FOOTER_TOP_BAR_SHADES = [
+  { key: "a", offset: "-translate-y-0.5" },
+  { key: "b", offset: "translate-y-0.5" },
+  { key: "c", offset: "-translate-y-0.5" },
+  { key: "d", offset: "translate-y-0.5" },
 ];
 
 function FooterTopBar() {
   return (
-    <div className="w-full border-border border-t border-dotted bg-background">
+    <div className="w-full bg-background [background-image:radial-gradient(circle,var(--color-border)_1px,transparent_1.5px)] [background-position:top] [background-repeat:repeat-x] [background-size:7px_2px]">
       <div className="container flex items-center justify-between gap-4 py-4">
         <div className="flex items-center gap-2">
           <span
@@ -149,7 +150,9 @@ function FooterTopBar() {
             <span className="text-muted-foreground dark:text-accent-green">
               Turbo Start
             </span>
-            <span className="text-muted-foreground/50">{" ///"}</span>
+            <span className="bg-linear-to-r from-transparent to-accent-green bg-clip-text text-transparent">
+              {" ///"}
+            </span>
           </p>
         </div>
         <div className="hidden items-center gap-3 md:flex">
@@ -164,12 +167,13 @@ function FooterTopBar() {
         <div className="hidden items-center gap-3 sm:flex">
           <span
             aria-hidden="true"
-            className="hidden items-center gap-2 sm:flex"
+            className="hidden items-center gap-0.5 sm:flex"
           >
-            {FOOTER_TOP_BAR_SQUARES.map((square) => (
+            {FOOTER_TOP_BAR_SHADES.map((shade) => (
               <span
-                className={`size-[18px] shrink-0 rounded-[1px] bg-grid-dots-stipple text-foreground ${square.offset}`}
-                key={square.key}
+                aria-hidden="true"
+                className={`h-3 w-3 shrink-0 bg-grid-dots-stipple text-foreground ${shade.offset}`}
+                key={shade.key}
               />
             ))}
           </span>
@@ -187,24 +191,25 @@ export function FooterSkeleton() {
     <>
       <FooterTopBar />
       <footer className="border-t border-accent-green-foreground/10 bg-accent-green text-accent-green-foreground">
-        <div className="container flex flex-col gap-10 pt-12 lg:flex-row lg:items-start lg:justify-between">
-          <div className="flex w-full max-w-96 shrink flex-col items-center gap-6 lg:items-start">
-            <div className="w-full">
-              <span className="flex items-center justify-center gap-3 lg:justify-start">
-                <div className="h-8 w-40 animate-pulse rounded bg-accent-green-foreground/10" />
-              </span>
-              <div className="mt-4 h-10 w-full animate-pulse rounded bg-accent-green-foreground/10" />
+        <div className="container flex flex-col items-start gap-10 pt-12 text-start lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex w-full max-w-96 shrink flex-col items-start gap-6">
+            <div className="flex w-full flex-col items-start gap-4">
+              <div className="h-8 w-44 animate-pulse rounded bg-accent-green-foreground/10" />
+              <div className="h-10 w-full animate-pulse rounded bg-accent-green-foreground/10" />
             </div>
-            <div className="flex items-center gap-4">
+            {/* Systems-operational pill */}
+            <div className="h-7 w-52 animate-pulse rounded-full bg-accent-green-foreground/10" />
+            {/* Social icons */}
+            <div className="flex items-center gap-3">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div
-                  className="h-[18px] w-[18px] animate-pulse rounded bg-accent-green-foreground/10"
+                  className="size-[18px] animate-pulse rounded bg-accent-green-foreground/10"
                   key={i}
                 />
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 sm:gap-14">
+          <div className="grid w-full grid-cols-2 gap-8 sm:grid-cols-4 sm:gap-14 lg:w-auto">
             {[1, 2, 3, 4].map((col) => (
               <div key={col}>
                 <div className="mb-2 h-4 w-20 animate-pulse rounded bg-accent-green-foreground/10" />
@@ -220,11 +225,17 @@ export function FooterSkeleton() {
             ))}
           </div>
         </div>
-        <div className="container mt-12 flex flex-col justify-between gap-4 pt-8 pb-6 text-center lg:flex-row lg:items-center lg:text-start">
-          <div className="h-4 w-48 animate-pulse rounded bg-accent-green-foreground/10" />
-          <div className="flex justify-center gap-4 lg:justify-start">
-            <div className="h-4 w-32 animate-pulse rounded bg-accent-green-foreground/10" />
-            <div className="h-4 w-24 animate-pulse rounded bg-accent-green-foreground/10" />
+        <div className="container relative z-10 mt-12 pt-8 pb-6">
+          <div className="flex flex-col items-start justify-between gap-6 text-start lg:flex-row lg:items-center lg:gap-4">
+            <div className="h-4 w-64 animate-pulse rounded bg-accent-green-foreground/10" />
+            <div className="flex flex-col items-start gap-4 lg:flex-row lg:items-center">
+              <div className="flex items-center gap-4">
+                <div className="h-4 w-32 animate-pulse rounded bg-accent-green-foreground/10" />
+                <div className="h-4 w-24 animate-pulse rounded bg-accent-green-foreground/10" />
+              </div>
+              {/* Theme toggle */}
+              <div className="h-8 w-16 animate-pulse rounded-full bg-accent-green-foreground/10" />
+            </div>
           </div>
         </div>
       </footer>
@@ -242,7 +253,7 @@ function Footer({ data, settingsData }: FooterProps) {
   return (
     <>
       <FooterTopBar />
-      <footer className="border-t border-accent-green-foreground/10 bg-accent-green text-accent-green-foreground">
+      <footer className="relative border-t border-accent-green-foreground/10 bg-accent-green text-accent-green-foreground">
         <div className="container flex flex-col items-start gap-10 pt-12 text-start lg:flex-row lg:items-start lg:justify-between">
           <div className="flex w-full max-w-96 shrink flex-col items-start gap-6 lg:items-start">
             <div className="flex flex-col items-start gap-4 lg:items-start">
@@ -277,7 +288,7 @@ function Footer({ data, settingsData }: FooterProps) {
                           key={`${link?._key}-${columnIndex}-column-${column?._key}`}
                         >
                           <Link
-                            className="focus-ring rounded-sm focus-visible:outline-accent-green-foreground!"
+                            className="focus-ring rounded-sm transition-colors hover:text-accent-green-foreground/70 focus-visible:outline-accent-green-foreground!"
                             href={link.href ?? "#"}
                             rel={
                               link.openInNewTab
@@ -307,7 +318,7 @@ function Footer({ data, settingsData }: FooterProps) {
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-accent-green-foreground/70 text-sm tracking-[0.24px] lg:flex-nowrap">
                   {credits.map((item, index) => {
                     const creditContent = (
-                      <span className="flex items-center gap-2 whitespace-nowrap">
+                      <span className="flex items-center gap-1 whitespace-nowrap">
                         {item.label}
                         {item.logo?.id && (
                           <span className="flex shrink-0 items-center">
@@ -333,7 +344,7 @@ function Footer({ data, settingsData }: FooterProps) {
                         )}
                         {item.url ? (
                           <a
-                            className="focus-ring focus-visible:outline-accent-green-foreground!"
+                            className="focus-ring rounded-sm transition-opacity hover:opacity-70 focus-visible:outline-accent-green-foreground!"
                             href={item.url}
                             rel="noopener noreferrer"
                             target="_blank"
