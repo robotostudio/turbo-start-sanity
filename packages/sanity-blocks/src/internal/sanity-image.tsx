@@ -1,5 +1,6 @@
 "use client";
 import { env } from "@workspace/env/client";
+import { cn } from "@workspace/tailwind-config/utils";
 import type { ElementType } from "react";
 import {
   SanityImage as BaseSanityImage,
@@ -33,6 +34,21 @@ const ImageWrapper = <T extends ElementType = "img">(
 // A well-formed Sanity image asset id: `image-<assetId>-<width>x<height>-<format>`.
 const SANITY_ASSET_ID = /^image-[a-zA-Z0-9]+-\d+x\d+-\w+$/;
 
+// Build the URL for the ORIGINAL SVG asset on the CDN, or null when the id
+// isn't an SVG. The `sanity-image` lib emits width-based `?w=…` srcsets, which
+// makes the CDN rasterize an SVG into a low-res bitmap that then upscales
+// (visible pixelation). For SVG sources we skip that pipeline and point a plain
+// <img> at the untransformed file: `image-<hash>-<w>x<h>-svg` →
+// `${SANITY_BASE_URL}<hash>-<w>x<h>.svg` (drop the `image-` prefix, swap the
+// trailing `-svg` for `.svg`).
+export function svgUrlFromAssetId(id: string | null): string | null {
+  if (!id?.endsWith("-svg")) {
+    return null;
+  }
+  const filename = `${id.replace(/^image-/, "").replace(/-svg$/, "")}.svg`;
+  return `${SANITY_BASE_URL}${filename}`;
+}
+
 // Normalize a Sanity image ref to its canonical asset id, or null when it's
 // missing/malformed. Selecting an asset via the media library can prepend a
 // stray `drafts.` prefix (assets have no draft/published split); strip it and
@@ -49,10 +65,54 @@ export function resolveAssetId(
   return SANITY_ASSET_ID.test(id) ? id : null;
 }
 
+// Extract the pixel dimensions Sanity encodes in an asset id
+// (`image-<hash>-<width>x<height>-<format>`). Returns null when the id is
+// missing/malformed. Used to normalize logo sizing by aspect ratio so a wide
+// wordmark and a square icon read as the same visual weight (the "logo soup"
+// problem) without any extra CMS fields.
+export function getImageDimensions(
+  image: SanityImageData | null | undefined
+): { width: number; height: number; aspectRatio: number } | null {
+  const id = resolveAssetId(image);
+  if (!id) {
+    return null;
+  }
+  const match = id.match(/-(\d+)x(\d+)-/);
+  if (!match) {
+    return null;
+  }
+  const width = Number(match[1]);
+  const height = Number(match[2]);
+  if (!(width > 0 && height > 0)) {
+    return null;
+  }
+  return { width, height, aspectRatio: width / height };
+}
+
 export function SanityImage({ image, ...props }: SanityImageProps) {
   const id = resolveAssetId(image);
   if (!(id && image)) {
     return null;
+  }
+
+  // SVG fast-path: render the untransformed vector directly so it stays crisp
+  // at any display size. No `data-lqip`, so the global
+  // `img[data-lqip]{image-rendering:pixelated}` rule can't touch it, and
+  // `object-contain` keeps the logo from being cropped by the global
+  // `img{object-fit:cover}`.
+  const svgUrl = svgUrlFromAssetId(id);
+  if (svgUrl) {
+    return (
+      // biome-ignore lint/performance/noImgElement: intentional plain <img> to serve the original SVG untouched by the CDN transform pipeline.
+      <img
+        alt={props.alt ?? image.alt ?? ""}
+        className={cn("object-contain", props.className)}
+        height={props.height}
+        loading={props.loading}
+        src={svgUrl}
+        width={props.width}
+      />
+    );
   }
 
   const processedData = {

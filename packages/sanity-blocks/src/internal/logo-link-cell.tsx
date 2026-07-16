@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { CSSProperties } from "react";
 
 import type { SanityImageData } from "./sanity-image";
 import { resolveAssetId, SanityImage } from "./sanity-image";
@@ -11,6 +12,8 @@ export interface LogoLinkCellProps {
   cellClassName: string;
   height: number;
   width: number;
+  // Optional inline style for the image, e.g. a per-logo normalized height.
+  imageStyle?: CSSProperties;
 }
 
 /**
@@ -27,6 +30,7 @@ export function LogoLinkCell({
   cellClassName,
   height,
   width,
+  imageStyle,
 }: Readonly<LogoLinkCellProps>) {
   // Gate on the same validity SanityImage uses, so a malformed id renders
   // nothing rather than an empty (unnamed) link wrapping a null image.
@@ -40,6 +44,7 @@ export function LogoLinkCell({
       height={height}
       image={image}
       loading="lazy"
+      style={imageStyle}
       width={width}
     />
   );
