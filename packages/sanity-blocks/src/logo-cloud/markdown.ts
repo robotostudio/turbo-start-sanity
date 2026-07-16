@@ -5,7 +5,10 @@ import {
   type MarkdownBlock,
   type MarkdownOptions,
 } from "../internal/markdown";
-import { formatUrl } from "../internal/portable-text-to-markdown";
+import {
+  absolutizeUrl,
+  formatUrl,
+} from "../internal/portable-text-to-markdown";
 
 export function logoCloudToMarkdown(
   block: MarkdownBlock,
@@ -19,7 +22,9 @@ export function logoCloudToMarkdown(
       }
       const href = logo.href;
       const item =
-        href && href !== "#" ? `[${media}](${formatUrl(href)})` : media;
+        href && href !== "#"
+          ? `[${media}](${formatUrl(absolutizeUrl(href, options.baseUrl))})`
+          : media;
       return `- ${item}`;
     })
     .filter(Boolean);

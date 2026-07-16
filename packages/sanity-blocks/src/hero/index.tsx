@@ -50,7 +50,6 @@ export function HeroBlock({
                 aria-hidden="true"
                 className="rounded-none! object-cover"
                 fill
-                priority
                 sizes="100vw"
                 src="/hero-fallback-light.png"
               />
@@ -63,7 +62,6 @@ export function HeroBlock({
                 aria-hidden="true"
                 className="rounded-none! object-cover"
                 fill
-                priority
                 sizes="100vw"
                 src="/hero-fallback-dark.png"
               />

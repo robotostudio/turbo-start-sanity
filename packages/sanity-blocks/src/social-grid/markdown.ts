@@ -10,7 +10,7 @@ import { escapeMarkdown } from "../internal/portable-text-to-markdown";
 
 export function socialGridToMarkdown(
   block: MarkdownBlock,
-  _options: MarkdownOptions
+  options: MarkdownOptions
 ): string {
   const socials = (block.socials ?? [])
     .map((social) => {
@@ -18,7 +18,7 @@ export function socialGridToMarkdown(
       if (!label) {
         return "";
       }
-      return `- ${mdLink(label, social.href)}`;
+      return `- ${mdLink(label, social.href, options)}`;
     })
     .filter(Boolean);
 

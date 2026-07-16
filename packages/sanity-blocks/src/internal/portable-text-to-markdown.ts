@@ -134,7 +134,9 @@ function fenceCodeBlock(code: string, language?: string | null): string {
     0
   );
   const fence = "`".repeat(Math.max(3, longestRun + 1));
-  const info = (language ?? "").trim();
+  // Strip backticks and newlines so the info string can't break out of or
+  // prematurely close the fence.
+  const info = (language ?? "").replace(/[\n\r`]/g, "").trim();
   // Trim trailing newlines with a linear scan; a `/\n+$/` regex backtracks.
   let end = code.length;
   while (end > 0 && code.charCodeAt(end - 1) === 10) {

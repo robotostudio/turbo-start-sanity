@@ -79,14 +79,14 @@ export const faqAccordionSchema = defineType({
               description:
                 "Choose the questions and answers shown when this category is selected. Add them in the order you want visitors to see them.",
               of: [
-                {
+                defineArrayMember({
                   type: "reference",
                   to: [{ type: "faq" }],
                   // Weak so a category can reference draft/unpublished FAQ docs
                   // without failing mutations or triggering a strength mismatch.
                   weak: true,
                   options: { disableNew: true },
-                },
+                }),
               ],
               validation: (Rule) => [Rule.required(), Rule.unique()],
             }),

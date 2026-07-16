@@ -53,7 +53,7 @@ export function CodeBlock({
       <div className="rich-code flex text-sm leading-relaxed">
         <div aria-hidden="true" className="rich-code-gutter font-mono">
           {Array.from({ length: lineCount }, (_, index) => (
-            <span key={index}>{index + 1}</span>
+            <span key={index + 1}>{index + 1}</span>
           ))}
         </div>
         <pre className="rich-code-pre overflow-x-auto font-mono">

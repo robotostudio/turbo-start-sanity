@@ -96,8 +96,8 @@ test("aggregates valid faqs across multiple categories", () => {
 
   const entities = questions(result);
   expect(entities).toHaveLength(2);
-  expect(entities[0]?.name).toBe("Q1");
-  expect(entities[1]?.name).toBe("Q2");
+  expect(entities.at(0)?.name).toBe("Q1");
+  expect(entities.at(1)?.name).toBe("Q2");
 });
 
 test("joins multiple spans across multiple blocks", () => {

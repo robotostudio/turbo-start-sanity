@@ -64,6 +64,13 @@ export interface MarkdownFaqCategory {
   faqs?: MarkdownFaq[] | null;
 }
 
+export interface MarkdownTestimonial {
+  eyebrow?: string | null;
+  quote?: PortableTextValue;
+  authorName?: string | null;
+  authorRole?: string | null;
+}
+
 export interface MarkdownBlock {
   _type?: string;
   _key?: string;
@@ -81,6 +88,7 @@ export interface MarkdownBlock {
   logos?: MarkdownLogo[] | null;
   socials?: MarkdownSocial[] | null;
   image?: MarkdownImage | null;
+  testimonial?: MarkdownTestimonial | null;
 }
 
 /** Joins defined, non-empty sections with a blank line between them. */

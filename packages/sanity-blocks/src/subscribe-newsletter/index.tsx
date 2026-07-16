@@ -111,6 +111,17 @@ export function SubscribeNewsletter({
   onSubmit,
   testimonial,
 }: Readonly<SubscribeNewsletterProps>) {
+  // A cleared Sanity object is still truthy; only treat the testimonial as
+  // present when it actually carries content.
+  const hasTestimonialContent = Boolean(
+    testimonial &&
+      (testimonial.eyebrow ||
+        testimonial.authorName ||
+        testimonial.authorRole ||
+        testimonial.authorImage?.id ||
+        (Array.isArray(testimonial.quote) && testimonial.quote.length > 0))
+  );
+
   return (
     <section
       className="bg-background pt-20 pb-0 sm:pt-28 lg:pt-[136px]"
@@ -119,7 +130,7 @@ export function SubscribeNewsletter({
       <div className="container">
         <div
           className={cn(
-            testimonial &&
+            hasTestimonialContent &&
               "grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-stretch lg:gap-16"
           )}
         >
@@ -162,7 +173,9 @@ export function SubscribeNewsletter({
               )}
             </div>
           </div>
-          {testimonial && <TestimonialPanel testimonial={testimonial} />}
+          {hasTestimonialContent && testimonial && (
+            <TestimonialPanel testimonial={testimonial} />
+          )}
         </div>
       </div>
     </section>

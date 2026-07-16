@@ -47,7 +47,7 @@ export function SanityImage({ image, ...props }: SanityImageProps) {
 
   const processedData = {
     id,
-    alt: image.alt ?? "",
+    alt: props.alt ?? image.alt ?? "",
     ...(image.preview && { preview: image.preview }),
     ...(image.hotspot && { hotspot: image.hotspot }),
     ...(image.crop && { crop: image.crop }),

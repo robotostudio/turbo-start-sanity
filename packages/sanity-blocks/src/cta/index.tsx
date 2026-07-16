@@ -3,9 +3,9 @@ import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import type { ButtonProps } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
-import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import { Badge } from "@workspace/ui/components/badge";
-import Link from "next/link";
+
+import { LogoLinkCell } from "../internal/logo-link-cell";
 
 export interface CtaUsedByTeamsLogo {
   _key: string;
@@ -28,39 +28,17 @@ export interface CtaBlockProps {
 }
 
 function UsedByTeamsLogo({ logo }: Readonly<{ logo: CtaUsedByTeamsLogo }>) {
-  const { image, href, openInNewTab } = logo;
-
-  if (!image?.id) {
-    return null;
-  }
-
-  const media = (
-    <SanityImage
-      className="h-8 w-auto max-w-full object-contain md:h-6 dark:invert"
+  return (
+    <LogoLinkCell
+      cellClassName="flex h-16 items-center justify-center bg-background p-2 md:w-[165px] md:p-4"
       height={24}
-      image={image}
-      loading="lazy"
+      href={logo.href}
+      image={logo.image}
+      imageClassName="h-8 w-auto max-w-full object-contain md:h-6 dark:invert"
+      openInNewTab={logo.openInNewTab}
       width={156}
     />
   );
-
-  const cellClassName =
-    "flex h-16 items-center justify-center bg-background p-2 md:w-[165px] md:p-4";
-
-  if (href) {
-    return (
-      <Link
-        className={cellClassName}
-        href={href}
-        rel={openInNewTab ? "noopener noreferrer" : undefined}
-        target={openInNewTab ? "_blank" : undefined}
-      >
-        {media}
-      </Link>
-    );
-  }
-
-  return <div className={cellClassName}>{media}</div>;
 }
 
 export function CTABlock({

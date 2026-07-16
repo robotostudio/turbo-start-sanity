@@ -1,0 +1,59 @@
+import Link from "next/link";
+
+import type { SanityImageData } from "./sanity-image";
+import { SanityImage } from "./sanity-image";
+
+export interface LogoLinkCellProps {
+  image?: SanityImageData | null;
+  href?: string | null;
+  openInNewTab?: boolean | null;
+  imageClassName: string;
+  cellClassName: string;
+  height: number;
+  width: number;
+}
+
+/**
+ * A single brand-logo cell shared by the Logo Cloud and the CTA "used by teams"
+ * strip: renders the image, optionally wrapped in a link. Returns null when the
+ * image has no usable asset id. Sizing and cell styling are passed in so each
+ * caller keeps its own layout.
+ */
+export function LogoLinkCell({
+  image,
+  href,
+  openInNewTab,
+  imageClassName,
+  cellClassName,
+  height,
+  width,
+}: Readonly<LogoLinkCellProps>) {
+  if (!image?.id) {
+    return null;
+  }
+
+  const media = (
+    <SanityImage
+      className={imageClassName}
+      height={height}
+      image={image}
+      loading="lazy"
+      width={width}
+    />
+  );
+
+  if (href) {
+    return (
+      <Link
+        className={cellClassName}
+        href={href}
+        rel={openInNewTab ? "noopener noreferrer" : undefined}
+        target={openInNewTab ? "_blank" : undefined}
+      >
+        {media}
+      </Link>
+    );
+  }
+
+  return <div className={cellClassName}>{media}</div>;
+}
