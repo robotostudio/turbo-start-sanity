@@ -37,7 +37,11 @@ function UsedByTeamsLogo({ logo }: Readonly<{ logo: CtaUsedByTeamsLogo }>) {
       image={logo.image}
       imageClassName="w-auto max-w-full object-contain dark:invert"
       imageStyle={{
-        height: normalizedLogoHeight(logo.image, { base: 26, min: 18, max: 30 }),
+        height: normalizedLogoHeight(logo.image, {
+          base: 26,
+          min: 18,
+          max: 30,
+        }),
       }}
       openInNewTab={logo.openInNewTab}
       width={156}

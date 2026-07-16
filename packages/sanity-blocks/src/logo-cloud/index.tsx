@@ -29,7 +29,11 @@ function Logo({ logo }: Readonly<{ logo: LogoCloudLogo }>) {
       image={logo.image}
       imageClassName="w-auto object-contain"
       imageStyle={{
-        height: normalizedLogoHeight(logo.image, { base: 28, min: 22, max: 32 }),
+        height: normalizedLogoHeight(logo.image, {
+          base: 28,
+          min: 22,
+          max: 32,
+        }),
       }}
       openInNewTab={logo.openInNewTab}
       width={240}

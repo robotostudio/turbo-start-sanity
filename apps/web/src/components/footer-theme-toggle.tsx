@@ -15,7 +15,9 @@ export function FooterThemeToggle() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const [pill, setPill] = useState<{ left: number; width: number } | null>(null);
+  const [pill, setPill] = useState<{ left: number; width: number } | null>(
+    null
+  );
 
   useEffect(() => {
     setMounted(true);
