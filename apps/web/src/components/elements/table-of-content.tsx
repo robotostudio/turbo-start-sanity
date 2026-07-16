@@ -1,18 +1,16 @@
 "use client";
 import { cn } from "@workspace/tailwind-config/utils";
-import {
-  Check,
-  Copy,
-  Facebook,
-  Linkedin,
-  type LucideIcon,
-  MessageCircle,
-  Twitter,
-} from "lucide-react";
-import Link from "next/link";
-import { type FC, useEffect, useRef, useState } from "react";
+import { Check } from "lucide-react";
+import { type FC, type MouseEvent, useEffect, useRef, useState } from "react";
 import slugify from "slugify";
 
+import {
+  CopyLinkIcon,
+  InstagramIcon,
+  LinkedInIcon,
+  RedditIcon,
+  XIcon,
+} from "@/components/icons";
 import type { SanityRichTextBlock, SanityRichTextProps } from "@/types";
 
 type TableOfContentProps = {
@@ -427,9 +425,37 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
   const hasChildren =
     Array.isArray(children) && children.length > 0 && currentDepth < maxDepth;
 
+  // In-page anchors are rendered as native <a>, not next/link. next/link
+  // unconditionally preventDefaults hash clicks and defers the scroll to the
+  // App Router, whose hash handling races with hydration and intermittently
+  // no-ops — so a click during that window is swallowed (default suppressed,
+  // no scroll). A native anchor plus this synchronous handler always scrolls:
+  // before hydration the browser jumps natively, after hydration we scroll
+  // here, and the router is never involved.
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+    const target = document.getElementById(slug);
+    if (!target) {
+      // Fall back to the browser's native hash navigation.
+      return;
+    }
+    event.preventDefault();
+    target.scrollIntoView({ behavior: "smooth" });
+    window.history.pushState(null, "", href);
+  };
+
   return (
     <li className={cn(currentDepth > 1 && "ml-3")}>
-      <Link
+      <a
         aria-current={isActive ? "location" : undefined}
         className={cn(
           "focus-ring block rounded-none px-2 py-0.5 text-base leading-6 tracking-[0.01em] transition-colors",
@@ -439,9 +465,10 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
         )}
         href={href}
         id={id}
+        onClick={handleClick}
       >
         {text}
-      </Link>
+      </a>
 
       {hasChildren && (
         <ul className="mt-1 flex flex-col gap-1">
@@ -463,33 +490,39 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
 type ShareTarget = {
   readonly network: string;
   readonly label: string;
-  readonly icon: LucideIcon;
+  readonly icon: FC<{ className?: string }>;
   readonly url: (encodedUrl: string, encodedTitle: string) => string;
+  // Networks with no web share-URL endpoint (Instagram) use the native Web
+  // Share sheet instead of a plain link.
+  readonly webShare?: boolean;
 };
 
 const SHARE_TARGETS: readonly ShareTarget[] = [
   {
     network: "X",
     label: "Post",
-    icon: Twitter,
+    icon: XIcon,
     url: (u, t) => `https://twitter.com/intent/tweet?url=${u}&text=${t}`,
   },
   {
-    network: "LinkedIn",
+    network: "Instagram",
     label: "Post",
-    icon: Linkedin,
-    url: (u) => `https://www.linkedin.com/sharing/share-offsite/?url=${u}`,
+    icon: InstagramIcon,
+    // Instagram has no share-URL endpoint; the Web Share sheet lets the user
+    // pick Instagram, falling back to opening instagram.com.
+    url: () => "https://www.instagram.com/",
+    webShare: true,
   },
   {
-    network: "Facebook",
+    network: "LinkedIn",
     label: "Share",
-    icon: Facebook,
-    url: (u) => `https://www.facebook.com/sharer/sharer.php?u=${u}`,
+    icon: LinkedInIcon,
+    url: (u) => `https://www.linkedin.com/sharing/share-offsite/?url=${u}`,
   },
   {
     network: "Reddit",
     label: "Post",
-    icon: MessageCircle,
+    icon: RedditIcon,
     url: (u, t) => `https://www.reddit.com/submit?url=${u}&title=${t}`,
   },
 ] as const;
@@ -529,32 +562,85 @@ function ShareOptions({ title }: Readonly<{ title?: string }>) {
     }
   };
 
+  const handleWebShare = async (fallbackUrl: string) => {
+    const shareUrl = url || window.location.href;
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share({ title: title || undefined, url: shareUrl });
+        return;
+      } catch {
+        // Cancelled or the share failed — fall through to the fallback link.
+      }
+    }
+    window.open(fallbackUrl, "_blank", "noopener,noreferrer");
+  };
+
   return (
-    <div className="flex items-center justify-between gap-2 border-border border-t pt-4">
-      {SHARE_TARGETS.map((target) => (
-        <a
-          aria-label={`Share on ${target.network}`}
-          className="focus-ring flex flex-col items-center gap-1 rounded-sm text-muted-foreground transition-colors hover:text-foreground"
-          href={target.url(encodedUrl, encodedTitle)}
-          key={target.network}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <target.icon aria-hidden="true" className="size-[18px]" />
-          <span className="text-xs">{target.label}</span>
-        </a>
-      ))}
+    <div className="flex items-center justify-between border-border border-t px-1 pt-4">
+      {SHARE_TARGETS.map((target) => {
+        const shareClass =
+          "focus-ring flex flex-col items-center justify-center gap-1 rounded-sm text-muted-foreground transition-colors hover:text-foreground";
+        if (target.webShare) {
+          return (
+            <button
+              aria-label={`Share on ${target.network}`}
+              className={shareClass}
+              key={target.network}
+              onClick={() =>
+                handleWebShare(target.url(encodedUrl, encodedTitle))
+              }
+              type="button"
+            >
+              <target.icon className="size-4.5" />
+              <span className="text-xs tracking-[0.02em]">{target.label}</span>
+            </button>
+          );
+        }
+        return (
+          <a
+            aria-label={`Share on ${target.network}`}
+            className={shareClass}
+            href={target.url(encodedUrl, encodedTitle)}
+            key={target.network}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <target.icon className="size-4.5" />
+            <span className="text-xs tracking-[0.02em]">{target.label}</span>
+          </a>
+        );
+      })}
       <button
-        className="focus-ring flex flex-col items-center gap-1 rounded-sm text-muted-foreground transition-colors hover:text-foreground"
+        className="focus-ring flex flex-col items-center justify-center gap-1 rounded-sm text-muted-foreground transition-colors hover:text-foreground"
         onClick={handleCopy}
         type="button"
       >
         {copied ? (
-          <Check aria-hidden="true" className="size-[18px]" />
+          <Check aria-hidden="true" className="size-4.5" />
         ) : (
-          <Copy aria-hidden="true" className="size-[18px]" />
+          <CopyLinkIcon className="size-4.5" />
         )}
-        <span className="text-xs">{copied ? "Copied" : "Copy"}</span>
+        {/* Stack both labels in one grid cell so the button always reserves the
+            wider "Copied" width — the hidden label holds the space, so toggling
+            copied↔not never shifts the justify-between row. */}
+        <span className="grid text-xs tracking-[0.02em]">
+          <span
+            className={cn(
+              "col-start-1 row-start-1",
+              copied ? "visible" : "invisible"
+            )}
+          >
+            Copied
+          </span>
+          <span
+            className={cn(
+              "col-start-1 row-start-1",
+              copied ? "invisible" : "visible"
+            )}
+          >
+            Copy
+          </span>
+        </span>
       </button>
     </div>
   );
@@ -584,7 +670,10 @@ export const TableOfContent: FC<TableOfContentProps> = ({
 
   return (
     <div
-      className={cn("bg-grid-dots-dense p-6 text-muted-foreground", className)}
+      className={cn(
+        "bg-grid-dots-dense p-6 text-muted-foreground [background-size:5.6px_5.6px]",
+        className
+      )}
     >
       <aside
         aria-labelledby="toc-heading"
