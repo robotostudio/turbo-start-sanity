@@ -67,7 +67,7 @@ const components: Partial<PortableTextReactComponents> = {
   },
   marks: {
     code: ({ children }) => (
-      <code className="rounded-md border border-white/10 bg-opacity-5 p-1 text-sm lg:whitespace-nowrap">
+      <code className="rounded-none border border-border bg-[color-mix(in_oklab,var(--muted-foreground)_12%,transparent)] px-1.5 py-0.5 font-mono text-[0.85em] text-foreground before:content-none after:content-none lg:whitespace-nowrap">
         {children}
       </code>
     ),

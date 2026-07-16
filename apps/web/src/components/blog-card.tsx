@@ -61,7 +61,7 @@ function BlogDate({
 
   return (
     <time
-      className={cn("text-foreground text-sm", className)}
+      className={cn("text-sm text-zinc-800 dark:text-zinc-200", className)}
       dateTime={publishedAt ?? ""}
     >
       {formatted}
@@ -89,7 +89,9 @@ function BlogAuthor({ author }: Readonly<{ author: Blog["authors"] }>) {
       ) : (
         <span className="size-6 shrink-0 rounded-full bg-muted" />
       )}
-      <span className="text-muted-foreground text-sm">{author.name}</span>
+      <span className="text-sm text-zinc-700 dark:text-zinc-300">
+        {author.name}
+      </span>
     </div>
   );
 }
@@ -101,7 +103,9 @@ function BlogCategoryTag({ category }: Readonly<{ category?: string | null }>) {
     return null;
   }
 
-  return <span className="text-muted-foreground text-sm">{label}</span>;
+  return (
+    <span className="text-sm text-zinc-700 dark:text-zinc-300">{label}</span>
+  );
 }
 
 function BlogMeta({
@@ -135,17 +139,14 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
     blog ?? {};
 
   return (
-    <article className="group focus-ring-within relative grid grid-cols-1 border border-border lg:grid-cols-2">
+    <article className="hover-surface group focus-ring-within relative grid grid-cols-1 border border-border lg:grid-cols-2">
       <div className="flex flex-col justify-between gap-10 p-6 sm:p-8">
         <FeaturedBadge />
         <div className="grid gap-4">
           <BlogMeta category={category} publishedAt={publishedAt} />
           <h2 className="text-balance font-normal text-3xl leading-tight tracking-tight sm:text-4xl">
-            <Link
-              className="outline-none transition-colors group-hover:text-muted-foreground"
-              href={slug ?? "#"}
-            >
-              <span className="absolute inset-0" />
+            <Link className="outline-none" href={slug ?? "#"}>
+              <span className="absolute inset-0 z-10" />
               {title}
             </Link>
           </h2>
@@ -179,20 +180,17 @@ export function BlogCard({ blog }: BlogCardProps) {
   const { title, publishedAt, slug, description, authors, category } = blog;
 
   return (
-    <article className="group focus-ring-within relative flex h-full flex-col gap-4 border border-border p-6 transition-colors hover:border-muted-foreground/40">
+    <article className="hover-surface group focus-ring-within relative flex h-full flex-col gap-4 border border-border p-6">
       <BlogMeta category={category} publishedAt={publishedAt} />
       <div className="grid flex-1 gap-3">
-        <h3 className="font-normal text-2xl leading-8">
-          <Link
-            className="outline-none transition-colors group-hover:text-muted-foreground"
-            href={slug ?? "#"}
-          >
-            <span className="absolute inset-0" />
+        <h3 className="font-normal text-2xl text-zinc-900 leading-[34px] dark:text-zinc-50">
+          <Link className="outline-none" href={slug ?? "#"}>
+            <span className="absolute inset-0 z-10" />
             {title}
           </Link>
         </h3>
         {description ? (
-          <p className="line-clamp-3 text-muted-foreground text-sm leading-5">
+          <p className="line-clamp-3 text-sm text-zinc-700 leading-5 dark:text-zinc-300">
             {description}
           </p>
         ) : null}

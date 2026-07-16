@@ -33,12 +33,12 @@ export function CodeBlock({
   const lineCount = code.replace(/\n$/, "").split("\n").length;
 
   return (
-    <figure className="not-prose my-6 overflow-hidden rounded-lg border border-border bg-background">
+    <figure className="not-prose my-6 overflow-hidden rounded-none border border-border bg-background">
       <div className="flex items-center justify-between gap-3 border-border border-b bg-muted px-3 py-2">
         <div className="flex min-w-0 items-center gap-2">
           <span
             aria-hidden="true"
-            className="grid h-6 min-w-6 place-items-center rounded border border-border bg-background px-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase"
+            className="grid h-6 min-w-6 place-items-center rounded-none border border-border bg-background px-1.5 font-mono font-semibold text-[10px] text-muted-foreground uppercase"
           >
             {badge}
           </span>

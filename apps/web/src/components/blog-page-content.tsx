@@ -70,7 +70,7 @@ export function BlogPageContent({
           {/* The dotted lattice frames the section: it lives on the outer
               padding only while the inner container paints a solid background
               so no dots show behind the search input or category buttons. */}
-          <aside className="h-max bg-grid-dots-dense p-4 text-muted-foreground">
+          <aside className="h-max bg-grid-dots-dense p-4 text-muted-foreground lg:sticky lg:top-24 lg:self-start">
             <div className="flex flex-col gap-6 bg-background p-4">
               <SearchInput
                 className="max-w-none"
