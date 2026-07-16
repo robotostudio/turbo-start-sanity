@@ -131,37 +131,94 @@
 
 /* Overrides Tailwind's built-in `container`; wins by source order. */
 @utility container {
-  @apply mx-auto w-full max-w-7xl px-4 md:px-6;
+  @apply mx-auto w-full max-w-[90rem] px-4 md:px-6;
 }
 
-/* Dense dot lattice on a 5.2px grid. */
+/* Shared card hover surface — a subtle zinc tint on hover. Apply to any card
+ * (blog, showcase, faq, etc.) so the hover style lives in ONE place. */
+@utility hover-surface {
+  @apply transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900;
+}
+
+/* Tailwind v4 (Preflight) resets interactive elements to `cursor: default`.
+ * Restore the pointer cursor on buttons and anything role="button" (links keep
+ * the browser default). Skip disabled controls. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  label[for],
+  summary {
+    cursor: pointer;
+  }
+}
+
+/* Crisp dot lattices. Each dot is a `circle at center` with a hard color stop
+ * (`<color> 0 Rpx`) followed by a 0.5px feather to `transparent` — just enough
+ * to soften the edge without the fuzzy halo of a wide gradient ramp.
+ * `background-repeat: round` scales each tile so a whole number fits the box on
+ * both axes, so the lattice never clips a dot in half at the edges (the box
+ * edges always land in the gaps between dots) — and equal-width grid cells stay
+ * phase-aligned at their seams. currentColor keeps the dots tinting per
+ * context (e.g. inverting on the green highlighted feature card). */
 @utility bg-grid-dots-dense {
+  /* Matched to the Figma social-card dot pattern (node 2273:302): a single
+     5.2px square lattice of ~1.2px dots (SVG dots at 2, 7.2, 12.4, 17.6, 22.8
+     within a 26-unit tile → 5×5 per tile). currentColor keeps the dots tinting
+     per context; `round` avoids half-cut dots at the box edges. */
   background-image: radial-gradient(
-    color-mix(in oklch, currentColor 70%, transparent) 0.6px,
-    transparent 0.7px
+    circle at center,
+    color-mix(in oklch, currentColor 70%, transparent) 0 0.9px,
+    transparent 1.3px
   );
   background-size: 5.2px 5.2px;
+  background-repeat: round;
 }
 
-/* Fine stipple for the footer top-bar motifs; background-position: center
- * keeps the lattice symmetric so rows aren't clipped at the edges. */
 @utility bg-grid-dots-stipple {
+  /* Matched to the Figma "Footer nitro icon" dot pattern (node 2193:2411):
+     ~2.6px spacing with ~0.6px dots (SVG pattern 5.2/1.2 units at 0.5 scale).
+     Fills the footer top-bar triangle at 6 rows over its 16px height. */
   background-image: radial-gradient(
-    color-mix(in oklch, currentColor 85%, transparent) 0.75px,
-    transparent 1px
+    circle at center,
+    color-mix(in oklch, currentColor 85%, transparent) 0 0.22px,
+    transparent 0.47px
   );
-  background-size: 3px 3px;
-  background-position: center;
+  background-size: 2.6px 2.6px;
+  background-repeat: round;
 }
 
-/* Medium dot lattice (7px grid) for the feature-card icon boxes; uses
- * currentColor so dots invert on the green highlighted card. */
 @utility bg-grid-dots-md {
+  /* Dense square dot lattice for the feature-card "Icon Background" (Figma node
+     2156:2016). A ~5.2px tile fills the 48px icon box with ~9–10 rows of small
+     dots (48 / 5.2 ≈ 9.2), reading as a densely-dotted field rather than a
+     sparse grid. Dots are kept fine (small hard-stop radius) so the field stays
+     crisp and airy; currentColor tints per context (light/dark + green card);
+     `background-repeat: round` fits whole tiles on both axes so the box edges
+     land in the gaps and no dot is clipped. */
   background-image: radial-gradient(
-    color-mix(in oklch, currentColor 50%, transparent) 0.9px,
-    transparent 1.1px
+    circle at center,
+    color-mix(in oklch, currentColor 65%, transparent) 0 0.75px,
+    transparent 1.15px
   );
-  background-size: 7px 7px;
+  background-size: 5.4px 5.4px;
+  background-repeat: round;
+}
+
+@utility bg-grid-dots-fine {
+  /* Fine dot lattice — matches Figma SVG nodes 2156:2032 (feature-card icon box)
+     and 2273:311 (social cards) exactly: 1.2px dots (0.6px radius) on a 5.2px
+     grid (a 26px tile of 5×5 dots). Kept as its own utility so the fine dot size
+     stays independent of the outer panel (bg-grid-dots-md, whose dots are a
+     touch larger). `background-repeat: round` fits whole tiles so no dot is
+     clipped at the box edges; currentColor tints per context (light/dark +
+     green hover card). */
+  background-image: radial-gradient(
+    circle at center,
+    currentColor 0 0.6px,
+    transparent 0.75px
+  );
+  background-size: 5.2px 5.2px;
+  background-repeat: round;
 }
 
 /* Translate a duplicated track by half its width for a seamless loop. */
@@ -211,6 +268,24 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Match the browser overscroll ("rubber-band") gutters to the page: pulling
+     past the top reveals the page background, pulling past the bottom reveals
+     the footer's green — instead of a flash of white. The gradient is fixed to
+     the viewport (not the document), so each end shows the correct color at any
+     scroll position; the opaque body covers it everywhere except the gutters. */
+  html {
+    background: linear-gradient(
+      to bottom,
+      var(--background) 0 50%,
+      var(--accent-green) 50% 100%
+    );
+    background-attachment: fixed;
+  }
+  /* Brand-tinted text selection, consistent across the site. */
+  ::selection {
+    background-color: var(--accent-green);
+    color: var(--accent-green-foreground);
+  }
   /* Global keyboard focus indicator; components opt out with `outline-none`. */
   :focus-visible {
     outline: 1px solid var(--foreground);
@@ -234,25 +309,87 @@
   }
 }
 
+/* Scroll-driven page background. The page/overscroll background transitions
+   from the first section's color (page --background) at the top of the document
+   to the footer's --accent-green at the bottom, driven by a scroll-progress
+   timeline (scroll(root block)) — the "one @Jono was talking about". The opaque
+   body covers this everywhere except the browser's overscroll ("rubber-band")
+   gutters, so pulling past the top reveals the page color and pulling past the
+   bottom reveals the green footer, with a smooth transition while scrolling.
+   Uses CSS vars so it works in both light and dark themes. Guarded by @supports
+   and prefers-reduced-motion; where unsupported (or reduced motion), the fixed
+   split-gradient defined on `html` in @layer base remains as the fallback.
+   Unlayered so it wins over the layered base rule via the cascade. */
+@keyframes page-bg-scroll {
+  from {
+    background-color: var(--background);
+  }
+  to {
+    background-color: var(--accent-green);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      /* Replace the fixed split-gradient with a single solid color that the
+         keyframes animate across the scroll range. */
+      background: var(--background);
+      animation: page-bg-scroll linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
 /* FAQ disclosure: smooth open/close, instant fallback where unsupported. */
 @media (prefers-reduced-motion: no-preference) {
-  .faq-disclosure {
-    interpolate-size: allow-keywords;
+  /* PRIMARY (Chromium 129+, and any engine shipping interpolate-size):
+     animate the real `height` from 0 → auto. Interpolating `height` runs a much
+     cheaper per-frame path than the grid `grid-template-rows: 0fr→1fr` trick,
+     whose grid-sizing algorithm re-solves every frame and visibly stutters on
+     tall panels. `interpolate-size` inherits, so setting it on the <details>
+     unlocks keyword (auto) interpolation for ::details-content. */
+  @supports (interpolate-size: allow-keywords) {
+    .faq-disclosure {
+      interpolate-size: allow-keywords;
+    }
+
+    .faq-disclosure::details-content {
+      height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition:
+        height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        content-visibility 0.3s allow-discrete;
+    }
+
+    .faq-disclosure[open]::details-content {
+      height: auto;
+      opacity: 1;
+    }
   }
 
-  .faq-disclosure::details-content {
-    overflow: hidden;
-    block-size: 0;
-    opacity: 0;
-    transition:
-      block-size 0.2s ease,
-      opacity 0.2s ease,
-      content-visibility 0.2s ease allow-discrete;
-  }
+  /* FALLBACK (Firefox/Safari, older Chromium): the grid 0fr→1fr trick, which
+     interpolates without `interpolate-size`. The inner content clips via
+     min-h-0 + overflow-hidden (set on the component). content-visibility with
+     allow-discrete keeps the panel rendered while it collapses on close. */
+  @supports not (interpolate-size: allow-keywords) {
+    .faq-disclosure::details-content {
+      display: grid;
+      grid-template-rows: 0fr;
+      overflow: hidden;
+      opacity: 0;
+      transition:
+        grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+        content-visibility 0.3s allow-discrete;
+    }
 
-  .faq-disclosure[open]::details-content {
-    block-size: auto;
-    opacity: 1;
+    .faq-disclosure[open]::details-content {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
   }
 }
 

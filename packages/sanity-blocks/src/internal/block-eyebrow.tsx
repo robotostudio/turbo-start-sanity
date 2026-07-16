@@ -11,9 +11,9 @@ export function BlockEyebrow({
   }
 
   return (
-    <span className="inline-flex items-center gap-2 self-start rounded-md border border-border px-3 py-1.5">
+    <span className="inline-flex items-center gap-2 self-start rounded-sm border border-border px-3 py-1.5">
       <span className="size-2 shrink-0 rounded-[1px] bg-accent-green" />
-      <span className="font-mono text-muted-foreground text-sm uppercase leading-5 tracking-widest">
+      <span className="font-light font-mono text-muted-foreground text-sm uppercase leading-5 tracking-[0.28px]">
         {eyebrow}
       </span>
     </span>

@@ -20,9 +20,8 @@ export interface FeatureCardsIconProps {
 
 function FeatureCardItem({
   card,
-  highlighted,
   index,
-}: Readonly<{ card: FeatureCard; highlighted: boolean; index: number }>) {
+}: Readonly<{ card: FeatureCard; index: number }>) {
   const { icon, title, richText } = card;
   // On the lg 3-column grid: keep the top border on rows after the first so a
   // wrapped second row gets a horizontal divider, and skip the left border on
@@ -32,46 +31,41 @@ function FeatureCardItem({
   return (
     <div
       className={cn(
-        "flex flex-col justify-between gap-12 p-8 md:min-h-72 md:gap-16",
-        highlighted
-          ? "bg-accent-green text-accent-green-foreground"
-          : cn(
-              "border-border border-t bg-background text-foreground",
-              isFirstRow && "lg:border-t-0",
-              !isFirstColumn && "lg:border-l"
-            )
+        "group flex min-w-0 flex-col justify-between gap-12 border-border border-t bg-background p-8 text-foreground transition-colors hover:bg-accent-green hover:text-accent-green-foreground md:min-h-72 md:gap-16",
+        isFirstRow && "lg:border-t-0",
+        !isFirstColumn && "lg:border-l"
       )}
     >
-      {icon && (
-        <div
-          className={cn(
-            "flex items-center bg-grid-dots-md",
-            highlighted
-              ? "-mr-8 h-20 bg-left pl-[14px]"
-              : "size-20 justify-center bg-center"
-          )}
-        >
-          <span
-            className={cn(
-              "flex size-[52px] items-center justify-center",
-              highlighted ? "bg-accent-green" : "bg-background"
-            )}
-          >
-            <SanityIcon className="size-6" icon={icon} />
-          </span>
-        </div>
-      )}
-      <div className="flex flex-col gap-2">
+      {icon &&
+        (index === 0 ? (
+          // Bleeding-edge card: the icon chip sits INSIDE a dot band that rings
+          // it on the left/top/bottom (via `pl-2.5` + vertical centering) and
+          // continues across to the card's right edge (`-mr-8` cancels the
+          // card's right padding). The `bg-background` chip masks the dots
+          // directly behind it, leaving the surrounding ring visible.
+          <div className="-mr-8 flex h-12 items-center bg-grid-dots-fine bg-left pl-2.5 text-zinc-800 group-hover:text-accent-green-foreground dark:text-zinc-50 dark:group-hover:text-accent-green-foreground">
+            <span className="flex size-7 shrink-0 items-center justify-center bg-background transition-colors group-hover:bg-accent-green">
+              <SanityIcon className="size-6" icon={icon} />
+            </span>
+          </div>
+        ) : (
+          // Other cards: a ring of dots surrounding the centered icon chip.
+          // Dots are ALWAYS visible (currentColor); hover only swaps the color
+          // (card + chip go accent-green) — the dot layout never changes.
+          <div className="flex size-12 items-center justify-center bg-grid-dots-fine bg-center text-zinc-800 group-hover:text-accent-green-foreground dark:text-zinc-50 dark:group-hover:text-accent-green-foreground">
+            <span className="flex size-7 items-center justify-center bg-background transition-colors group-hover:bg-accent-green">
+              <SanityIcon className="size-6" icon={icon} />
+            </span>
+          </div>
+        ))}
+      <div className="flex min-w-0 flex-col gap-2">
         {title ? (
-          <h3 className="font-medium text-xl leading-8">{title}</h3>
+          <h3 className="text-balance break-words font-medium text-xl leading-8">
+            {title}
+          </h3>
         ) : null}
         <RichText
-          className={cn(
-            "text-pretty font-normal text-lg leading-7",
-            highlighted
-              ? "text-accent-green-foreground/80"
-              : "text-muted-foreground"
-          )}
+          className="break-words text-pretty font-normal text-lg text-muted-foreground leading-7 transition-colors group-hover:text-accent-green-foreground/80"
           richText={richText}
         />
       </div>
@@ -95,7 +89,7 @@ export function FeatureCardsWithIcon({
           <BlockEyebrow eyebrow={eyebrow} />
           <div className="flex flex-col items-start gap-5">
             {title ? (
-              <h2 className="max-w-2xl text-balance font-normal text-4xl text-foreground tracking-tight md:text-5xl">
+              <h2 className="max-w-2xl text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] md:text-5xl">
                 {title}
               </h2>
             ) : null}
@@ -106,12 +100,11 @@ export function FeatureCardsWithIcon({
           </div>
         </div>
       </div>
-      <div className="mt-12 bg-grid-dots-md p-[30px] md:mt-16 md:p-[45px]">
+      <div className="mt-12 bg-grid-dots-md p-[30px] text-zinc-800 md:mt-16 md:p-[45px] dark:text-zinc-50">
         <div className="grid lg:grid-cols-3">
           {cards?.map((card, index) => (
             <FeatureCardItem
               card={card}
-              highlighted={index === 0}
               index={index}
               key={card._key ?? `FeatureCard-${index}`}
             />

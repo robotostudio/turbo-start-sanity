@@ -59,8 +59,8 @@ function TestimonialPanel({
 }: Readonly<{ testimonial: NewsletterTestimonial }>) {
   const { eyebrow, quote, authorImage, authorName, authorRole } = testimonial;
   return (
-    <div className="bg-grid-dots-dense p-8">
-      <div className="flex h-full flex-col gap-12 border border-border bg-background p-8">
+    <div className="bg-grid-dots-dense p-[30px] text-zinc-800 [background-size:5px_5px] dark:text-zinc-50">
+      <div className="flex h-full flex-col gap-8 bg-background p-6">
         <BlockEyebrow eyebrow={eyebrow} />
         <div className="flex flex-col gap-8">
           <RichText
@@ -128,10 +128,10 @@ export function SubscribeNewsletter({
               "grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-stretch lg:gap-16"
           )}
         >
-          <div className="flex max-w-xl flex-col items-start gap-12 md:gap-16">
+          <div className="flex max-w-3xl flex-col items-start gap-12 md:gap-16">
             <div className="flex flex-col items-start gap-5">
               {title && (
-                <h2 className="max-w-md text-balance font-normal text-4xl text-foreground leading-[1.15] tracking-tight sm:text-5xl">
+                <h2 className="max-w-none text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] sm:text-5xl">
                   {title}
                 </h2>
               )}
