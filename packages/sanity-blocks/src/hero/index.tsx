@@ -23,10 +23,13 @@ export function HeroBlock({
   image,
   richText,
 }: Readonly<HeroBlockProps>) {
-  // Without a badge the text column is shorter, so give that space to the banner.
-  const imageHeight = badge
-    ? "h-[58vh] max-h-[540px] min-h-[180px]"
-    : "h-[62vh] max-h-[580px] min-h-[180px]";
+  // Full-bleed banner sized to the Figma "image container" (1460×533 at 1440px
+  // width): the tall 2014:1276 artwork aspect forces the height to clamp to the
+  // Figma banner height (534px, matching the intrinsic height below) on every
+  // desktop width, so the banner stays a stable fixed height regardless of the
+  // badge. On narrow viewports it scales down proportionally, floored by min-h
+  // so it never collapses. object-cover crops the artwork to fill.
+  const imageHeight = "aspect-[2014/1276] max-h-[500px] min-h-[180px]";
   return (
     <section
       className="relative overflow-hidden bg-background pb-10 md:pb-14"
@@ -35,7 +38,10 @@ export function HeroBlock({
       <div className="w-full overflow-hidden">
         {image?.id ? (
           <SanityImage
-            className={cn(imageHeight, "w-full rounded-none! object-cover")}
+            className={cn(
+              imageHeight,
+              "w-full rounded-none! object-cover object-center"
+            )}
             fetchPriority="high"
             height={534}
             image={image}
@@ -48,7 +54,7 @@ export function HeroBlock({
               <Image
                 alt=""
                 aria-hidden="true"
-                className="rounded-none! object-cover"
+                className="rounded-none! object-cover object-center"
                 fill
                 sizes="100vw"
                 src="/hero-fallback-light.png"
@@ -60,7 +66,7 @@ export function HeroBlock({
               <Image
                 alt=""
                 aria-hidden="true"
-                className="rounded-none! object-cover"
+                className="rounded-none! object-cover object-center"
                 fill
                 sizes="100vw"
                 src="/hero-fallback-dark.png"
@@ -78,11 +84,11 @@ export function HeroBlock({
                 {badge}
               </Badge>
             )}
-            <h1 className="max-w-4xl text-balance font-normal text-4xl text-foreground leading-[1.1] tracking-[-0.24px] sm:text-5xl lg:text-6xl">
+            <h1 className="max-w-[827px] break-words font-normal text-4xl text-foreground leading-[1.1] tracking-[-0.24px] sm:text-5xl lg:text-[64px]">
               {title}
             </h1>
             <RichText
-              className="max-w-xl text-base text-muted-foreground leading-6"
+              className="max-w-[633px] text-base text-muted-foreground leading-6"
               richText={richText}
             />
           </div>
