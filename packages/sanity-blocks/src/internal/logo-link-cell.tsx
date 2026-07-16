@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import type { SanityImageData } from "./sanity-image";
-import { SanityImage } from "./sanity-image";
+import { resolveAssetId, SanityImage } from "./sanity-image";
 
 export interface LogoLinkCellProps {
   image?: SanityImageData | null;
@@ -28,7 +28,9 @@ export function LogoLinkCell({
   height,
   width,
 }: Readonly<LogoLinkCellProps>) {
-  if (!image?.id) {
+  // Gate on the same validity SanityImage uses, so a malformed id renders
+  // nothing rather than an empty (unnamed) link wrapping a null image.
+  if (!(resolveAssetId(image) && image)) {
     return null;
   }
 

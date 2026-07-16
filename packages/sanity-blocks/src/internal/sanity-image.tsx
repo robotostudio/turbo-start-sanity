@@ -33,18 +33,25 @@ const ImageWrapper = <T extends ElementType = "img">(
 // A well-formed Sanity image asset id: `image-<assetId>-<width>x<height>-<format>`.
 const SANITY_ASSET_ID = /^image-[a-zA-Z0-9]+-\d+x\d+-\w+$/;
 
-export function SanityImage({ image, ...props }: SanityImageProps) {
+// Normalize a Sanity image ref to its canonical asset id, or null when it's
+// missing/malformed. Selecting an asset via the media library can prepend a
+// stray `drafts.` prefix (assets have no draft/published split); strip it and
+// reject anything that still isn't a full `image-…` ref so a malformed value
+// degrades to nothing instead of throwing "Could not parse image ID". Exported
+// so callers gate on the exact same validity as SanityImage.
+export function resolveAssetId(
+  image: SanityImageData | null | undefined
+): string | null {
   if (!image?.id || typeof image.id !== "string") {
     return null;
   }
-
-  // Selecting an existing asset via the media library can write the ref with a
-  // stray `drafts.` prefix (assets have no draft/published split), which the
-  // image library can't parse. Normalize it back to the real asset id, and bail
-  // out on anything that still isn't a valid `image-…` ref so a malformed value
-  // degrades to nothing instead of throwing "Could not parse image ID".
   const id = image.id.replace(/^drafts\./, "");
-  if (!SANITY_ASSET_ID.test(id)) {
+  return SANITY_ASSET_ID.test(id) ? id : null;
+}
+
+export function SanityImage({ image, ...props }: SanityImageProps) {
+  const id = resolveAssetId(image);
+  if (!(id && image)) {
     return null;
   }
 

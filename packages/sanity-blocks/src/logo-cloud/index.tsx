@@ -28,7 +28,7 @@ function Logo({ logo }: Readonly<{ logo: LogoCloudLogo }>) {
   );
 }
 
-export function LogoCloud({ logos }: Readonly<LogoCloudProps>) {
+export function LogoCloud({ logos, title }: Readonly<LogoCloudProps>) {
   if (!(Array.isArray(logos) && logos.length > 0)) {
     return null;
   }
@@ -39,6 +39,11 @@ export function LogoCloud({ logos }: Readonly<LogoCloudProps>) {
       className="overflow-hidden bg-accent-green py-4"
       id="logo-cloud"
     >
+      {title ? (
+        <p className="container mb-4 font-mono text-accent-green-foreground text-sm uppercase tracking-wide">
+          {title}
+        </p>
+      ) : null}
       {/* Duplicate track so the -50% marquee translate loops seamlessly. */}
       <div className="flex w-max animate-marquee items-center hover:[animation-play-state:paused] focus-within:[animation-play-state:paused] motion-reduce:animate-none">
         <div className="flex shrink-0 items-center gap-12 pr-12">
