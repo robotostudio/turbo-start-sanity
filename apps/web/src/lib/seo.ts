@@ -158,7 +158,7 @@ export async function getSEOMetadata(
     creator: siteConfig.title,
     authors: [{ name: siteConfig.title }],
     icons: {
-      icon: `${baseUrl}/favicon.ico`,
+      icon: `${baseUrl}/favicon.svg`,
     },
     keywords: allKeywords,
     robots: seoNoIndex ? "noindex, nofollow" : "index, follow",
