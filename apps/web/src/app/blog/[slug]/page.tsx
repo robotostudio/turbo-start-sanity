@@ -82,35 +82,28 @@ export async function generateMetadata({
   });
 }
 
-export default async function BlogSlugPage({
+export default function BlogSlugPage({
   params,
 }: {
   params: Promise<BlogParams>;
 }) {
-  const { isEnabled: isDraftMode } = await draftMode();
-  if (isDraftMode || previewForceDrafts) {
-    return (
-      <Suspense fallback={<BlogFallback />}>
-        <DynamicBlogPage params={params} />
-      </Suspense>
-    );
-  }
-  const { slug } = await params;
-  const data = await getCachedBlogPage({
-    slug,
-    perspective: "published",
-    stega: false,
-  });
-  if (!data) {
-    notFound();
-  }
-  return <BlogPageContent data={data} />;
+  // Non-async + Suspense-first so Next prerenders/prefetches a static shell and
+  // streams the content instead of blocking the navigation on the Sanity fetch.
+  return (
+    <Suspense fallback={<BlogFallback />}>
+      <BlogSlugInner params={params} />
+    </Suspense>
+  );
 }
 
-async function DynamicBlogPage({ params }: { params: Promise<BlogParams> }) {
+async function BlogSlugInner({ params }: { params: Promise<BlogParams> }) {
+  const { isEnabled: isDraftMode } = await draftMode();
+  const isDraft = isDraftMode || previewForceDrafts;
   const [{ slug }, { perspective, stega }] = await Promise.all([
     params,
-    getDynamicFetchOptions(),
+    isDraft
+      ? getDynamicFetchOptions()
+      : Promise.resolve({ perspective: "published" as const, stega: false }),
   ]);
   const data = await getCachedBlogPage({ slug, perspective, stega });
   if (!data) {

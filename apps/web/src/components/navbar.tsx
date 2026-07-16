@@ -18,7 +18,6 @@ import type { ColumnLink, NavigationData } from "@/types";
 import { GithubStars } from "./github-stars";
 import { Logo } from "./logo";
 import { MobileMenu } from "./mobile-menu";
-import { ModeToggle } from "./mode-toggle";
 
 const fetcher = async (url: string): Promise<NavigationData> => {
   const response = await fetch(url);
@@ -40,10 +39,17 @@ export function NavbarSkeleton() {
       <div className="container">
         <div className="flex h-16 items-center justify-between">
           <div className="flex h-10 flex-1 items-center">
-            <div className="h-10 w-40 animate-pulse rounded bg-muted/50" />
+            <div className="h-10 w-44 animate-pulse rounded bg-muted/50" />
           </div>
 
-          <div className="h-10 w-10 animate-pulse rounded bg-muted/50 lg:hidden" />
+          <div className="hidden flex-1 items-center justify-end gap-4 lg:flex">
+            <div className="h-9 w-20 animate-pulse rounded bg-muted/50" />
+            <div className="h-9 w-24 animate-pulse rounded bg-muted/50" />
+          </div>
+
+          <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
+            <div className="h-10 w-10 animate-pulse rounded bg-muted/50" />
+          </div>
         </div>
       </div>
     </header>
@@ -165,18 +171,16 @@ export function Navbar({
           </NavigationMenu>
 
           <div className="hidden flex-1 items-center justify-end gap-4 lg:flex">
-            <GithubStars className="mr-1" gitHubUrl={gitHubUrl} />
+            <GithubStars gitHubUrl={gitHubUrl} />
             <SanityButtons
               buttonClassName={NAV_BUTTON_CLASS}
               buttons={buttons || []}
               className="flex items-center gap-2"
               size="sm"
             />
-            <ModeToggle />
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
-            <ModeToggle />
             <MobileMenu navbarData={navbarData} settingsData={settingsData} />
           </div>
         </div>

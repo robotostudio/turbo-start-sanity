@@ -30,21 +30,24 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function Page() {
-  const { isEnabled: isDraftMode } = await draftMode();
-  if (isDraftMode || previewForceDrafts) {
-    return (
-      <Suspense fallback={<HomeFallback />}>
-        <DynamicHome />
-      </Suspense>
-    );
-  }
-  return <CachedHome perspective="published" stega={false} />;
+export default function Page() {
+  // Non-async + Suspense-first so Next prerenders/prefetches a static shell and
+  // streams the content. Reading draftMode() at the top would make the whole
+  // route dynamic, leaving nothing for <Link> to prefetch — the navigation jank.
+  return (
+    <Suspense fallback={<HomeFallback />}>
+      <HomeContent />
+    </Suspense>
+  );
 }
 
-async function DynamicHome() {
-  const { perspective, stega } = await getDynamicFetchOptions();
-  return <CachedHome perspective={perspective} stega={stega} />;
+async function HomeContent() {
+  const { isEnabled: isDraftMode } = await draftMode();
+  if (isDraftMode || previewForceDrafts) {
+    const { perspective, stega } = await getDynamicFetchOptions();
+    return <CachedHome perspective={perspective} stega={stega} />;
+  }
+  return <CachedHome perspective="published" stega={false} />;
 }
 
 async function CachedHome({ perspective, stega }: DynamicFetchOptions) {

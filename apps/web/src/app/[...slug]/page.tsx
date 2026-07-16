@@ -74,35 +74,24 @@ export async function generateMetadata({
   });
 }
 
-export default async function SlugPage({
-  params,
-}: {
-  params: Promise<SlugParams>;
-}) {
-  const { isEnabled: isDraftMode } = await draftMode();
-  if (isDraftMode || previewForceDrafts) {
-    return (
-      <Suspense fallback={<SlugFallback />}>
-        <DynamicSlugPage params={params} />
-      </Suspense>
-    );
-  }
-  const { slug } = await params;
-  const pageData = await getCachedSlugPage({
-    slug,
-    perspective: "published",
-    stega: false,
-  });
-  if (!pageData) {
-    notFound();
-  }
-  return <SlugPageContent pageData={pageData} />;
+export default function SlugPage({ params }: { params: Promise<SlugParams> }) {
+  // Non-async + Suspense-first so Next prerenders/prefetches a static shell and
+  // streams the content instead of blocking the navigation on the Sanity fetch.
+  return (
+    <Suspense fallback={<SlugFallback />}>
+      <SlugPageInner params={params} />
+    </Suspense>
+  );
 }
 
-async function DynamicSlugPage({ params }: { params: Promise<SlugParams> }) {
+async function SlugPageInner({ params }: { params: Promise<SlugParams> }) {
+  const { isEnabled: isDraftMode } = await draftMode();
+  const isDraft = isDraftMode || previewForceDrafts;
   const [{ slug }, { perspective, stega }] = await Promise.all([
     params,
-    getDynamicFetchOptions(),
+    isDraft
+      ? getDynamicFetchOptions()
+      : Promise.resolve({ perspective: "published" as const, stega: false }),
   ]);
   const pageData = await getCachedSlugPage({ slug, perspective, stega });
   if (!pageData) {
