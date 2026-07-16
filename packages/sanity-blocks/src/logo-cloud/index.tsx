@@ -49,6 +49,7 @@ export function LogoCloud({ logos }: Readonly<LogoCloudProps>) {
         <div
           aria-hidden="true"
           className="flex shrink-0 items-center gap-12 pr-12"
+          inert
         >
           {logos.map((logo) => (
             <Logo key={`dup-${logo._key}`} logo={logo} />

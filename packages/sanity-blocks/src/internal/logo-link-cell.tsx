@@ -42,7 +42,10 @@ export function LogoLinkCell({
     />
   );
 
-  if (href) {
+  // Only wrap in a link when the logo has alt text — the SanityImage's alt is
+  // the anchor's accessible name, so linking an alt-less image yields an unnamed
+  // link. Alt-less logos still render, just unlinked.
+  if (href && image.alt?.trim()) {
     return (
       <Link
         className={cellClassName}

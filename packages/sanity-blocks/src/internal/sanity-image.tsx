@@ -30,6 +30,9 @@ const ImageWrapper = <T extends ElementType = "img">(
   props: WrapperProps<T>
 ) => <BaseSanityImage baseUrl={SANITY_BASE_URL} {...props} />;
 
+// A well-formed Sanity image asset id: `image-<assetId>-<width>x<height>-<format>`.
+const SANITY_ASSET_ID = /^image-[a-zA-Z0-9]+-\d+x\d+-\w+$/;
+
 export function SanityImage({ image, ...props }: SanityImageProps) {
   if (!image?.id || typeof image.id !== "string") {
     return null;
@@ -41,7 +44,7 @@ export function SanityImage({ image, ...props }: SanityImageProps) {
   // out on anything that still isn't a valid `image-…` ref so a malformed value
   // degrades to nothing instead of throwing "Could not parse image ID".
   const id = image.id.replace(/^drafts\./, "");
-  if (!id.startsWith("image-")) {
+  if (!SANITY_ASSET_ID.test(id)) {
     return null;
   }
 
