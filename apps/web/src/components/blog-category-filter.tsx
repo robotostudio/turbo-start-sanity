@@ -25,7 +25,7 @@ export function BlogCategoryFilter({
           <Link
             aria-current={isActive ? "page" : undefined}
             className={cn(
-              "focus-ring inline-flex w-max items-center rounded-none px-1 py-px font-mono text-sm uppercase tracking-wide transition-colors focus-visible:rounded-md",
+              "focus-ring inline-flex w-max items-center rounded-none px-1 py-px font-mono text-sm uppercase tracking-wide transition-colors",
               isActive
                 ? "bg-accent-green text-accent-green-foreground"
                 : "text-muted-foreground hover:text-foreground"

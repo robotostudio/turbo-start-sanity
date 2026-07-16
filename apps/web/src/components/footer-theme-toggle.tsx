@@ -28,8 +28,8 @@ export function FooterThemeToggle() {
             aria-pressed={active}
             className={
               active
-                ? "focus-ring rounded-full bg-accent-green-foreground p-2 transition-colors"
-                : "focus-ring rounded-full p-2 transition-colors hover:bg-accent-green-foreground/10"
+                ? "focus-ring rounded-full bg-accent-green-foreground p-2 transition-colors focus-visible:outline-accent-green-foreground!"
+                : "focus-ring rounded-full p-2 transition-colors hover:bg-accent-green-foreground/10 focus-visible:outline-accent-green-foreground!"
             }
             key={value}
             onClick={() => setTheme(value)}

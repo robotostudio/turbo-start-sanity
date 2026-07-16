@@ -195,6 +195,13 @@
     outline: 2px solid var(--foreground);
     outline-offset: -3px;
   }
+
+  /* Card-level focus ring: shown when a descendant link is keyboard-focused,
+     so the whole card is indicated instead of just the inner title link. */
+  .focus-ring-within:has(a:focus-visible) {
+    outline: 1px solid var(--foreground);
+    outline-offset: 2px;
+  }
 }
 
 @layer base {
