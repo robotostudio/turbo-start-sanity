@@ -175,7 +175,7 @@ export function PageBuilder({
     // renderBlockComponent). A block that omits one renders edge-to-edge.
     // Renders a plain <div> (not <main>) so each caller owns the page's <main>
     // landmark — this avoids a nested main when a page wraps PageBuilder.
-    <div className="grid" data-sanity={containerDataAttribute}>
+    <div className="grid grid-cols-1" data-sanity={containerDataAttribute}>
       {blocks.map(renderBlock)}
     </div>
   );
