@@ -28,7 +28,6 @@ type ContentProps = Record<string, string>;
 
 type DominantColorSeoImageRenderProps = {
   title?: Maybe<string>;
-  description?: Maybe<string>;
   _type?: Maybe<string>;
   siteTitle?: Maybe<string>;
 };
@@ -41,7 +40,6 @@ const seoImageRender = ({ seoImage }: SeoImageRenderProps) => (
 
 const dominantColorSeoImageRender = ({
   title,
-  description,
   _type,
   siteTitle,
 }: DominantColorSeoImageRenderProps) => (
@@ -75,14 +73,6 @@ const dominantColorSeoImageRender = ({
       >
         {title ?? siteTitle ?? "Turbo Start Sanity"}
       </h1>
-      {description && (
-        <p
-          style={{ lineHeight: 1.3, color: "#A1A1A1" }}
-          tw="flex text-[32px] mt-8"
-        >
-          {description}
-        </p>
-      )}
     </div>
   </div>
 );

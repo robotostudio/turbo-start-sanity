@@ -205,11 +205,6 @@ const ogFieldsFragment = /* groq */ `
     defined(seoTitle) => seoTitle,
     title
   ),
-  "description": select(
-    defined(ogDescription) => ogDescription,
-    defined(seoDescription) => seoDescription,
-    description
-  ),
   "seoImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
   "siteTitle": *[_type == "settings"][0].siteTitle
 `;
