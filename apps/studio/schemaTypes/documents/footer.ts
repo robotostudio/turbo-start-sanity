@@ -139,7 +139,6 @@ export const footer = defineType({
       type: "string",
       title: "Copyright text",
       description: "Copyright line shown on the right of the bottom bar",
-      initialValue: "© 2025 Turbo Start",
     }),
     defineField({
       name: "credits",

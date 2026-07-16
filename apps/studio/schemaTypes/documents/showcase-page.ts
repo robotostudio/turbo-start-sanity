@@ -14,12 +14,14 @@ export const showcasePage = defineType({
     defineField({
       name: "headline",
       type: "string",
+      title: "Headline",
       description:
         "The large heading shown at the top of the showcase page (for example: 'Real sites. Real traffic. Same starting point as yours.').",
     }),
     defineField({
       name: "description",
       type: "text",
+      title: "Intro Text",
       rows: 3,
       description:
         "The short paragraph shown under the headline that explains what the showcase is about.",

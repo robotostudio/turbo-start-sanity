@@ -171,8 +171,11 @@ export const navbar = defineType({
             return true;
           }
           try {
-            const { hostname } = new URL(value);
-            if (hostname === "github.com" || hostname === "www.github.com") {
+            const { hostname, pathname } = new URL(value);
+            const isGitHubHost =
+              hostname === "github.com" || hostname === "www.github.com";
+            const segments = pathname.split("/").filter(Boolean);
+            if (isGitHubHost && segments.length >= 2) {
               return true;
             }
           } catch {
