@@ -31,6 +31,12 @@ export type DynamicFetchOptions = {
 export async function getDynamicFetchOptions(): Promise<DynamicFetchOptions> {
   const { isEnabled: isDraftMode } = await draftMode();
   if (!isDraftMode) {
+    // Preview deployments can opt into rendering drafts on the plain URL (no
+    // Presentation / draft-mode cookie) so the link can be shared for review.
+    // Guarded by a Preview-only env flag — never enable this in production.
+    if (env.SANITY_PREVIEW_FORCE_DRAFTS) {
+      return { perspective: "drafts", stega: false };
+    }
     return { perspective: "published", stega: false };
   }
 
