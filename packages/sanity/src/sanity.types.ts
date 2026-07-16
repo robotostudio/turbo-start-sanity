@@ -515,10 +515,7 @@ export type CustomUrl = {
   external?: string;
   href?: string;
   internal?:
-    | BlogReference
-    | BlogIndexReference
-    | PageReference
-    | ShowcasePageReference;
+    BlogReference | BlogIndexReference | PageReference | ShowcasePageReference;
 };
 
 export type Redirect = {
