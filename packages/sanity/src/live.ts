@@ -1,11 +1,11 @@
 import { env } from "@workspace/env/server";
+import { cookies, draftMode } from "next/headers";
 import type { QueryParams } from "next-sanity";
 import {
   defineLive,
   type LivePerspective,
   resolvePerspectiveFromCookies,
 } from "next-sanity/live";
-import { cookies, draftMode } from "next/headers";
 
 import { client } from "./client";
 
@@ -26,6 +26,14 @@ export type DynamicFetchOptions = {
   perspective: LivePerspective;
   stega: boolean;
 };
+
+/**
+ * When true, a preview deployment renders draft content on the plain URL (no
+ * draft-mode cookie). Pages and the layout use this to take the dynamic (draft)
+ * render path instead of the static published one; `getDynamicFetchOptions`
+ * then resolves the `drafts` perspective. Never enable in production.
+ */
+export const previewForceDrafts = env.SANITY_PREVIEW_FORCE_DRAFTS;
 
 /** Resolves perspective/stega outside any `'use cache'` boundary (reads draftMode/cookies). */
 export async function getDynamicFetchOptions(): Promise<DynamicFetchOptions> {

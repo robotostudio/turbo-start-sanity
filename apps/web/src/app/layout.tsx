@@ -3,6 +3,7 @@ import "@workspace/ui/globals.css";
 import {
   type DynamicFetchOptions,
   getDynamicFetchOptions,
+  previewForceDrafts,
   SanityLive,
 } from "@workspace/sanity/live";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -49,7 +50,7 @@ export default async function RootLayout({
       >
         <Providers>
           <ScrollToTop />
-          {isDraftMode ? (
+          {isDraftMode || previewForceDrafts ? (
             <Suspense fallback={<NavbarSkeleton />}>
               <DynamicNavbar />
             </Suspense>
@@ -57,7 +58,7 @@ export default async function RootLayout({
             <CachedNavbar perspective="published" stega={false} />
           )}
           {children}
-          {isDraftMode ? (
+          {isDraftMode || previewForceDrafts ? (
             <Suspense fallback={<FooterSkeleton />}>
               <DynamicFooter />
             </Suspense>

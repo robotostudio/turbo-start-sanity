@@ -2,6 +2,7 @@ import { Logger } from "@workspace/logger";
 import {
   type DynamicFetchOptions,
   getDynamicFetchOptions,
+  previewForceDrafts,
   sanityFetch,
   sanityFetchMetadata,
   sanityFetchStaticParams,
@@ -87,7 +88,7 @@ export default async function BlogSlugPage({
   params: Promise<BlogParams>;
 }) {
   const { isEnabled: isDraftMode } = await draftMode();
-  if (isDraftMode) {
+  if (isDraftMode || previewForceDrafts) {
     return (
       <Suspense fallback={<BlogFallback />}>
         <DynamicBlogPage params={params} />

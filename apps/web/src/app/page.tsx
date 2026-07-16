@@ -1,6 +1,7 @@
 import {
   type DynamicFetchOptions,
   getDynamicFetchOptions,
+  previewForceDrafts,
   sanityFetch,
   sanityFetchMetadata,
 } from "@workspace/sanity/live";
@@ -31,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
   const { isEnabled: isDraftMode } = await draftMode();
-  if (isDraftMode) {
+  if (isDraftMode || previewForceDrafts) {
     return (
       <Suspense fallback={<HomeFallback />}>
         <DynamicHome />
