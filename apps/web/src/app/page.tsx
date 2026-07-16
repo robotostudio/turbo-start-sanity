@@ -63,7 +63,9 @@ async function CachedHome({ perspective, stega }: DynamicFetchOptions) {
   return (
     <>
       <PageBuilderJsonLd pageBuilder={pageBuilder} />
-      <PageBuilder id={_id} pageBuilder={pageBuilder ?? []} type={_type} />
+      <main>
+        <PageBuilder id={_id} pageBuilder={pageBuilder ?? []} type={_type} />
+      </main>
     </>
   );
 }

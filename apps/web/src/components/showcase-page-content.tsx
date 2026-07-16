@@ -19,6 +19,7 @@ type LogoSource =
   | { kind: "initials"; initials: string; className: string };
 
 type CardView = {
+  id: string;
   name: string;
   attributionName: string;
   screenshot: ImageSource;
@@ -64,6 +65,7 @@ function cmsToView(item: ShowcaseItemData): CardView {
         className: "bg-foreground text-background",
       };
   return {
+    id: item._id,
     name: item.siteName ?? "Untitled",
     attributionName,
     screenshot: hasValidAssetId(item.screenshot)
@@ -137,6 +139,27 @@ function BuiltByRobotoBadge() {
   );
 }
 
+function ShowcaseBreadcrumb() {
+  return (
+    <nav aria-label="Breadcrumb">
+      <ol className="flex items-center gap-1.5 text-sm">
+        <li>
+          <Link
+            className="focus-ring text-muted-foreground transition-colors hover:text-foreground"
+            href="/"
+          >
+            Home
+          </Link>
+        </li>
+        <li aria-hidden="true" className="text-muted-foreground">
+          /
+        </li>
+        <li className="text-foreground">Showcase</li>
+      </ol>
+    </nav>
+  );
+}
+
 function ShowcaseCard({ item }: Readonly<{ item: CardView }>) {
   return (
     <article className="flex flex-col gap-2">
@@ -177,22 +200,7 @@ function ShowcaseHero({
   return (
     <section className="grid gap-12 lg:grid-cols-2 lg:items-stretch">
       <div className="flex flex-col justify-between gap-10">
-        <nav aria-label="Breadcrumb">
-          <ol className="flex items-center gap-1.5 text-sm">
-            <li>
-              <Link
-                className="focus-ring text-muted-foreground transition-colors hover:text-foreground"
-                href="/"
-              >
-                Home
-              </Link>
-            </li>
-            <li aria-hidden="true" className="text-muted-foreground">
-              /
-            </li>
-            <li className="text-foreground">Showcase</li>
-          </ol>
-        </nav>
+        <ShowcaseBreadcrumb />
         <div className="flex flex-col gap-6">
           <h1 className="text-balance font-normal text-4xl leading-tight tracking-tight sm:text-5xl">
             {headline}
@@ -244,22 +252,7 @@ export function ShowcasePageContent({
     return (
       <main className="container flex flex-col gap-24 py-16">
         <section className="flex flex-col gap-6">
-          <nav aria-label="Breadcrumb">
-            <ol className="flex items-center gap-1.5 text-sm">
-              <li>
-                <Link
-                  className="focus-ring text-muted-foreground transition-colors hover:text-foreground"
-                  href="/"
-                >
-                  Home
-                </Link>
-              </li>
-              <li aria-hidden="true" className="text-muted-foreground">
-                /
-              </li>
-              <li className="text-foreground">Showcase</li>
-            </ol>
-          </nav>
+          <ShowcaseBreadcrumb />
           <h1 className="text-balance font-normal text-4xl leading-tight tracking-tight sm:text-5xl">
             {headline}
           </h1>
@@ -282,8 +275,8 @@ export function ShowcasePageContent({
         headline={headline}
       />
       <section className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-        {cards.map((item, index) => (
-          <ShowcaseCard item={item} key={`${item.name}-${index}`} />
+        {cards.map((item) => (
+          <ShowcaseCard item={item} key={item.id} />
         ))}
       </section>
     </main>

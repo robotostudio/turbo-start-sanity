@@ -173,8 +173,10 @@ export function PageBuilder({
   return (
     // Full-bleed by design: each block owns its own `container` rail (see
     // renderBlockComponent). A block that omits one renders edge-to-edge.
-    <main className="flex flex-col" data-sanity={containerDataAttribute}>
+    // Renders a plain <div> (not <main>) so each caller owns the page's <main>
+    // landmark — this avoids a nested main when a page wraps PageBuilder.
+    <div className="flex flex-col" data-sanity={containerDataAttribute}>
       {blocks.map(renderBlock)}
-    </main>
+    </div>
   );
 }

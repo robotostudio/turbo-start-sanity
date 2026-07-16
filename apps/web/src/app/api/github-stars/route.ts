@@ -4,6 +4,9 @@ import { NextResponse } from "next/server";
 // Cache the star count for 1 hour to avoid hitting GitHub API rate limits.
 const REVALIDATE_SECONDS = 3600;
 
+// Abort a slow GitHub request so the route can't hang on an unresponsive API.
+const REQUEST_TIMEOUT_MS = 5000;
+
 // Only allow "owner/repo" slugs so we never fetch an arbitrary URL (SSRF guard).
 const REPO_PATTERN = /^[\w.-]+\/[\w.-]+$/;
 
@@ -22,6 +25,7 @@ export async function GET(request: Request) {
         Accept: "application/vnd.github+json",
       },
       next: { revalidate: REVALIDATE_SECONDS },
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
 
     if (!response.ok) {

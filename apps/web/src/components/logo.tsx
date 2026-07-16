@@ -30,7 +30,19 @@ export function Logo({
   priority = true,
 }: LogoProps) {
   if (!image?.id) {
-    return null;
+    // No logo configured: keep the homepage link and site identity via a text
+    // fallback rather than rendering nothing.
+    return (
+      <Link
+        className={cn(
+          "inline-block rounded-md font-semibold text-lg focus-ring",
+          linkClassName
+        )}
+        href="/"
+      >
+        {alt ?? "Home"}
+      </Link>
+    );
   }
 
   const loading = priority ? "eager" : "lazy";
@@ -40,7 +52,7 @@ export function Logo({
       className={cn("inline-block rounded-md focus-ring", linkClassName)}
       href="/"
     >
-      {imageDark ? (
+      {imageDark?.id ? (
         <>
           <SanityImage
             className={cn("h-auto w-44 dark:hidden", className)}

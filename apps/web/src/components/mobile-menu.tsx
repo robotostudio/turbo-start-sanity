@@ -102,7 +102,7 @@ export function MobileMenu({
                 </DrawerTitle>
                 <div className="[&_img]:h-6 [&_img]:w-auto [&_img]:rounded-none">
                   <Logo
-                    alt="Turbo Start Sanity"
+                    alt={siteTitle ?? "Turbo Start Sanity"}
                     image={logos?.logo}
                     imageDark={logos?.logoDark}
                   />

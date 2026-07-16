@@ -18,7 +18,7 @@ function BlogImage({ image, title, className }: Readonly<BlogImageProps>) {
 
   return (
     <SanityImage
-      alt={title ?? "Blog post image"}
+      alt={title ?? "Blog post"}
       className={cn(
         "absolute inset-0 size-full rounded-none object-cover",
         className
@@ -135,14 +135,14 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
     blog ?? {};
 
   return (
-    <article className="group relative grid grid-cols-1 border border-border lg:grid-cols-2">
+    <article className="group focus-ring-within relative grid grid-cols-1 border border-border lg:grid-cols-2">
       <div className="flex flex-col justify-between gap-10 p-6 sm:p-8">
         <FeaturedBadge />
-        <div className="flex flex-col gap-4">
+        <div className="grid gap-4">
           <BlogMeta category={category} publishedAt={publishedAt} />
           <h2 className="text-balance font-normal text-3xl leading-tight tracking-tight sm:text-4xl">
             <Link
-              className="focus-ring transition-colors group-hover:text-muted-foreground"
+              className="outline-none transition-colors group-hover:text-muted-foreground"
               href={slug ?? "#"}
             >
               <span className="absolute inset-0" />
@@ -157,7 +157,7 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
           <BlogAuthor author={authors} />
         </div>
       </div>
-      <div className="relative order-first min-h-[240px] overflow-hidden border-border border-b lg:order-last lg:min-h-full lg:border-b-0 lg:border-l">
+      <div className="relative order-first min-h-[240px] overflow-hidden border-border border-b lg:order-last lg:min-h-full lg:border-b-0 lg:border-s">
         <BlogImage image={image} title={title} />
       </div>
     </article>
@@ -179,12 +179,12 @@ export function BlogCard({ blog }: BlogCardProps) {
   const { title, publishedAt, slug, description, authors, category } = blog;
 
   return (
-    <article className="group relative flex h-full flex-col gap-4 border border-border p-6 transition-colors hover:border-muted-foreground/40">
+    <article className="group focus-ring-within relative flex h-full flex-col gap-4 border border-border p-6 transition-colors hover:border-muted-foreground/40">
       <BlogMeta category={category} publishedAt={publishedAt} />
-      <div className="flex flex-1 flex-col gap-3">
+      <div className="grid flex-1 gap-3">
         <h3 className="font-normal text-2xl leading-8">
           <Link
-            className="focus-ring transition-colors group-hover:text-muted-foreground"
+            className="outline-none transition-colors group-hover:text-muted-foreground"
             href={slug ?? "#"}
           >
             <span className="absolute inset-0" />
@@ -210,7 +210,7 @@ export function BlogHeader({
   description: string | null;
 }) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="grid gap-6">
       <nav aria-label="Breadcrumb">
         <ol className="flex items-center gap-1.5 text-sm">
           <li>

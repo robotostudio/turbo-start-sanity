@@ -105,7 +105,9 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
     searchParams,
     getDynamicFetchOptions(),
   ]);
-  const currentPage = page ? Number(page) : 1;
+  const parsedPage = Number(page);
+  const currentPage =
+    Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const activeCategory = category ?? "";
 
   const [[indexPageData, errIndexPageData], [totalCount, errTotalCount]] =

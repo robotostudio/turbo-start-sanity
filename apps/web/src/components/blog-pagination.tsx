@@ -11,6 +11,8 @@ export type PaginationProps = {
 
 interface BlogPaginationProps extends PaginationProps {
   className?: string;
+  // Active category filter, preserved across page navigation when set.
+  category?: string;
 }
 
 type PaginationItem = number | "ellipsis-start" | "ellipsis-end";
@@ -63,14 +65,20 @@ export function BlogPagination({
   hasPreviousPage,
   basePath = "/blog",
   className,
+  category,
 }: BlogPaginationProps) {
   const paginationItems = generatePaginationItems(currentPage, totalPages);
 
   const getPageUrl = (page: number): string => {
-    if (page === 1) {
-      return basePath;
+    const params = new URLSearchParams();
+    if (category) {
+      params.set("category", category);
     }
-    return `${basePath}?page=${page}`;
+    if (page > 1) {
+      params.set("page", String(page));
+    }
+    const query = params.toString();
+    return query ? `${basePath}?${query}` : basePath;
   };
 
   return (
@@ -83,7 +91,7 @@ export function BlogPagination({
           aria-label={`Go to page ${currentPage - 1}`}
           className={cn(
             navLabelBase,
-            "focus-ring rounded-none text-zinc-500 hover:text-foreground focus-visible:rounded-sm"
+            "focus-ring rounded-none text-zinc-500 hover:text-foreground"
           )}
           href={getPageUrl(currentPage - 1)}
         >
@@ -119,7 +127,7 @@ export function BlogPagination({
         return (
           <Link
             aria-label={`Go to page ${item}`}
-            className="focus-ring rounded-none px-0.5 text-sm font-light text-zinc-500 leading-5 transition-colors hover:text-foreground focus-visible:rounded-sm"
+            className="focus-ring rounded-none px-0.5 text-sm font-light text-zinc-500 leading-5 transition-colors hover:text-foreground"
             href={getPageUrl(item)}
             key={item}
           >
@@ -133,7 +141,7 @@ export function BlogPagination({
           aria-label={`Go to page ${currentPage + 1}`}
           className={cn(
             navLabelBase,
-            "focus-ring rounded-none text-zinc-500 hover:text-foreground focus-visible:rounded-sm"
+            "focus-ring rounded-none text-zinc-500 hover:text-foreground"
           )}
           href={getPageUrl(currentPage + 1)}
         >

@@ -10,7 +10,7 @@ import {
   Twitter,
 } from "lucide-react";
 import Link from "next/link";
-import { type FC, useEffect, useState } from "react";
+import { type FC, useEffect, useRef, useState } from "react";
 import slugify from "slugify";
 
 import type { SanityRichTextBlock, SanityRichTextProps } from "@/types";
@@ -497,10 +497,20 @@ const SHARE_TARGETS: readonly ShareTarget[] = [
 function ShareOptions({ title }: Readonly<{ title?: string }>) {
   const [url, setUrl] = useState("");
   const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setUrl(window.location.href);
   }, []);
+
+  useEffect(
+    () => () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    },
+    []
+  );
 
   const encodedUrl = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title ?? "");
@@ -509,7 +519,10 @@ function ShareOptions({ title }: Readonly<{ title?: string }>) {
     try {
       await navigator.clipboard.writeText(url || window.location.href);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => setCopied(false), 2000);
     } catch {
       // Clipboard access can be denied; reset so the UI reflects the failure.
       setCopied(false);

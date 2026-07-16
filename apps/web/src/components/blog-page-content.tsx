@@ -38,7 +38,8 @@ export function BlogPageContent({
     useBlogSearch();
 
   const searchParams = useSearchParams();
-  const hasCategory = (searchParams.get("category") ?? "").length > 0;
+  const activeCategory = searchParams.get("category") ?? "";
+  const hasCategory = activeCategory.length > 0;
 
   // The featured card is a single, page-1-only element: post[0] renders as the
   // full-width card and the rest fill the grid list.
@@ -96,6 +97,7 @@ export function BlogPageContent({
                 <BlogList blogs={remainingBlogs} />
                 {paginationMetadata?.totalPages > 1 && (
                   <BlogPagination
+                    category={activeCategory}
                     className="mt-12"
                     currentPage={paginationMetadata.currentPage}
                     hasNextPage={paginationMetadata.hasNextPage}

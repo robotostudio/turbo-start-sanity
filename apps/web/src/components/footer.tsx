@@ -220,7 +220,7 @@ export function FooterSkeleton() {
             ))}
           </div>
         </div>
-        <div className="container mt-12 flex flex-col justify-between gap-4 pt-8 pb-6 text-center lg:flex-row lg:items-center lg:text-left">
+        <div className="container mt-12 flex flex-col justify-between gap-4 pt-8 pb-6 text-center lg:flex-row lg:items-center lg:text-start">
           <div className="h-4 w-48 animate-pulse rounded bg-accent-green-foreground/10" />
           <div className="flex justify-center gap-4 lg:justify-start">
             <div className="h-4 w-32 animate-pulse rounded bg-accent-green-foreground/10" />
@@ -243,7 +243,7 @@ function Footer({ data, settingsData }: FooterProps) {
     <>
       <FooterTopBar />
       <footer className="border-t border-accent-green-foreground/10 bg-accent-green text-accent-green-foreground">
-        <div className="container flex flex-col items-start gap-10 pt-12 text-left lg:flex-row lg:items-start lg:justify-between lg:text-left">
+        <div className="container flex flex-col items-start gap-10 pt-12 text-start lg:flex-row lg:items-start lg:justify-between">
           <div className="flex w-full max-w-96 shrink flex-col items-start gap-6 lg:items-start">
             <div className="flex flex-col items-start gap-4 lg:items-start">
               <span className="flex items-center gap-2">
@@ -298,7 +298,7 @@ function Footer({ data, settingsData }: FooterProps) {
           )}
         </div>
         <div className="container relative z-10 mt-12 pt-8 pb-6">
-          <div className="flex flex-col items-start justify-between gap-6 text-left lg:flex-row lg:items-center lg:gap-4">
+          <div className="flex flex-col items-start justify-between gap-6 text-start lg:flex-row lg:items-center lg:gap-4">
             <p className="text-accent-green-foreground/80 text-sm tracking-[0.24px]">
               {copyright ?? `© ${year} ${siteTitle}. All rights reserved.`}
             </p>

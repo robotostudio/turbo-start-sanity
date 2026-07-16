@@ -148,7 +148,9 @@ function SlugPageContent({
   return (
     <>
       <PageBuilderJsonLd pageBuilder={pageBuilder} />
-      <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
+      <main>
+        <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
+      </main>
     </>
   );
 }

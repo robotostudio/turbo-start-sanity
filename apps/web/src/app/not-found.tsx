@@ -6,7 +6,7 @@ const ACTION_CLASS = "font-mono font-normal text-sm uppercase tracking-wide";
 export default function NotFound() {
   return (
     <main className="container flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center py-24">
-      <div className="flex max-w-xl flex-col items-center gap-8 text-center">
+      <div className="grid max-w-xl justify-items-center gap-8 text-center">
         <div className="inline-flex items-center gap-2 border border-border px-3 py-1.5">
           <span className="size-2 rounded-[1px] bg-accent-green" />
           <span className="font-light font-mono text-foreground text-sm uppercase tracking-wide">
