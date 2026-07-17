@@ -42,7 +42,7 @@ function UsedByTeamsLogo({ logo }: Readonly<{ logo: CtaUsedByTeamsLogo }>) {
   });
   return (
     <LogoLinkCell
-      cellClassName="flex items-center justify-center bg-background px-2 py-3 lg:w-[165px]"
+      cellClassName="flex items-center justify-center bg-background px-2 py-4 lg:w-[165px]"
       height={24}
       href={logo.href}
       image={logo.image}
