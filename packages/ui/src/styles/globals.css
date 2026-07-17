@@ -45,6 +45,10 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Ink strength for the dot lattice — bg-grid-dots mixes currentColor at this
+     alpha. Kept as a var so a theme can knock the dots back if needed. */
+  --dot-alpha: 80%;
 }
 
 .dark {
@@ -81,6 +85,7 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+  --dot-alpha: 80%;
 }
 
 @theme inline {
@@ -129,15 +134,28 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Overrides Tailwind's built-in `container`; wins by source order. */
+/* Overrides Tailwind's built-in `container`; wins by source order.
+ * Content inset: 16px below lg, 2px on desktop. */
 @utility container {
-  @apply mx-auto w-full max-w-[90rem] px-4 md:px-6;
+  @apply mx-auto w-full max-w-[90rem] px-4 lg:px-[2px];
 }
 
 /* Shared card hover surface — a subtle zinc tint on hover. Apply to any card
  * (blog, showcase, faq, etc.) so the hover style lives in ONE place. */
 @utility hover-surface {
   @apply transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900;
+}
+
+/* Shared body/paragraph typography — 18px with comfortable leading and nice
+ * wrapping. Apply to lead/description paragraphs; text color stays per-context. */
+@utility body-text {
+  @apply text-pretty font-normal text-lg leading-7;
+}
+
+/* Shared section heading — the h2 style every page-builder block uses.
+ * Width/color overrides stay per-caller. */
+@utility block-title {
+  @apply text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] md:text-5xl;
 }
 
 /* Tailwind v4 (Preflight) resets interactive elements to `cursor: default`.
@@ -152,76 +170,33 @@
   }
 }
 
-/* Crisp dot lattices. Each dot is a `circle at center` with a hard color stop
- * (`<color> 0 Rpx`) followed by a 0.5px feather to `transparent` — just enough
- * to soften the edge without the fuzzy halo of a wide gradient ramp.
- * `background-repeat: round` scales each tile so a whole number fits the box on
- * both axes, so the lattice never clips a dot in half at the edges (the box
- * edges always land in the gaps between dots) — and equal-width grid cells stay
- * phase-aligned at their seams. currentColor keeps the dots tinting per
- * context (e.g. inverting on the green highlighted feature card). */
-@utility bg-grid-dots-dense {
-  /* Matched to the Figma social-card dot pattern (node 2273:302): a single
-     5.2px square lattice of ~1.2px dots (SVG dots at 2, 7.2, 12.4, 17.6, 22.8
-     within a 26-unit tile → 5×5 per tile). currentColor keeps the dots tinting
-     per context; `round` avoids half-cut dots at the box edges. */
+/* Canonical dot lattice — the SINGLE dotted-surface utility for the whole app.
+ *
+ * SPEC: a 5.2px tile whose dot is a
+ * `circle at center` of 1.2px diameter (0.6px radius) with a 0.4px feather to
+ * `transparent` at 1px. currentColor keeps the dots tinting per context
+ * (light/dark, or inverting on the green highlighted feature card);
+ * `--dot-alpha` sets ink strength.
+ *
+ * FIXED 5.2px PITCH: the dot grid is always a 5.2px lattice.
+ * `background-repeat: round` scales each tile so
+ * a WHOLE number of dots fits the box on both axes, so the box edges always
+ * land in the gaps between dots (no half-cut dots) and equal-width grid cells
+ * stay phase-aligned at their seams.
+ *
+ * CONTROL LAYERS VIA PADDING: because the pitch is fixed, the number of dot
+ * "layers" (rows) that frame a component's content = its padding ÷ 5.2px.
+ * Control density purely through padding — do NOT resize the tile. */
+@utility bg-grid-dots {
   background-image: radial-gradient(
     circle at center,
-    color-mix(in oklch, currentColor 70%, transparent) 0 0.9px,
-    transparent 1.3px
+    color-mix(in oklch, currentColor var(--dot-alpha), transparent) 0 0.6px,
+    transparent 1px
   );
   background-size: 5.2px 5.2px;
   background-repeat: round;
 }
 
-@utility bg-grid-dots-stipple {
-  /* Matched to the Figma "Footer nitro icon" dot pattern (node 2193:2411):
-     ~2.6px spacing with ~0.6px dots (SVG pattern 5.2/1.2 units at 0.5 scale).
-     Fills the footer top-bar triangle at 6 rows over its 16px height. */
-  background-image: radial-gradient(
-    circle at center,
-    color-mix(in oklch, currentColor 85%, transparent) 0 0.22px,
-    transparent 0.47px
-  );
-  background-size: 2.6px 2.6px;
-  background-repeat: round;
-}
-
-@utility bg-grid-dots-md {
-  /* Dense square dot lattice for the feature-card "Icon Background" (Figma node
-     2156:2016). A ~5.2px tile fills the 48px icon box with ~9–10 rows of small
-     dots (48 / 5.2 ≈ 9.2), reading as a densely-dotted field rather than a
-     sparse grid. Dots are kept fine (small hard-stop radius) so the field stays
-     crisp and airy; currentColor tints per context (light/dark + green card);
-     `background-repeat: round` fits whole tiles on both axes so the box edges
-     land in the gaps and no dot is clipped. */
-  background-image: radial-gradient(
-    circle at center,
-    color-mix(in oklch, currentColor 65%, transparent) 0 0.75px,
-    transparent 1.15px
-  );
-  background-size: 5.4px 5.4px;
-  background-repeat: round;
-}
-
-@utility bg-grid-dots-fine {
-  /* Fine dot lattice — matches Figma SVG nodes 2156:2032 (feature-card icon box)
-     and 2273:311 (social cards) exactly: 1.2px dots (0.6px radius) on a 5.2px
-     grid (a 26px tile of 5×5 dots). Kept as its own utility so the fine dot size
-     stays independent of the outer panel (bg-grid-dots-md, whose dots are a
-     touch larger). `background-repeat: round` fits whole tiles so no dot is
-     clipped at the box edges; currentColor tints per context (light/dark +
-     green hover card). */
-  background-image: radial-gradient(
-    circle at center,
-    currentColor 0 0.6px,
-    transparent 0.75px
-  );
-  background-size: 5.2px 5.2px;
-  background-repeat: round;
-}
-
-/* Translate a duplicated track by half its width for a seamless loop. */
 @keyframes marquee {
   from {
     transform: translateX(0);
@@ -281,7 +256,6 @@
     );
     background-attachment: fixed;
   }
-  /* Brand-tinted text selection, consistent across the site. */
   ::selection {
     background-color: var(--accent-green);
     color: var(--accent-green-foreground);
@@ -309,17 +283,12 @@
   }
 }
 
-/* Scroll-driven page background. The page/overscroll background transitions
-   from the first section's color (page --background) at the top of the document
-   to the footer's --accent-green at the bottom, driven by a scroll-progress
-   timeline (scroll(root block)) — the "one @Jono was talking about". The opaque
-   body covers this everywhere except the browser's overscroll ("rubber-band")
-   gutters, so pulling past the top reveals the page color and pulling past the
-   bottom reveals the green footer, with a smooth transition while scrolling.
-   Uses CSS vars so it works in both light and dark themes. Guarded by @supports
-   and prefers-reduced-motion; where unsupported (or reduced motion), the fixed
-   split-gradient defined on `html` in @layer base remains as the fallback.
-   Unlayered so it wins over the layered base rule via the cascade. */
+/* Scroll-driven page background: transitions from --background at the top of
+   the document to the footer's --accent-green at the bottom via a scroll
+   timeline. The opaque body covers this except in the overscroll gutters, so
+   pulling past either end reveals the correct color. Guarded by @supports and
+   prefers-reduced-motion; where unsupported the fixed split-gradient on `html`
+   in @layer base is the fallback. Unlayered so it wins via the cascade. */
 @keyframes page-bg-scroll {
   from {
     background-color: var(--background);
