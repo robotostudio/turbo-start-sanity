@@ -69,13 +69,16 @@ function BlogDate({
   );
 }
 
-function BlogAuthor({ author }: Readonly<{ author: Blog["authors"] }>) {
+function BlogAuthor({
+  author,
+  className,
+}: Readonly<{ author: Blog["authors"]; className?: string }>) {
   if (!author?.name) {
     return null;
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={cn("flex items-center gap-2", className)}>
       {author.image?.id ? (
         <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted">
           <SanityImage
@@ -168,34 +171,41 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
 export function BlogCard({ blog }: BlogCardProps) {
   if (!blog) {
     return (
-      <article className="flex h-full flex-col gap-4 border border-border p-6">
+      <article className="row-span-4 grid grid-rows-subgrid border border-border p-6">
         <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-        <div className="mt-2 h-6 w-full animate-pulse rounded bg-muted" />
-        <div className="h-6 w-2/3 animate-pulse rounded bg-muted" />
-        <div className="mt-auto h-6 w-28 animate-pulse rounded bg-muted" />
+        <div className="grid content-start gap-2">
+          <div className="h-6 w-full animate-pulse rounded bg-muted" />
+          <div className="h-6 w-2/3 animate-pulse rounded bg-muted" />
+        </div>
+        <div />
+        <div className="h-6 w-28 animate-pulse self-end rounded bg-muted" />
       </article>
     );
   }
 
   const { title, publishedAt, slug, description, authors, category } = blog;
 
+  // Subgrid: the card's four sections (meta, title, description, author)
+  // occupy row tracks shared with sibling cards, so each section lines up
+  // across every card in the same listing row.
   return (
-    <article className="hover-surface group focus-ring-within relative flex h-full flex-col gap-4 border border-border p-6">
+    <article className="hover-surface group focus-ring-within relative row-span-4 grid grid-rows-subgrid border border-border p-6">
       <BlogMeta category={category} publishedAt={publishedAt} />
-      <div className="grid flex-1 content-start gap-3">
-        <h3 className="font-normal text-2xl text-zinc-900 leading-[34px] dark:text-zinc-50">
-          <Link className="outline-none" href={slug ?? "#"}>
-            <span className="absolute inset-0 z-10" />
-            {title}
-          </Link>
-        </h3>
-        {description ? (
-          <p className="body-text line-clamp-3 self-start text-muted-foreground">
-            {description}
-          </p>
-        ) : null}
-      </div>
-      <BlogAuthor author={authors} />
+      <h3 className="font-normal text-2xl text-zinc-900 leading-[34px] dark:text-zinc-50">
+        <Link className="outline-none" href={slug ?? "#"}>
+          <span className="absolute inset-0 z-10" />
+          {title}
+        </Link>
+      </h3>
+      {description ? (
+        <p className="body-text line-clamp-3 self-start text-muted-foreground">
+          {description}
+        </p>
+      ) : (
+        // Placeholder keeps the author in the shared fourth track.
+        <div />
+      )}
+      <BlogAuthor author={authors} className="self-end" />
     </article>
   );
 }
