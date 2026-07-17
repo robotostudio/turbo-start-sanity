@@ -157,7 +157,7 @@ function BlogPageContent({
   return (
     <main className="bg-background">
       <ArticleJsonLd article={data} />
-      <div className="container flex flex-col gap-16 pt-12 pb-20 md:gap-24 md:pt-16">
+      <div className="container flex flex-col gap-16 pt-12 pb-24 md:gap-24 md:pt-16">
         <div className="flex flex-col gap-6">
           <nav aria-label="Breadcrumb" className="text-sm tracking-[0.01em]">
             <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-muted-foreground">
@@ -173,12 +173,12 @@ function BlogPageContent({
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
-              <li className="line-clamp-1 text-foreground/90">{title}</li>
+              <li className="line-clamp-1 text-foreground">{title}</li>
             </ol>
           </nav>
 
           <header className="flex flex-col gap-6">
-            <h1 className="max-w-[52rem] text-balance font-normal text-4xl tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.1]">
+            <h1 className="text-balance font-normal text-4xl tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.1]">
               {title}
             </h1>
 
@@ -220,10 +220,10 @@ function BlogPageContent({
           </header>
         </div>
 
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-20">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-32">
           <article className="min-w-0">
             <RichText
-              className="prose-lg"
+              className="prose-lg prose-p:my-0 prose-p:leading-7 prose-p:tracking-[0.013em] prose-li:leading-7 [&>p+p]:mt-8 [&_blockquote]:border-none [&_blockquote]:bg-grid-dots [&_blockquote]:p-4 [&_blockquote]:font-normal [&_blockquote]:not-italic [&_blockquote]:text-zinc-800 dark:[&_blockquote]:text-zinc-50 [&_blockquote_p]:my-0 [&_blockquote_p]:bg-background [&_blockquote_p]:p-8 [&_blockquote_p]:text-lg [&_blockquote_p]:text-muted-foreground [&_blockquote_p]:leading-7 [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none [&_blockquote_strong]:font-normal [&_blockquote_strong]:text-foreground"
               richText={richText as RichTextValue}
             />
           </article>

@@ -353,9 +353,6 @@ function useTableOfContentState(
   }
 }
 
-// Highlights the heading currently in view, matching the active "On this page"
-// state in the design. Depends on a stable string key so the observer is only
-// rebuilt when the set of headings changes.
 function useActiveHeading(slugKey: string): string | null {
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
 
@@ -411,7 +408,6 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
 }) => {
   const { href, text, children, id } = heading;
 
-  // Don't render if we're at max depth and this is a child
   if (currentDepth > maxDepth) {
     return null;
   }
@@ -508,8 +504,6 @@ const SHARE_TARGETS: readonly ShareTarget[] = [
     network: "Instagram",
     label: "Post",
     icon: InstagramIcon,
-    // Instagram has no share-URL endpoint; the Web Share sheet lets the user
-    // pick Instagram, falling back to opening instagram.com.
     url: () => "https://www.instagram.com/",
     webShare: true,
   },
@@ -576,7 +570,7 @@ function ShareOptions({ title }: Readonly<{ title?: string }>) {
   };
 
   return (
-    <div className="flex items-center justify-between border-border border-t px-1 pt-4">
+    <div className="flex items-center justify-between border-t border-zinc-900 px-1 pt-4 dark:border-zinc-50">
       {SHARE_TARGETS.map((target) => {
         const shareClass =
           "focus-ring flex flex-col items-center justify-center gap-1 rounded-sm text-muted-foreground transition-colors hover:text-foreground";
@@ -671,7 +665,7 @@ export const TableOfContent: FC<TableOfContentProps> = ({
   return (
     <div
       className={cn(
-        "bg-grid-dots-dense p-6 text-muted-foreground [background-size:5.6px_5.6px]",
+        "bg-grid-dots p-6 text-zinc-800 dark:text-zinc-50",
         className
       )}
     >
