@@ -4,7 +4,6 @@ type NormalizeOptions = {
   max: number;
 };
 
-
 function aspectRatioFromId(
   image: { id?: string | null } | null | undefined
 ): number | null {
@@ -23,7 +22,6 @@ function aspectRatioFromId(
   }
   return width / height;
 }
-
 
 export function normalizedLogoHeight(
   image: { id?: string | null } | null | undefined,
