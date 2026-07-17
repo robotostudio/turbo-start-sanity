@@ -93,7 +93,7 @@ export function CTABlock({
                   {usedByTeams.title}
                 </p>
               )}
-              <div className="grid w-full grid-cols-3 gap-[15.6px] bg-grid-dots p-[15.6px] text-zinc-800 lg:w-auto dark:text-zinc-50">
+              <div className="grid w-full grid-cols-3 gap-[15.6px] bg-grid-dots [background-size:5.3px_5.2px] p-[15.6px] text-zinc-800 lg:w-auto dark:text-zinc-50">
                 {logos.map((logo) => (
                   <UsedByTeamsLogo key={logo._key} logo={logo} />
                 ))}
