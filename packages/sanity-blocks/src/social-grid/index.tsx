@@ -79,14 +79,14 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
   const Icon = platform ? PLATFORM_ICONS[platform] : undefined;
   const displayLabel = label ?? platform ?? "";
 
-  const iconMedia = Icon ? <Icon className="size-[50px]" /> : null;
+  const iconMedia = Icon ? <Icon className="h-[42px] w-auto" /> : null;
   const media = logo?.id ? (
-    <span className="flex size-[50px] shrink-0 items-center justify-center overflow-hidden">
+    <span className="flex h-[42px] shrink-0 items-center justify-center">
       <SanityImage
-        className="h-full w-full object-contain dark:invert"
-        height={50}
+        className="h-[42px] w-auto max-w-full object-contain opacity-90"
+        height={42}
         image={logo}
-        width={50}
+        width={47}
       />
     </span>
   ) : (
@@ -94,9 +94,9 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
   );
 
   const card = (
-    <div className="group relative min-h-[248px] overflow-hidden text-foreground transition-colors hover:bg-accent-green">
+    <div className="group relative min-h-[220px] overflow-hidden text-foreground transition-colors hover:bg-accent-green sm:min-h-0 sm:aspect-[360/248]">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <span className="relative flex size-[100px] items-center justify-center bg-background text-foreground">
+        <span className="relative flex size-[100px] items-center justify-center bg-black text-zinc-200">
           <span
             aria-hidden="true"
             className="-top-[12px] -left-[12px] absolute size-2 border-accent-green-foreground border-r border-b opacity-0 transition-opacity duration-200 group-hover:opacity-100"
@@ -116,7 +116,7 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
           {media}
         </span>
       </div>
-      <span className="absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center bg-background px-1 py-0.5 font-light font-mono text-foreground text-sm uppercase">
+      <span className="absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center bg-background p-1 font-light font-mono text-foreground text-sm uppercase leading-none">
         <span className="min-w-0 truncate">{displayLabel}</span>
         {href ? (
           <ArrowRight
@@ -163,20 +163,16 @@ export function SocialGrid({
         <div className="flex flex-col items-start gap-6">
           <BlockEyebrow eyebrow={eyebrow} />
           <div className="flex flex-col items-start gap-5">
-            {title ? (
-              <h2 className="max-w-2xl text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] md:text-5xl">
-                {title}
-              </h2>
-            ) : null}
+            {title ? <h2 className="max-w-2xl block-title">{title}</h2> : null}
             {subtitle ? (
-              <p className="max-w-xl text-pretty text-lg text-muted-foreground leading-7">
+              <p className="body-text max-w-xl text-muted-foreground">
                 {subtitle}
               </p>
             ) : null}
           </div>
         </div>
       </div>
-      <div className="mt-12 grid grid-cols-1 bg-grid-dots-fine bg-background text-zinc-800 sm:grid-cols-2 md:mt-16 lg:grid-cols-4 dark:text-zinc-50">
+      <div className="mt-12 grid grid-cols-1 bg-grid-dots bg-background text-zinc-800 sm:grid-cols-2 md:mt-16 lg:grid-cols-4 dark:text-zinc-50 [background-size:5.4px_5.2px]">
         {socials.map((social) => (
           <SocialCard key={social._key} social={social} />
         ))}
