@@ -14,13 +14,6 @@ export {
   imageWithAltField,
 } from "@workspace/sanity-blocks/internal/schema-fields";
 
-export const richTextField = defineField({
-  name: "richText",
-  type: "richText",
-  description:
-    "A text editor that lets you add formatting like bold text, links, and bullet points",
-});
-
 export const pageBuilderField = defineField({
   name: "pageBuilder",
   group: GROUP.MAIN_CONTENT,

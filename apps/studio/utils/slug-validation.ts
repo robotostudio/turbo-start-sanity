@@ -4,7 +4,7 @@
 
 import slugify from "slugify";
 
-export type SlugValidationResult = {
+type SlugValidationResult = {
   errors: string[];
   warnings: string[];
 };
@@ -30,7 +30,7 @@ const SEGMENT_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MIN_LEN = 3;
 const MAX_LEN = 60;
 
-export const SLUG_ERROR_MESSAGES = {
+const SLUG_ERROR_MESSAGES = {
   REQUIRED: "Slug must have a value",
   INVALID_CHARACTERS:
     "Only lowercase letters, numbers, and hyphens are allowed.",
@@ -43,7 +43,7 @@ export const SLUG_ERROR_MESSAGES = {
   TRAILING_SLASH: "URL path must not end with a forward slash (/)",
 } as const;
 
-export const SLUG_WARNING_MESSAGES = {
+const SLUG_WARNING_MESSAGES = {
   TOO_SHORT: `Slug must be at least ${MIN_LEN} characters long.`,
   TOO_LONG: `Slug can't be longer than ${MAX_LEN} characters.`,
 } as const;
@@ -193,7 +193,7 @@ function validateDocTypeRules(
 }
 
 /** Main validation — flat pipeline, no branching. */
-export function validateSlug(
+function validateSlug(
   slug: string | undefined | null,
   options: SlugValidationOptions = {}
 ): SlugValidationResult {
@@ -249,7 +249,7 @@ export function createSlugWarningValidator(
 }
 
 /** Clean a raw string into a valid slug segment. */
-export function cleanSlug(slug: string): string {
+function cleanSlug(slug: string): string {
   if (!slug) return "";
   return slugify(slug, { lower: true, strict: true });
 }
