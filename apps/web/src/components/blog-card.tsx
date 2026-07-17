@@ -182,7 +182,7 @@ export function BlogCard({ blog }: BlogCardProps) {
   return (
     <article className="hover-surface group focus-ring-within relative flex h-full flex-col gap-4 border border-border p-6">
       <BlogMeta category={category} publishedAt={publishedAt} />
-      <div className="grid flex-1 gap-3">
+      <div className="grid flex-1 content-start gap-3">
         <h3 className="font-normal text-2xl text-zinc-900 leading-[34px] dark:text-zinc-50">
           <Link className="outline-none" href={slug ?? "#"}>
             <span className="absolute inset-0 z-10" />
@@ -190,7 +190,7 @@ export function BlogCard({ blog }: BlogCardProps) {
           </Link>
         </h3>
         {description ? (
-          <p className="body-text line-clamp-3 text-muted-foreground">
+          <p className="body-text line-clamp-3 self-start text-muted-foreground">
             {description}
           </p>
         ) : null}
