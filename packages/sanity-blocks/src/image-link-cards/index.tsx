@@ -1,8 +1,8 @@
+import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
-import { Badge } from "@workspace/ui/components/badge";
 import Link from "next/link";
 
 export interface ImageLinkCard {
@@ -75,7 +75,7 @@ export function ImageLinkCards({
       <div className="container">
         <div className="flex w-full flex-col items-center">
           <div className="flex flex-col items-center space-y-5 text-center">
-            {eyebrow && <Badge variant="secondary">{eyebrow}</Badge>}
+            <BlockEyebrow eyebrow={eyebrow} />
             {title && (
               <h2 className="text-balance font-medium text-3xl tracking-tight md:text-5xl">
                 {title}
