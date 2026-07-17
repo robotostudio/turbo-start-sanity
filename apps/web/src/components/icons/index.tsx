@@ -15,7 +15,7 @@ type IconProps = { className?: string };
 // Share glyphs — currentColor, follow the surrounding text color.
 // ---------------------------------------------------------------------------
 
-export function XIcon({ className }: IconProps) {
+export function XIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       aria-hidden="true"
@@ -31,7 +31,7 @@ export function XIcon({ className }: IconProps) {
   );
 }
 
-export function InstagramIcon({ className }: IconProps) {
+export function InstagramIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       aria-hidden="true"
@@ -47,7 +47,7 @@ export function InstagramIcon({ className }: IconProps) {
   );
 }
 
-export function LinkedInIcon({ className }: IconProps) {
+export function LinkedInIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       aria-hidden="true"
@@ -63,7 +63,7 @@ export function LinkedInIcon({ className }: IconProps) {
   );
 }
 
-export function RedditIcon({ className }: IconProps) {
+export function RedditIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       aria-hidden="true"
@@ -83,7 +83,7 @@ export function RedditIcon({ className }: IconProps) {
   );
 }
 
-export function CopyLinkIcon({ className }: IconProps) {
+export function CopyLinkIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       aria-hidden="true"
@@ -107,7 +107,7 @@ export function CopyLinkIcon({ className }: IconProps) {
 // "Built by Roboto" badge glyph (showcase cards).
 // ---------------------------------------------------------------------------
 
-export function RobotoIcon({ className }: IconProps) {
+export function RobotoIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       aria-hidden="true"
@@ -128,7 +128,7 @@ export function RobotoIcon({ className }: IconProps) {
 // Brand marks — full-color social logos used by the footer social links.
 // ---------------------------------------------------------------------------
 
-export function LinkedinBrandIcon({ className }: IconProps) {
+export function LinkedinBrandIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       className={className}
@@ -144,7 +144,7 @@ export function LinkedinBrandIcon({ className }: IconProps) {
   );
 }
 
-export function XBrandIcon({ className }: IconProps) {
+export function XBrandIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       className={className}
@@ -160,7 +160,7 @@ export function XBrandIcon({ className }: IconProps) {
   );
 }
 
-export function YoutubeIcon({ className }: IconProps) {
+export function YoutubeIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       className={className}
@@ -176,7 +176,7 @@ export function YoutubeIcon({ className }: IconProps) {
   );
 }
 
-export function FacebookIcon({ className }: IconProps) {
+export function FacebookIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       className={className}
@@ -191,7 +191,7 @@ export function FacebookIcon({ className }: IconProps) {
   );
 }
 
-export function RedditBrandIcon({ className }: IconProps) {
+export function RedditBrandIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       className={className}
@@ -206,7 +206,7 @@ export function RedditBrandIcon({ className }: IconProps) {
   );
 }
 
-export function InstagramBrandIcon({ className }: IconProps) {
+export function InstagramBrandIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       className={className}
@@ -223,7 +223,7 @@ export function InstagramBrandIcon({ className }: IconProps) {
 
 // Official GitHub mark (octocat) — the recognizable brand logo, rather than
 // lucide's simplified glyph.
-export function GithubIcon({ className }: IconProps) {
+export function GithubIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       aria-hidden="true"

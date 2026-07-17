@@ -126,7 +126,7 @@ type OrganizationJsonLdProps = {
   settings: QuerySettingsDataResult;
 };
 
-function OrganizationJsonLd({ settings }: OrganizationJsonLdProps) {
+function OrganizationJsonLd({ settings }: Readonly<OrganizationJsonLdProps>) {
   if (!settings) {
     return null;
   }
@@ -166,7 +166,7 @@ type WebSiteJsonLdProps = {
   settings: QuerySettingsDataResult;
 };
 
-function WebSiteJsonLd({ settings }: WebSiteJsonLdProps) {
+function WebSiteJsonLd({ settings }: Readonly<WebSiteJsonLdProps>) {
   if (!settings) {
     return null;
   }

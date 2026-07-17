@@ -84,9 +84,9 @@ export async function generateMetadata({
 
 export default function BlogSlugPage({
   params,
-}: {
+}: Readonly<{
   params: Promise<BlogParams>;
-}) {
+}>) {
   // Non-async + Suspense-first so Next prerenders/prefetches a static shell and
   // streams the content instead of blocking the navigation on the Sanity fetch.
   return (
@@ -96,7 +96,9 @@ export default function BlogSlugPage({
   );
 }
 
-async function BlogSlugInner({ params }: { params: Promise<BlogParams> }) {
+async function BlogSlugInner({
+  params,
+}: Readonly<{ params: Promise<BlogParams> }>) {
   const { isEnabled: isDraftMode } = await draftMode();
   const isDraft = isDraftMode || previewForceDrafts;
   const [{ slug }, { perspective, stega }] = await Promise.all([
