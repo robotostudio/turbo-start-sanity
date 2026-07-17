@@ -28,14 +28,14 @@ const fetcher = async (url: string): Promise<NavigationData> => {
 };
 
 const TRIGGER_CLASS =
-  "h-auto bg-transparent px-2 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:bg-transparent focus:bg-transparent focus:text-foreground data-popup-open:bg-transparent data-popup-open:text-foreground";
+  "h-auto bg-transparent px-2 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal transition-opacity hover:bg-transparent hover:opacity-70 focus:bg-transparent focus:text-foreground data-popup-open:bg-transparent data-popup-open:text-foreground";
 
 const NAV_BUTTON_CLASS =
   "h-9 px-4 font-mono font-normal text-sm uppercase tracking-wide";
 
 export function NavbarSkeleton() {
   return (
-    <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full bg-background/60 backdrop-blur-lg dark:bg-background/60">
       <div className="container">
         <div className="flex h-16 items-center justify-between">
           <div className="flex h-10 flex-1 items-center">
@@ -91,7 +91,7 @@ export function Navbar({
   }
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full bg-background/60 backdrop-blur-lg dark:bg-background/60">
       <div className="container">
         <div className="flex h-16 items-center justify-between">
           <div className="flex h-10 flex-1 items-center">
@@ -157,7 +157,7 @@ export function Navbar({
                   return (
                     <NavigationMenuItem key={column._key}>
                       <NavigationMenuLink
-                        className="flex h-auto items-center rounded-md px-2 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal"
+                        className="flex h-auto items-center rounded-md px-2 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal transition-opacity hover:opacity-70"
                         render={<Link href={column.href} />}
                       >
                         {column.name}

@@ -49,6 +49,11 @@
   /* Ink strength for the dot lattice — bg-grid-dots mixes currentColor at this
      alpha. Kept as a var so a theme can knock the dots back if needed. */
   --dot-alpha: 80%;
+
+  /* Surface shown in the top overscroll ("rubber-band") gutter. Matches the
+     page background in light mode; a theme can lift it so the bounce reads as a
+     blended surface rather than a flat block. */
+  --overscroll-top: var(--background);
 }
 
 .dark {
@@ -86,6 +91,15 @@
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
   --dot-alpha: 80%;
+
+  /* Pure black (--background) in the top gutter reads as a hard, opaque block
+     against the translucent navbar. Lift it slightly toward the foreground so
+     the overscroll bounce reads as a blended, translucent-looking surface. */
+  --overscroll-top: color-mix(
+    in oklab,
+    var(--background) 90%,
+    var(--foreground) 10%
+  );
 }
 
 @theme inline {
@@ -251,7 +265,7 @@
   html {
     background: linear-gradient(
       to bottom,
-      var(--background) 0 50%,
+      var(--overscroll-top) 0 50%,
       var(--accent-green) 50% 100%
     );
     background-attachment: fixed;
@@ -291,7 +305,7 @@
    in @layer base is the fallback. Unlayered so it wins via the cascade. */
 @keyframes page-bg-scroll {
   from {
-    background-color: var(--background);
+    background-color: var(--overscroll-top);
   }
   to {
     background-color: var(--accent-green);
