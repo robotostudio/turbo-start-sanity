@@ -33,7 +33,7 @@ function FeatureCardItem({ card }: Readonly<{ card: FeatureCard }>) {
             aria-hidden="true"
             className="absolute inset-y-0 right-0 left-12 bg-grid-dots bg-left text-accent-green-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100"
           />
-          <div className="relative flex size-12 items-center justify-center bg-grid-dots bg-center text-zinc-800 group-hover:bg-accent-green group-hover:text-accent-green-foreground dark:text-zinc-50 dark:group-hover:text-accent-green-foreground">
+          <div className="relative flex size-12 items-center justify-center bg-grid-dots bg-center text-zinc-800 group-hover:text-accent-green-foreground dark:text-zinc-50 dark:group-hover:text-accent-green-foreground">
             <span className="flex size-7 items-center justify-center bg-background transition-colors group-hover:bg-accent-green">
               <SanityIcon className="size-6" icon={icon} />
             </span>
