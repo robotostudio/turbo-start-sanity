@@ -5,7 +5,7 @@ import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text"
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import { ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 export interface FaqItem {
   _key?: string | null;
@@ -37,37 +37,110 @@ export interface FaqAccordionProps {
   title?: string | null;
 }
 
-function FaqList({ faqs, name }: Readonly<{ faqs: FaqItem[]; name: string }>) {
+const DISCLOSURE_BASE_CLASS =
+  "faq-disclosure hover-surface group border border-border bg-background px-4 has-[summary:focus-visible]:[outline:2px_solid_var(--foreground)] has-[summary:focus-visible]:[outline-offset:-2px]";
+const DISCLOSURE_ANIMATION_CLASS =
+  "fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-300 ease-out";
+
+function FaqDisclosure({
+  animate = false,
+  animationDelay,
+  faq,
+  name,
+  open,
+}: Readonly<{
+  animate?: boolean;
+  animationDelay?: string;
+  faq: FaqItem;
+  name?: string;
+  open?: boolean;
+}>) {
+  return (
+    <details
+      className={
+        animate
+          ? `${DISCLOSURE_BASE_CLASS} ${DISCLOSURE_ANIMATION_CLASS}`
+          : DISCLOSURE_BASE_CLASS
+      }
+      name={name}
+      open={open}
+      style={animate ? { animationDelay } : undefined}
+    >
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2.5 py-4 outline-none [&::-webkit-details-marker]:hidden">
+        <h3 className="font-normal text-foreground text-lg leading-6">
+          {faq.title}
+        </h3>
+        <Plus className="pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-open:rotate-45 dark:text-accent-green" />
+      </summary>
+      {faq.richText?.length ? (
+        <div className="min-h-0 overflow-hidden pb-4 text-muted-foreground">
+          <RichText className="body-text" richText={faq.richText} />
+        </div>
+      ) : null}
+    </details>
+  );
+}
+
+// Reserved height of one category list (all its <details> open): the closed
+// stack (summary rows + borders + gaps) plus its tallest answer.
+function measureCategoryReserved(list: HTMLElement): number {
+  const detailsEls = Array.from(
+    list.querySelectorAll<HTMLDetailsElement>(":scope > details")
+  );
+  if (detailsEls.length === 0) return 0;
+
+  const rowGap = Number.parseFloat(getComputedStyle(list).rowGap) || 0;
+  let closedStackHeight = rowGap * (detailsEls.length - 1);
+  let maxContentHeight = 0;
+  for (const el of detailsEls) {
+    const summary = el.querySelector<HTMLElement>(":scope > summary");
+    const content = el.querySelector<HTMLElement>(":scope > summary + div");
+    const styles = getComputedStyle(el);
+    closedStackHeight +=
+      (summary?.offsetHeight ?? 0) +
+      (Number.parseFloat(styles.borderTopWidth) || 0) +
+      (Number.parseFloat(styles.borderBottomWidth) || 0);
+    maxContentHeight = Math.max(maxContentHeight, content?.offsetHeight ?? 0);
+  }
+
+  return closedStackHeight + maxContentHeight;
+}
+
+function measureTallestReserved(layer: HTMLElement): number | undefined {
+  const lists = Array.from(layer.querySelectorAll<HTMLElement>(":scope > div"));
+  if (lists.length === 0) return undefined;
+
+  let tallest = 0;
+  for (const list of lists) {
+    tallest = Math.max(tallest, measureCategoryReserved(list));
+  }
+  return tallest;
+}
+
+function FaqList({
+  faqs,
+  minHeight,
+  name,
+}: Readonly<{ faqs: FaqItem[]; minHeight?: number; name: string }>) {
   const defaultFaq = faqs.find((faq) => faq?.title);
   const defaultOpenId = defaultFaq
     ? (defaultFaq._key ?? defaultFaq._id)
     : undefined;
 
   return (
-    <div className="grid content-start gap-4">
+    <div className="grid content-start gap-4" style={{ minHeight }}>
       {faqs.map((faq, index) => {
         if (!faq?.title) return null;
         const itemId = faq._key ?? faq._id;
         return (
-          <details
-            className="faq-disclosure hover-surface group fade-in slide-in-from-bottom-2 animate-in border border-border bg-background px-4 fill-mode-both duration-300 ease-out has-[summary:focus-visible]:[outline:2px_solid_var(--foreground)] has-[summary:focus-visible]:[outline-offset:-2px]"
+          <FaqDisclosure
+            animate
+            animationDelay={`${Math.min(index, 8) * 45}ms`}
+            faq={faq}
             key={`faq-${itemId}`}
             name={name}
             open={itemId === defaultOpenId}
-            style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
-          >
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-2.5 py-4 outline-none [&::-webkit-details-marker]:hidden">
-              <h3 className="font-normal text-foreground text-lg leading-6">
-                {faq.title}
-              </h3>
-              <Plus className="pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-open:rotate-45 dark:text-accent-green" />
-            </summary>
-            {faq.richText?.length ? (
-              <div className="min-h-0 overflow-hidden pb-4 text-muted-foreground">
-                <RichText className="body-text" richText={faq.richText} />
-              </div>
-            ) : null}
-          </details>
+          />
         );
       })}
     </div>
@@ -164,7 +237,7 @@ function FaqContactLink({ link }: Readonly<{ link: FaqLink }>) {
       )}
       <Link
         aria-label={link.description ?? link.title ?? "Learn more"}
-        className="focus-ring-inset group flex items-center gap-2 rounded-none px-1 py-0.5"
+        className="focus-ring group flex items-center gap-2 rounded-full px-1 py-0.5"
         href={link.href}
         rel={link.openInNewTab ? "noopener noreferrer" : undefined}
         target={link.openInNewTab ? "_blank" : "_self"}
@@ -194,10 +267,37 @@ export function FaqAccordion({
   link,
 }: Readonly<FaqAccordionProps>) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const measureRef = useRef<HTMLDivElement>(null);
+  const [minHeight, setMinHeight] = useState<number | undefined>();
 
   const validCategories = (categories ?? []).filter((category) =>
     category?.faqs?.some((faq) => faq?.title)
   );
+
+  // Reserve the tallest possible state across ALL categories so neither
+  // toggling an answer nor switching tabs shifts the content below the list.
+  // Measured from the hidden always-open copy rendered next to the list.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: re-measure when the categories change
+  useLayoutEffect(() => {
+    const layer = measureRef.current;
+    if (!layer) return;
+
+    const measure = () => {
+      const reserved = measureTallestReserved(layer);
+      setMinHeight((prev) =>
+        reserved !== undefined &&
+        prev !== undefined &&
+        Math.abs(prev - reserved) <= 1
+          ? prev
+          : reserved
+      );
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(layer);
+    return () => observer.disconnect();
+  }, [categories]);
   const hasCategories = validCategories.length > 0;
   const boundedIndex = hasCategories
     ? Math.min(activeIndex, validCategories.length - 1)
@@ -228,11 +328,40 @@ export function FaqAccordion({
               />
             )}
 
-            <FaqList
-              faqs={activeFaqs}
-              key={accordionName}
-              name={accordionName}
-            />
+            <div className="relative">
+              <FaqList
+                faqs={activeFaqs}
+                key={accordionName}
+                minHeight={minHeight}
+                name={accordionName}
+              />
+              {/* Hidden always-open copy of every category, used only to
+                  measure the tallest possible list state. No `name` (items
+                  must all stay open) and no entry animations. */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none invisible absolute inset-x-0 top-0 -z-10"
+                inert
+                ref={measureRef}
+              >
+                {validCategories.map((category, categoryIndex) => (
+                  <div
+                    className="grid content-start gap-4"
+                    key={`faq-measure-${category._key ?? categoryIndex}`}
+                  >
+                    {(category.faqs ?? []).map((faq) =>
+                      faq?.title ? (
+                        <FaqDisclosure
+                          faq={faq}
+                          key={`faq-measure-${faq._key ?? faq._id}`}
+                          open
+                        />
+                      ) : null
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
           {link && <FaqContactLink link={link} />}

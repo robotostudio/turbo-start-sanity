@@ -161,7 +161,7 @@ export function SubscribeNewsletter({
               </form>
               {helperText && (
                 <RichText
-                  className="text-muted-foreground text-sm leading-5 [&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-solid"
+                  className="text-muted-foreground text-sm leading-5 [&_a]:rounded-full [&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-solid"
                   richText={helperText}
                 />
               )}
