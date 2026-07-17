@@ -149,6 +149,21 @@ function SlugPageContent({
   );
 }
 
+// Mirrors the hero block (banner + heading/intro) most pages open with.
 function SlugFallback() {
-  return <div className="min-h-[50vh]" />;
+  return (
+    <main className="min-h-[50vh] animate-pulse bg-background">
+      <div className="aspect-[4/3] min-h-[280px] w-full bg-muted lg:aspect-[2014/1276] lg:max-h-[560px] lg:min-h-[180px]" />
+      <div className="container mt-8 pb-24 md:mt-10">
+        <div className="grid max-w-[827px] gap-5">
+          <div className="h-10 w-3/4 bg-muted sm:h-12 lg:h-16" />
+          <div className="grid max-w-[633px] gap-3">
+            <div className="h-5 w-full bg-muted" />
+            <div className="h-5 w-5/6 bg-muted" />
+            <div className="h-5 w-2/3 bg-muted" />
+          </div>
+        </div>
+      </div>
+    </main>
+  );
 }

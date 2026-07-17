@@ -74,6 +74,37 @@ async function CachedHome({ perspective, stega }: DynamicFetchOptions) {
   );
 }
 
+// Mirrors the hero block the home page opens with, plus one section header,
+// so the fold doesn't collapse and reflow when content streams in.
 function HomeFallback() {
-  return <div className="min-h-[50vh]" />;
+  return (
+    <main className="-mt-16 min-h-[50vh] animate-pulse bg-background">
+      <div className="aspect-[4/3] min-h-[280px] w-full bg-muted lg:aspect-[2014/1276] lg:max-h-[560px] lg:min-h-[180px]" />
+      <div className="container mt-8 md:mt-10">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-12">
+          <div className="grid gap-5">
+            <div className="h-4 w-24 bg-muted" />
+            <div className="grid max-w-[827px] gap-3">
+              <div className="h-10 w-full bg-muted sm:h-12 lg:h-16" />
+              <div className="h-10 w-2/3 bg-muted sm:h-12 lg:h-16" />
+            </div>
+            <div className="grid max-w-[633px] gap-3">
+              <div className="h-5 w-full bg-muted" />
+              <div className="h-5 w-4/5 bg-muted" />
+            </div>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
+            <div className="h-10 w-full rounded-full bg-muted sm:w-36" />
+            <div className="h-10 w-full rounded-full bg-muted sm:w-36" />
+          </div>
+        </div>
+      </div>
+      <div className="container mt-16 pb-24 md:mt-24">
+        <div className="grid gap-5">
+          <div className="h-4 w-24 bg-muted" />
+          <div className="h-9 w-full max-w-xl bg-muted sm:h-10" />
+        </div>
+      </div>
+    </main>
+  );
 }
