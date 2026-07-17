@@ -1,3 +1,4 @@
+import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import type { ButtonProps } from "@workspace/sanity-blocks/internal/sanity-buttons";
@@ -5,7 +6,6 @@ import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons"
 import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
-import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import Image from "next/image";
 
 export interface HeroBlockProps {
@@ -23,7 +23,7 @@ export function HeroBlock({
   image,
   richText,
 }: Readonly<HeroBlockProps>) {
-  const imageHeight = "aspect-[2014/1276] max-h-[500px] min-h-[180px]";
+  const imageHeight = "aspect-[2014/1276] max-h-[560px] min-h-[180px]";
   return (
     <section className="relative overflow-hidden bg-background" id="hero">
       <div className="w-full overflow-hidden">
