@@ -59,12 +59,12 @@ function TestimonialPanel({
 }: Readonly<{ testimonial: NewsletterTestimonial }>) {
   const { eyebrow, quote, authorImage, authorName, authorRole } = testimonial;
   return (
-    <div className="bg-grid-dots-dense p-[30px] text-zinc-800 [background-size:5px_5px] dark:text-zinc-50">
-      <div className="flex h-full flex-col gap-8 bg-background p-6">
+    <div className="-mx-4 bg-grid-dots p-8 text-zinc-800 lg:mx-0 dark:text-zinc-50">
+      <div className="flex h-full flex-col gap-12 bg-background p-8">
         <BlockEyebrow eyebrow={eyebrow} />
         <div className="flex flex-col gap-8">
           <RichText
-            className="text-pretty text-lg text-muted-foreground leading-7 [&_strong]:font-normal [&_strong]:text-foreground"
+            className="body-text text-muted-foreground [&_strong]:font-normal [&_strong]:text-foreground"
             richText={quote}
           />
           <div className="flex items-center gap-4">
@@ -125,10 +125,10 @@ export function SubscribeNewsletter({
         <div
           className={cn(
             hasTestimonialContent &&
-              "grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-stretch lg:gap-16"
+              "grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-stretch lg:gap-48"
           )}
         >
-          <div className="flex max-w-3xl flex-col items-start gap-12 md:gap-16">
+          <div className="flex max-w-3xl flex-col items-start gap-8 pb-12">
             <div className="flex flex-col items-start gap-5">
               {title && (
                 <h2 className="max-w-none text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] sm:text-5xl">
@@ -137,12 +137,12 @@ export function SubscribeNewsletter({
               )}
               {subTitle && (
                 <RichText
-                  className="text-balance text-lg text-muted-foreground leading-7"
+                  className="body-text max-w-[360px] text-muted-foreground"
                   richText={subTitle}
                 />
               )}
             </div>
-            <div className="flex w-full max-w-md flex-col items-start gap-3">
+            <div className="flex w-full flex-col items-start gap-3">
               <form
                 action={action}
                 className="flex w-full items-center gap-1.5 bg-muted py-1 pr-1.5 pl-4 has-[input:focus-visible]:[outline:1px_solid_var(--foreground)] has-[input:focus-visible]:outline-offset-2"
