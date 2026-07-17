@@ -18,8 +18,6 @@ export interface LogoCloudProps {
   title?: string | null;
 }
 
-// Logos are area-normalized (see normalizedLogoHeight) so a wide wordmark and a
-// square mark carry equal visual weight within the 64px strip.
 function Logo({ logo }: Readonly<{ logo: LogoCloudLogo }>) {
   return (
     <LogoLinkCell
@@ -55,6 +53,9 @@ export function LogoCloud({ logos, title }: Readonly<LogoCloudProps>) {
     return null;
   }
 
+  const repeats = Math.max(1, Math.ceil(20 / logos.length));
+  const loopLogos = Array.from({ length: repeats }, () => logos).flat();
+
   const setPlaybackRate = (rate: number) => {
     for (const animation of trackRef.current?.getAnimations() ?? []) {
       animation.playbackRate = rate;
@@ -62,10 +63,9 @@ export function LogoCloud({ logos, title }: Readonly<LogoCloudProps>) {
   };
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: hovering anywhere in the decorative marquee band slows it; the interactive elements are the logo links inside, and keyboard users get the focus-within pause.
     <section
       aria-label="Logo cloud"
-      className="overflow-hidden bg-accent-green py-4"
+      className="mt-20 overflow-hidden bg-accent-green py-4"
       id="logo-cloud"
       onMouseEnter={() => setPlaybackRate(HOVER_PLAYBACK_RATE)}
       onMouseLeave={() => setPlaybackRate(1)}
@@ -75,14 +75,18 @@ export function LogoCloud({ logos, title }: Readonly<LogoCloudProps>) {
           {title}
         </p>
       ) : null}
-      {/* Duplicate track so the -50% marquee translate loops seamlessly. */}
+      {/* Each marquee half must be at least a viewport wide or the -50% loop
+          shows a gap at the seam, so small logo sets repeat within the half. */}
       <div
         className="flex w-max animate-marquee items-center focus-within:[animation-play-state:paused] motion-reduce:animate-none"
         ref={trackRef}
+        // The base duration is tuned for one logo set per half; repeated
+        // sets widen the track, so scale duration to keep the same px/s speed.
+        style={{ animationDuration: `${repeats * 35}s` }}
       >
         <div className="flex shrink-0 items-center gap-12 pr-12">
-          {logos.map((logo) => (
-            <Logo key={logo._key} logo={logo} />
+          {loopLogos.map((logo, index) => (
+            <Logo key={`${logo._key}-${index}`} logo={logo} />
           ))}
         </div>
         <div
@@ -90,8 +94,8 @@ export function LogoCloud({ logos, title }: Readonly<LogoCloudProps>) {
           className="flex shrink-0 items-center gap-12 pr-12"
           inert
         >
-          {logos.map((logo) => (
-            <Logo key={`dup-${logo._key}`} logo={logo} />
+          {loopLogos.map((logo, index) => (
+            <Logo key={`dup-${logo._key}-${index}`} logo={logo} />
           ))}
         </div>
       </div>
