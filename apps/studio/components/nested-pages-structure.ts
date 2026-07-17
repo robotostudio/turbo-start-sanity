@@ -141,6 +141,14 @@ const buildFolderStructure = (
   return folderStructure;
 };
 
+// Case-insensitive alphabetical compare for deterministic ordering
+const compareAlpha = (a: string, b: string): number =>
+  a.localeCompare(b, undefined, { sensitivity: "base" });
+
+// Sort documents by title, falling back to slug for untitled pages
+const byDocumentTitle = (a: DocumentData, b: DocumentData): number =>
+  compareAlpha(a.title || a.slug, b.title || b.slug);
+
 // Helper function to create a unique ID for list items
 const createUniqueId = (
   type: "folder" | "doc" | "main" | "single",
@@ -266,9 +274,9 @@ const processFolderItem = (config: FolderProcessConfig): ListItemBuilder => {
 
   // Find the main page for this folder (exact path match)
   const mainPageDoc = folder.documents.find((doc) => doc.slug === folder.path);
-  const otherDocs = folder.documents.filter(
-    (doc) => doc._id !== mainPageDoc?._id
-  );
+  const otherDocs = folder.documents
+    .filter((doc) => doc._id !== mainPageDoc?._id)
+    .sort(byDocumentTitle);
 
   // 1. Add child documents first
   if (otherDocs.length > 0) {
@@ -359,10 +367,14 @@ export const createSlugBasedStructure = (
         ): SanityListItem[] => {
           const { depth = 0, parentPath = "" } = options;
           const folders: ListItemBuilder[] = [];
-          const files: ListItemBuilder[] = [];
+          const looseDocs: DocumentData[] = [];
 
-          // Process each item in the structure
-          for (const [key, folder] of Object.entries(structure)) {
+          // Sort by path segment so folders render alphabetically
+          const sortedEntries = Object.entries(structure).sort(([a], [b]) =>
+            compareAlpha(a, b)
+          );
+
+          for (const [key, folder] of sortedEntries) {
             const hasChildren = Object.keys(folder.children).length > 0;
             const hasDocuments = folder.documents.length > 0;
             const totalItems =
@@ -384,10 +396,14 @@ export const createSlugBasedStructure = (
             }
             // If it's a single document with no children, it's a file
             else if (hasDocuments && folder.documents.length === 1) {
-              const doc = folder.documents[0];
-              files.push(createSingleDocumentListItem(S, doc, schemaType));
+              looseDocs.push(folder.documents[0]);
             }
           }
+
+          // Loose pages sort by title (slug fallback), below the folders
+          const files = looseDocs
+            .sort(byDocumentTitle)
+            .map((doc) => createSingleDocumentListItem(S, doc, schemaType));
 
           return combineItemsWithDividers(S, folders, files);
         };
