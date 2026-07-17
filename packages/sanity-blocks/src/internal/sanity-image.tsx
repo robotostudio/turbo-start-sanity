@@ -77,7 +77,7 @@ export function getImageDimensions(
   if (!id) {
     return null;
   }
-  const match = id.match(/-(\d+)x(\d+)-/);
+  const match = /-(\d+)x(\d+)-/.exec(id);
   if (!match) {
     return null;
   }

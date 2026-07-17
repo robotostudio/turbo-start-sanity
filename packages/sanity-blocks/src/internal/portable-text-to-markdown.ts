@@ -139,7 +139,7 @@ function fenceCodeBlock(code: string, language?: string | null): string {
   const info = (language ?? "").replace(/[\n\r`]/g, "").trim();
   // Trim trailing newlines with a linear scan; a `/\n+$/` regex backtracks.
   let end = code.length;
-  while (end > 0 && code.charCodeAt(end - 1) === 10) {
+  while (end > 0 && code.codePointAt(end - 1) === 10) {
     end--;
   }
   const body = code.slice(0, end);
