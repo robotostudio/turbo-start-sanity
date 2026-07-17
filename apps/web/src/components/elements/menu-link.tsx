@@ -14,7 +14,7 @@ export function MenuLink({
 
   return (
     <Link
-      className="group flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-accent focus-ring"
+      className="group flex items-start gap-3 rounded-md p-3 transition-colors hover:bg-accent focus-ring"
       href={href}
       onClick={onClick}
     >
@@ -25,9 +25,7 @@ export function MenuLink({
         />
       )}
       <div className="grid gap-1">
-        <div className="font-medium leading-none group-hover:text-accent-foreground">
-          {name}
-        </div>
+        <div className="font-medium text-foreground leading-none">{name}</div>
         {description && (
           <div className="line-clamp-2 text-muted-foreground text-sm">
             {description}

@@ -126,7 +126,7 @@ type OrganizationJsonLdProps = {
   settings: QuerySettingsDataResult;
 };
 
-export function OrganizationJsonLd({ settings }: OrganizationJsonLdProps) {
+function OrganizationJsonLd({ settings }: OrganizationJsonLdProps) {
   if (!settings) {
     return null;
   }
@@ -166,7 +166,7 @@ type WebSiteJsonLdProps = {
   settings: QuerySettingsDataResult;
 };
 
-export function WebSiteJsonLd({ settings }: WebSiteJsonLdProps) {
+function WebSiteJsonLd({ settings }: WebSiteJsonLdProps) {
   if (!settings) {
     return null;
   }
@@ -188,7 +188,6 @@ export function WebSiteJsonLd({ settings }: WebSiteJsonLdProps) {
   return <JsonLdScript data={websiteJsonLd} id="website-json-ld" />;
 }
 
-// Combined JSON-LD Component for pages with multiple structured data
 type CombinedJsonLdProps = {
   settings?: QuerySettingsDataResult;
   article?: QueryBlogSlugPageDataResult;

@@ -96,11 +96,11 @@ export function MobileMenu({
             )}
           >
             <DrawerContent>
-              <div className="flex flex-row items-center justify-between border-b px-6 py-4">
+              <div className="flex flex-row items-center justify-between border-b px-6 py-2.5">
                 <DrawerTitle className="sr-only">
                   {siteTitle || "Menu"}
                 </DrawerTitle>
-                <div className="[&_img]:h-6 [&_img]:w-auto [&_img]:rounded-none">
+                <div className="flex items-center [&_img]:h-auto [&_img]:w-40 [&_img]:rounded-none">
                   <Logo
                     alt={siteTitle ?? "Turbo Start Sanity"}
                     image={logos?.logo}
@@ -108,14 +108,13 @@ export function MobileMenu({
                   />
                 </div>
                 <DrawerClose
-                  className={cn(
-                    "rounded-sm opacity-70 transition-opacity hover:opacity-100",
-                    FOCUS_RING
-                  )}
-                >
-                  <X className="size-5" />
-                  <span className="sr-only">Close</span>
-                </DrawerClose>
+                  render={
+                    <Button size="icon" variant="ghost">
+                      <X className="size-4" />
+                      <span className="sr-only">Close</span>
+                    </Button>
+                  }
+                />
               </div>
 
               <nav
@@ -131,7 +130,7 @@ export function MobileMenu({
                       return (
                         <Link
                           className={cn(
-                            "-mx-3 flex items-center rounded-md px-3 py-3 font-medium text-sm transition-colors hover:text-primary",
+                            "-mx-3 flex items-center rounded-md px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal",
                             FOCUS_RING
                           )}
                           href={column.href}
@@ -150,7 +149,7 @@ export function MobileMenu({
                           key={column._key}
                           value={column._key}
                         >
-                          <AccordionTrigger className="-mx-3 px-3 py-3 hover:no-underline">
+                          <AccordionTrigger className="-mx-3 px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:no-underline">
                             {column.title}
                           </AccordionTrigger>
                           <AccordionContent>
@@ -179,9 +178,9 @@ export function MobileMenu({
               </nav>
 
               {buttons?.length ? (
-                <div className="mt-auto grid gap-2 border-t p-4">
+                <div className="mt-auto grid border-t px-6 py-4">
                   <SanityButtons
-                    buttonClassName="w-full justify-center"
+                    buttonClassName="w-full justify-center font-mono font-normal text-sm uppercase tracking-wide"
                     buttons={buttons || []}
                     className="grid gap-3"
                   />

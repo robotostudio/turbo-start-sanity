@@ -8,9 +8,6 @@ import Link from "next/link";
 import { RobotoIcon } from "@/components/icons";
 import type { ShowcaseItemData, ShowcasePageData } from "@/types";
 
-// A normalized view model derived from CMS data, so the exact same
-// markup/classes render every card. A screenshot may be absent (no valid
-// asset), and an attribution logo falls back to initials when missing.
 type ImageSource =
   | { kind: "sanity"; image: SanityImageData }
   | { kind: "none" };
@@ -47,9 +44,6 @@ function hasValidAssetId<T extends { id?: string | null }>(
   return image.id.replace(/^drafts\./, "").startsWith("image-");
 }
 
-// Fall back to a favicon for the item's domain when no attribution logo was
-// uploaded. Returns null when the URL can't be parsed so callers can drop back
-// to initials.
 function faviconFor(url: string) {
   try {
     const { hostname } = new URL(url);
@@ -78,8 +72,6 @@ function cmsToView(item: ShowcaseItemData): CardView {
     className: "bg-foreground text-background",
   };
   const faviconUrl = item.url ? faviconFor(item.url) : null;
-  // Uploaded asset wins; otherwise fall back to a fetched favicon when a URL is
-  // present, and finally to initials.
   let logo: LogoSource;
   if (hasValidAssetId(item.attributionLogo)) {
     logo = { kind: "sanity", image: item.attributionLogo };
@@ -89,8 +81,6 @@ function cmsToView(item: ShowcaseItemData): CardView {
     logo = initialsLogo;
   }
 
-  // Only an uploaded Sanity asset renders a screenshot; anything else shows the
-  // empty placeholder.
   const screenshot: ImageSource = hasValidAssetId(item.screenshot)
     ? { kind: "sanity", image: item.screenshot }
     : { kind: "none" };
@@ -278,12 +268,12 @@ function ShowcaseHero({
           <h1 className="text-balance font-normal text-4xl leading-tight tracking-tight sm:text-5xl">
             {headline}
           </h1>
-          <p className="max-w-lg text-base text-muted-foreground leading-6">
+          <p className="body-text max-w-xl text-muted-foreground">
             {description}
           </p>
         </div>
       </div>
-      <div className="bg-grid-dots-dense p-7 text-zinc-800 [background-size:6.6px_6.6px] dark:text-zinc-50">
+      <div className="bg-grid-dots p-7 text-zinc-800 dark:text-zinc-50 [background-size:5.3px_5.3px]">
         <div className="relative aspect-video w-full overflow-hidden bg-muted">
           <ScreenshotImage
             name={featured.name}
@@ -319,17 +309,15 @@ export function ShowcasePageContent({
   const headline = data?.headline ?? "";
   const description = data?.description ?? "";
 
-  // Nothing to show without CMS items — render just the hero copy rather
-  // than crashing on a missing featured item.
   if (!featuredItem) {
     return (
-      <main className="container flex flex-col gap-24 py-16">
+      <main className="container flex flex-col gap-24 py-24">
         <section className="flex flex-col gap-6">
           <ShowcaseBreadcrumb />
           <h1 className="text-balance font-normal text-4xl leading-tight tracking-tight sm:text-5xl">
             {headline}
           </h1>
-          <p className="max-w-lg text-base text-muted-foreground leading-6">
+          <p className="body-text max-w-lg text-muted-foreground">
             {description}
           </p>
         </section>
@@ -338,12 +326,10 @@ export function ShowcasePageContent({
   }
 
   const featured = cmsToView(featuredItem);
-  // The featured item already headlines the hero, so drop it from the grid
-  // below to avoid showing it twice.
   const cards = cmsItems.filter((item) => item !== featuredItem).map(cmsToView);
 
   return (
-    <main className="container flex flex-col gap-24 py-16">
+    <main className="container flex flex-col gap-24 py-24">
       <ShowcaseHero
         description={description}
         featured={featured}

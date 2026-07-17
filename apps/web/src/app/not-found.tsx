@@ -14,7 +14,7 @@ export default function NotFound() {
           </span>
         </div>
 
-        <div className="inline-flex items-center justify-center bg-grid-dots-dense px-12 py-8 text-muted-foreground/40 sm:px-20 sm:py-10">
+        <div className="inline-flex items-center justify-center bg-grid-dots px-12 py-8 text-zinc-800 sm:px-20 sm:py-10 dark:text-zinc-50">
           <h1 className="font-normal text-7xl text-foreground leading-none tracking-tight sm:text-8xl md:text-9xl">
             404
           </h1>
@@ -24,7 +24,7 @@ export default function NotFound() {
           <h2 className="text-balance font-normal text-2xl tracking-tight sm:text-3xl">
             This page could not be found
           </h2>
-          <p className="text-balance text-base text-muted-foreground leading-6">
+          <p className="body-text text-balance text-muted-foreground">
             The page you are looking for doesn&apos;t exist or may have been
             moved. Let&apos;s get you back on track.
           </p>
