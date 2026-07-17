@@ -20,13 +20,7 @@ export interface FeatureCardsIconProps {
 function FeatureCardItem({ card }: Readonly<{ card: FeatureCard }>) {
   const { icon, title, richText } = card;
   return (
-    <div className="group flex min-w-0 transform-gpu flex-col justify-between gap-12 border-border border-t bg-background p-[31.2px] text-foreground transition-colors duration-200 ease-out first:border-t-0 hover:bg-accent-green hover:text-accent-green-foreground md:min-h-72 md:gap-16 lg:border-t-0 lg:border-l lg:[&:nth-child(3n+1)]:border-l-0 lg:[&:nth-child(n+4)]:border-t">
-      {/* -mr-[31.2px] cancels the card's right padding so the strip reaches
-          the card edge. bg-grid-dots tiles with background-repeat: round,
-          which self-heals partial dots per element; the pitch-quantized
-          padding (multiples of 5.2px) keeps the card and outer-frame
-          lattices in step. The strip starts at left-12 — exactly the
-          plate's width — so the two lattices never overlap. */}
+    <div className="group flex min-w-0 transform-gpu flex-col justify-between gap-12 bg-background p-[31.2px] text-foreground transition-colors duration-200 ease-out hover:bg-accent-green hover:text-accent-green-foreground md:min-h-72 md:gap-16">
       {icon && (
         <div className="-mr-[31.2px] relative flex h-12 items-center">
           <span
@@ -66,7 +60,7 @@ export function FeatureCardsWithIcon({
       className="bg-background pt-20 pb-0 sm:pt-28 lg:pt-[136px]"
       id="features"
     >
-      <div className="container">
+      <div className="mx-auto w-full max-w-6xl px-2">
         <div className="flex flex-col items-start gap-6">
           <BlockEyebrow eyebrow={eyebrow} />
           <div className="flex flex-col items-start gap-5">
