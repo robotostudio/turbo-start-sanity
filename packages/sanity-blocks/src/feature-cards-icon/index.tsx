@@ -20,7 +20,7 @@ export interface FeatureCardsIconProps {
 function FeatureCardItem({ card }: Readonly<{ card: FeatureCard }>) {
   const { icon, title, richText } = card;
   return (
-    <div className="group flex min-w-0 flex-col justify-between gap-12 border-border border-t bg-background p-[31.2px] text-foreground transition-colors first:border-t-0 hover:bg-accent-green hover:text-accent-green-foreground md:min-h-72 md:gap-16 lg:border-t-0 lg:border-l lg:[&:nth-child(3n+1)]:border-l-0 lg:[&:nth-child(n+4)]:border-t">
+    <div className="group flex min-w-0 transform-gpu flex-col justify-between gap-12 border-border border-t bg-background p-[31.2px] text-foreground transition-colors duration-200 ease-out first:border-t-0 hover:bg-accent-green hover:text-accent-green-foreground md:min-h-72 md:gap-16 lg:border-t-0 lg:border-l lg:[&:nth-child(3n+1)]:border-l-0 lg:[&:nth-child(n+4)]:border-t">
       {/* -mr-[31.2px] cancels the card's right padding so the strip reaches
           the card edge. bg-grid-dots tiles with background-repeat: round,
           which self-heals partial dots per element; the pitch-quantized
@@ -31,10 +31,10 @@ function FeatureCardItem({ card }: Readonly<{ card: FeatureCard }>) {
         <div className="-mr-[31.2px] relative flex h-12 items-center">
           <span
             aria-hidden="true"
-            className="absolute inset-y-0 right-0 left-12 bg-grid-dots bg-left text-accent-green-foreground opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+            className="absolute inset-y-0 right-0 left-12 bg-grid-dots bg-left text-accent-green-foreground opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100"
           />
-          <div className="relative flex size-12 items-center justify-center bg-grid-dots bg-center text-zinc-800 group-hover:text-accent-green-foreground dark:text-zinc-50 dark:group-hover:text-accent-green-foreground">
-            <span className="flex size-7 items-center justify-center bg-background transition-colors group-hover:bg-accent-green">
+          <div className="relative flex size-12 items-center justify-center bg-grid-dots bg-center text-zinc-800 transition-colors duration-200 ease-out group-hover:text-accent-green-foreground dark:text-zinc-50 dark:group-hover:text-accent-green-foreground">
+            <span className="flex size-7 items-center justify-center bg-background transition-colors duration-200 ease-out group-hover:bg-accent-green">
               <SanityIcon className="size-6" icon={icon} />
             </span>
           </div>
@@ -47,7 +47,7 @@ function FeatureCardItem({ card }: Readonly<{ card: FeatureCard }>) {
           </h3>
         ) : null}
         <RichText
-          className="body-text break-words text-muted-foreground transition-colors group-hover:text-accent-green-foreground/80"
+          className="body-text break-words text-muted-foreground transition-colors duration-200 ease-out group-hover:text-accent-green-foreground/80"
           richText={richText}
         />
       </div>
