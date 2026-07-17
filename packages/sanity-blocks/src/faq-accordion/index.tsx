@@ -1,5 +1,6 @@
 "use client";
 
+import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import { ArrowUpRight, Plus } from "lucide-react";
@@ -49,7 +50,7 @@ function FaqList({ faqs, name }: Readonly<{ faqs: FaqItem[]; name: string }>) {
         const itemId = faq._key ?? faq._id;
         return (
           <details
-            className="faq-disclosure hover-surface group fade-in slide-in-from-bottom-2 animate-in border border-border bg-background px-4 fill-mode-both duration-300 ease-out has-[summary:focus-visible]:[outline:1px_solid_var(--foreground)] has-[summary:focus-visible]:outline-offset-2"
+            className="faq-disclosure hover-surface group fade-in slide-in-from-bottom-2 animate-in border border-border bg-background px-4 fill-mode-both duration-300 ease-out has-[summary:focus-visible]:[outline:2px_solid_var(--foreground)] has-[summary:focus-visible]:[outline-offset:-2px]"
             key={`faq-${itemId}`}
             name={name}
             open={itemId === defaultOpenId}
@@ -63,10 +64,7 @@ function FaqList({ faqs, name }: Readonly<{ faqs: FaqItem[]; name: string }>) {
             </summary>
             {faq.richText?.length ? (
               <div className="min-h-0 overflow-hidden pb-4 text-muted-foreground">
-                <RichText
-                  className="text-sm md:text-base"
-                  richText={faq.richText}
-                />
+                <RichText className="body-text" richText={faq.richText} />
               </div>
             ) : null}
           </details>
@@ -100,7 +98,7 @@ function CategoryTabs({
                 type="button"
               >
                 <span
-                  className={`shrink-0 px-1 py-px font-mono text-sm uppercase tracking-wider ${
+                  className={`shrink-0 px-1 py-px font-light font-mono text-sm uppercase leading-5 tracking-[0.28px] ${
                     isActive
                       ? "bg-accent-green text-accent-green-foreground"
                       : "text-muted-foreground"
@@ -109,8 +107,10 @@ function CategoryTabs({
                   {number}
                 </span>
                 <span
-                  className={`font-mono text-sm capitalize tracking-wider ${
-                    isActive ? "text-foreground" : "text-muted-foreground"
+                  className={`font-light font-mono text-sm uppercase leading-5 tracking-[0.28px] ${
+                    isActive
+                      ? "text-zinc-900 dark:text-zinc-100"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {category.title}
@@ -122,7 +122,7 @@ function CategoryTabs({
       </ul>
       <div
         aria-hidden="true"
-        className="hidden w-full max-w-[149px] flex-1 bg-grid-dots-dense text-muted-foreground lg:block"
+        className="hidden w-full max-w-[149px] flex-1 bg-grid-dots text-zinc-800 lg:block dark:text-zinc-50"
       />
     </div>
   );
@@ -135,14 +135,7 @@ function FaqHeader({
 }: Readonly<Pick<FaqAccordionProps, "eyebrow" | "title" | "subtitle">>) {
   return (
     <div className="flex flex-col items-start gap-6">
-      {eyebrow && (
-        <div className="inline-flex items-center gap-2 rounded-none border border-border px-3 py-1.5">
-          <span className="size-2 shrink-0 rounded-[1px] bg-accent-green" />
-          <span className="font-light font-mono text-muted-foreground text-sm uppercase tracking-[0.28px]">
-            {eyebrow}
-          </span>
-        </div>
-      )}
+      <BlockEyebrow eyebrow={eyebrow} />
       {(title || subtitle) && (
         <div className="flex flex-col gap-5">
           {title && (
@@ -151,7 +144,7 @@ function FaqHeader({
             </h2>
           )}
           {subtitle && (
-            <p className="max-w-xl text-lg text-muted-foreground leading-7">
+            <p className="body-text max-w-xl text-muted-foreground">
               {subtitle}
             </p>
           )}
@@ -206,7 +199,6 @@ export function FaqAccordion({
     category?.faqs?.some((faq) => faq?.title)
   );
   const hasCategories = validCategories.length > 0;
-  // Default to the first category; clamp any stale index into range.
   const boundedIndex = hasCategories
     ? Math.min(activeIndex, validCategories.length - 1)
     : 0;
