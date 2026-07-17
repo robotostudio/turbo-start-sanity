@@ -224,7 +224,7 @@ function ShowcaseCard({ item }: Readonly<{ item: CardView }>) {
         item.url && "group focus-ring-within relative"
       )}
     >
-      <div className="relative aspect-video min-h-[249px] w-full overflow-hidden bg-muted">
+      <div className="relative aspect-video w-full overflow-hidden bg-muted sm:min-h-[249px]">
         <ScreenshotImage
           name={item.name}
           screenshot={item.screenshot}
@@ -261,35 +261,37 @@ function ShowcaseHero({
   featured: CardView;
 }>) {
   return (
-    <section className="grid gap-12 lg:grid-cols-2 lg:items-stretch">
-      <div className="flex flex-col justify-between gap-10">
-        <ShowcaseBreadcrumb />
-        <div className="flex flex-col gap-6">
-          <h1 className="text-balance font-normal text-4xl leading-tight tracking-tight sm:text-5xl">
-            {headline}
-          </h1>
-          <p className="body-text max-w-xl text-muted-foreground">
-            {description}
-          </p>
+    <section className="relative left-1/2 w-screen -translate-x-1/2 px-4 sm:px-6 lg:px-8">
+      <div className="grid gap-8 sm:gap-12 lg:grid-cols-2 lg:items-stretch">
+        <div className="flex flex-col justify-between gap-10">
+          <ShowcaseBreadcrumb />
+          <div className="flex flex-col gap-6">
+            <h1 className="text-balance font-normal text-4xl leading-tight tracking-tight sm:text-5xl">
+              {headline}
+            </h1>
+            <p className="body-text max-w-xl text-muted-foreground">
+              {description}
+            </p>
+          </div>
         </div>
-      </div>
-      <div className="bg-grid-dots p-7 text-zinc-800 dark:text-zinc-50 [background-size:5.3px_5.3px]">
-        <div className="relative aspect-video w-full overflow-hidden bg-muted">
-          <ScreenshotImage
-            name={featured.name}
-            screenshot={featured.screenshot}
-            sizes="(min-width: 1024px) 50vw, 100vw"
-          />
-        </div>
-        <div className="flex items-center gap-2 bg-zinc-100 px-4 py-2 text-foreground dark:bg-zinc-900">
-          <AttributionLogo
-            logo={featured.logo}
-            name={featured.attributionName}
-          />
-          <span className="flex-1 font-medium text-base text-foreground">
-            {featured.name}
-          </span>
-          <span className="text-muted-foreground text-sm">Featured</span>
+        <div className="bg-grid-dots p-7 text-zinc-800 dark:text-zinc-50 [background-size:5.3px_5.3px]">
+          <div className="relative aspect-video w-full overflow-hidden bg-muted">
+            <ScreenshotImage
+              name={featured.name}
+              screenshot={featured.screenshot}
+              sizes="(min-width: 1024px) 50vw, 100vw"
+            />
+          </div>
+          <div className="flex items-center gap-2 bg-zinc-100 px-4 py-2 text-foreground dark:bg-zinc-900">
+            <AttributionLogo
+              logo={featured.logo}
+              name={featured.attributionName}
+            />
+            <span className="flex-1 font-medium text-base text-foreground">
+              {featured.name}
+            </span>
+            <span className="text-muted-foreground text-sm">Featured</span>
+          </div>
         </div>
       </div>
     </section>
@@ -311,7 +313,7 @@ export function ShowcasePageContent({
 
   if (!featuredItem) {
     return (
-      <main className="container flex flex-col gap-24 py-24">
+      <main className="container flex flex-col gap-24 overflow-x-clip py-24">
         <section className="flex flex-col gap-6">
           <ShowcaseBreadcrumb />
           <h1 className="text-balance font-normal text-4xl leading-tight tracking-tight sm:text-5xl">
@@ -329,13 +331,13 @@ export function ShowcasePageContent({
   const cards = cmsItems.filter((item) => item !== featuredItem).map(cmsToView);
 
   return (
-    <main className="container flex flex-col gap-24 py-24">
+    <main className="container flex flex-col gap-24 overflow-x-clip py-24">
       <ShowcaseHero
         description={description}
         featured={featured}
         headline={headline}
       />
-      <section className="grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="grid gap-x-6 gap-y-8 sm:grid-cols-2 sm:gap-y-12 lg:grid-cols-3">
         {cards.map((item) => (
           <ShowcaseCard item={item} key={item.id} />
         ))}
