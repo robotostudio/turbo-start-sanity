@@ -116,7 +116,7 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
           {media}
         </span>
       </div>
-      <span className="absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center bg-background p-1 font-light font-mono text-foreground text-sm uppercase leading-none">
+      <span className="absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center bg-background p-1 font-light font-mono text-foreground text-sm uppercase leading-none transition-colors duration-200 group-hover:bg-black group-hover:text-white dark:group-hover:bg-background dark:group-hover:text-foreground">
         <span className="min-w-0 truncate">{displayLabel}</span>
         {href ? (
           <ArrowRight
