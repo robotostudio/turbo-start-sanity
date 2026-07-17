@@ -109,7 +109,7 @@ export function MobileMenu({
                 </div>
                 <DrawerClose
                   render={
-                    <Button size="icon" variant="ghost">
+                    <Button className="-mr-3" size="icon" variant="ghost">
                       <X className="size-4" />
                       <span className="sr-only">Close</span>
                     </Button>
