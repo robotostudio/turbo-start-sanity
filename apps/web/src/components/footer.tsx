@@ -11,6 +11,7 @@ import type {
   QueryFooterDataResult,
   QueryGlobalSeoSettingsResult,
 } from "@workspace/sanity/types";
+import { normalizedLogoHeight } from "@workspace/sanity-blocks/internal/logo-height";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import Link from "next/link";
 import { Fragment } from "react";
@@ -127,19 +128,10 @@ function SystemsOperationalPill() {
   );
 }
 
-// Alternating ±2px vertical offsets give the ░ (U+2591 LIGHT SHADE) indicator
-// glyphs a zig-zag, matching the Figma "ready indicator" (node 2193:2411).
-const FOOTER_TOP_BAR_SHADES = [
-  { key: "a", offset: "-translate-y-0.5" },
-  { key: "b", offset: "translate-y-0.5" },
-  { key: "c", offset: "-translate-y-0.5" },
-  { key: "d", offset: "translate-y-0.5" },
-];
-
 function FooterTopBar() {
   return (
-    <div className="w-full bg-background [background-image:radial-gradient(circle,var(--color-border)_1px,transparent_1.5px)] [background-position:top] [background-repeat:repeat-x] [background-size:7px_2px]">
-      <div className="container flex items-center justify-between gap-4 py-4">
+    <div className="w-full bg-background [background-image:radial-gradient(circle,var(--color-zinc-500)_0.8px,transparent_1.3px)] [background-position:top] [background-repeat:repeat-x] [background-size:6.7px_1.4px]">
+      <div className="container grid grid-cols-3 items-center gap-4 py-4">
         <div className="flex items-center gap-2">
           <span
             aria-hidden="true"
@@ -155,28 +147,12 @@ function FooterTopBar() {
             </span>
           </p>
         </div>
-        <div className="hidden items-center gap-3 md:flex">
-          <span
-            aria-hidden="true"
-            className="h-4 w-[58px] shrink-0 bg-grid-dots-stipple text-foreground [clip-path:polygon(50%_0%,100%_100%,0%_100%)]"
-          />
+        <div className="hidden items-center justify-center md:flex">
           <p className="whitespace-nowrap font-light font-mono text-muted-foreground text-sm uppercase leading-5 tracking-[0.28px]">
             [ Nitro: Armed ]
           </p>
         </div>
-        <div className="hidden items-center gap-3 sm:flex">
-          <span
-            aria-hidden="true"
-            className="hidden items-center gap-0.5 sm:flex"
-          >
-            {FOOTER_TOP_BAR_SHADES.map((shade) => (
-              <span
-                aria-hidden="true"
-                className={`h-3 w-3 shrink-0 bg-grid-dots-stipple text-foreground ${shade.offset}`}
-                key={shade.key}
-              />
-            ))}
-          </span>
+        <div className="hidden items-center justify-end sm:flex">
           <p className="whitespace-nowrap font-light font-mono text-muted-foreground text-sm uppercase leading-5 tracking-[0.28px]">
             [ Ready to Rip ]
           </p>
@@ -197,9 +173,7 @@ export function FooterSkeleton() {
               <div className="h-8 w-44 animate-pulse rounded bg-accent-green-foreground/10" />
               <div className="h-10 w-full animate-pulse rounded bg-accent-green-foreground/10" />
             </div>
-            {/* Systems-operational pill */}
             <div className="h-7 w-52 animate-pulse rounded-full bg-accent-green-foreground/10" />
-            {/* Social icons */}
             <div className="flex items-center gap-3">
               {[1, 2, 3, 4, 5].map((i) => (
                 <div
@@ -233,7 +207,6 @@ export function FooterSkeleton() {
                 <div className="h-4 w-32 animate-pulse rounded bg-accent-green-foreground/10" />
                 <div className="h-4 w-24 animate-pulse rounded bg-accent-green-foreground/10" />
               </div>
-              {/* Theme toggle */}
               <div className="h-8 w-16 animate-pulse rounded-full bg-accent-green-foreground/10" />
             </div>
           </div>
@@ -317,16 +290,22 @@ function Footer({ data, settingsData }: FooterProps) {
               {credits && credits.length > 0 && (
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-accent-green-foreground/70 text-sm tracking-[0.24px] lg:flex-nowrap">
                   {credits.map((item, index) => {
+                    const logoHeight = normalizedLogoHeight(item.logo, {
+                      base: 34,
+                      min: 11,
+                      max: 18,
+                    });
                     const creditContent = (
                       <span className="flex items-center gap-1 whitespace-nowrap">
                         {item.label}
                         {item.logo?.id && (
                           <span className="flex shrink-0 items-center">
                             <SanityImage
-                              className="h-4 w-auto max-w-none rounded-none! object-contain"
-                              height={16}
+                              className="w-auto max-w-none rounded-none! object-contain"
+                              height={logoHeight}
                               image={item.logo}
                               loading="lazy"
+                              style={{ height: logoHeight }}
                               width={75}
                             />
                           </span>
