@@ -6,7 +6,6 @@
 
 import {
   buttonsToMarkdown,
-  cardHeading,
   eyebrowToMarkdown,
   headingToMarkdown,
   imageToMarkdown,
@@ -320,45 +319,4 @@ test("mdLink escapes markdown metacharacters in the label", () => {
 
 test("mdLink wraps href with parentheses in angle brackets", () => {
   expect(mdLink("Link", "/wiki/foo_(bar)")).toBe("[Link](</wiki/foo_(bar)>)");
-});
-
-// ─── cardHeading ─────────────────────────────────────────────────────────────
-
-test("cardHeading returns a linked h3 when title and href are both valid", () => {
-  expect(cardHeading("Hero Block", "/hero")).toBe("### [Hero Block](/hero)");
-});
-
-test("cardHeading returns plain h3 (no link) when href is '#'", () => {
-  expect(cardHeading("Hero Block", "#")).toBe("### Hero Block");
-});
-
-test("cardHeading returns plain h3 when href is null", () => {
-  expect(cardHeading("Card", null)).toBe("### Card");
-});
-
-test("cardHeading returns plain h3 when href is undefined", () => {
-  expect(cardHeading("Card", undefined)).toBe("### Card");
-});
-
-test("cardHeading escapes markdown chars in title", () => {
-  expect(cardHeading("user_name [special]", "/path")).toBe(
-    "### [user\\_name \\[special\\]](/path)"
-  );
-});
-
-test("cardHeading uses the href as heading text when title is empty", () => {
-  expect(cardHeading("", "/features")).toBe("### /features");
-});
-
-test("cardHeading returns empty string when title is empty and href is '#'", () => {
-  expect(cardHeading("", "#")).toBe("");
-});
-
-test("cardHeading returns empty string when title is empty and href is null", () => {
-  expect(cardHeading("", null)).toBe("");
-  expect(cardHeading("", undefined)).toBe("");
-});
-
-test("cardHeading wraps paren-containing href in angle brackets when title is empty", () => {
-  expect(cardHeading("", "/docs/foo_(bar)")).toBe("### </docs/foo_(bar)>");
 });

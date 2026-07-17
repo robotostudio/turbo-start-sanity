@@ -64,15 +64,6 @@ const CONFIGS: Record<string, SlugValidationOptions> = {
       (s) => (s !== "/blog" ? ["Blog index must be exactly '/blog'"] : []),
     ],
   },
-  showcasePage: {
-    documentType: "Showcase page",
-    requireSlash: true,
-    sanityDocumentType: "showcasePage",
-    customValidators: [
-      (s) =>
-        s !== "/showcase" ? ["Showcase page must be exactly '/showcase'"] : [],
-    ],
-  },
   homePage: {
     documentType: "Home page",
     requireSlash: true,

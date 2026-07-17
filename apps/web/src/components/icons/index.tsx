@@ -1,19 +1,4 @@
-// Single source for hand-authored inline SVG icons used across the web app.
-// Each icon renders verbatim SVG paths and accepts a `className` so callers
-// control size/color. Two visually distinct families live here on purpose:
-//   * "Share glyphs" (currentColor, ~18px) used by the blog Table of Contents
-//     share row — XIcon, InstagramIcon, LinkedInIcon, RedditIcon, CopyLinkIcon.
-//   * "Brand marks" (solid social logos) used by the footer social links —
-//     the *BrandIcon set plus FacebookIcon, YoutubeIcon, GithubIcon.
-// They are kept separate because collapsing e.g. X/Reddit/Instagram into one
-// component would visibly change one surface (the footer marks include the
-// full brand shapes/backgrounds that the share glyphs omit).
-
 type IconProps = { className?: string };
-
-// ---------------------------------------------------------------------------
-// Share glyphs — currentColor, follow the surrounding text color.
-// ---------------------------------------------------------------------------
 
 export function XIcon({ className }: Readonly<IconProps>) {
   return (
@@ -99,27 +84,6 @@ export function CopyLinkIcon({ className }: Readonly<IconProps>) {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path d="M5.8125 5.8125V4.3125C5.8125 3.48407 6.48407 2.8125 7.3125 2.8125H13.6875C14.5159 2.8125 15.1875 3.48407 15.1875 4.3125V10.695C15.1875 11.5235 14.5159 12.195 13.6875 12.195H12.1875M2.8125 7.3125V13.6875C2.8125 14.5159 3.48407 15.1875 4.3125 15.1875H10.6875C11.5159 15.1875 12.1875 14.5159 12.1875 13.6875V7.3125C12.1875 6.48407 11.5159 5.8125 10.6875 5.8125H4.3125C3.48407 5.8125 2.8125 6.48407 2.8125 7.3125Z" />
-    </svg>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// "Built by Roboto" badge glyph (showcase cards).
-// ---------------------------------------------------------------------------
-
-export function RobotoIcon({ className }: Readonly<IconProps>) {
-  return (
-    <svg
-      aria-hidden="true"
-      className={className}
-      fill="none"
-      viewBox="0 0 14 12"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M10.8333 8.16L12.7593 6.24V2.4L10.3518 0H4.81481L2.40741 2.4H10.3518V6.24H4.79315L3.37037 7.6584H2.40741V2.4L0 4.8V12H2.40741V8.1384H6.72148L10.3518 12H13.2407L9.87037 8.16H10.8333Z"
-        fill="currentColor"
-      />
     </svg>
   );
 }
@@ -221,8 +185,6 @@ export function InstagramBrandIcon({ className }: Readonly<IconProps>) {
   );
 }
 
-// Official GitHub mark (octocat) — the recognizable brand logo, rather than
-// lucide's simplified glyph.
 export function GithubIcon({ className }: Readonly<IconProps>) {
   return (
     <svg

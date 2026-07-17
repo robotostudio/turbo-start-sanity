@@ -25,7 +25,6 @@ export interface MarkdownCard {
   _key?: string | null;
   title?: string | null;
   description?: string | null;
-  href?: string | null;
   // Feature-card icon — intentionally dropped from Markdown (a test guards this).
   icon?: string | null;
   image?: MarkdownImage | null;
@@ -58,6 +57,13 @@ export interface MarkdownSocial {
   href?: string | null;
 }
 
+export interface MarkdownShowcaseItem {
+  _key?: string | null;
+  siteName?: string | null;
+  attributionName?: string | null;
+  url?: string | null;
+}
+
 export interface MarkdownFaqCategory {
   _key?: string | null;
   title?: string | null;
@@ -76,6 +82,8 @@ export interface MarkdownBlock {
   _key?: string;
   title?: string | null;
   eyebrow?: string | null;
+  description?: string | null;
+  items?: MarkdownShowcaseItem[] | null;
   badge?: string | null;
   subtitle?: string | null;
   richText?: PortableTextValue;
@@ -159,17 +167,4 @@ export function mdLink(
   return href && href !== "#"
     ? `[${escapeMarkdown(label)}](${formatUrl(absolutizeUrl(href, options.baseUrl))})`
     : escapeMarkdown(label);
-}
-
-export function cardHeading(
-  title: string,
-  href: string | null | undefined,
-  options: MarkdownOptions = {}
-): string {
-  if (title) {
-    return `### ${mdLink(title, href, options)}`;
-  }
-  return href && href !== "#"
-    ? `### ${formatUrl(absolutizeUrl(href, options.baseUrl))}`
-    : "";
 }

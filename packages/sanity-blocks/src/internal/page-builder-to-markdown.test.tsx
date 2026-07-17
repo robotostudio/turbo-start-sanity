@@ -130,20 +130,9 @@ test("treats '#' href as no link (plain text fallback)", () => {
   ]);
   expect(faq).toContain("More");
   expect(faq).not.toContain("(#)");
-
-  const cards = pageBuilderToMarkdown([
-    {
-      _type: "imageLinkCards",
-      title: "T",
-      cards: [{ _key: "c", title: "Card", href: "#", description: "d" }],
-    },
-  ]);
-  // "#" href cards are kept as plain-text headings (no link).
-  expect(cards).toContain("### Card");
-  expect(cards).not.toContain("](#)");
 });
 
-test("keeps no-href links and cards as plain text instead of dropping them", () => {
+test("keeps no-href links as plain text instead of dropping them", () => {
   const faq = pageBuilderToMarkdown([
     {
       _type: "faqAccordion",
@@ -160,17 +149,6 @@ test("keeps no-href links and cards as plain text instead of dropping them", () 
   ]);
   expect(faq).toContain("All questions");
   expect(faq).not.toContain("](");
-
-  const cards = pageBuilderToMarkdown([
-    {
-      _type: "imageLinkCards",
-      title: "T",
-      cards: [{ _key: "c", title: "Solo Card", description: "Details" }],
-    },
-  ]);
-  expect(cards).toContain("### Solo Card");
-  expect(cards).toContain("Details");
-  expect(cards).not.toContain("](");
 });
 
 test("separates blocks with a blank line", () => {

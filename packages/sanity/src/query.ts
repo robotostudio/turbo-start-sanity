@@ -2,9 +2,9 @@ import { ctaGroqProjection } from "@workspace/sanity-blocks/cta/cta.groq";
 import { faqAccordionGroqProjection } from "@workspace/sanity-blocks/faq-accordion/faq-accordion.groq";
 import { featureCardsIconGroqProjection } from "@workspace/sanity-blocks/feature-cards-icon/feature-cards-icon.groq";
 import { heroGroqProjection } from "@workspace/sanity-blocks/hero/hero.groq";
-import { imageLinkCardsGroqProjection } from "@workspace/sanity-blocks/image-link-cards/image-link-cards.groq";
 import { logoCloudGroqProjection } from "@workspace/sanity-blocks/logo-cloud/logo-cloud.groq";
 import { richTextBlockGroqProjection } from "@workspace/sanity-blocks/rich-text-block/rich-text-block.groq";
+import { showcaseGridGroqProjection } from "@workspace/sanity-blocks/showcase-grid/showcase-grid.groq";
 import { socialGridGroqProjection } from "@workspace/sanity-blocks/social-grid/social-grid.groq";
 import { subscribeNewsletterGroqProjection } from "@workspace/sanity-blocks/subscribe-newsletter/subscribe-newsletter.groq";
 import { defineQuery } from "next-sanity";
@@ -117,9 +117,9 @@ const pageBuilderFragment = /* groq */ `
     ${faqAccordionGroqProjection},
     ${featureCardsIconGroqProjection},
     ${subscribeNewsletterGroqProjection},
-    ${imageLinkCardsGroqProjection},
     ${logoCloudGroqProjection},
     ${socialGridGroqProjection},
+    ${showcaseGridGroqProjection},
     ${richTextBlockGroqProjection}
   }
 `;
@@ -348,33 +348,6 @@ export const querySettingsData = defineQuery(`
     "logo": logos.logo.asset->url + "?w=80&h=40&dpr=3&fit=max",
     "socialLinks": socialLinks,
     "contactEmail": contactEmail,
-  }
-`);
-
-export const queryShowcasePageData =
-  defineQuery(`*[_type == "showcasePage" && _id == "showcasePage"][0]{
-    _id,
-    _type,
-    headline,
-    description,
-    "slug": slug.current
-  }`);
-
-export const queryShowcaseItems = defineQuery(`
-  *[_type == "showcaseItem"] | order(orderRank asc){
-    _id,
-    _type,
-    siteName,
-    url,
-    "screenshot": screenshot{
-      ${imageFields}
-    },
-    attributionName,
-    "attributionLogo": attributionLogo{
-      ${imageFields}
-    },
-    builtByRoboto,
-    featured
   }
 `);
 

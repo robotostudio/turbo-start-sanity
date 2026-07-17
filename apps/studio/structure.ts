@@ -5,8 +5,6 @@ import {
   File,
   FileText,
   HomeIcon,
-  Images,
-  LayoutGrid,
   type LucideIcon,
   MessageCircle,
   PanelBottom,
@@ -126,12 +124,6 @@ export const structure = (
         type: "redirect",
         title: "Redirects",
         icon: TrendingUpDown,
-      }),
-      createIndexListWithOrderableItems({
-        S,
-        index: { type: "showcasePage", title: "Showcase", icon: LayoutGrid },
-        list: { type: "showcaseItem", title: "Showcase Items", icon: Images },
-        context,
       }),
       S.divider(),
       S.listItem()

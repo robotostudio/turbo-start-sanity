@@ -5,9 +5,9 @@ import { ctaToMarkdown } from "../cta/markdown";
 import { faqAccordionToMarkdown } from "../faq-accordion/markdown";
 import { featureCardsIconToMarkdown } from "../feature-cards-icon/markdown";
 import { heroToMarkdown } from "../hero/markdown";
-import { imageLinkCardsToMarkdown } from "../image-link-cards/markdown";
 import { logoCloudToMarkdown } from "../logo-cloud/markdown";
 import { richTextBlockToMarkdown } from "../rich-text-block/markdown";
+import { showcaseGridToMarkdown } from "../showcase-grid/markdown";
 import { socialGridToMarkdown } from "../social-grid/markdown";
 import { subscribeNewsletterToMarkdown } from "../subscribe-newsletter/markdown";
 import {
@@ -32,12 +32,12 @@ function blockToMarkdown(
       return richTextBlockToMarkdown(block, options);
     case "featureCardsIcon":
       return featureCardsIconToMarkdown(block, options);
-    case "imageLinkCards":
-      return imageLinkCardsToMarkdown(block, options);
     case "logoCloud":
       return logoCloudToMarkdown(block, options);
     case "socialGrid":
       return socialGridToMarkdown(block, options);
+    case "showcaseGrid":
+      return showcaseGridToMarkdown(block, options);
     case "faqAccordion":
       return faqAccordionToMarkdown(block, options);
     case "subscribeNewsletter":

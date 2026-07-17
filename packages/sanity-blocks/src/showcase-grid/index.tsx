@@ -1,3 +1,4 @@
+import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import {
   SanityImage,
   type SanityImageData,
@@ -5,8 +6,26 @@ import {
 import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 
-import { RobotoIcon } from "@/components/icons";
-import type { ShowcaseItemData, ShowcasePageData } from "@/types";
+export interface ShowcaseGridItem {
+  _key: string;
+  siteName?: string | null;
+  url?: string | null;
+  screenshot?: SanityImageData | null;
+  attributionName?: string | null;
+  attributionLogo?: SanityImageData | null;
+  builtByRoboto?: boolean | null;
+  featured?: boolean | null;
+}
+
+export interface ShowcaseGridProps {
+  /** Supplied by the renderer (not Sanity data): the page's own title,
+   * shown as the "Home / <title>" breadcrumb when set. */
+  pageTitle?: string | null;
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  items?: ShowcaseGridItem[] | null;
+}
 
 type ImageSource =
   | { kind: "sanity"; image: SanityImageData }
@@ -64,7 +83,7 @@ function getInitials(name: string) {
   return initials || "?";
 }
 
-function cmsToView(item: ShowcaseItemData): CardView {
+function cmsToView(item: ShowcaseGridItem): CardView {
   const attributionName = item.attributionName ?? item.siteName ?? "Untitled";
   const initialsLogo: LogoSource = {
     kind: "initials",
@@ -86,7 +105,7 @@ function cmsToView(item: ShowcaseItemData): CardView {
     : { kind: "none" };
 
   return {
-    id: item._id,
+    id: item._key,
     name: item.siteName ?? "Untitled",
     attributionName,
     url: item.url ?? null,
@@ -94,6 +113,23 @@ function cmsToView(item: ShowcaseItemData): CardView {
     logo,
     builtByRoboto: item.builtByRoboto ?? false,
   };
+}
+
+function RobotoIcon({ className }: Readonly<{ className?: string }>) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 14 12"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M10.8333 8.16L12.7593 6.24V2.4L10.3518 0H4.81481L2.40741 2.4H10.3518V6.24H4.79315L3.37037 7.6584H2.40741V2.4L0 4.8V12H2.40741V8.1384H6.72148L10.3518 12H13.2407L9.87037 8.16H10.8333Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
 }
 
 function ScreenshotImage({
@@ -140,7 +176,7 @@ function AttributionLogo({
   if (logo.kind === "url") {
     return (
       <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden">
-        {/* biome-ignore lint/performance/noImgElement: external redirect URL (microlink/google favicon) — next/image can't handle the redirect */}
+        {/* biome-ignore lint/performance/noImgElement: external redirect URL (google favicon) — next/image can't handle the redirect */}
         <img
           alt={`${name} logo`}
           className="size-6 object-contain"
@@ -171,27 +207,6 @@ function BuiltByRobotoBadge() {
         Built by Roboto
       </span>
     </span>
-  );
-}
-
-function ShowcaseBreadcrumb() {
-  return (
-    <nav aria-label="Breadcrumb">
-      <ol className="flex items-center gap-1.5 text-sm">
-        <li>
-          <Link
-            className="focus-ring text-muted-foreground transition-colors hover:text-foreground"
-            href="/"
-          >
-            Home
-          </Link>
-        </li>
-        <li aria-hidden="true" className="text-muted-foreground">
-          /
-        </li>
-        <li className="text-foreground">Showcase</li>
-      </ol>
-    </nav>
   );
 }
 
@@ -251,79 +266,124 @@ function ShowcaseCard({ item }: Readonly<{ item: CardView }>) {
   );
 }
 
-function ShowcaseHero({
-  headline,
-  description,
-  featured,
-}: Readonly<{
-  headline: string;
-  description: string;
-  featured: CardView;
-}>) {
+function ShowcaseBreadcrumb({ label }: Readonly<{ label: string }>) {
   return (
-    <section className="relative left-1/2 w-screen -translate-x-1/2 px-4 sm:px-6 lg:px-8">
-      <div className="grid gap-8 sm:gap-12 lg:grid-cols-2 lg:items-stretch">
-        <div className="flex flex-col justify-between gap-10">
-          <ShowcaseBreadcrumb />
-          <div className="flex flex-col gap-6">
-            <h1 className="text-balance font-normal text-4xl leading-tight tracking-tight sm:text-5xl">
-              {headline}
-            </h1>
-            <p className="body-text max-w-xl text-muted-foreground">
-              {description}
-            </p>
-          </div>
-        </div>
-        <div className="bg-grid-dots p-7 text-zinc-800 dark:text-zinc-50 [background-size:5.3px_5.3px]">
-          <div className="relative aspect-video w-full overflow-hidden bg-muted">
-            <ScreenshotImage
-              name={featured.name}
-              screenshot={featured.screenshot}
-              sizes="(min-width: 1024px) 50vw, 100vw"
-            />
-          </div>
-          <div className="flex items-center gap-2 bg-zinc-100 px-4 py-2 text-foreground dark:bg-zinc-900">
-            <AttributionLogo
-              logo={featured.logo}
-              name={featured.attributionName}
-            />
-            <span className="flex-1 font-medium text-base text-foreground">
-              {featured.name}
-            </span>
-            <span className="text-muted-foreground text-sm">Featured</span>
-          </div>
-        </div>
-      </div>
-    </section>
+    <nav aria-label="Breadcrumb">
+      <ol className="flex items-center gap-1.5 text-sm">
+        <li>
+          <Link
+            className="focus-ring text-muted-foreground transition-colors hover:text-foreground"
+            href="/"
+          >
+            Home
+          </Link>
+        </li>
+        <li aria-hidden="true" className="text-muted-foreground">
+          /
+        </li>
+        <li className="text-foreground">{label}</li>
+      </ol>
+    </nav>
   );
 }
 
-export function ShowcasePageContent({
-  data,
-  items,
+function ShowcaseHeader({
+  eyebrow,
+  title,
+  description,
 }: Readonly<{
-  data?: ShowcasePageData;
-  items?: ShowcaseItemData[];
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
 }>) {
+  return (
+    <div className="flex flex-col items-start gap-6">
+      <BlockEyebrow eyebrow={eyebrow} />
+      {title ? <h2 className="max-w-3xl block-title">{title}</h2> : null}
+      {description ? (
+        <p className="body-text max-w-xl text-muted-foreground">
+          {description}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+// Deliberately no `w-screen -translate-x-1/2` full-bleed here: the old page's
+// hack clips at the left edge inside the Presentation tool's iframe.
+function ShowcaseHero({
+  pageTitle,
+  eyebrow,
+  title,
+  description,
+  featured,
+}: Readonly<{
+  pageTitle?: string | null;
+  eyebrow?: string | null;
+  title?: string | null;
+  description?: string | null;
+  featured: CardView;
+}>) {
+  return (
+    <div className="grid gap-8 sm:gap-12 lg:grid-cols-2 lg:items-stretch">
+      <div
+        className={cn(
+          "flex flex-col",
+          pageTitle ? "justify-between gap-10" : "justify-center"
+        )}
+      >
+        {pageTitle ? <ShowcaseBreadcrumb label={pageTitle} /> : null}
+        <ShowcaseHeader
+          description={description}
+          eyebrow={eyebrow}
+          title={title}
+        />
+      </div>
+      <div className="bg-grid-dots p-7 text-zinc-800 dark:text-zinc-50 [background-size:5.3px_5.3px]">
+        <div className="relative aspect-video w-full overflow-hidden bg-muted">
+          <ScreenshotImage
+            name={featured.name}
+            screenshot={featured.screenshot}
+            sizes="(min-width: 1024px) 50vw, 100vw"
+          />
+        </div>
+        <div className="flex items-center gap-2 bg-zinc-100 px-4 py-2 text-foreground dark:bg-zinc-900">
+          <AttributionLogo
+            logo={featured.logo}
+            name={featured.attributionName}
+          />
+          <span className="flex-1 font-medium text-base text-foreground">
+            {featured.name}
+          </span>
+          <span className="text-muted-foreground text-sm">Featured</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function ShowcaseGrid({
+  pageTitle,
+  eyebrow,
+  title,
+  description,
+  items,
+}: Readonly<ShowcaseGridProps>) {
   const cmsItems = items ?? [];
   const featuredItem = cmsItems.find((item) => item.featured) ?? cmsItems[0];
 
-  const headline = data?.headline ?? "";
-  const description = data?.description ?? "";
-
   if (!featuredItem) {
     return (
-      <main className="container flex flex-col gap-24 overflow-x-clip py-24">
-        <section className="flex flex-col gap-6">
-          <ShowcaseBreadcrumb />
-          <h1 className="text-balance font-normal text-4xl leading-tight tracking-tight sm:text-5xl">
-            {headline}
-          </h1>
-          <p className="body-text max-w-lg text-muted-foreground">
-            {description}
-          </p>
-        </section>
-      </main>
+      <section className="bg-background pt-18 pb-24" id="showcase">
+        <div className="container flex flex-col gap-10">
+          {pageTitle ? <ShowcaseBreadcrumb label={pageTitle} /> : null}
+          <ShowcaseHeader
+            description={description}
+            eyebrow={eyebrow}
+            title={title}
+          />
+        </div>
+      </section>
     );
   }
 
@@ -331,17 +391,23 @@ export function ShowcasePageContent({
   const cards = cmsItems.filter((item) => item !== featuredItem).map(cmsToView);
 
   return (
-    <main className="container flex flex-col gap-24 overflow-x-clip py-24">
-      <ShowcaseHero
-        description={description}
-        featured={featured}
-        headline={headline}
-      />
-      <section className="grid gap-x-6 gap-y-8 sm:grid-cols-2 sm:gap-y-12 lg:grid-cols-3">
-        {cards.map((item) => (
-          <ShowcaseCard item={item} key={item.id} />
-        ))}
-      </section>
-    </main>
+    <section className="bg-background pt-18 pb-24" id="showcase">
+      <div className="container flex flex-col gap-24">
+        <ShowcaseHero
+          description={description}
+          eyebrow={eyebrow}
+          featured={featured}
+          pageTitle={pageTitle}
+          title={title}
+        />
+        {cards.length > 0 ? (
+          <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 sm:gap-y-12 lg:grid-cols-3">
+            {cards.map((item) => (
+              <ShowcaseCard item={item} key={item.id} />
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </section>
   );
 }
