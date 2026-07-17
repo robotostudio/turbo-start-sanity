@@ -1,6 +1,4 @@
 import { env } from "@workspace/env/client";
-import type { PortableTextBlock } from "next-sanity";
-import slugify from "slugify";
 
 export const getBaseUrl = () => {
   if (env.NEXT_PUBLIC_VERCEL_ENV === "production") {
@@ -38,33 +36,11 @@ export async function handleErrors<T>(
   }
 }
 
-const DEFAULT_SLUG_OPTIONS: { fallback?: string } = { fallback: "top-level" };
-
-function convertToSlug(
-  text?: string,
-  { fallback }: { fallback?: string } = DEFAULT_SLUG_OPTIONS
-) {
-  if (!text) {
-    return fallback;
-  }
-  return slugify(text.trim(), {
-    lower: true,
-    remove: /[^a-zA-Z0-9 ]/g,
-  });
-}
-
-export function parseChildrenToSlug(children: PortableTextBlock["children"]) {
-  if (!children) {
-    return "";
-  }
-  return convertToSlug(children.map((child) => child.text).join(""));
-}
-
 // Number of blog cards rendered in the grid list on every page. On page 1 the
 // full-width featured card sits above these, so page 1 consumes one extra
 // document (1 featured + BLOG_LIST_PAGE_SIZE list = 10 docs). Every later page
 // shows BLOG_LIST_PAGE_SIZE (9) list docs only.
-export const BLOG_LIST_PAGE_SIZE = 9;
+const BLOG_LIST_PAGE_SIZE = 9;
 
 /**
  * GROQ slice window `[start, end)` into the full ordered blog list for a given
