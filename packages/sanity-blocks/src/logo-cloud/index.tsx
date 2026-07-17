@@ -65,7 +65,7 @@ export function LogoCloud({ logos, title }: Readonly<LogoCloudProps>) {
   return (
     <section
       aria-label="Logo cloud"
-      className="mt-20 overflow-hidden bg-accent-green py-4"
+      className="mt-20 overflow-hidden bg-accent-green py-[20px]"
       id="logo-cloud"
       onMouseEnter={() => setPlaybackRate(HOVER_PLAYBACK_RATE)}
       onMouseLeave={() => setPlaybackRate(1)}
