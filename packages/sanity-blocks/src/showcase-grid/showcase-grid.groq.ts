@@ -10,7 +10,6 @@ export const showcaseGridGroqProjection = /* groq */ `
       "screenshot": screenshot{
         ${imageFields}
       },
-      attributionName,
       "attributionLogo": attributionLogo{
         ${imageFields}
       },

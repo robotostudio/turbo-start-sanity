@@ -11,15 +11,12 @@ export interface ShowcaseGridItem {
   siteName?: string | null;
   url?: string | null;
   screenshot?: SanityImageData | null;
-  attributionName?: string | null;
   attributionLogo?: SanityImageData | null;
   builtByRoboto?: boolean | null;
   featured?: boolean | null;
 }
 
 export interface ShowcaseGridProps {
-  /** Supplied by the renderer (not Sanity data): the page's own title,
-   * shown as the "Home / <title>" breadcrumb when set. */
   pageTitle?: string | null;
   eyebrow?: string | null;
   title?: string | null;
@@ -39,7 +36,6 @@ type LogoSource =
 type CardView = {
   id: string;
   name: string;
-  attributionName: string;
   url: string | null;
   screenshot: ImageSource;
   logo: LogoSource;
@@ -84,10 +80,10 @@ function getInitials(name: string) {
 }
 
 function cmsToView(item: ShowcaseGridItem): CardView {
-  const attributionName = item.attributionName ?? item.siteName ?? "Untitled";
+  const name = item.siteName ?? "Untitled";
   const initialsLogo: LogoSource = {
     kind: "initials",
-    initials: getInitials(attributionName),
+    initials: getInitials(name),
     className: "bg-foreground text-background",
   };
   const faviconUrl = item.url ? faviconFor(item.url) : null;
@@ -106,8 +102,7 @@ function cmsToView(item: ShowcaseGridItem): CardView {
 
   return {
     id: item._key,
-    name: item.siteName ?? "Untitled",
-    attributionName,
+    name,
     url: item.url ?? null,
     screenshot,
     logo,
@@ -211,7 +206,8 @@ function BuiltByRobotoBadge() {
 }
 
 function ShowcaseCardName({ item }: Readonly<{ item: CardView }>) {
-  if (item.url) {
+  // Only "Built by Roboto" cards link out; everything else is display-only.
+  if (item.url && item.builtByRoboto) {
     return (
       <a
         className="text-base text-zinc-900 leading-6 outline-none dark:text-zinc-50"
@@ -220,23 +216,24 @@ function ShowcaseCardName({ item }: Readonly<{ item: CardView }>) {
         target="_blank"
       >
         <span className="absolute inset-0 z-10" />
-        {item.attributionName}
+        {item.name}
       </a>
     );
   }
   return (
     <span className="text-base text-zinc-900 leading-6 dark:text-zinc-50">
-      {item.attributionName}
+      {item.name}
     </span>
   );
 }
 
 function ShowcaseCard({ item }: Readonly<{ item: CardView }>) {
+  const clickable = Boolean(item.url && item.builtByRoboto);
   return (
     <article
       className={cn(
         "flex flex-col gap-2",
-        item.url && "group focus-ring-within relative"
+        clickable && "group focus-ring-within relative"
       )}
     >
       <div className="relative aspect-video w-full overflow-hidden bg-muted sm:min-h-[249px]">
@@ -253,7 +250,7 @@ function ShowcaseCard({ item }: Readonly<{ item: CardView }>) {
         )}
       >
         <div className="flex items-center gap-1">
-          <AttributionLogo logo={item.logo} name={item.attributionName} />
+          <AttributionLogo logo={item.logo} name={item.name} />
           <ShowcaseCardName item={item} />
         </div>
         {item.builtByRoboto ? (
@@ -348,10 +345,7 @@ function ShowcaseHero({
           />
         </div>
         <div className="flex items-center gap-2 bg-zinc-100 px-4 py-2 text-foreground dark:bg-zinc-900">
-          <AttributionLogo
-            logo={featured.logo}
-            name={featured.attributionName}
-          />
+          <AttributionLogo logo={featured.logo} name={featured.name} />
           <span className="flex-1 font-medium text-base text-foreground">
             {featured.name}
           </span>

@@ -12,7 +12,7 @@ const showcaseItem = defineArrayMember({
       type: "string",
       title: "Site Name",
       description:
-        "The name of the website or project being shown (for example: 'Volvo Chile').",
+        "The name of the site, shown as the label beneath its screenshot (for example: 'Volvo Chile').",
       validation: (Rule) => Rule.required().error("A site name is required"),
     }),
     defineField({
@@ -20,33 +20,26 @@ const showcaseItem = defineArrayMember({
       type: "url",
       title: "URL",
       description:
-        "The full web address of the live site, including https://. Used to link the screenshot to the real website.",
+        "The live site's full web address, including https://. The card links here — but the link is only clickable when this item is marked 'Built by Roboto'.",
     }),
     imageWithAltField({
       name: "screenshot",
       title: "Screenshot",
       description:
-        "A screenshot of the website's homepage. This is the main image shown in the card.",
-    }),
-    defineField({
-      name: "attributionName",
-      type: "string",
-      title: "Attribution Name",
-      description:
-        "The person, brand, or company credited for the site, shown next to the screenshot.",
+        "A screenshot of the site's homepage — the main image on the card. Use a 16:9 image for the cleanest crop.",
     }),
     imageWithAltField({
       name: "attributionLogo",
-      title: "Attribution Logo",
+      title: "Logo",
       description:
-        "An optional small logo or mark for the credited person or brand. Leave empty to show their initials instead.",
+        "Optional small logo or mark for the site, shown next to its name. Leave empty to fall back to the site's initials.",
     }),
     defineField({
       name: "builtByRoboto",
       type: "boolean",
       title: "Built by Roboto",
       description:
-        "Turn this on to show a 'Built by Roboto' badge on the card, indicating we built this site.",
+        "Mark sites we built: shows a 'Built by Roboto' badge and makes the card link out to the live site. Cards without this are display-only.",
       initialValue: false,
     }),
     defineField({
@@ -54,14 +47,14 @@ const showcaseItem = defineArrayMember({
       type: "boolean",
       title: "Featured",
       description:
-        "Turn this on to show this site in the large featured card at the top of the section. If more than one is marked, only the first is used.",
+        "Show this site in the large card at the top of the section. If several are marked, only the first is used.",
       initialValue: false,
     }),
   ],
   preview: {
     select: {
       title: "siteName",
-      subtitle: "attributionName",
+      subtitle: "url",
       media: "screenshot",
     },
     prepare: ({ title, subtitle, media }) => ({
@@ -85,14 +78,14 @@ export const showcaseGridSchema = defineType({
       title: "Eyebrow",
       type: "string",
       description:
-        'Optional short label shown in a pill above the title, for example "Showcase"',
+        "Optional short label shown in a pill above the title (for example: 'Showcase').",
     }),
     defineField({
       name: "title",
       title: "Title",
       type: "string",
       description:
-        "The large heading shown at the top of the section (for example: 'Real sites. Real traffic. Same starting point as yours.')",
+        "The large heading at the top of the section (for example: 'Real sites. Real traffic. Same starting point as yours.').",
     }),
     defineField({
       name: "description",
@@ -100,14 +93,14 @@ export const showcaseGridSchema = defineType({
       type: "text",
       rows: 3,
       description:
-        "The short paragraph shown under the title that explains what the showcase is about.",
+        "The short paragraph under the title that sets up what the showcase is about.",
     }),
     defineField({
       name: "items",
       title: "Showcase Items",
       type: "array",
       description:
-        "The websites to show in the grid. Drag to reorder — the order here is the order visitors see. Mark one item as 'Featured' to show it in the large card at the top.",
+        "The sites shown in the grid. Drag to reorder — visitors see them in this order. Mark one as Featured for the large card at the top; mark 'Built by Roboto' to make a card link out to its live site.",
       of: [showcaseItem],
     }),
   ],

@@ -34,11 +34,11 @@ test("showcaseGridToMarkdown renders items as a linked list", () => {
   expect(result).not.toContain("No Link Site](");
 });
 
-test("showcaseGridToMarkdown falls back to the attribution name and skips nameless items", () => {
+test("showcaseGridToMarkdown links the site name and skips nameless items", () => {
   const result = showcaseGridToMarkdown(
     {
       items: [
-        { _key: "i1", attributionName: "Roboto", url: "https://roboto.studio" },
+        { _key: "i1", siteName: "Roboto", url: "https://roboto.studio" },
         { _key: "i2", url: "https://nameless.example.com" },
       ],
     },
@@ -58,7 +58,6 @@ test("showcaseGridToMarkdown emits no HTML or JSX tags", () => {
         {
           _key: "i1",
           siteName: "Volvo Chile",
-          attributionName: "Roboto",
           url: "https://volvo.cl",
         },
       ],

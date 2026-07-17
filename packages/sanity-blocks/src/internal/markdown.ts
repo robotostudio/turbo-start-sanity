@@ -60,7 +60,6 @@ export interface MarkdownSocial {
 export interface MarkdownShowcaseItem {
   _key?: string | null;
   siteName?: string | null;
-  attributionName?: string | null;
   url?: string | null;
 }
 

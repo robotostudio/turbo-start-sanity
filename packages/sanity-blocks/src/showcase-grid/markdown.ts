@@ -14,7 +14,7 @@ export function showcaseGridToMarkdown(
 ): string {
   const items = (block.items ?? [])
     .map((item) => {
-      const name = (item.siteName ?? item.attributionName ?? "").trim();
+      const name = (item.siteName ?? "").trim();
       if (!name) {
         return "";
       }
