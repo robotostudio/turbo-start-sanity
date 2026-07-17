@@ -104,7 +104,9 @@ function BlogCategoryTag({ category }: Readonly<{ category?: string | null }>) {
   }
 
   return (
-    <span className="text-sm text-zinc-700 dark:text-zinc-300">{label}</span>
+    <span className="text-sm text-zinc-700 capitalize dark:text-zinc-300">
+      {label}
+    </span>
   );
 }
 
@@ -151,9 +153,7 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
             </Link>
           </h2>
           {description ? (
-            <p className="text-base text-muted-foreground leading-6">
-              {description}
-            </p>
+            <p className="body-text text-muted-foreground">{description}</p>
           ) : null}
           <BlogAuthor author={authors} />
         </div>
@@ -190,7 +190,7 @@ export function BlogCard({ blog }: BlogCardProps) {
           </Link>
         </h3>
         {description ? (
-          <p className="line-clamp-3 text-sm text-zinc-700 leading-5 dark:text-zinc-300">
+          <p className="body-text line-clamp-3 text-muted-foreground">
             {description}
           </p>
         ) : null}
@@ -229,7 +229,7 @@ export function BlogHeader({
         {title}
       </h1>
       {description ? (
-        <p className="max-w-2xl text-lg text-muted-foreground leading-8">
+        <p className="body-text max-w-2xl text-muted-foreground">
           {description}
         </p>
       ) : null}

@@ -31,7 +31,7 @@ export function SearchInput({
           />
 
           <Input
-            className="h-10 rounded-none border-border bg-transparent pr-10 pl-9 text-sm shadow-none"
+            className="h-auto rounded-none border-border bg-transparent py-1.5 pr-10 pl-[38px] text-sm shadow-none"
             id="blog-search-input"
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}

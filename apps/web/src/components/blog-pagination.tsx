@@ -11,7 +11,6 @@ export type PaginationProps = {
 
 interface BlogPaginationProps extends PaginationProps {
   className?: string;
-  // Active category filter, preserved across page navigation when set.
   category?: string;
 }
 
@@ -54,9 +53,7 @@ function generatePaginationItems(
   return items;
 }
 
-// Prev/Next labels and page numbers all use the default sans typeface.
-const navLabelBase =
-  "text-sm font-light leading-5 tracking-wide transition-colors";
+const navLabelBase = "font-light text-base leading-5 transition-colors";
 
 export function BlogPagination({
   currentPage,
@@ -91,7 +88,7 @@ export function BlogPagination({
           aria-label={`Go to page ${currentPage - 1}`}
           className={cn(
             navLabelBase,
-            "focus-ring rounded-none text-zinc-500 hover:text-foreground"
+            "focus-ring rounded-none text-zinc-400 hover:text-foreground"
           )}
           href={getPageUrl(currentPage - 1)}
         >
@@ -104,7 +101,7 @@ export function BlogPagination({
           return (
             <span
               aria-hidden="true"
-              className="text-sm font-light text-zinc-500 leading-5"
+              className="font-light font-mono text-base text-zinc-400 leading-5"
               key={item}
             >
               &hellip;
@@ -116,7 +113,7 @@ export function BlogPagination({
           return (
             <span
               aria-current="page"
-              className="flex items-center justify-center rounded-none border border-foreground px-2 py-0.5 text-sm text-foreground leading-5 dark:border-accent-green dark:text-accent-green"
+              className="flex items-center justify-center rounded-none border border-foreground px-2 pt-0.5 pb-1 font-mono text-base text-foreground leading-5 dark:border-accent-green dark:text-accent-green"
               key={item}
             >
               {item}
@@ -127,7 +124,7 @@ export function BlogPagination({
         return (
           <Link
             aria-label={`Go to page ${item}`}
-            className="focus-ring rounded-none px-0.5 text-sm font-light text-zinc-500 leading-5 transition-colors hover:text-foreground"
+            className="focus-ring rounded-none px-0.5 font-light font-mono text-base text-zinc-400 leading-5 transition-colors hover:text-foreground"
             href={getPageUrl(item)}
             key={item}
           >
@@ -141,7 +138,7 @@ export function BlogPagination({
           aria-label={`Go to page ${currentPage + 1}`}
           className={cn(
             navLabelBase,
-            "focus-ring rounded-none text-zinc-500 hover:text-foreground"
+            "focus-ring rounded-none text-zinc-400 hover:text-foreground"
           )}
           href={getPageUrl(currentPage + 1)}
         >

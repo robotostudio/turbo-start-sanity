@@ -41,8 +41,6 @@ export function BlogPageContent({
   const activeCategory = searchParams.get("category") ?? "";
   const hasCategory = activeCategory.length > 0;
 
-  // The featured card is a single, page-1-only element: post[0] renders as the
-  // full-width card and the rest fill the grid list.
   const shouldDisplayFeaturedBlogs =
     Boolean(displayFeaturedBlogs) &&
     paginationMetadata.currentPage === 1 &&
@@ -67,10 +65,7 @@ export function BlogPageContent({
         )}
 
         <div className="mt-10 grid gap-8 lg:mt-14 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-          {/* The dotted lattice frames the section: it lives on the outer
-              padding only while the inner container paints a solid background
-              so no dots show behind the search input or category buttons. */}
-          <aside className="h-max bg-grid-dots-dense p-4 text-muted-foreground lg:sticky lg:top-24 lg:self-start">
+          <aside className="h-max bg-grid-dots p-4 text-zinc-800 lg:sticky lg:top-24 lg:self-start dark:text-zinc-50">
             <div className="flex flex-col gap-6 bg-background p-4">
               <SearchInput
                 className="max-w-none"
