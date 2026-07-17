@@ -261,7 +261,7 @@ function Footer({ data, settingsData }: FooterProps) {
                           key={`${link?._key}-${columnIndex}-column-${column?._key}`}
                         >
                           <Link
-                            className="focus-ring rounded-sm transition-colors hover:text-accent-green-foreground/70 focus-visible:outline-accent-green-foreground!"
+                            className="focus-ring rounded-sm transition-colors hover:text-accent-green-foreground/80 focus-visible:outline-accent-green-foreground!"
                             href={link.href ?? "#"}
                             rel={
                               link.openInNewTab
@@ -323,7 +323,7 @@ function Footer({ data, settingsData }: FooterProps) {
                         )}
                         {item.url ? (
                           <a
-                            className="focus-ring rounded-sm transition-opacity hover:opacity-70 focus-visible:outline-accent-green-foreground!"
+                            className="focus-ring rounded-sm transition-opacity hover:opacity-90 focus-visible:outline-accent-green-foreground!"
                             href={item.url}
                             rel="noopener noreferrer"
                             target="_blank"
