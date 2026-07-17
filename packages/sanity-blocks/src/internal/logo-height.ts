@@ -4,11 +4,7 @@ type NormalizeOptions = {
   max: number;
 };
 
-// Parse the aspect ratio straight from the Sanity asset id
-// (`image-<hash>-<width>x<height>-<format>`). Kept inline (rather than reusing
-// getImageDimensions) so this stays a plain, server-safe function — the image
-// helpers live in a "use client" module and can't be called from a Server
-// Component like the footer.
+
 function aspectRatioFromId(
   image: { id?: string | null } | null | undefined
 ): number | null {
@@ -28,12 +24,7 @@ function aspectRatioFromId(
   return width / height;
 }
 
-// The "logo soup" fix (sanity.io/blog/the-logo-soup-problem): sizing every logo
-// to one fixed height makes wide wordmarks dominate and square marks look tiny.
-// Normalize by AREA instead — height = base / sqrt(aspectRatio) — so a wide
-// wordmark sits shorter and a square mark taller, giving each roughly equal
-// visual weight. Clamped so extreme ratios stay legible. Shared by the logo
-// cloud marquee, the CTA "used by teams" grid, and the footer credits.
+
 export function normalizedLogoHeight(
   image: { id?: string | null } | null | undefined,
   { base, min, max }: NormalizeOptions

@@ -110,6 +110,7 @@ export function SanityImage({ image, ...props }: SanityImageProps) {
         height={props.height}
         loading={props.loading}
         src={svgUrl}
+        style={props.style}
         width={props.width}
       />
     );

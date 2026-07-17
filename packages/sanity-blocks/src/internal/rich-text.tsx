@@ -25,7 +25,7 @@ const components: Partial<PortableTextReactComponents> = {
       const slug = parseChildrenToSlug(value.children);
       return (
         <h2
-          className="scroll-m-20 border-b pb-2 font-semibold text-3xl first:mt-0"
+          className="mt-12 mb-8 scroll-m-20 font-medium text-4xl leading-[48px] tracking-[-0.24px] first:mt-0"
           id={slug}
         >
           {children}
@@ -35,7 +35,10 @@ const components: Partial<PortableTextReactComponents> = {
     h3: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h3 className="scroll-m-20 font-semibold text-2xl" id={slug}>
+        <h3
+          className="scroll-m-20 font-medium text-3xl leading-10 tracking-[-0.24px]"
+          id={slug}
+        >
           {children}
         </h3>
       );
@@ -43,7 +46,10 @@ const components: Partial<PortableTextReactComponents> = {
     h4: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h4 className="scroll-m-20 font-semibold text-xl" id={slug}>
+        <h4
+          className="scroll-m-20 font-medium text-2xl leading-8 tracking-[-0.24px]"
+          id={slug}
+        >
           {children}
         </h4>
       );
@@ -51,7 +57,7 @@ const components: Partial<PortableTextReactComponents> = {
     h5: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h5 className="scroll-m-20 font-semibold text-lg" id={slug}>
+        <h5 className="scroll-m-20 font-medium text-xl leading-7" id={slug}>
           {children}
         </h5>
       );
@@ -59,7 +65,7 @@ const components: Partial<PortableTextReactComponents> = {
     h6: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h6 className="scroll-m-20 font-semibold text-base" id={slug}>
+        <h6 className="scroll-m-20 font-medium text-lg leading-7" id={slug}>
           {children}
         </h6>
       );
@@ -112,7 +118,7 @@ const components: Partial<PortableTextReactComponents> = {
       return (
         <figure className="my-4">
           <SanityImage
-            className="h-auto w-full rounded-lg"
+            className="h-auto w-full"
             height={900}
             image={value}
             width={1600}
@@ -153,7 +159,9 @@ export function RichText<T extends RichTextValue>({
   return (
     <div
       className={cn(
-        "prose prose-zinc dark:prose-invert max-w-none prose-headings:scroll-m-24 prose-h2:border-b prose-h2:pb-2 prose-h2:font-semibold prose-h2:text-3xl prose-a:decoration-dotted prose-img:rounded-lg prose-h2:first:mt-0",
+        // `strong` is the design's highlight treatment: foreground ink at
+        // normal weight, not bold.
+        "prose prose-zinc dark:prose-invert max-w-none prose-headings:scroll-m-24 prose-a:decoration-dotted prose-strong:font-normal prose-strong:text-foreground prose-h2:first:mt-0 dark:prose-headings:text-zinc-100",
         className
       )}
     >
