@@ -5,7 +5,7 @@ import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons"
 import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
-import { Badge } from "@workspace/ui/components/badge";
+import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import Image from "next/image";
 
 export interface HeroBlockProps {
@@ -23,18 +23,9 @@ export function HeroBlock({
   image,
   richText,
 }: Readonly<HeroBlockProps>) {
-  // Full-bleed banner sized to the Figma "image container" (1460×533 at 1440px
-  // width): the tall 2014:1276 artwork aspect forces the height to clamp to the
-  // Figma banner height (534px, matching the intrinsic height below) on every
-  // desktop width, so the banner stays a stable fixed height regardless of the
-  // badge. On narrow viewports it scales down proportionally, floored by min-h
-  // so it never collapses. object-cover crops the artwork to fill.
   const imageHeight = "aspect-[2014/1276] max-h-[500px] min-h-[180px]";
   return (
-    <section
-      className="relative overflow-hidden bg-background pb-10 md:pb-14"
-      id="hero"
-    >
+    <section className="relative overflow-hidden bg-background" id="hero">
       <div className="w-full overflow-hidden">
         {image?.id ? (
           <SanityImage
@@ -79,16 +70,12 @@ export function HeroBlock({
       <div className="container mt-8 md:mt-10">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-12">
           <div className="grid gap-5">
-            {badge && (
-              <Badge className="w-fit border-foreground" variant="secondary">
-                {badge}
-              </Badge>
-            )}
+            <BlockEyebrow eyebrow={badge} />
             <h1 className="max-w-[827px] break-words font-normal text-4xl text-foreground leading-[1.1] tracking-[-0.24px] sm:text-5xl lg:text-[64px]">
               {title}
             </h1>
             <RichText
-              className="max-w-[633px] text-base text-muted-foreground leading-6"
+              className="body-text max-w-[633px] text-muted-foreground"
               richText={richText}
             />
           </div>
