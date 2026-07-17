@@ -23,7 +23,8 @@ export function HeroBlock({
   image,
   richText,
 }: Readonly<HeroBlockProps>) {
-  const imageHeight = "aspect-[2014/1276] max-h-[560px] min-h-[180px]";
+  const imageHeight =
+    "aspect-[4/3] min-h-[280px] object-cover object-center lg:aspect-[2014/1276] lg:max-h-[560px] lg:min-h-[180px]";
   return (
     <section className="relative overflow-hidden bg-background" id="hero">
       <div className="w-full overflow-hidden">
