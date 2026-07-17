@@ -159,7 +159,7 @@ export function SocialGrid({
       className="bg-background pt-20 pb-0 sm:pt-28 lg:pt-[136px]"
       id="socials"
     >
-      <div className="container">
+      <div className="mx-auto w-full max-w-6xl px-2">
         <div className="flex flex-col items-start gap-6">
           <BlockEyebrow eyebrow={eyebrow} />
           <div className="flex flex-col items-start gap-5">
