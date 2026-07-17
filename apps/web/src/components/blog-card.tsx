@@ -1,3 +1,4 @@
+import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
@@ -128,17 +129,6 @@ function BlogMeta({
   );
 }
 
-function FeaturedBadge() {
-  return (
-    <div className="inline-flex items-center gap-2 self-start rounded-sm border border-border px-3 py-1.5">
-      <span className="size-2 rounded-[1px] bg-accent-green" />
-      <span className="font-light font-mono text-foreground text-sm uppercase tracking-wide">
-        Featured
-      </span>
-    </div>
-  );
-}
-
 export function FeaturedBlogCard({ blog }: BlogCardProps) {
   const { title, publishedAt, slug, description, image, authors, category } =
     blog ?? {};
@@ -146,7 +136,7 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
   return (
     <article className="hover-surface group focus-ring-within relative grid grid-cols-1 border border-border lg:grid-cols-2">
       <div className="flex flex-col justify-between gap-10 p-6 sm:p-8">
-        <FeaturedBadge />
+        <BlockEyebrow eyebrow="Featured" />
         <div className="grid gap-4">
           <BlogMeta category={category} publishedAt={publishedAt} />
           <h2 className="text-balance font-normal text-3xl leading-tight tracking-tight sm:text-4xl">
@@ -171,41 +161,36 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
 export function BlogCard({ blog }: BlogCardProps) {
   if (!blog) {
     return (
-      <article className="row-span-4 grid grid-rows-subgrid border border-border p-6">
+      <article className="flex flex-col gap-4 border border-border p-6">
         <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-        <div className="grid content-start gap-2">
+        <div className="flex flex-col gap-3">
           <div className="h-6 w-full animate-pulse rounded bg-muted" />
           <div className="h-6 w-2/3 animate-pulse rounded bg-muted" />
         </div>
-        <div />
-        <div className="h-6 w-28 animate-pulse self-end rounded bg-muted" />
+        <div className="h-6 w-28 animate-pulse rounded bg-muted" />
       </article>
     );
   }
 
   const { title, publishedAt, slug, description, authors, category } = blog;
 
-  // Subgrid: the card's four sections (meta, title, description, author)
-  // occupy row tracks shared with sibling cards, so each section lines up
-  // across every card in the same listing row.
   return (
-    <article className="hover-surface group focus-ring-within relative row-span-4 grid grid-rows-subgrid border border-border p-6">
+    <article className="hover-surface group focus-ring-within relative flex flex-col gap-4 border border-border p-6">
       <BlogMeta category={category} publishedAt={publishedAt} />
-      <h3 className="font-normal text-2xl text-zinc-900 leading-[34px] dark:text-zinc-50">
-        <Link className="outline-none" href={slug ?? "#"}>
-          <span className="absolute inset-0 z-10" />
-          {title}
-        </Link>
-      </h3>
-      {description ? (
-        <p className="body-text line-clamp-3 self-start text-muted-foreground">
-          {description}
-        </p>
-      ) : (
-        // Placeholder keeps the author in the shared fourth track.
-        <div />
-      )}
-      <BlogAuthor author={authors} className="self-end" />
+      <div className="flex flex-col gap-3">
+        <h3 className="font-normal text-2xl text-zinc-900 leading-[34px] dark:text-zinc-50">
+          <Link className="outline-none" href={slug ?? "#"}>
+            <span className="absolute inset-0 z-10" />
+            {title}
+          </Link>
+        </h3>
+        {description ? (
+          <p className="body-text line-clamp-3 text-muted-foreground">
+            {description}
+          </p>
+        ) : null}
+      </div>
+      <BlogAuthor author={authors} className="mt-auto" />
     </article>
   );
 }
@@ -219,19 +204,17 @@ export function BlogHeader({
 }) {
   return (
     <div className="grid gap-6">
-      <nav aria-label="Breadcrumb">
-        <ol className="flex items-center gap-1.5 text-sm">
+      <nav aria-label="Breadcrumb" className="text-sm">
+        <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
           <li>
             <Link
-              className="focus-ring text-muted-foreground transition-colors hover:text-foreground"
+              className="focus-ring transition-colors hover:text-foreground"
               href="/"
             >
               Home
             </Link>
           </li>
-          <li aria-hidden="true" className="text-muted-foreground">
-            /
-          </li>
+          <li aria-hidden="true">/</li>
           <li className="text-foreground">Blog</li>
         </ol>
       </nav>

@@ -161,21 +161,29 @@ function BlogPageContent({
       <ArticleJsonLd article={data} />
       <div className="container flex flex-col gap-16 pt-12 pb-24 md:gap-24 md:pt-16">
         <div className="flex flex-col gap-6">
-          <nav aria-label="Breadcrumb" className="text-sm tracking-[0.01em]">
-            <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-muted-foreground">
+          <nav aria-label="Breadcrumb" className="text-sm">
+            <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
               <li>
-                <Link className="focus-ring hover:text-foreground" href="/">
+                <Link
+                  className="focus-ring transition-colors hover:text-foreground"
+                  href="/"
+                >
                   Home
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
               <li>
-                <Link className="focus-ring hover:text-foreground" href="/blog">
+                <Link
+                  className="focus-ring transition-colors hover:text-foreground"
+                  href="/blog"
+                >
                   Blog
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
-              <li className="line-clamp-1 text-foreground">{title}</li>
+              <li className="min-w-0 text-foreground">
+                <span className="block truncate">{title}</span>
+              </li>
             </ol>
           </nav>
 
