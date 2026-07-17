@@ -94,7 +94,7 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
   );
 
   const card = (
-    <div className="group relative min-h-[220px] overflow-hidden text-foreground transition-colors hover:bg-accent-green sm:min-h-0 sm:aspect-[360/248]">
+    <div className="group relative min-h-[260px] overflow-hidden text-foreground transition-colors hover:bg-accent-green sm:min-h-0 sm:aspect-[360/248]">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <span className="relative flex size-[100px] items-center justify-center bg-black text-zinc-200">
           <span
