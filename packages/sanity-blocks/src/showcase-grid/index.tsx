@@ -336,7 +336,7 @@ function ShowcaseHero({
           title={title}
         />
       </div>
-      <div className="bg-grid-dots p-7 text-zinc-800 dark:text-zinc-50 [background-size:5.3px_5.3px]">
+      <div className="bg-grid-dots bg-size-[5.5px_5.5px] p-7 text-zinc-800 dark:text-zinc-50">
         <div className="relative aspect-video w-full overflow-hidden bg-muted">
           <ScreenshotImage
             name={featured.name}

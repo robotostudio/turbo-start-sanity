@@ -72,7 +72,7 @@ export function FeatureCardsWithIcon({
           </div>
         </div>
       </div>
-      <div className="mt-12 bg-grid-dots p-[31.2px] text-zinc-800 md:mt-16 dark:text-zinc-50">
+      <div className="mt-12 bg-grid-dots p-[42px] text-zinc-800 md:mt-16 dark:text-zinc-50 [background-size:7px_7px]">
         <div className="grid bg-background lg:grid-cols-3">
           {cards?.map((card, index) => (
             <FeatureCardItem
