@@ -17,27 +17,20 @@ export interface HeroBlockProps {
   title?: string | null;
 }
 
-const imageHeight =
-  "aspect-[4/3] min-h-[280px] object-cover object-center lg:aspect-[2014/1276] lg:max-h-[520px] lg:min-h-[180px]";
-
-const compactImageHeight =
-  "aspect-[16/9] min-h-[220px] object-cover object-center lg:aspect-[2014/860] lg:max-h-[430px] lg:min-h-[160px]";
+const bannerFill = "absolute inset-0 size-full";
 
 function HeroBannerMedia({
   image,
   isCap = false,
-  compact = false,
 }: {
   image?: SanityImageData | null;
   isCap?: boolean;
-  compact?: boolean;
 }) {
-  const heightClass = cn(compact ? compactImageHeight : imageHeight, "w-full");
   if (image?.id) {
     return (
       <SanityImage
         alt={isCap ? "" : undefined}
-        className={cn(heightClass, "rounded-none! object-cover object-center")}
+        className={cn(bannerFill, "rounded-none! object-cover object-center")}
         fetchPriority={isCap ? undefined : "high"}
         height={534}
         image={image}
@@ -49,7 +42,7 @@ function HeroBannerMedia({
 
   return (
     <>
-      <div className={cn(heightClass, "relative dark:hidden")}>
+      <div className={cn(bannerFill, "dark:hidden")}>
         <Image
           alt=""
           aria-hidden="true"
@@ -60,7 +53,7 @@ function HeroBannerMedia({
           src="/hero-fallback-light.png"
         />
       </div>
-      <div className={cn(heightClass, "relative hidden dark:block")}>
+      <div className={cn(bannerFill, "hidden dark:block")}>
         <Image
           alt=""
           aria-hidden="true"
@@ -83,28 +76,28 @@ export function HeroBlock({
   richText,
   isFirst,
 }: Readonly<HeroBlockProps>) {
-  const compact = Boolean(badge?.trim());
   return (
-    <section className="relative bg-background" id="hero">
+    <section
+      className="relative flex min-h-svh flex-col bg-background"
+      id="hero"
+    >
       {isFirst && (
         <div
           aria-hidden="true"
           className="-scale-y-100 pointer-events-none absolute inset-x-0 bottom-full h-64 select-none"
         >
-          <HeroBannerMedia compact={compact} image={image} isCap />
-          {/* Fades the revealed artwork out the further the rubber-band pulls
-              (this wrapper is flipped, so local top = the visible seam). */}
+          <HeroBannerMedia image={image} isCap />
           <div
             aria-hidden="true"
             className="absolute inset-0 bg-linear-to-b from-transparent to-background"
           />
         </div>
       )}
-      <div className="w-full overflow-hidden">
-        <HeroBannerMedia compact={compact} image={image} />
+      <div className="relative min-h-[220px] w-full flex-1 overflow-hidden">
+        <HeroBannerMedia image={image} />
       </div>
 
-      <div className="container mt-8 md:mt-10">
+      <div className="container mt-8 pb-8 md:mt-10 md:pb-12">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-12">
           <div className="grid gap-5">
             <BlockEyebrow eyebrow={badge} />
@@ -117,7 +110,7 @@ export function HeroBlock({
             />
           </div>
           <SanityButtons
-            buttonClassName="w-full sm:w-auto"
+            buttonClassName="h-auto w-full py-3 text-xl leading-8 sm:w-auto"
             buttons={buttons}
             className="gap-3 sm:flex-row lg:justify-end"
           />
