@@ -48,7 +48,7 @@ const dominantColorSeoImageRender = ({
     tw="flex flex-col justify-between w-full h-full p-[70px]"
   >
     <div tw="flex items-center justify-between w-full">
-      <div tw="flex text-white text-2xl font-semibold">
+      <div tw="flex text-white text-4xl font-semibold">
         {siteTitle ?? "Turbo Start Sanity"}
       </div>
       {/* Type pill: blog posts only */}
