@@ -4,9 +4,7 @@ import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import type { ButtonProps } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
-import type { CSSProperties } from "react";
 
-import { normalizedLogoHeight } from "../internal/logo-height";
 import { LogoLinkCell } from "../internal/logo-link-cell";
 
 export interface CtaUsedByTeamsLogo {
@@ -30,29 +28,13 @@ export interface CtaBlockProps {
 }
 
 function UsedByTeamsLogo({ logo }: Readonly<{ logo: CtaUsedByTeamsLogo }>) {
-  const baseHeight = normalizedLogoHeight(logo.image, {
-    base: 26,
-    min: 18,
-    max: 30,
-  });
-  const desktopHeight = normalizedLogoHeight(logo.image, {
-    base: 30,
-    min: 21,
-    max: 34,
-  });
   return (
     <LogoLinkCell
       cellClassName="flex items-center justify-center bg-background px-2 py-4 lg:w-[165px]"
       height={24}
       href={logo.href}
       image={logo.image}
-      imageClassName="h-[var(--logo-h)] w-auto max-w-full object-contain md:h-[var(--logo-h-md)] dark:invert"
-      imageStyle={
-        {
-          "--logo-h": `${baseHeight}px`,
-          "--logo-h-md": `${desktopHeight}px`,
-        } as CSSProperties
-      }
+      imageClassName="h-6 w-auto max-w-full object-contain md:h-[22px] dark:invert"
       openInNewTab={logo.openInNewTab}
       width={156}
     />
@@ -85,8 +67,6 @@ export function CTABlock({
             </div>
           </div>
           {hasLogos && (
-            // -mx-4 mirrors the container's px-4 so the dotted grid bleeds
-            // edge-to-edge when stacked below lg; the title re-adds the inset.
             <div className="-mx-4 flex flex-col items-start gap-2 lg:mx-0">
               {usedByTeams?.title && (
                 <p className="px-4 font-light font-mono text-sm text-zinc-600 uppercase leading-6 tracking-[0.24px] lg:px-0 dark:text-zinc-300">
