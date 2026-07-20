@@ -83,7 +83,7 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
   const media = logo?.id ? (
     <span className="flex h-[42px] shrink-0 items-center justify-center">
       <SanityImage
-        className="h-[42px] w-auto max-w-full object-contain opacity-90"
+        className="h-[42px] w-auto max-w-full object-contain opacity-90 invert group-hover:invert-0 dark:invert-0"
         height={42}
         image={logo}
         width={47}
@@ -96,7 +96,7 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
   const card = (
     <div className="group relative min-h-[260px] overflow-hidden text-foreground transition-colors hover:bg-accent-green sm:min-h-0 sm:aspect-[360/248]">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <span className="relative flex size-[100px] items-center justify-center bg-black text-zinc-200">
+        <span className="relative flex size-[100px] items-center justify-center bg-background text-foreground transition-colors duration-200 group-hover:bg-black group-hover:text-white">
           <span
             aria-hidden="true"
             className="-top-[12px] -left-[12px] absolute size-2 border-accent-green-foreground border-r border-b opacity-0 transition-opacity duration-200 group-hover:opacity-100"
