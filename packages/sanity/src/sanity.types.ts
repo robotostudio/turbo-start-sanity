@@ -212,7 +212,6 @@ export type ShowcaseGrid = {
     siteName: string;
     url?: string;
     screenshot?: Screenshot;
-    attributionName?: string;
     attributionLogo?: AttributionLogo;
     builtByRoboto?: boolean;
     featured?: boolean;

@@ -1439,13 +1439,6 @@
                   },
                   "optional": true
                 },
-                "attributionName": {
-                  "type": "objectAttribute",
-                  "value": {
-                    "type": "string"
-                  },
-                  "optional": true
-                },
                 "attributionLogo": {
                   "type": "objectAttribute",
                   "value": {
