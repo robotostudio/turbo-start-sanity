@@ -76,6 +76,7 @@ export function HeroBlock({
   richText,
   isFirst,
 }: Readonly<HeroBlockProps>) {
+  const compact = Boolean(badge?.trim());
   return (
     <section
       className="relative flex min-h-svh flex-col bg-background"
@@ -93,7 +94,12 @@ export function HeroBlock({
           />
         </div>
       )}
-      <div className="relative min-h-[220px] w-full flex-1 overflow-hidden">
+      <div
+        className={cn(
+          "relative min-h-[220px] w-full flex-1 overflow-hidden",
+          compact && "lg:max-h-[56svh]"
+        )}
+      >
         <HeroBannerMedia image={image} />
       </div>
 
