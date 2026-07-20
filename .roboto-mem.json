@@ -1,0 +1,46 @@
+{
+  "configVersion": 1,
+  "commons": "https://github.com/robotostudio/team-memory",
+  "overlays": [],
+  "project": "turbo-start-sanity",
+  "squads": [],
+  "workspaces": {
+    "packages/sanity-blocks": [
+      "stack/nextjs",
+      "stack/sanity",
+      "stack/typescript"
+    ],
+    "packages/sanity": [
+      "stack/nextjs",
+      "stack/sanity",
+      "stack/typescript"
+    ],
+    "apps/studio": [
+      "stack/react",
+      "stack/sanity",
+      "stack/typescript"
+    ],
+    "packages/env": [
+      "stack/typescript"
+    ],
+    "packages/logger": [
+      "stack/typescript"
+    ],
+    "packages/tailwind-config": [
+      "stack/typescript"
+    ],
+    "apps/web": [
+      "stack/nextjs",
+      "stack/react",
+      "stack/sanity",
+      "stack/typescript"
+    ],
+    "packages/ui": [
+      "stack/react",
+      "stack/typescript"
+    ],
+    ".": [
+      "stack/typescript"
+    ]
+  }
+}

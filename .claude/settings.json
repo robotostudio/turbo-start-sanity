@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "roboto-mem": {
+      "source": {
+        "source": "github",
+        "repo": "robotostudio/roboto-mem"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "roboto-mem@roboto-mem": true
+  }
+}
