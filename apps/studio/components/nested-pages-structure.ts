@@ -401,9 +401,10 @@ export const createSlugBasedStructure = (
           }
 
           // Loose pages sort by title (slug fallback), below the folders
-          const files = looseDocs
-            .sort(byDocumentTitle)
-            .map((doc) => createSingleDocumentListItem(S, doc, schemaType));
+          looseDocs.sort(byDocumentTitle);
+          const files = looseDocs.map((doc) =>
+            createSingleDocumentListItem(S, doc, schemaType)
+          );
 
           return combineItemsWithDividers(S, folders, files);
         };

@@ -22,10 +22,10 @@ const bannerFill = "absolute inset-0 size-full";
 function HeroBannerMedia({
   image,
   isCap = false,
-}: {
+}: Readonly<{
   image?: SanityImageData | null;
   isCap?: boolean;
-}) {
+}>) {
   if (image?.id) {
     return (
       <SanityImage
