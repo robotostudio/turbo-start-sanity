@@ -84,9 +84,11 @@ test("FaqAccordion defaults to the first category", () => {
   // Both category tabs are listed.
   expect(html).toMatch(/First Category/);
   expect(html).toMatch(/Second Category/);
-  // Only the first (default) category's faqs are shown.
-  expect(html).toMatch(/First question/);
-  expect(html).not.toMatch(/Second question/);
+  // Every category is also rendered into the inert measurement layer (it
+  // reserves the tallest category's height), so assert the visible list only.
+  const visible = html.split('inert=""')[0];
+  expect(visible).toMatch(/First question/);
+  expect(visible).not.toMatch(/Second question/);
   // The first category tab is marked active, the second inactive.
   expect(html).toMatch(/aria-pressed="true"/);
   expect(html).toMatch(/aria-pressed="false"/);
