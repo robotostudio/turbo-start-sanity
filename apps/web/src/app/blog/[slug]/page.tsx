@@ -249,47 +249,87 @@ function BlogPageContent({
   );
 }
 
+function ParagraphSkeleton() {
+  return (
+    <div className="grid gap-2">
+      <div className="h-5 w-full bg-muted" />
+      <div className="h-5 w-full bg-muted" />
+      <div className="h-5 w-full bg-muted" />
+      <div className="h-5 w-3/5 bg-muted" />
+    </div>
+  );
+}
+
+function ShareItemSkeleton() {
+  return (
+    <div>
+      <div className="size-4.5 bg-muted" />
+      <div className="h-4 w-10 bg-muted" />
+    </div>
+  );
+}
+
 function BlogFallback() {
   return (
     <main className="bg-background">
-      <div className="container flex min-h-[50vh] animate-pulse flex-col gap-16 pt-12 pb-24 md:gap-24 md:pt-16">
+      <div className="container flex animate-pulse flex-col gap-16 pt-12 pb-24 md:gap-24 md:pt-16">
         <div className="flex flex-col gap-6">
-          <div className="h-5 w-48 bg-muted" />
+          <div className="flex flex-wrap items-center gap-1.5">
+            <div className="h-5 w-12 bg-muted" />
+            <div className="h-5 w-2 bg-muted" />
+            <div className="h-5 w-10 bg-muted" />
+            <div className="h-5 w-2 bg-muted" />
+            <div className="h-5 w-48 bg-muted" />
+          </div>
+
           <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-3">
-              <div className="h-10 w-full max-w-3xl bg-muted sm:h-12 lg:h-16" />
-              <div className="h-10 w-2/3 max-w-xl bg-muted sm:h-12 lg:h-16" />
+            <div className="grid gap-2">
+              <div className="h-8 w-full bg-muted sm:h-10 lg:h-[58px]" />
+              <div className="h-8 w-2/3 bg-muted sm:h-10 lg:h-[58px]" />
             </div>
+
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <div className="h-4 w-56 bg-muted" />
-                <div className="h-4 w-64 bg-muted" />
+              <div className="flex flex-col">
+                <div className="h-5 w-56 bg-muted" />
+                <div className="h-5 w-64 bg-muted" />
               </div>
+
               <div className="flex items-center gap-2">
                 <div className="size-6 rounded-full bg-muted" />
-                <div className="h-4 w-28 bg-muted" />
+                <div className="h-5 w-28 bg-muted" />
               </div>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-32">
-          <div className="flex min-w-0 flex-col gap-4">
-            <div className="h-5 w-full bg-muted" />
-            <div className="h-5 w-11/12 bg-muted" />
-            <div className="h-5 w-full bg-muted" />
-            <div className="h-5 w-4/5 bg-muted" />
-            <div className="h-5 w-full bg-muted" />
-            <div className="h-5 w-3/5 bg-muted" />
+          <div className="grid min-w-0 gap-8">
+            <ParagraphSkeleton />
+            <ParagraphSkeleton />
+            <ParagraphSkeleton />
           </div>
 
           <div className="hidden lg:block">
-            <div className="sticky top-24 bg-grid-dots p-6">
-              <div className="flex flex-col gap-4 bg-background p-4">
-                <div className="h-5 w-32 bg-muted" />
-                <div className="h-4 w-full bg-muted" />
-                <div className="h-4 w-5/6 bg-muted" />
-                <div className="h-4 w-2/3 bg-muted" />
+            <div className="sticky top-24">
+              <div className="bg-grid-dots p-6">
+                <div className="flex flex-col gap-12 bg-background p-4">
+                  <div>
+                    <div className="h-7 w-32 bg-muted" />
+                    <div className="mt-6 flex flex-col gap-2">
+                      <div className="h-5 w-full bg-muted" />
+                      <div className="h-5 w-full bg-muted" />
+                      <div className="h-5 w-full bg-muted" />
+                      <div className="h-5 w-2/3 bg-muted" />
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between border-zinc-900 border-t px-1 pt-4 dark:border-zinc-50 [&>div]:grid [&>div]:justify-items-center [&>div]:gap-1">
+                    <ShareItemSkeleton />
+                    <ShareItemSkeleton />
+                    <ShareItemSkeleton />
+                    <ShareItemSkeleton />
+                    <ShareItemSkeleton />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -13,6 +13,7 @@ import type {
 } from "@workspace/sanity/types";
 import { normalizedLogoHeight } from "@workspace/sanity-blocks/internal/logo-height";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
+import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 import { Fragment } from "react";
 
@@ -162,52 +163,66 @@ function FooterTopBar() {
   );
 }
 
+const FOOTER_BAR = "bg-accent-green-foreground/10";
+
+function FooterSocialDotSkeleton() {
+  return <div className={cn("size-[18px]", FOOTER_BAR)} />;
+}
+
+function FooterLinkColumnSkeleton() {
+  return (
+    <div>
+      <div className={cn("mb-2 h-5 w-20", FOOTER_BAR)} />
+      <div className="space-y-1">
+        <div className={cn("h-6 w-24", FOOTER_BAR)} />
+        <div className={cn("h-6 w-24", FOOTER_BAR)} />
+        <div className={cn("h-6 w-24", FOOTER_BAR)} />
+      </div>
+    </div>
+  );
+}
+
 export function FooterSkeleton() {
   return (
     <>
       <FooterTopBar />
-      <footer className="border-t border-accent-green-foreground/10 bg-accent-green text-accent-green-foreground">
+      <footer className="relative animate-pulse border-t border-accent-green-foreground/10 bg-accent-green text-accent-green-foreground">
         <div className="container flex flex-col items-start gap-10 pt-12 text-start lg:flex-row lg:items-start lg:justify-between">
-          <div className="flex w-full max-w-96 shrink flex-col items-start gap-6">
-            <div className="flex w-full flex-col items-start gap-4">
-              <div className="h-8 w-44 animate-pulse rounded bg-accent-green-foreground/10" />
-              <div className="h-10 w-full animate-pulse rounded bg-accent-green-foreground/10" />
+          <div className="flex w-full max-w-96 shrink flex-col items-start gap-6 lg:items-start">
+            <div className="flex w-full flex-col items-start gap-4 lg:items-start">
+              <div className={cn("h-7 w-44", FOOTER_BAR)} />
+              <div className="flex w-full flex-col">
+                <div className={cn("h-5 w-full", FOOTER_BAR)} />
+                <div className={cn("h-5 w-3/4", FOOTER_BAR)} />
+              </div>
             </div>
-            <div className="h-7 w-52 animate-pulse rounded-full bg-accent-green-foreground/10" />
+            <div className={cn("h-7 w-52 rounded-full", FOOTER_BAR)} />
             <div className="flex items-center gap-3">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div
-                  className="size-[18px] animate-pulse rounded bg-accent-green-foreground/10"
-                  key={i}
-                />
-              ))}
+              <FooterSocialDotSkeleton />
+              <FooterSocialDotSkeleton />
+              <FooterSocialDotSkeleton />
+              <FooterSocialDotSkeleton />
+              <FooterSocialDotSkeleton />
             </div>
           </div>
           <div className="grid w-full grid-cols-2 gap-8 sm:grid-cols-4 sm:gap-14 lg:w-auto">
-            {[1, 2, 3, 4].map((col) => (
-              <div key={col}>
-                <div className="mb-2 h-4 w-20 animate-pulse rounded bg-accent-green-foreground/10" />
-                <div className="space-y-1.5">
-                  {[1, 2, 3].map((item) => (
-                    <div
-                      className="h-4 w-full animate-pulse rounded bg-accent-green-foreground/10"
-                      key={item}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
+            <FooterLinkColumnSkeleton />
+            <FooterLinkColumnSkeleton />
+            <FooterLinkColumnSkeleton />
+            <FooterLinkColumnSkeleton />
           </div>
         </div>
         <div className="container relative z-10 mt-12 pt-8 pb-6">
           <div className="flex flex-col items-start justify-between gap-6 text-start lg:flex-row lg:items-center lg:gap-4">
-            <div className="h-4 w-64 animate-pulse rounded bg-accent-green-foreground/10" />
+            <div className={cn("h-5 w-64", FOOTER_BAR)} />
             <div className="flex flex-col items-start gap-4 lg:flex-row lg:items-center">
-              <div className="flex items-center gap-4">
-                <div className="h-4 w-32 animate-pulse rounded bg-accent-green-foreground/10" />
-                <div className="h-4 w-24 animate-pulse rounded bg-accent-green-foreground/10" />
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <div className={cn("h-[18px] w-32", FOOTER_BAR)} />
+                <div className={cn("h-[18px] w-24", FOOTER_BAR)} />
               </div>
-              <div className="h-8 w-16 animate-pulse rounded-full bg-accent-green-foreground/10" />
+              <div
+                className={cn("h-[34px] w-[104px] rounded-full", FOOTER_BAR)}
+              />
             </div>
           </div>
         </div>

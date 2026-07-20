@@ -33,22 +33,32 @@ const TRIGGER_CLASS =
 const NAV_BUTTON_CLASS =
   "h-9 px-4 font-mono font-normal text-sm uppercase tracking-wide";
 
+function NavItemSkeleton() {
+  return <div className="h-5 w-20 bg-muted/50" />;
+}
+
 export function NavbarSkeleton() {
   return (
-    <header className="sticky top-0 z-40 w-full bg-background/60 backdrop-blur-lg dark:bg-background/60">
+    <header className="sticky top-0 z-40 w-full animate-pulse bg-background/60 backdrop-blur-lg dark:bg-background/60">
       <div className="container">
         <div className="flex h-16 items-center justify-between">
           <div className="flex h-10 flex-1 items-center">
-            <div className="h-10 w-44 animate-pulse rounded bg-muted/50" />
+            <div className="h-7 w-44 bg-muted/50" />
+          </div>
+
+          <div className="hidden items-center gap-8 lg:flex">
+            <NavItemSkeleton />
+            <NavItemSkeleton />
+            <NavItemSkeleton />
           </div>
 
           <div className="hidden flex-1 items-center justify-end gap-4 lg:flex">
-            <div className="h-9 w-20 animate-pulse rounded bg-muted/50" />
-            <div className="h-9 w-24 animate-pulse rounded bg-muted/50" />
+            <div className="h-7 w-20 bg-muted/50" />
+            <div className="h-9 w-28 rounded-full bg-muted/50" />
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
-            <div className="h-10 w-10 animate-pulse rounded bg-muted/50" />
+            <div className="size-10 rounded-full bg-muted/50" />
           </div>
         </div>
       </div>

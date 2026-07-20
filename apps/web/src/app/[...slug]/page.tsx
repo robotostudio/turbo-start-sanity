@@ -154,21 +154,29 @@ function SlugPageContent({
   );
 }
 
-// Mirrors the hero block (banner + heading/intro) most pages open with.
 function SlugFallback() {
   return (
-    <main className="min-h-[50vh] animate-pulse bg-background">
-      <div className="aspect-[4/3] min-h-[280px] w-full bg-muted lg:aspect-[2014/1276] lg:max-h-[560px] lg:min-h-[180px]" />
-      <div className="container mt-8 pb-24 md:mt-10">
-        <div className="grid max-w-[827px] gap-5">
-          <div className="h-10 w-3/4 bg-muted sm:h-12 lg:h-16" />
-          <div className="grid max-w-[633px] gap-3">
-            <div className="h-5 w-full bg-muted" />
-            <div className="h-5 w-5/6 bg-muted" />
-            <div className="h-5 w-2/3 bg-muted" />
+    <main>
+      <section className="relative flex min-h-svh animate-pulse flex-col bg-background">
+        <div className="relative min-h-[220px] w-full flex-1 overflow-hidden bg-muted" />
+        <div className="container mt-8 pb-8 md:mt-10 md:pb-12">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-12">
+            <div className="grid gap-5">
+              <div className="grid max-w-[827px] gap-2">
+                <div className="h-8 w-full bg-muted sm:h-11 lg:h-[62px]" />
+                <div className="h-8 w-2/3 bg-muted sm:h-11 lg:h-[62px]" />
+              </div>
+              <div className="grid max-w-[633px] gap-2">
+                <div className="h-5 w-full bg-muted" />
+                <div className="h-5 w-5/6 bg-muted" />
+              </div>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
+              <div className="h-14 w-full rounded-full bg-muted sm:w-44" />
+            </div>
           </div>
         </div>
-      </div>
+      </section>
     </main>
   );
 }
