@@ -33,7 +33,7 @@ function HeroPosterFrame({
   return (
     <SanityImage
       alt=""
-      className={cn(bannerFill, "rounded-none! object-cover object-[50%_55%]")}
+      className={cn(bannerFill, "rounded-none! object-cover object-[50%_45%]")}
       fetchPriority={isCap ? undefined : "high"}
       height={534}
       image={variant.poster}
@@ -110,8 +110,8 @@ export function HeroBlock({
       <div
         className={cn(
           "relative flex-1 overflow-hidden",
-          "h-[104vw] sm:h-[74vw]",
-          "lg:h-auto lg:min-h-[34vw] lg:max-h-[calc(100svh-296px)]"
+          "h-[108vw] sm:h-[77vw]",
+          "lg:h-auto lg:min-h-[39vw] lg:max-h-[calc(100svh-276px)]"
         )}
       >
         {posterLight && (
