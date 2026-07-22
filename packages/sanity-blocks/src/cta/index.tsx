@@ -61,9 +61,10 @@ export function CTABlock({
               <h2 className="font-normal text-3xl text-foreground leading-tight tracking-[-0.24px] md:text-4xl lg:text-5xl">
                 {title}
               </h2>
-              <div className="body-text text-muted-foreground">
-                <RichText richText={richText} />
-              </div>
+              <RichText
+                className="body-text prose-p:text-base prose-p:leading-6 text-muted-foreground sm:prose-p:text-lg sm:prose-p:leading-7"
+                richText={richText}
+              />
             </div>
           </div>
           {hasLogos && (
