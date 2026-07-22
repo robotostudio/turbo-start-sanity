@@ -53,7 +53,7 @@ export function BlogPageContent({
 
   return (
     <main className="bg-background">
-      <div className="container my-16">
+      <div className="container mt-8 mb-16 md:my-16">
         <BlogHeader description={description} title={title} />
 
         {featuredBlogs.length > 0 && (

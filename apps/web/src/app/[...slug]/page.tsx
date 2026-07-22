@@ -142,7 +142,7 @@ function SlugPageContent({
   return (
     <>
       <PageBuilderJsonLd pageBuilder={pageBuilder} />
-      <main>
+      <main className="-mt-16">
         <PageBuilder
           id={_id}
           pageBuilder={pageBuilder}
@@ -156,7 +156,7 @@ function SlugPageContent({
 
 function SlugFallback() {
   return (
-    <main>
+    <main className="-mt-16">
       <section className="relative flex min-h-svh animate-pulse flex-col bg-background">
         <div className="relative min-h-[220px] w-full flex-1 overflow-hidden bg-muted" />
         <div className="container mt-8 pb-8 md:mt-10 md:pb-12">

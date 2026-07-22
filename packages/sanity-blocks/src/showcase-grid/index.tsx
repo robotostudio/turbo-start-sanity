@@ -368,7 +368,7 @@ export function ShowcaseGrid({
 
   if (!featuredItem) {
     return (
-      <section className="bg-background pt-18 pb-24" id="showcase">
+      <section className="mt-16 bg-background pt-18 pb-24" id="showcase">
         <div className="container flex flex-col gap-10">
           {pageTitle ? <ShowcaseBreadcrumb label={pageTitle} /> : null}
           <ShowcaseHeader
@@ -385,7 +385,7 @@ export function ShowcaseGrid({
   const cards = cmsItems.filter((item) => item !== featuredItem).map(cmsToView);
 
   return (
-    <section className="bg-background pt-18 pb-24" id="showcase">
+    <section className="mt-16 bg-background pt-18 pb-24" id="showcase">
       <div className="container flex flex-col gap-24">
         <ShowcaseHero
           description={description}
