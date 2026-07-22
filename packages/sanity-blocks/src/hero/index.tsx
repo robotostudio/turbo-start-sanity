@@ -5,7 +5,6 @@ import type { ButtonProps } from "@workspace/sanity-blocks/internal/sanity-butto
 import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
-import Image from "next/image";
 
 import type { HeroVideoData, HeroVideoVariant } from "./hero-video";
 import { HeroVideo } from "./hero-video";
@@ -23,35 +22,6 @@ export interface HeroBlockProps {
 
 const bannerFill = "absolute inset-0 size-full";
 
-function HeroBannerMedia({ isCap = false }: Readonly<{ isCap?: boolean }>) {
-  return (
-    <>
-      <div className={cn(bannerFill, "dark:hidden")}>
-        <Image
-          alt=""
-          aria-hidden="true"
-          className="rounded-none! object-cover object-[50%_45%]"
-          fill
-          loading={isCap ? "lazy" : undefined}
-          sizes="100vw"
-          src="/hero-fallback-light.png"
-        />
-      </div>
-      <div className={cn(bannerFill, "hidden dark:block")}>
-        <Image
-          alt=""
-          aria-hidden="true"
-          className="rounded-none! object-cover object-[50%_45%]"
-          fill
-          loading={isCap ? "lazy" : undefined}
-          sizes="100vw"
-          src="/hero-fallback-dark.png"
-        />
-      </div>
-    </>
-  );
-}
-
 function HeroPosterFrame({
   variant,
   isCap = false,
@@ -63,7 +33,7 @@ function HeroPosterFrame({
   return (
     <SanityImage
       alt=""
-      className={cn(bannerFill, "rounded-none! object-cover object-[50%_45%]")}
+      className={cn(bannerFill, "rounded-none! object-cover object-[50%_55%]")}
       fetchPriority={isCap ? undefined : "high"}
       height={534}
       image={variant.poster}
@@ -126,12 +96,10 @@ export function HeroBlock({
       {isFirst && (
         <div
           aria-hidden="true"
-          className="-scale-y-100 pointer-events-none absolute inset-x-0 bottom-full h-64 select-none"
+          className="pointer-events-none absolute inset-x-0 bottom-full h-64 select-none"
         >
-          {posterLight ? (
+          {posterLight && (
             <HeroPosterMedia dark={posterDark} isCap light={posterLight} />
-          ) : (
-            <HeroBannerMedia isCap />
           )}
           <div
             aria-hidden="true"
@@ -145,14 +113,12 @@ export function HeroBlock({
           "relative w-full flex-1 overflow-hidden",
 
           compact
-            ? "min-h-[max(280px,min(38vw,460px))]"
-            : "min-h-[max(320px,min(44vw,540px))]"
+            ? "min-h-[48vw] max-h-[58vw] sm:min-h-[34vw] sm:max-h-[44vw] lg:min-h-[min(26vw,420px)] lg:max-h-[calc(100svh-400px)]"
+            : "min-h-[78vw] sm:min-h-[56vw] lg:min-h-[max(320px,min(44vw,540px))]"
         )}
       >
-        {posterLight ? (
+        {posterLight && (
           <HeroPosterMedia dark={posterDark} light={posterLight} />
-        ) : (
-          <HeroBannerMedia />
         )}
         <HeroVideo className={bannerFill} video={video} />
       </div>

@@ -109,7 +109,7 @@ export function HeroVideo({
       aria-hidden="true"
       autoPlay
       className={cn(
-        "size-full object-cover object-[50%_45%] transition-opacity duration-700 ease-out",
+        "size-full object-cover object-[50%_55%] transition-opacity duration-700 ease-out",
         ready ? "opacity-100" : "opacity-0",
         className
       )}
