@@ -40,9 +40,9 @@ function NavItemSkeleton() {
 export function NavbarSkeleton() {
   return (
     <header className="sticky top-0 z-40 w-full animate-pulse bg-background/60 backdrop-blur-lg dark:bg-background/60">
-      <div className="container [--container-px:1rem] md:[--container-px:1.5rem]">
+      <div className="container">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex h-10 flex-1 items-center ps-1">
+          <div className="flex h-10 flex-1 items-center">
             <div className="h-7 w-44 bg-muted/50" />
           </div>
 
@@ -101,10 +101,10 @@ export function Navbar({
   }
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-background/60 backdrop-blur-lg dark:bg-background/60">
-      <div className="container [--container-px:1rem] md:[--container-px:1.5rem]">
+    <header className="sticky top-0 z-40 w-full bg-background/20 backdrop-blur-sm dark:bg-background/40">
+      <div className="container">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex h-10 flex-1 items-center ps-1">
+          <div className="flex h-10 flex-1 items-center">
             <Logo
               alt={siteTitle ?? "Turbo Start Sanity"}
               className="w-44"
