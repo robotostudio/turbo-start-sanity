@@ -46,13 +46,10 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
 
-  /* Ink strength for the dot lattice — bg-grid-dots mixes currentColor at this
-     alpha. Kept as a var so a theme can knock the dots back if needed. */
+  /* Dot ink strength — bg-grid-dots mixes currentColor at this alpha. */
   --dot-alpha: 80%;
 
-  /* Surface shown in the top overscroll ("rubber-band") gutter. Matches the
-     page background in light mode; a theme can lift it so the bounce reads as a
-     blended surface rather than a flat block. */
+  /* Top overscroll gutter surface; a theme can lift it off the background. */
   --overscroll-top: var(--background);
 }
 
@@ -92,9 +89,7 @@
   --sidebar-ring: oklch(0.439 0 0);
   --dot-alpha: 80%;
 
-  /* Pure black (--background) in the top gutter reads as a hard, opaque block
-     against the translucent navbar. Lift it slightly toward the foreground so
-     the overscroll bounce reads as a blended, translucent-looking surface. */
+  /* Lifted off pure black so the bounce doesn't read as a hard block. */
   --overscroll-top: color-mix(
     in oklab,
     var(--background) 90%,
@@ -148,33 +143,32 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Overrides Tailwind's built-in `container`; wins by source order.
- * Content inset: 8px on all breakpoints. */
+/* Overrides Tailwind's own `container`. Inset defaults to 8px; a fallback, not
+ * a declaration, so [--container-px:…] can override it per instance. */
 @utility container {
-  @apply mx-auto w-full max-w-[90rem] px-2;
+  @apply mx-auto w-full max-w-[90rem] px-[var(--container-px,0.5rem)];
 }
 
-/* Shared card hover surface — a subtle zinc tint on hover. Apply to any card
- * (blog, showcase, faq, etc.) so the hover style lives in ONE place. */
+/* Cancels the container's padding, whatever it is — hardcoding it caused
+ * mobile horizontal scroll. */
+@utility bleed-x {
+  margin-inline: calc(var(--container-px, 0.5rem) * -1);
+}
+
+/* Card hover tint — kept here so every card shares one definition. */
 @utility hover-surface {
   @apply transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900;
 }
 
-/* Shared body/paragraph typography — 18px with comfortable leading and nice
- * wrapping. Apply to lead/description paragraphs; text color stays per-context. */
 @utility body-text {
-  @apply text-pretty font-normal text-lg leading-7;
+  @apply text-pretty font-normal text-base leading-6 sm:text-lg sm:leading-7;
 }
 
-/* Shared section heading — the h2 style every page-builder block uses.
- * Width/color overrides stay per-caller. */
 @utility block-title {
   @apply text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] md:text-5xl;
 }
 
-/* Tailwind v4 (Preflight) resets interactive elements to `cursor: default`.
- * Restore the pointer cursor on buttons and anything role="button" (links keep
- * the browser default). Skip disabled controls. */
+/* Preflight resets buttons to cursor:default — restore the pointer. */
 @layer base {
   button:not(:disabled),
   [role="button"]:not(:disabled),
@@ -220,8 +214,7 @@
   }
 }
 
-/* Keyboard focus indicator; matches the global `:focus-visible` base rule,
- * for elements that need to re-enable or scope it. */
+/* Keyboard focus ring, for elements that re-enable or scope :focus-visible. */
 @layer utilities {
   .focus-ring {
     outline: none;
@@ -242,8 +235,7 @@
     outline-offset: -3px;
   }
 
-  /* Card-level focus ring: shown when a descendant link is keyboard-focused,
-     so the whole card is indicated instead of just the inner title link. */
+  /* Rings the whole card when a link inside it is focused. */
   .focus-ring-within:has(a:focus-visible) {
     outline: 1px solid var(--foreground);
     outline-offset: 2px;
@@ -257,11 +249,8 @@
   body {
     @apply bg-background text-foreground;
   }
-  /* Match the browser overscroll ("rubber-band") gutters to the page: pulling
-     past the top reveals the page background, pulling past the bottom reveals
-     the footer's green — instead of a flash of white. The gradient is fixed to
-     the viewport (not the document), so each end shows the correct color at any
-     scroll position; the opaque body covers it everywhere except the gutters. */
+  /* Overscroll gutters match the page instead of flashing white. Fixed to the
+     viewport so each end shows the right colour at any scroll position. */
   html {
     background: linear-gradient(
       to bottom,
@@ -300,12 +289,8 @@
   }
 }
 
-/* Scroll-driven page background: transitions from --background at the top of
-   the document to the footer's --accent-green at the bottom via a scroll
-   timeline. The opaque body covers this except in the overscroll gutters, so
-   pulling past either end reveals the correct color. Guarded by @supports and
-   prefers-reduced-motion; where unsupported the fixed split-gradient on `html`
-   in @layer base is the fallback. Unlayered so it wins via the cascade. */
+/* Scroll-timeline version of the gutter colours above; falls back to the fixed
+   gradient in @layer base. Unlayered so it wins the cascade. */
 @keyframes page-bg-scroll {
   from {
     background-color: var(--overscroll-top);

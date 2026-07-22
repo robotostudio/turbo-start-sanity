@@ -59,7 +59,7 @@ function TestimonialPanel({
 }: Readonly<{ testimonial: NewsletterTestimonial }>) {
   const { eyebrow, quote, authorImage, authorName, authorRole } = testimonial;
   return (
-    <div className="-mx-4 bg-grid-dots p-8 text-zinc-800 lg:mx-0 dark:text-zinc-50">
+    <div className="bleed-x bg-grid-dots p-8 text-zinc-800 lg:mx-0 dark:text-zinc-50">
       <div className="flex h-full flex-col gap-12 bg-background p-8">
         <BlockEyebrow eyebrow={eyebrow} />
         <div className="flex flex-col gap-8">

@@ -67,7 +67,7 @@ export function CTABlock({
             </div>
           </div>
           {hasLogos && (
-            <div className="-mx-4 flex flex-col items-start gap-2 lg:mx-0">
+            <div className="bleed-x flex flex-col items-start gap-2 lg:mx-0">
               {usedByTeams?.title && (
                 <p className="px-4 font-light font-mono text-sm text-zinc-600 uppercase leading-6 tracking-[0.24px] lg:px-0 dark:text-zinc-300">
                   {usedByTeams.title}
