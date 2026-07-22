@@ -116,7 +116,7 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
           {media}
         </span>
       </div>
-      <span className="absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center bg-background p-1 font-light font-mono text-foreground text-sm uppercase leading-none transition-colors duration-200 group-hover:bg-black group-hover:text-white dark:group-hover:bg-background dark:group-hover:text-foreground">
+      <span className="absolute bottom-2 left-2 flex max-w-[calc(100%-1rem)] items-center bg-background px-[5px] py-[2.5px] font-light font-mono text-foreground text-sm uppercase leading-none transition-colors duration-200 group-hover:bg-black group-hover:text-white dark:group-hover:bg-background dark:group-hover:text-foreground">
         <span className="min-w-0 truncate">{displayLabel}</span>
         {href ? (
           <ArrowRight
@@ -172,7 +172,7 @@ export function SocialGrid({
           </div>
         </div>
       </div>
-      <div className="mt-12 grid grid-cols-1 bg-grid-dots bg-background bg-size-[6px_6px] text-zinc-800 sm:grid-cols-2 md:mt-16 lg:grid-cols-4 dark:text-zinc-50">
+      <div className="mt-12 grid grid-cols-1 bg-grid-dots bg-background bg-size-[5.8px_5.8px] text-zinc-800 sm:grid-cols-2 md:mt-16 lg:grid-cols-4 dark:text-zinc-50">
         {socials.map((social) => (
           <SocialCard key={social._key} social={social} />
         ))}
