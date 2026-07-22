@@ -83,7 +83,6 @@ export function HeroBlock({
   isFirst,
   video,
 }: Readonly<HeroBlockProps>) {
-  const compact = Boolean(badge?.trim());
   const lightPoster = hasPoster(video?.light) ? video?.light : null;
   const darkPoster = hasPoster(video?.dark) ? video?.dark : null;
   const posterLight = lightPoster ?? darkPoster;
@@ -110,11 +109,9 @@ export function HeroBlock({
 
       <div
         className={cn(
-          "relative w-full flex-1 overflow-hidden",
-
-          compact
-            ? "min-h-[48vw] max-h-[58vw] sm:min-h-[34vw] sm:max-h-[44vw] lg:min-h-[min(26vw,420px)] lg:max-h-[calc(100svh-400px)]"
-            : "min-h-[78vw] sm:min-h-[56vw] lg:min-h-[max(320px,min(44vw,540px))]"
+          "relative flex-1 overflow-hidden",
+          "h-[104vw] sm:h-[74vw]",
+          "lg:h-auto lg:min-h-[34vw] lg:max-h-[calc(100svh-296px)]"
         )}
       >
         {posterLight && (
