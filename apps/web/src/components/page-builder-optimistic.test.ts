@@ -478,4 +478,35 @@ describe("reconcilePageBuilder", () => {
       },
     ]);
   });
+
+  test("ignores unsafe keys in raw blocks and images", () => {
+    const rawBlocks = JSON.parse(`[
+      {
+        "_key": "hero",
+        "_type": "hero",
+        "__proto__": { "polluted": true },
+        "constructor": { "polluted": true },
+        "prototype": { "polluted": true },
+        "image": {
+          "_type": "image",
+          "asset": { "_ref": "image-safe-800x600-jpg" },
+          "__proto__": { "polluted": true },
+          "constructor": { "polluted": true },
+          "prototype": { "polluted": true }
+        }
+      }
+    ]`);
+
+    const reconciled = reconcilePageBuilder([], rawBlocks);
+    const block = resultBlock(reconciled, 0);
+    const image = block.image as Record<string, unknown>;
+
+    for (const target of [block, image]) {
+      expect(Object.getPrototypeOf(target)).toBe(Object.prototype);
+      expect(Object.hasOwn(target, "__proto__")).toBe(false);
+      expect(Object.hasOwn(target, "constructor")).toBe(false);
+      expect(Object.hasOwn(target, "prototype")).toBe(false);
+    }
+    expect(image).toEqual({ id: "image-safe-800x600-jpg" });
+  });
 });

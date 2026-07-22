@@ -30,6 +30,11 @@ export type OptimisticPageBuilderAction = {
 };
 
 const NO_SPECIAL_RECONCILIATION = Symbol("no-special-reconciliation");
+const UNSAFE_OBJECT_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+function isUnsafeObjectKey(key: string) {
+  return UNSAFE_OBJECT_KEYS.has(key);
+}
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -92,6 +97,9 @@ function reconcileImage(
   }
 
   for (const [key, value] of Object.entries(raw)) {
+    if (isUnsafeObjectKey(key)) {
+      continue;
+    }
     if (key === "asset" || (key === "_type" && !inArray && !current?._type)) {
       continue;
     }
@@ -225,6 +233,9 @@ function reconcileRawFields(
 ) {
   const reconciled: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(raw)) {
+    if (isUnsafeObjectKey(key)) {
+      continue;
+    }
     reconciled[key] = reconcileValue(current?.[key], value, key, false);
   }
   return reconciled;
