@@ -11,6 +11,10 @@ import { RichTextBlock } from "@workspace/sanity-blocks/rich-text-block/index";
 import { SubscribeNewsletter } from "@workspace/sanity-blocks/subscribe-newsletter/index";
 import { createDataAttribute } from "next-sanity";
 
+import {
+  type RawPageBuilderDocument,
+  reconcilePageBuilder,
+} from "@/components/page-builder-optimistic";
 import type { PageBuilderBlock, PagebuilderType } from "@/types";
 
 export type PageBuilderProps = {
@@ -109,12 +113,14 @@ function useOptimisticPageBuilder(
   initialBlocks: PageBuilderBlock[],
   documentId: string
 ) {
-  // biome-ignore lint/suspicious/noExplicitAny: <any is used to allow for dynamic component rendering>
-  return useOptimistic<PageBuilderBlock[], any>(
+  return useOptimistic<PageBuilderBlock[], RawPageBuilderDocument>(
     initialBlocks,
     (currentBlocks, action) => {
-      if (action.id === documentId && action.document?.pageBuilder) {
-        return action.document.pageBuilder;
+      if (action.id === documentId && action.document) {
+        return reconcilePageBuilder(
+          currentBlocks,
+          action.document.pageBuilder ?? []
+        );
       }
       return currentBlocks;
     }
