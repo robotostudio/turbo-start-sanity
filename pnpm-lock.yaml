@@ -381,6 +381,9 @@ importers:
       next-sanity:
         specifier: ^12.1.1
         version: 12.1.1(2ec53a95912a3ff3df8b088b143b3b1b)
+      next-themes:
+        specifier: 'catalog:'
+        version: 0.4.6(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       react:
         specifier: 'catalog:'
         version: 19.2.4
