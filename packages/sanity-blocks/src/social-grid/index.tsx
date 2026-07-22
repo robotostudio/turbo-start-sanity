@@ -172,7 +172,7 @@ export function SocialGrid({
           </div>
         </div>
       </div>
-      <div className="mt-12 grid grid-cols-1 bg-grid-dots bg-background bg-size-[5.8px_5.8px] text-zinc-800 sm:grid-cols-2 md:mt-16 lg:grid-cols-4 dark:text-zinc-50">
+      <div className="mt-12 grid grid-cols-1 bg-grid-dots bg-background bg-size-[5.7px_5.7px] text-zinc-800 sm:grid-cols-2 md:mt-16 lg:grid-cols-4 dark:text-zinc-50">
         {socials.map((social) => (
           <SocialCard key={social._key} social={social} />
         ))}
