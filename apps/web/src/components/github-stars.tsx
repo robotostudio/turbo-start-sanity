@@ -90,7 +90,7 @@ export function GithubStars({
     >
       <GithubIcon className="size-[18px] shrink-0" />
       {stars !== null ? (
-        <span className="text-muted-foreground">{formatStars(stars)}</span>
+        <span className="text-foreground">{formatStars(stars)}</span>
       ) : null}
     </a>
   );
