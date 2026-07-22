@@ -149,3 +149,35 @@ test("PageBuilder keeps an authoritative broken link visible during an optimisti
     optimisticState.action = undefined;
   }
 });
+
+test("PageBuilder distinguishes an omitted page builder from an explicit deletion", () => {
+  const block = {
+    _key: "hero",
+    _type: "hero",
+    buttons: [],
+    richText: [],
+    title: "Keep projected content",
+  } as unknown as PageBuilderBlock;
+
+  try {
+    optimisticState.action = {
+      document: {},
+      id: "homePage",
+    };
+    const preservedHtml = renderToStaticMarkup(
+      <PageBuilder id="homePage" pageBuilder={[block]} type="homePage" />
+    );
+    expect(preservedHtml).toContain("Keep projected content");
+
+    optimisticState.action = {
+      document: { pageBuilder: [] },
+      id: "homePage",
+    };
+    const deletedHtml = renderToStaticMarkup(
+      <PageBuilder id="homePage" pageBuilder={[block]} type="homePage" />
+    );
+    expect(deletedHtml).not.toContain("Keep projected content");
+  } finally {
+    optimisticState.action = undefined;
+  }
+});

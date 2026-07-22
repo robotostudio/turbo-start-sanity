@@ -116,11 +116,11 @@ function useOptimisticPageBuilder(
   return useOptimistic<PageBuilderBlock[], RawPageBuilderDocument>(
     initialBlocks,
     (currentBlocks, action) => {
-      if (action.id === documentId && action.document) {
-        return reconcilePageBuilder(
-          currentBlocks,
-          action.document.pageBuilder ?? []
-        );
+      if (
+        action.id === documentId &&
+        action.document?.pageBuilder !== undefined
+      ) {
+        return reconcilePageBuilder(currentBlocks, action.document.pageBuilder);
       }
       return currentBlocks;
     }

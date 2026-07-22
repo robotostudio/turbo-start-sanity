@@ -96,6 +96,12 @@ describe("reconcilePageBuilder", () => {
             href: "/contact/",
             openInNewTab: false,
             text: "Contact us",
+            url: {
+              _type: "customUrl",
+              internal: undefined,
+              openInNewTab: false,
+              type: "internal",
+            },
             variant: "outline",
           },
         ],
@@ -386,6 +392,11 @@ describe("reconcilePageBuilder", () => {
         href: "https://example.com",
         openInNewTab: true,
         text: "External",
+        url: {
+          external: "https://example.com",
+          openInNewTab: true,
+          type: "external",
+        },
       },
     ]);
     expect(resultBlock(reconciled, 0).cards).toMatchObject([
@@ -508,5 +519,39 @@ describe("reconcilePageBuilder", () => {
       expect(Object.hasOwn(target, "prototype")).toBe(false);
     }
     expect(image).toEqual({ id: "image-safe-800x600-jpg" });
+  });
+
+  test("preserves defined custom button fields from raw payloads", () => {
+    const rawBlocks = JSON.parse(`[
+      {
+        "_key": "cta",
+        "_type": "cta",
+        "buttons": [
+          {
+            "_key": "contact",
+            "_type": "button",
+            "analyticsId": "contact-primary",
+            "text": "Contact us",
+            "url": {
+              "external": "https://example.com/contact",
+              "type": "external"
+            }
+          }
+        ]
+      }
+    ]`);
+
+    const reconciled = reconcilePageBuilder([], rawBlocks);
+
+    expect(resultBlock(reconciled, 0).buttons).toMatchObject([
+      {
+        _key: "contact",
+        _type: "button",
+        analyticsId: "contact-primary",
+        href: "https://example.com/contact",
+        openInNewTab: false,
+        text: "Contact us",
+      },
+    ]);
   });
 });

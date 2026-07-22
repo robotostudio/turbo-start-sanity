@@ -143,14 +143,8 @@ function reconcileButton(
     return undefined;
   }
 
-  const button: Record<string, unknown> = {
-    href: resolvedHref ?? current?.href,
-  };
-  for (const key of ["_key", "_type", "text", "variant"] as const) {
-    if (raw[key] !== undefined) {
-      button[key] = raw[key];
-    }
-  }
+  const button = reconcileRawFields(current, raw);
+  button.href = resolvedHref ?? current?.href;
   button.openInNewTab = url?.openInNewTab ?? false;
   return button;
 }
