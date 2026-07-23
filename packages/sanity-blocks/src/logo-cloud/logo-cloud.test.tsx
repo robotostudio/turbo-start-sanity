@@ -1,7 +1,7 @@
 import { LogoCloud } from "@workspace/sanity-blocks/logo-cloud/index";
 import { renderToStaticMarkup } from "react-dom/server";
 
-test("LogoCloud renders the title and logos", () => {
+test("LogoCloud renders the logos", () => {
   const html = renderToStaticMarkup(
     <LogoCloud
       logos={[
@@ -12,11 +12,9 @@ test("LogoCloud renders the title and logos", () => {
           openInNewTab: true,
         },
       ]}
-      title="Used by teams"
     />
   );
 
-  expect(html).toMatch(/Used by teams/);
   expect(html).toMatch(/alt="Acme"/);
   expect(html).toMatch(/href="https:\/\/example\.com"/);
   expect(html).toContain('target="_blank"');
@@ -39,7 +37,7 @@ test("LogoCloud renders logos without a link", () => {
 });
 
 test("LogoCloud renders nothing when there are no logos", () => {
-  const html = renderToStaticMarkup(<LogoCloud title="Partners" />);
+  const html = renderToStaticMarkup(<LogoCloud />);
 
   expect(html).toBe("");
 });

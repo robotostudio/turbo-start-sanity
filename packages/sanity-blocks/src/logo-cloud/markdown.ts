@@ -1,5 +1,4 @@
 import {
-  eyebrowToMarkdown,
   imageToMarkdown,
   joinSections,
   type MarkdownBlock,
@@ -29,8 +28,5 @@ export function logoCloudToMarkdown(
     })
     .filter(Boolean);
 
-  return joinSections([
-    eyebrowToMarkdown(block.title),
-    logos.length > 0 ? logos.join("\n") : "",
-  ]);
+  return joinSections([logos.length > 0 ? logos.join("\n") : ""]);
 }

@@ -4,15 +4,9 @@ test("logoCloudToMarkdown returns empty string for a fully empty block", () => {
   expect(logoCloudToMarkdown({}, {})).toBe("");
 });
 
-test("logoCloudToMarkdown renders the title as an emphasized label", () => {
-  const result = logoCloudToMarkdown({ title: "Used by teams" }, {});
-  expect(result).toBe("**Used by teams**");
-});
-
 test("logoCloudToMarkdown renders logos as an image list when a resolver is provided", () => {
   const result = logoCloudToMarkdown(
     {
-      title: "Partners",
       logos: [{ _key: "l1", image: { id: "img1", alt: "Acme" } }],
     },
     { resolveImageUrl: (img) => `https://cdn.example.com/${img.id}.webp` }
@@ -55,7 +49,6 @@ test("logoCloudToMarkdown skips logos with '#' href links", () => {
 test("logoCloudToMarkdown emits no HTML or JSX tags", () => {
   const result = logoCloudToMarkdown(
     {
-      title: "Partners",
       logos: [
         { _key: "l1", image: { id: "img1", alt: "Acme" }, href: "/acme" },
       ],

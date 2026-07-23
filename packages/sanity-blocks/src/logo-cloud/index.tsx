@@ -15,7 +15,6 @@ export interface LogoCloudLogo {
 
 export interface LogoCloudProps {
   logos?: LogoCloudLogo[] | null;
-  title?: string | null;
 }
 
 function Logo({ logo }: Readonly<{ logo: LogoCloudLogo }>) {
@@ -41,7 +40,7 @@ function Logo({ logo }: Readonly<{ logo: LogoCloudLogo }>) {
 
 const HOVER_PLAYBACK_RATE = 0.6;
 
-export function LogoCloud({ logos, title }: Readonly<LogoCloudProps>) {
+export function LogoCloud({ logos }: Readonly<LogoCloudProps>) {
   const trackRef = useRef<HTMLDivElement>(null);
 
   if (!(Array.isArray(logos) && logos.length > 0)) {
@@ -60,16 +59,11 @@ export function LogoCloud({ logos, title }: Readonly<LogoCloudProps>) {
   return (
     <section
       aria-label="Logo cloud"
-      className="mt-20 overflow-hidden bg-accent-green py-6"
+      className="overflow-hidden bg-accent-green py-6"
       id="logo-cloud"
       onMouseEnter={() => setPlaybackRate(HOVER_PLAYBACK_RATE)}
       onMouseLeave={() => setPlaybackRate(1)}
     >
-      {title ? (
-        <p className="container mb-4 font-mono text-accent-green-foreground text-sm uppercase tracking-wide">
-          {title}
-        </p>
-      ) : null}
       <div
         className="flex w-max animate-marquee items-center focus-within:[animation-play-state:paused] motion-reduce:animate-none"
         ref={trackRef}

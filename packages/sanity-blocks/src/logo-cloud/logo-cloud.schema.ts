@@ -11,13 +11,6 @@ export const logoCloudSchema = defineType({
   title: "Logo Cloud",
   fields: [
     defineField({
-      name: "title",
-      title: "Title",
-      type: "string",
-      description:
-        'Optional short label displayed above the logos, for example "Used by teams"',
-    }),
-    defineField({
       name: "logos",
       title: "Logos",
       type: "array",
@@ -28,14 +21,13 @@ export const logoCloudSchema = defineType({
   preview: {
     select: {
       logos: "logos",
-      title: "title",
     },
-    prepare: ({ logos = [], title }) => {
+    prepare: ({ logos = [] }) => {
       const logoCount = logos.length;
       const logoLabel = logoCount === 1 ? "logo" : "logos";
 
       return {
-        title: title || "Logo Cloud",
+        title: "Logo Cloud",
         subtitle: `${logoCount} ${logoLabel}`,
       };
     },
