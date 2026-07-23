@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import type { PageBuilderBlock } from "@/types";
+import type { RawOptimisticPageBuilder } from "./page-builder-optimistic";
 import { reconcilePageBuilder } from "./page-builder-optimistic";
 
 function projectedBlocks(
@@ -506,7 +507,7 @@ describe("reconcilePageBuilder", () => {
           "prototype": { "polluted": true }
         }
       }
-    ]`);
+    ]`) as RawOptimisticPageBuilder;
 
     const reconciled = reconcilePageBuilder([], rawBlocks);
     const block = resultBlock(reconciled, 0);
@@ -539,7 +540,7 @@ describe("reconcilePageBuilder", () => {
           }
         ]
       }
-    ]`);
+    ]`) as RawOptimisticPageBuilder;
 
     const reconciled = reconcilePageBuilder([], rawBlocks);
 
