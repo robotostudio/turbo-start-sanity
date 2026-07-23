@@ -3,7 +3,10 @@ import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text"
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import type { ButtonProps } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
-import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
+import {
+  getImageDimensions,
+  SanityImage,
+} from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
 
 import type { HeroVideoData, HeroVideoVariant } from "./hero-video";
@@ -22,6 +25,10 @@ export interface HeroBlockProps {
 
 const bannerFill = "absolute inset-0 size-full";
 
+const POSTER_WIDTH = 1440;
+/** Fallback shape for a poster whose asset id carries no dimensions. */
+const POSTER_FALLBACK_HEIGHT = 913;
+
 function HeroPosterFrame({
   variant,
   isCap = false,
@@ -30,15 +37,20 @@ function HeroPosterFrame({
     return null;
   }
 
+  const dimensions = getImageDimensions(variant.poster);
+  const height = dimensions
+    ? Math.round(POSTER_WIDTH / dimensions.aspectRatio)
+    : POSTER_FALLBACK_HEIGHT;
+
   return (
     <SanityImage
       alt=""
       className={cn(bannerFill, "rounded-none! object-cover object-[50%_45%]")}
       fetchPriority={isCap ? undefined : "high"}
-      height={534}
+      height={height}
       image={variant.poster}
       loading={isCap ? "lazy" : "eager"}
-      width={1440}
+      width={POSTER_WIDTH}
     />
   );
 }
