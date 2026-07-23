@@ -25,7 +25,7 @@ export function Breadcrumbs({
   return (
     <div
       className={cn(
-        "border-y-[0.75px] border-zinc-900 bg-background",
+        "border-y-[0.75px] border-zinc-200 dark:border-zinc-900 bg-background",
         className
       )}
     >
@@ -67,7 +67,7 @@ export function Breadcrumbs({
 
 export function BreadcrumbsSkeleton() {
   return (
-    <div className="border-b-[0.75px] border-zinc-900 bg-background">
+    <div className="border-b-[0.75px] border-zinc-200 dark:border-zinc-900 bg-background">
       <div className="container flex min-h-13 animate-pulse items-center justify-between gap-2.5">
         <div className="h-5 w-64 max-w-full bg-muted" />
         <div className="h-5 w-36 shrink-0 bg-muted" />
