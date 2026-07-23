@@ -111,7 +111,7 @@ export function HeroBlock({
         className={cn(
           "relative flex-1 overflow-hidden",
           "h-[108vw] sm:h-[77vw]",
-          "lg:h-auto lg:min-h-[39vw] lg:max-h-[calc(100svh-276px)]"
+          "lg:h-auto lg:min-h-[40vw] lg:max-h-[calc(100svh-276px)]"
         )}
       >
         {posterLight && (
