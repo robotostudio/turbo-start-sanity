@@ -50,6 +50,7 @@ export function NavbarSkeleton() {
             <NavItemSkeleton />
             <NavItemSkeleton />
             <NavItemSkeleton />
+            <NavItemSkeleton />
           </div>
 
           <div className="hidden flex-1 items-center justify-end gap-2 lg:flex">
