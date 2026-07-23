@@ -150,8 +150,15 @@ function useBlockRenderer(id: string, type: string, pageTitle?: string) {
       );
     }
 
+    const isPinnedHero = index === 0 && block._type === "hero";
+
     return (
       <div
+        className={
+          isPinnedHero
+            ? "sticky top-0 z-0 h-svh"
+            : "relative z-10 bg-background"
+        }
         data-sanity={createBlockDataAttribute(block._key)}
         key={`${block._type}-${block._key}`}
       >

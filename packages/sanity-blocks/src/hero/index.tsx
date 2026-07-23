@@ -104,19 +104,12 @@ export function HeroBlock({
 }: Readonly<HeroBlockProps>) {
   return (
     <section
-      className="relative flex min-h-svh flex-col bg-background"
+      className={cn(
+        "relative flex flex-col bg-background",
+        isFirst ? "h-full" : "min-h-svh"
+      )}
       id="hero"
     >
-      {isFirst && (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-full h-64 select-none"
-        >
-          <HeroPosters video={video} />
-          <div className="absolute inset-0 bg-linear-to-b from-transparent to-background" />
-        </div>
-      )}
-
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <HeroPosters eager video={video} />
         <HeroVideo className={bannerFill} video={video} />
@@ -126,18 +119,18 @@ export function HeroBlock({
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-12">
           <div className="grid gap-5">
             <BlockEyebrow eyebrow={badge} />
-            <h1 className="max-w-[827px] break-words font-normal text-4xl text-foreground leading-[1.1] tracking-[-0.24px] sm:text-5xl lg:text-[64px]">
+            <h1 className="hero-enter max-w-[827px] break-words font-normal text-4xl text-foreground leading-[1.1] tracking-[-0.24px] sm:text-5xl lg:text-[64px]">
               {title}
             </h1>
             <RichText
-              className="body-text max-w-[633px] text-muted-foreground"
+              className="body-text hero-enter max-w-[633px] text-muted-foreground [animation-delay:80ms]"
               richText={richText}
             />
           </div>
           <SanityButtons
-            buttonClassName="h-auto w-full py-3 text-xl leading-8 sm:w-auto"
+            buttonClassName="h-auto w-full px-5 py-2 text-xl leading-8 sm:w-auto"
             buttons={buttons}
-            className="gap-3 sm:flex-row lg:justify-end"
+            className="hero-enter gap-3 sm:flex-row lg:justify-end [animation-delay:160ms]"
           />
         </div>
       </div>

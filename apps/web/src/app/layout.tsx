@@ -59,13 +59,15 @@ export default async function RootLayout({
             <CachedNavbar perspective="published" stega={false} />
           )}
           {children}
-          {isDraftMode || previewForceDrafts ? (
-            <Suspense fallback={<FooterSkeleton />}>
-              <DynamicFooter />
-            </Suspense>
-          ) : (
-            <CachedFooter perspective="published" stega={false} />
-          )}
+          <div className="relative z-10">
+            {isDraftMode || previewForceDrafts ? (
+              <Suspense fallback={<FooterSkeleton />}>
+                <DynamicFooter />
+              </Suspense>
+            ) : (
+              <CachedFooter perspective="published" stega={false} />
+            )}
+          </div>
           <SanityLive action={revalidateSyncTags} includeDrafts={isDraftMode} />
           <Suspense fallback={null}>
             <CombinedJsonLd includeOrganization includeWebsite />
