@@ -176,6 +176,10 @@
   summary {
     cursor: pointer;
   }
+
+  body {
+    overflow-x: clip;
+  }
 }
 
 /* Canonical dot lattice — the SINGLE dotted-surface utility for the whole app.
