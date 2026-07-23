@@ -19,7 +19,6 @@ export type PageBuilderProps = {
   readonly pageBuilder?: PageBuilderBlock[];
   readonly id: string;
   readonly type: string;
-  readonly pageTitle?: string;
 };
 
 type SanityDataAttributeConfig = {
@@ -33,11 +32,7 @@ type SanityDataAttributeConfig = {
  * against its PagebuilderType so a GROQ or schema rename breaks the build
  * instead of silently passing through `any`.
  */
-function renderBlockComponent(
-  block: PageBuilderBlock,
-  isFirst: boolean,
-  pageTitle?: string
-) {
+function renderBlockComponent(block: PageBuilderBlock, isFirst: boolean) {
   switch (block?._type) {
     case "cta":
       return <CTABlock {...(block as PagebuilderType<"cta">)} />;
@@ -64,12 +59,7 @@ function renderBlockComponent(
     case "socialGrid":
       return <SocialGrid {...(block as PagebuilderType<"socialGrid">)} />;
     case "showcaseGrid":
-      return (
-        <ShowcaseGrid
-          {...(block as PagebuilderType<"showcaseGrid">)}
-          pageTitle={pageTitle}
-        />
-      );
+      return <ShowcaseGrid {...(block as PagebuilderType<"showcaseGrid">)} />;
     case "richTextBlock":
       return <RichTextBlock {...(block as PagebuilderType<"richTextBlock">)} />;
     default:
@@ -128,7 +118,7 @@ function useOptimisticPageBuilder(
   );
 }
 
-function useBlockRenderer(id: string, type: string, pageTitle?: string) {
+function useBlockRenderer(id: string, type: string) {
   const createBlockDataAttribute = (blockKey: string) =>
     createSanityDataAttribute({
       id,
@@ -137,8 +127,7 @@ function useBlockRenderer(id: string, type: string, pageTitle?: string) {
     });
 
   const renderBlock = (block: PageBuilderBlock, index: number) => {
-    const content =
-      block && renderBlockComponent(block, index === 0, pageTitle);
+    const content = block && renderBlockComponent(block, index === 0);
 
     if (!content) {
       return (
@@ -174,10 +163,9 @@ export function PageBuilder({
   pageBuilder: initialBlocks = [],
   id,
   type,
-  pageTitle,
 }: PageBuilderProps) {
   const blocks = useOptimisticPageBuilder(initialBlocks, id);
-  const { renderBlock } = useBlockRenderer(id, type, pageTitle);
+  const { renderBlock } = useBlockRenderer(id, type);
 
   const containerDataAttribute = createSanityDataAttribute({
     id,

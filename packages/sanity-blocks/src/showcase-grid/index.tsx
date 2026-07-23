@@ -4,7 +4,6 @@ import {
   type SanityImageData,
 } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
-import Link from "next/link";
 
 export interface ShowcaseGridItem {
   _key: string;
@@ -17,7 +16,6 @@ export interface ShowcaseGridItem {
 }
 
 export interface ShowcaseGridProps {
-  pageTitle?: string | null;
   eyebrow?: string | null;
   title?: string | null;
   description?: string | null;
@@ -42,20 +40,12 @@ type CardView = {
   builtByRoboto: boolean;
 };
 
-// A usable Sanity image id is the asset ref, e.g. `image-<hash>-<dims>-<ext>`.
-// Malformed values (a missing/empty ref, or an invalid one like a `drafts.`
-// prefixed id from a broken field) must NOT reach SanityImage — it throws
-// "Could not parse image ID" and takes the whole page down. Guard here so bad
-// data degrades to initials / no screenshot instead of crashing.
 function hasValidAssetId<T extends { id?: string | null }>(
   image: T | null | undefined
 ): image is T {
   if (typeof image?.id !== "string") {
     return false;
   }
-  // Tolerate the stray `drafts.` prefix a media-library selection can add;
-  // SanityImage normalizes it too. Anything that still isn't an `image-…` ref
-  // (missing/empty/garbage) falls back to initials / no screenshot.
   return image.id.replace(/^drafts\./, "").startsWith("image-");
 }
 
@@ -206,7 +196,6 @@ function BuiltByRobotoBadge() {
 }
 
 function ShowcaseCardName({ item }: Readonly<{ item: CardView }>) {
-  // Only "Built by Roboto" cards link out; everything else is display-only.
   if (item.url && item.builtByRoboto) {
     return (
       <a
@@ -263,27 +252,6 @@ function ShowcaseCard({ item }: Readonly<{ item: CardView }>) {
   );
 }
 
-function ShowcaseBreadcrumb({ label }: Readonly<{ label: string }>) {
-  return (
-    <nav aria-label="Breadcrumb">
-      <ol className="flex items-center gap-1.5 text-sm">
-        <li>
-          <Link
-            className="focus-ring text-muted-foreground transition-colors hover:text-foreground"
-            href="/"
-          >
-            Home
-          </Link>
-        </li>
-        <li aria-hidden="true" className="text-muted-foreground">
-          /
-        </li>
-        <li className="text-foreground">{label}</li>
-      </ol>
-    </nav>
-  );
-}
-
 function ShowcaseHeader({
   eyebrow,
   title,
@@ -306,16 +274,12 @@ function ShowcaseHeader({
   );
 }
 
-// Deliberately no `w-screen -translate-x-1/2` full-bleed here: the old page's
-// hack clips at the left edge inside the Presentation tool's iframe.
 function ShowcaseHero({
-  pageTitle,
   eyebrow,
   title,
   description,
   featured,
 }: Readonly<{
-  pageTitle?: string | null;
   eyebrow?: string | null;
   title?: string | null;
   description?: string | null;
@@ -323,13 +287,7 @@ function ShowcaseHero({
 }>) {
   return (
     <div className="grid gap-8 sm:gap-12 lg:grid-cols-2 lg:items-stretch">
-      <div
-        className={cn(
-          "flex flex-col",
-          pageTitle ? "justify-between gap-10" : "justify-center"
-        )}
-      >
-        {pageTitle ? <ShowcaseBreadcrumb label={pageTitle} /> : null}
+      <div className="flex flex-col justify-end gap-10">
         <ShowcaseHeader
           description={description}
           eyebrow={eyebrow}
@@ -357,7 +315,6 @@ function ShowcaseHero({
 }
 
 export function ShowcaseGrid({
-  pageTitle,
   eyebrow,
   title,
   description,
@@ -368,9 +325,8 @@ export function ShowcaseGrid({
 
   if (!featuredItem) {
     return (
-      <section className="mt-16 bg-background pt-18 pb-24" id="showcase">
+      <section className="bg-background pt-8 pb-24" id="showcase">
         <div className="container flex flex-col gap-10">
-          {pageTitle ? <ShowcaseBreadcrumb label={pageTitle} /> : null}
           <ShowcaseHeader
             description={description}
             eyebrow={eyebrow}
@@ -385,13 +341,12 @@ export function ShowcaseGrid({
   const cards = cmsItems.filter((item) => item !== featuredItem).map(cmsToView);
 
   return (
-    <section className="mt-16 bg-background pt-18 pb-24" id="showcase">
+    <section className="bg-background pt-8 pb-24" id="showcase">
       <div className="container flex flex-col gap-24">
         <ShowcaseHero
           description={description}
           eyebrow={eyebrow}
           featured={featured}
-          pageTitle={pageTitle}
           title={title}
         />
         {cards.length > 0 ? (

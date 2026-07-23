@@ -13,6 +13,7 @@ import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
 import { getSEOMetadata } from "@/lib/seo";
@@ -77,8 +78,6 @@ export async function generateMetadata({
 export default function SlugPage({
   params,
 }: Readonly<{ params: Promise<SlugParams> }>) {
-  // Non-async + Suspense-first so Next prerenders/prefetches a static shell and
-  // streams the content instead of blocking the navigation on the Sanity fetch.
   return (
     <Suspense fallback={<SlugFallback />}>
       <SlugPageInner params={params} />
@@ -104,7 +103,6 @@ async function SlugPageInner({
   return <SlugPageContent pageData={pageData} />;
 }
 
-// notFound() stays in the non-cached callers above — never inside `'use cache'`.
 async function getCachedSlugPage({
   slug,
   perspective,
@@ -139,16 +137,18 @@ function SlugPageContent({
     );
   }
 
+  const hasLeadingHero = pageBuilder[0]?._type === "hero";
+
   return (
     <>
       <PageBuilderJsonLd pageBuilder={pageBuilder} />
-      <main className="-mt-16">
-        <PageBuilder
-          id={_id}
-          pageBuilder={pageBuilder}
-          pageTitle={title}
-          type={_type}
+      {hasLeadingHero ? null : (
+        <Breadcrumbs
+          crumbs={[{ label: "Home", href: "/" }, { label: title }]}
         />
+      )}
+      <main className={hasLeadingHero ? "-mt-16" : undefined}>
+        <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
       </main>
     </>
   );
