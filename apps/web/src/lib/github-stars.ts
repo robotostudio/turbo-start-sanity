@@ -1,12 +1,8 @@
-import { Logger } from "@workspace/logger";
-
 const REVALIDATE_SECONDS = 3600;
 const REQUEST_TIMEOUT_MS = 3000;
 // Owner and repo may only be word characters, dots and dashes — no slashes, so
 // a crafted URL can't escape the /repos/ path (SSRF guard).
 const SEGMENT = /^[\w.-]+$/;
-
-const logger = new Logger("GithubStars");
 
 function parseRepo(gitHubUrl: string): string | null {
   try {
@@ -40,15 +36,13 @@ export async function getGithubStars(
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
     if (!response.ok) {
-      logger.error(`GitHub API responded ${response.status} for ${repo}`);
       return null;
     }
     const { stargazers_count } = (await response.json()) as {
       stargazers_count?: number;
     };
-    return stargazers_count ?? null;
-  } catch (error) {
-    logger.error("Failed to fetch GitHub star count", error);
+    return typeof stargazers_count === "number" ? stargazers_count : null;
+  } catch {
     return null;
   }
 }

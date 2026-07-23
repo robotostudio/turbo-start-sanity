@@ -17,15 +17,13 @@ export function GithubStars({
   gitHubUrl?: string | null;
   stars?: number | null;
 }>) {
-  if (!gitHubUrl) {
+  if (!gitHubUrl || stars === null || stars === undefined) {
     return null;
   }
 
-  const hasStars = stars !== null && stars !== undefined;
-
   return (
     <a
-      aria-label={hasStars ? `GitHub stars: ${stars}` : "GitHub repository"}
+      aria-label={`GitHub stars: ${stars}`}
       className={
         "focus-ring inline-flex h-9 items-center gap-2 rounded-full px-2 font-mono font-normal text-foreground text-sm uppercase tracking-wide" +
         (className ? ` ${className}` : "")
@@ -35,11 +33,7 @@ export function GithubStars({
       target="_blank"
     >
       <GithubIcon className="size-[18px] shrink-0" />
-      {hasStars ? (
-        <span className="text-foreground tabular-nums">
-          {formatStars(stars)}
-        </span>
-      ) : null}
+      <span className="text-foreground tabular-nums">{formatStars(stars)}</span>
     </a>
   );
 }
