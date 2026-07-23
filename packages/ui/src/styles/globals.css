@@ -55,12 +55,12 @@
   /* Height the leading hero's copy occupies. The pinned banner is sized to the
      viewport minus this, so the copy lands exactly on the fold. Retune if the
      hero copy grows past two title lines. */
-  --hero-copy: 460px;
+  --hero-copy: 300px;
 }
 
 @media (width >= 64rem) {
   :root {
-    --hero-copy: 320px;
+    --hero-copy: 285px;
   }
 }
 
