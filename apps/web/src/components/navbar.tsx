@@ -53,12 +53,11 @@ export function NavbarSkeleton() {
           </div>
 
           <div className="hidden flex-1 items-center justify-end gap-2 lg:flex">
-            <div className="h-7 w-20 bg-muted/50" />
+            <div className="h-9 w-28 rounded-full bg-muted/50" />
             <div className="h-9 w-28 rounded-full bg-muted/50" />
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
-            <div className="h-7 w-20 bg-muted/50" />
             <div className="size-10 rounded-full bg-muted/50" />
           </div>
         </div>
