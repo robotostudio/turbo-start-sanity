@@ -104,19 +104,21 @@ export function HeroBlock({
 }: Readonly<HeroBlockProps>) {
   return (
     <section
-      className={cn(
-        "relative flex flex-col bg-background",
-        isFirst ? "h-full" : "min-h-svh"
-      )}
+      className="relative flex min-h-svh flex-col bg-background"
       id="hero"
     >
-      <div className="relative min-h-0 flex-1 overflow-hidden">
+      <div
+        className={cn(
+          "relative min-h-0 flex-1 overflow-hidden",
+          isFirst && "sticky top-0"
+        )}
+      >
         <HeroPosters eager video={video} />
         <HeroVideo className={bannerFill} video={video} />
       </div>
 
-      <div className="container mt-8 pb-8 md:mt-10 md:pb-12">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-12">
+      <div className="relative z-10 bg-background pt-10 pb-8 md:pt-12 md:pb-12">
+        <div className="container grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-12">
           <div className="grid gap-5">
             <BlockEyebrow eyebrow={badge} />
             <h1 className="hero-enter max-w-[827px] break-words font-normal text-4xl text-foreground leading-[1.1] tracking-[-0.24px] sm:text-5xl lg:text-[64px]">

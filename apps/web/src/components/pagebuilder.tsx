@@ -11,6 +11,7 @@ import { RichTextBlock } from "@workspace/sanity-blocks/rich-text-block/index";
 import { ShowcaseGrid } from "@workspace/sanity-blocks/showcase-grid/index";
 import { SocialGrid } from "@workspace/sanity-blocks/social-grid/index";
 import { SubscribeNewsletter } from "@workspace/sanity-blocks/subscribe-newsletter/index";
+import { cn } from "@workspace/tailwind-config/utils";
 import { createDataAttribute } from "next-sanity";
 
 import type { PageBuilderBlock, PagebuilderType } from "@/types";
@@ -139,15 +140,14 @@ function useBlockRenderer(id: string, type: string) {
       );
     }
 
-    const isPinnedHero = index === 0 && block._type === "hero";
+    const isLeadingHero = index === 0 && block._type === "hero";
 
     return (
       <div
-        className={
-          isPinnedHero
-            ? "sticky top-0 z-0 h-svh"
-            : "relative z-10 bg-background"
-        }
+        className={cn(
+          "min-w-0",
+          !isLeadingHero && "relative z-10 bg-background"
+        )}
         data-sanity={createBlockDataAttribute(block._key)}
         key={`${block._type}-${block._key}`}
       >
@@ -178,7 +178,10 @@ export function PageBuilder({
   }
 
   return (
-    <div className="grid grid-cols-1" data-sanity={containerDataAttribute}>
+    <div
+      className="grid min-w-0 grid-cols-1"
+      data-sanity={containerDataAttribute}
+    >
       {blocks.map(renderBlock)}
     </div>
   );
