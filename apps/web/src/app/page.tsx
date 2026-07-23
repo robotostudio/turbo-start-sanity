@@ -78,7 +78,7 @@ function HomeFallback() {
   return (
     <main className="-mt-16">
       <section className="relative flex min-h-svh animate-pulse flex-col bg-background">
-        <div className="relative h-[108vw] flex-1 overflow-hidden bg-muted sm:h-[77vw] lg:h-auto lg:max-h-[calc(100svh-276px)] lg:min-h-[40vw]" />
+        <div className="hero-banner relative flex-1 overflow-hidden bg-muted" />
         <div className="container mt-8 pb-8 md:mt-10 md:pb-12">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-12">
             <div className="grid gap-5">

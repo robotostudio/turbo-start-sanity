@@ -119,13 +119,7 @@ export function HeroBlock({
         </div>
       )}
 
-      <div
-        className={cn(
-          "relative flex-1 overflow-hidden",
-          "h-[108vw] sm:h-[77vw]",
-          "lg:h-auto lg:min-h-[40vw] lg:max-h-[calc(100svh-276px)]"
-        )}
-      >
+      <div className="hero-banner relative flex-1 overflow-hidden">
         {posterLight && (
           <HeroPosterMedia dark={posterDark} light={posterLight} />
         )}
