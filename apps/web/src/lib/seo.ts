@@ -32,7 +32,6 @@ type OgImageParams = {
   id?: string;
 };
 
-// Fallbacks used until the Settings document is populated in the Studio
 const FALLBACK_SITE_CONFIG: SiteConfig = {
   title: "Turbo Start Sanity",
   description: "Turbo Start Sanity",
@@ -40,7 +39,6 @@ const FALLBACK_SITE_CONFIG: SiteConfig = {
   keywords: ["roboto", "studio", "demo", "sanity", "next", "react", "template"],
 };
 
-// Pulls site-wide config from the Sanity Settings document, with fallbacks
 async function resolveSiteConfig(): Promise<SiteConfig> {
   const { perspective } = await getDynamicFetchOptions();
   const { data: settings } = await sanityFetchMetadata({
@@ -129,9 +127,6 @@ export async function getSEOMetadata(
     siteTitle: siteConfig.title,
   });
   const defaultDescription = pageDescription || siteConfig.description;
-  // Open graph description override: falls back to the page description when
-  // the `ogDescription` field is left blank. Only affects social (OG/Twitter)
-  // metadata — the top-level `description` stays the page description.
   const socialDescription = ogDescription || defaultDescription;
   const allKeywords = [...siteConfig.keywords, ...pageKeywords];
 
@@ -143,7 +138,7 @@ export async function getSEOMetadata(
   const fullTitle =
     defaultTitle === siteConfig.title
       ? defaultTitle
-      : `${defaultTitle} | ${siteConfig.title}`;
+      : `${defaultTitle} / ${siteConfig.title}`;
 
   const markdownUrl =
     slug && slug !== "/" ? `${pageUrl}.md` : `${baseUrl}/index.md`;
