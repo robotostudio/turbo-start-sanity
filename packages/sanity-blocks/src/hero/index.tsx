@@ -3,6 +3,7 @@ import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text"
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import type { ButtonProps } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
+import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
 import {
   getImageDimensions,
   SanityImage,
@@ -26,30 +27,37 @@ export interface HeroBlockProps {
 const bannerFill = "absolute inset-0 size-full";
 
 const POSTER_WIDTH = 1440;
-/** Fallback shape for a poster whose asset id carries no dimensions. */
-const POSTER_FALLBACK_HEIGHT = 913;
 
-function HeroPosterFrame({
-  variant,
-  isCap = false,
-}: Readonly<{ variant: HeroVideoVariant; isCap?: boolean }>) {
-  if (!variant.poster?.id) {
-    return null;
-  }
+function posterOf(variant?: HeroVideoVariant | null): SanityImageData | null {
+  return variant?.poster?.id ? variant.poster : null;
+}
 
-  const dimensions = getImageDimensions(variant.poster);
-  const height = dimensions
-    ? Math.round(POSTER_WIDTH / dimensions.aspectRatio)
-    : POSTER_FALLBACK_HEIGHT;
-
+function HeroPoster({
+  className,
+  eager,
+  poster,
+}: Readonly<{
+  className?: string;
+  eager?: boolean;
+  poster: SanityImageData;
+}>) {
+  const dimensions = getImageDimensions(poster);
   return (
     <SanityImage
       alt=""
-      className={cn(bannerFill, "rounded-none! object-cover object-[50%_45%]")}
-      fetchPriority={isCap ? undefined : "high"}
-      height={height}
-      image={variant.poster}
-      loading={isCap ? "lazy" : "eager"}
+      className={cn(
+        bannerFill,
+        "rounded-none! object-cover object-[50%_45%]",
+        className
+      )}
+      fetchPriority={eager ? "high" : undefined}
+      height={
+        dimensions
+          ? Math.round(POSTER_WIDTH / dimensions.aspectRatio)
+          : undefined
+      }
+      image={poster}
+      loading={eager ? "eager" : "lazy"}
       width={POSTER_WIDTH}
     />
   );
@@ -60,31 +68,30 @@ function HeroPosterFrame({
  * Split light/dark in CSS because this renders on the server, where the
  * active theme isn't known.
  */
-function HeroPosterMedia({
-  light,
-  dark,
-  isCap = false,
-}: Readonly<{
-  light: HeroVideoVariant;
-  dark?: HeroVideoVariant | null;
-  isCap?: boolean;
-}>) {
+function HeroPosters({
+  eager,
+  video,
+}: Readonly<{ eager?: boolean; video?: HeroVideoData | null }>) {
+  const light = posterOf(video?.light) ?? posterOf(video?.dark);
+  const dark = posterOf(video?.dark) ?? light;
+  if (!light) {
+    return null;
+  }
+
+  const split = dark !== null && dark !== light;
+
   return (
     <>
-      <div className={cn(bannerFill, dark && "dark:hidden")}>
-        <HeroPosterFrame isCap={isCap} variant={light} />
-      </div>
-      {dark && (
-        <div className={cn(bannerFill, "hidden dark:block")}>
-          <HeroPosterFrame isCap={isCap} variant={dark} />
-        </div>
+      <HeroPoster
+        className={split ? "dark:hidden" : undefined}
+        eager={eager}
+        poster={light}
+      />
+      {split && (
+        <HeroPoster className="hidden dark:block" eager={eager} poster={dark} />
       )}
     </>
   );
-}
-
-function hasPoster(variant?: HeroVideoVariant | null): boolean {
-  return Boolean(variant?.poster?.id);
 }
 
 export function HeroBlock({
