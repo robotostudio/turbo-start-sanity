@@ -415,9 +415,7 @@
 }
 
 @utility copy-shake {
-  @media (prefers-reduced-motion: no-preference) {
-    animation: copy-shake 400ms ease-in-out both;
-  }
+  animation: copy-shake 400ms ease-in-out both;
 }
 
 @keyframes hero-enter {
@@ -429,7 +427,13 @@
 }
 
 @utility hero-enter {
-  @media (prefers-reduced-motion: no-preference) {
-    animation: hero-enter 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: hero-enter 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Reduced motion: land on the final state instead of animating to it. */
+@media (prefers-reduced-motion: reduce) {
+  .copy-shake,
+  .hero-enter {
+    animation: none;
   }
 }
