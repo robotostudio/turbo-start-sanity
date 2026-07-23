@@ -102,10 +102,6 @@ export function HeroBlock({
   isFirst,
   video,
 }: Readonly<HeroBlockProps>) {
-  const lightPoster = hasPoster(video?.light) ? video?.light : null;
-  const darkPoster = hasPoster(video?.dark) ? video?.dark : null;
-  const posterLight = lightPoster ?? darkPoster;
-  const posterDark = darkPoster ?? lightPoster;
   return (
     <section
       className="relative flex min-h-svh flex-col bg-background"
@@ -116,20 +112,13 @@ export function HeroBlock({
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 bottom-full h-64 select-none"
         >
-          {posterLight && (
-            <HeroPosterMedia dark={posterDark} isCap light={posterLight} />
-          )}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 bg-linear-to-b from-transparent to-background"
-          />
+          <HeroPosters video={video} />
+          <div className="absolute inset-0 bg-linear-to-b from-transparent to-background" />
         </div>
       )}
 
-      <div className="hero-banner relative flex-1 overflow-hidden">
-        {posterLight && (
-          <HeroPosterMedia dark={posterDark} light={posterLight} />
-        )}
+      <div className="relative min-h-0 flex-1 overflow-hidden">
+        <HeroPosters eager video={video} />
         <HeroVideo className={bannerFill} video={video} />
       </div>
 

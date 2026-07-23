@@ -168,14 +168,6 @@
   @apply text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] md:text-5xl;
 }
 
-/* The hero's poster/video band. The real hero and the loading skeletons that
- * stand in for it share this one definition, so a height change can't land in
- * one and miss the other — a skeleton that measures differently from the hero
- * is itself the layout shift the skeleton exists to prevent. */
-@utility hero-banner {
-  @apply h-[108vw] sm:h-[77vw] lg:h-auto lg:max-h-[calc(100svh-276px)] lg:min-h-[36vw];
-}
-
 /* Preflight resets buttons to cursor:default — restore the pointer. */
 @layer base {
   button:not(:disabled),
