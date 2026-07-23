@@ -36,7 +36,7 @@ export function GithubStars({
     >
       <GithubIcon className="size-[18px] shrink-0" />
       {hasStars ? (
-        <span className="min-w-[4.25ch] text-foreground tabular-nums">
+        <span className="text-foreground tabular-nums">
           {formatStars(stars)}
         </span>
       ) : null}

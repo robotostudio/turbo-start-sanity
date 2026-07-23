@@ -193,7 +193,11 @@ export function Navbar({
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
-            <GithubStars gitHubUrl={gitHubUrl} stars={stars} />
+            <GithubStars
+              className="-mr-2"
+              gitHubUrl={gitHubUrl}
+              stars={stars}
+            />
             <MobileMenu navbarData={navbarData} settingsData={settingsData} />
           </div>
         </div>
