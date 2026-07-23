@@ -8,6 +8,7 @@ import { BlogCategoryFilter } from "@/components/blog-category-filter";
 import { BlogList } from "@/components/blog-list";
 import { BlogPagination } from "@/components/blog-pagination";
 import { BlogSearchResults } from "@/components/blog-search-results";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { PageBuilder } from "@/components/pagebuilder";
 import { useBlogSearch } from "@/hooks/use-blog-search";
 import type { Blog } from "@/types";
@@ -53,6 +54,7 @@ export function BlogPageContent({
 
   return (
     <main className="bg-background">
+      <Breadcrumbs crumbs={[{ label: "Home", href: "/" }, { label: "Blog" }]} />
       <div className="container mt-8 mb-16 md:my-16">
         <BlogHeader description={description} title={title} />
 

@@ -16,6 +16,11 @@ import { Suspense } from "react";
 
 import { BlogHeader } from "@/components/blog-card";
 import { BlogPageContent } from "@/components/blog-page-content";
+import {
+  Breadcrumbs,
+  BreadcrumbsSkeleton,
+  type Crumb,
+} from "@/components/breadcrumbs";
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
 import { getSEOMetadata } from "@/lib/seo";
@@ -25,6 +30,11 @@ import {
   handleErrors,
 } from "@/utils";
 
+const BLOG_CRUMBS: readonly Crumb[] = [
+  { label: "Home", href: "/" },
+  { label: "Blog" },
+];
+
 function BlogIndexError({
   indexPageData,
   message,
@@ -33,24 +43,27 @@ function BlogIndexError({
   message: string;
 }>) {
   return (
-    <main className="container my-16">
-      <BlogHeader
-        description={indexPageData.description}
-        title={indexPageData.title}
-      />
-      <div className="py-12 text-center">
-        <p className="text-muted-foreground">{message}</p>
+    <main className="bg-background">
+      <Breadcrumbs crumbs={BLOG_CRUMBS} />
+      <div className="container my-16">
+        <BlogHeader
+          description={indexPageData.description}
+          title={indexPageData.title}
+        />
+        <div className="py-12 text-center">
+          <p className="text-muted-foreground">{message}</p>
+        </div>
+        {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
+          <>
+            <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
+            <PageBuilder
+              id={indexPageData._id}
+              pageBuilder={indexPageData.pageBuilder}
+              type={indexPageData._type}
+            />
+          </>
+        )}
       </div>
-      {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
-        <>
-          <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
-          <PageBuilder
-            id={indexPageData._id}
-            pageBuilder={indexPageData.pageBuilder}
-            type={indexPageData._type}
-          />
-        </>
-      )}
     </main>
   );
 }
@@ -166,9 +179,6 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
     );
   }
 
-  // A single full-width featured card sits on page 1 only, and never when a
-  // category filter is active. It consumes the first document, shifting the
-  // list pagination window by one.
   const hasFeatured =
     Boolean(indexPageData.displayFeaturedBlogs) && !activeCategory;
 
@@ -247,13 +257,9 @@ function BlogCardSkeleton() {
 function BlogIndexFallback() {
   return (
     <main className="bg-background">
+      <BreadcrumbsSkeleton />
       <div className="container my-16 animate-pulse">
         <div className="grid gap-6">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <div className="h-5 w-12 bg-muted" />
-            <div className="h-5 w-2 bg-muted" />
-            <div className="h-5 w-10 bg-muted" />
-          </div>
           <div className="h-10 w-full max-w-md bg-muted sm:h-12" />
           <div className="grid max-w-2xl gap-2">
             <div className="h-5 w-full bg-muted" />

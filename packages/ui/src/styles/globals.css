@@ -394,6 +394,32 @@
   display: block;
 }
 
+/* Failure shake: decaying segments, transform only. */
+@keyframes copy-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+@utility copy-shake {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: copy-shake 400ms ease-in-out both;
+  }
+}
+
 @keyframes hero-enter {
   from {
     opacity: 0;

@@ -204,20 +204,6 @@ export function BlogHeader({
 }) {
   return (
     <div className="grid gap-6">
-      <nav aria-label="Breadcrumb" className="text-sm">
-        <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
-          <li>
-            <Link
-              className="focus-ring transition-colors hover:text-foreground"
-              href="/"
-            >
-              Home
-            </Link>
-          </li>
-          <li aria-hidden="true">/</li>
-          <li className="text-foreground">Blog</li>
-        </ol>
-      </nav>
       <h1 className="text-balance font-normal text-4xl tracking-tight sm:text-5xl">
         {title}
       </h1>

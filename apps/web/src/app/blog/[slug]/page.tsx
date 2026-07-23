@@ -15,10 +15,10 @@ import {
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+import { Breadcrumbs, BreadcrumbsSkeleton } from "@/components/breadcrumbs";
 import { TableOfContent } from "@/components/elements/table-of-content";
 import { ArticleJsonLd } from "@/components/json-ld";
 import { getSEOMetadata } from "@/lib/seo";
@@ -87,8 +87,6 @@ export default function BlogSlugPage({
 }: Readonly<{
   params: Promise<BlogParams>;
 }>) {
-  // Non-async + Suspense-first so Next prerenders/prefetches a static shell and
-  // streams the content instead of blocking the navigation on the Sanity fetch.
   return (
     <Suspense fallback={<BlogFallback />}>
       <BlogSlugInner params={params} />
@@ -114,7 +112,6 @@ async function BlogSlugInner({
   return <BlogPageContent data={data} />;
 }
 
-// notFound() stays in the non-cached callers above — never inside `'use cache'`.
 async function getCachedBlogPage({
   slug,
   perspective,
@@ -159,76 +156,55 @@ function BlogPageContent({
   return (
     <main className="bg-background">
       <ArticleJsonLd article={data} />
+      <Breadcrumbs
+        crumbs={[
+          { label: "Home", href: "/" },
+          { label: "Blog", href: "/blog" },
+          { label: title },
+        ]}
+      />
       <div className="container flex flex-col gap-16 pt-12 pb-24 md:gap-24 md:pt-16">
-        <div className="flex flex-col gap-6">
-          <nav aria-label="Breadcrumb" className="text-sm">
-            <ol className="flex flex-wrap items-center gap-1.5 text-muted-foreground">
-              <li>
-                <Link
-                  className="focus-ring transition-colors hover:text-foreground"
-                  href="/"
-                >
-                  Home
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li>
-                <Link
-                  className="focus-ring transition-colors hover:text-foreground"
-                  href="/blog"
-                >
-                  Blog
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li className="min-w-0 text-foreground">
-                <span className="block truncate">{title}</span>
-              </li>
-            </ol>
-          </nav>
+        <header className="flex flex-col gap-6">
+          <h1 className="text-balance font-normal text-4xl tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.1]">
+            {title}
+          </h1>
 
-          <header className="flex flex-col gap-6">
-            <h1 className="text-balance font-normal text-4xl tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.1]">
-              {title}
-            </h1>
-
-            <div className="flex flex-col gap-4">
-              <dl className="flex flex-col text-sm">
-                {publishedDate && (
-                  <div className="flex gap-1.5">
-                    <dt className="text-muted-foreground">Published At:</dt>
-                    <dd className="text-foreground/90">{publishedDate}</dd>
-                  </div>
-                )}
-                {updatedDate && (
-                  <div className="flex gap-1.5">
-                    <dt className="text-muted-foreground">Last Updated At:</dt>
-                    <dd className="text-foreground/90">{updatedDate}</dd>
-                  </div>
-                )}
-              </dl>
-
-              {author?.name && (
-                <div className="flex items-center gap-2">
-                  {author.image?.id && (
-                    <span className="inline-block size-6 overflow-hidden rounded-full">
-                      <SanityImage
-                        alt={author.name}
-                        className="size-6 rounded-full object-cover"
-                        height={48}
-                        image={author.image}
-                        width={48}
-                      />
-                    </span>
-                  )}
-                  <span className="text-muted-foreground text-sm">
-                    {author.name}
-                  </span>
+          <div className="flex flex-col gap-4">
+            <dl className="flex flex-col text-sm">
+              {publishedDate && (
+                <div className="flex gap-1.5">
+                  <dt className="text-muted-foreground">Published At:</dt>
+                  <dd className="text-foreground/90">{publishedDate}</dd>
                 </div>
               )}
-            </div>
-          </header>
-        </div>
+              {updatedDate && (
+                <div className="flex gap-1.5">
+                  <dt className="text-muted-foreground">Last Updated At:</dt>
+                  <dd className="text-foreground/90">{updatedDate}</dd>
+                </div>
+              )}
+            </dl>
+
+            {author?.name && (
+              <div className="flex items-center gap-2">
+                {author.image?.id && (
+                  <span className="inline-block size-6 overflow-hidden rounded-full">
+                    <SanityImage
+                      alt={author.name}
+                      className="size-6 rounded-full object-cover"
+                      height={48}
+                      image={author.image}
+                      width={48}
+                    />
+                  </span>
+                )}
+                <span className="text-muted-foreground text-sm">
+                  {author.name}
+                </span>
+              </div>
+            )}
+          </div>
+        </header>
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-32">
           <article className="min-w-0">
@@ -272,32 +248,23 @@ function ShareItemSkeleton() {
 function BlogFallback() {
   return (
     <main className="bg-background">
+      <BreadcrumbsSkeleton />
       <div className="container flex animate-pulse flex-col gap-16 pt-12 pb-24 md:gap-24 md:pt-16">
         <div className="flex flex-col gap-6">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <div className="h-5 w-12 bg-muted" />
-            <div className="h-5 w-2 bg-muted" />
-            <div className="h-5 w-10 bg-muted" />
-            <div className="h-5 w-2 bg-muted" />
-            <div className="h-5 w-48 bg-muted" />
+          <div className="grid gap-2">
+            <div className="h-8 w-full bg-muted sm:h-10 lg:h-[58px]" />
+            <div className="h-8 w-2/3 bg-muted sm:h-10 lg:h-[58px]" />
           </div>
 
-          <div className="flex flex-col gap-6">
-            <div className="grid gap-2">
-              <div className="h-8 w-full bg-muted sm:h-10 lg:h-[58px]" />
-              <div className="h-8 w-2/3 bg-muted sm:h-10 lg:h-[58px]" />
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col">
+              <div className="h-5 w-56 bg-muted" />
+              <div className="h-5 w-64 bg-muted" />
             </div>
 
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col">
-                <div className="h-5 w-56 bg-muted" />
-                <div className="h-5 w-64 bg-muted" />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="size-6 rounded-full bg-muted" />
-                <div className="h-5 w-28 bg-muted" />
-              </div>
+            <div className="flex items-center gap-2">
+              <div className="size-6 rounded-full bg-muted" />
+              <div className="h-5 w-28 bg-muted" />
             </div>
           </div>
         </div>
