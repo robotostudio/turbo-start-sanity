@@ -146,7 +146,7 @@ function useBlockRenderer(id: string, type: string) {
       <div
         className={cn(
           "min-w-0",
-          !isLeadingHero && "relative z-10 bg-background"
+          isLeadingHero ? "contents" : "relative z-10 bg-background"
         )}
         data-sanity={createBlockDataAttribute(block._key)}
         key={`${block._type}-${block._key}`}

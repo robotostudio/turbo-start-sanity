@@ -51,6 +51,17 @@
 
   /* Top overscroll gutter surface; a theme can lift it off the background. */
   --overscroll-top: var(--background);
+
+  /* Height the leading hero's copy occupies. The pinned banner is sized to the
+     viewport minus this, so the copy lands exactly on the fold. Retune if the
+     hero copy grows past two title lines. */
+  --hero-copy: 460px;
+}
+
+@media (width >= 64rem) {
+  :root {
+    --hero-copy: 320px;
+  }
 }
 
 .dark {

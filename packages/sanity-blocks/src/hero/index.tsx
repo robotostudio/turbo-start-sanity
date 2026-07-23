@@ -102,40 +102,58 @@ export function HeroBlock({
   isFirst,
   video,
 }: Readonly<HeroBlockProps>) {
-  return (
-    <section
-      className="relative flex min-h-svh flex-col bg-background"
-      id="hero"
-    >
-      <div
-        className={cn(
-          "relative min-h-0 flex-1 overflow-hidden",
-          isFirst && "sticky top-0"
-        )}
-      >
-        <HeroPosters eager video={video} />
-        <HeroVideo className={bannerFill} video={video} />
-      </div>
+  const banner = (
+    <>
+      <HeroPosters eager video={video} />
+      <HeroVideo className={bannerFill} video={video} />
+    </>
+  );
 
-      <div className="relative z-10 bg-background pt-10 pb-8 md:pt-12 md:pb-12">
-        <div className="container grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-12">
-          <div className="grid gap-5">
-            <BlockEyebrow eyebrow={badge} />
-            <h1 className="hero-enter max-w-[827px] break-words font-normal text-4xl text-foreground leading-[1.1] tracking-[-0.24px] sm:text-5xl lg:text-[64px]">
-              {title}
-            </h1>
-            <RichText
-              className="body-text hero-enter max-w-[633px] text-muted-foreground [animation-delay:80ms]"
-              richText={richText}
-            />
-          </div>
-          <SanityButtons
-            buttonClassName="h-auto w-full px-5 py-2 text-xl leading-8 sm:w-auto"
-            buttons={buttons}
-            className="hero-enter gap-3 sm:flex-row lg:justify-end [animation-delay:160ms]"
-          />
-        </div>
+  const copy = (
+    <div className="container grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-12">
+      <div className="grid gap-5">
+        <BlockEyebrow eyebrow={badge} />
+        <h1 className="hero-enter max-w-[827px] break-words font-normal text-4xl text-foreground leading-[1.1] tracking-[-0.24px] sm:text-5xl lg:text-[64px]">
+          {title}
+        </h1>
+        <RichText
+          className="body-text hero-enter max-w-[633px] text-muted-foreground [animation-delay:80ms]"
+          richText={richText}
+        />
       </div>
-    </section>
+      <SanityButtons
+        buttonClassName="h-auto w-full px-5 py-2 text-xl leading-8 sm:w-auto"
+        buttons={buttons}
+        className="hero-enter gap-3 sm:flex-row lg:justify-end [animation-delay:160ms]"
+      />
+    </div>
+  );
+
+  if (!isFirst) {
+    return (
+      <section
+        className="relative flex min-h-svh flex-col bg-background"
+        id="hero"
+      >
+        <div className="relative min-h-0 flex-1 overflow-hidden">{banner}</div>
+        <div className="relative z-10 bg-background pt-10 pb-8 md:pt-12 md:pb-12">
+          {copy}
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <>
+      <div
+        className="sticky top-0 z-0 h-[calc(100svh-var(--hero-copy))] overflow-hidden bg-background"
+        id="hero"
+      >
+        {banner}
+      </div>
+      <div className="relative z-10 bg-background pt-10 pb-8 md:pt-12 md:pb-12">
+        {copy}
+      </div>
+    </>
   );
 }
