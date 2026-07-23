@@ -52,12 +52,13 @@ export function NavbarSkeleton() {
             <NavItemSkeleton />
           </div>
 
-          <div className="hidden flex-1 items-center justify-end gap-4 lg:flex">
+          <div className="hidden flex-1 items-center justify-end gap-2 lg:flex">
             <div className="h-7 w-20 bg-muted/50" />
             <div className="h-9 w-28 rounded-full bg-muted/50" />
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
+            <div className="h-7 w-20 bg-muted/50" />
             <div className="size-10 rounded-full bg-muted/50" />
           </div>
         </div>
@@ -69,7 +70,8 @@ export function NavbarSkeleton() {
 export function Navbar({
   navbarData: initialNavbarData,
   settingsData: initialSettingsData,
-}: Readonly<NavigationData>) {
+  stars,
+}: Readonly<NavigationData & { stars?: number | null }>) {
   const { data, error, isLoading } = useSWR<NavigationData>(
     "/api/navigation",
     fetcher,
@@ -180,8 +182,8 @@ export function Navbar({
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="hidden flex-1 items-center justify-end gap-4 lg:flex">
-            <GithubStars gitHubUrl={gitHubUrl} />
+          <div className="hidden flex-1 items-center justify-end gap-2 lg:flex">
+            <GithubStars gitHubUrl={gitHubUrl} stars={stars} />
             <SanityButtons
               buttonClassName={NAV_BUTTON_CLASS}
               buttons={buttons || []}
@@ -191,6 +193,7 @@ export function Navbar({
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
+            <GithubStars gitHubUrl={gitHubUrl} stars={stars} />
             <MobileMenu navbarData={navbarData} settingsData={settingsData} />
           </div>
         </div>

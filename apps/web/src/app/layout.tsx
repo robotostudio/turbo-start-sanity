@@ -23,6 +23,7 @@ import { Navbar, NavbarSkeleton } from "@/components/navbar";
 import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
 import { ScrollToTop } from "@/components/scroll-to-top";
+import { getGithubStars } from "@/lib/github-stars";
 import { getNavigationData } from "@/lib/navigation";
 
 const fontSans = Geist({
@@ -92,5 +93,9 @@ async function CachedNavbar({ perspective, stega }: DynamicFetchOptions) {
     perspective,
     stega,
   });
-  return <Navbar navbarData={navbarData} settingsData={settingsData} />;
+  const stars = await getGithubStars(navbarData?.gitHubUrl);
+
+  return (
+    <Navbar navbarData={navbarData} settingsData={settingsData} stars={stars} />
+  );
 }
