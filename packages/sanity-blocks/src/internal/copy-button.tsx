@@ -40,13 +40,13 @@ export function CopyButton({ code }: Readonly<{ code: string }>) {
       <span className="relative grid size-4 place-items-center">
         <Copy
           aria-hidden="true"
-          className={`col-start-1 row-start-1 size-4 transition-all duration-200 ease-out ${
+          className={`col-start-1 row-start-1 size-4 transition-[transform,opacity] duration-[250ms] ease-in-out ${
             copied ? "scale-50 opacity-0" : "scale-100 opacity-100"
           }`}
         />
         <Check
           aria-hidden="true"
-          className={`col-start-1 row-start-1 size-4 transition-all duration-200 ease-out ${
+          className={`col-start-1 row-start-1 size-4 transition-[transform,opacity] duration-[250ms] ease-in-out ${
             copied ? "scale-100 opacity-100" : "scale-50 opacity-0"
           }`}
         />
