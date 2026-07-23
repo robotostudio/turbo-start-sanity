@@ -14,7 +14,7 @@ export default function NotFound() {
           </span>
         </div>
 
-        <div className="inline-flex items-center justify-center bg-grid-dots px-12 py-8 text-zinc-800 sm:px-20 sm:py-10 dark:text-zinc-50">
+        <div className="inline-flex items-center justify-center bg-grid-dots bg-size-[5.6px_4.6px] px-12 py-8 text-zinc-800 sm:px-20 sm:py-10 dark:text-zinc-50">
           <h1 className="font-normal text-7xl text-foreground leading-none tracking-tight sm:text-8xl md:text-9xl">
             404
           </h1>
