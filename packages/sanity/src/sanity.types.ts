@@ -323,7 +323,6 @@ export type SocialGrid = {
 
 export type LogoCloud = {
   _type: "logoCloud";
-  title?: string;
   logos?: Array<{
     image?: LogoCloudItemImage;
     url?: CustomUrl;
@@ -1494,7 +1493,6 @@ export type QueryHomePageDataResult = {
     | {
         _key: string;
         _type: "logoCloud";
-        title?: string;
         logos: Array<{
           image: {
             id: string | null;
@@ -2059,7 +2057,6 @@ export type QuerySlugPageDataResult = {
     | {
         _key: string;
         _type: "logoCloud";
-        title?: string;
         logos: Array<{
           image: {
             id: string | null;
@@ -2624,7 +2621,6 @@ export type QueryBlogIndexPageDataResult = {
     | {
         _key: string;
         _type: "logoCloud";
-        title?: string;
         logos: Array<{
           image: {
             id: string | null;

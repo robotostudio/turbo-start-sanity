@@ -2056,13 +2056,6 @@
             "value": "logoCloud"
           }
         },
-        "title": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          },
-          "optional": true
-        },
         "logos": {
           "type": "objectAttribute",
           "value": {
