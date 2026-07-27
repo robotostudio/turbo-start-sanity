@@ -3,9 +3,9 @@ import {
   type SanityImageData,
 } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
-import type { CSSProperties } from "react";
 
 import { normalizedLogoHeight } from "../internal/logo-height";
+import { ShowcaseMarquee } from "./showcase-marquee";
 
 export interface ShowcaseGridItem {
   _key: string;
@@ -160,36 +160,6 @@ function FocusBrackets() {
   );
 }
 
-function ShowcaseMarquee({ items }: Readonly<{ items: CardView[] }>) {
-  const shots = items.filter((item) => item.screenshot.kind === "sanity");
-  if (shots.length === 0) {
-    return null;
-  }
-  const loop = [...shots, ...shots];
-  const duration = Math.max(36, shots.length * 9);
-  return (
-    <div aria-hidden="true" className="relative w-full overflow-hidden">
-      <div
-        className="flex w-max [animation:marquee_var(--marquee-duration)_linear_infinite] hover:[animation-play-state:paused] motion-reduce:[animation:none]"
-        style={{ "--marquee-duration": `${duration}s` } as CSSProperties}
-      >
-        {loop.map((item, index) => (
-          <div
-            className="relative mr-2 aspect-video h-56 shrink-0 overflow-hidden bg-muted sm:h-80 lg:h-[28.5rem]"
-            key={`${item.id}-${index}`}
-          >
-            <ScreenshotImage
-              name={item.name}
-              screenshot={item.screenshot}
-              sizes="(min-width: 1024px) 810px, (min-width: 640px) 570px, 400px"
-            />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function ShowcaseHeader({
   title,
   description,
@@ -241,9 +211,7 @@ function FeaturedBanner({
   );
 
   const panel = (
-    <div
-      className="relative flex min-h-64 items-center justify-center overflow-hidden bg-grid-dots p-8 text-foreground sm:min-h-80 lg:min-h-0 lg:p-14"
-    >
+    <div className="relative flex min-h-64 items-center justify-center overflow-hidden bg-grid-dots p-8 text-foreground sm:min-h-80 lg:min-h-0 lg:p-14">
       {clickable ? (
         <span
           aria-hidden="true"
@@ -392,6 +360,11 @@ export function ShowcaseGrid({
   const cmsItems = items ?? [];
   const label = title?.trim() || eyebrow?.trim() || "Showcase";
   const allViews = cmsItems.map(cmsToView);
+  const marqueeShots = allViews.flatMap((view) =>
+    view.screenshot.kind === "sanity"
+      ? [{ id: view.id, name: view.name, image: view.screenshot.image }]
+      : []
+  );
 
   const explicitFeaturedKeys = new Set(
     cmsItems.filter((item) => item.featured).map((item) => item._key)
@@ -420,7 +393,7 @@ export function ShowcaseGrid({
     <section className="bg-background pb-24" id="showcase">
       {title ? null : <h2 className="sr-only">{label}</h2>}
       <div className="flex flex-col gap-16">
-        <ShowcaseMarquee items={allViews} />
+        <ShowcaseMarquee shots={marqueeShots} />
 
         <div className="container">
           <ShowcaseHeader description={description} title={title} />
