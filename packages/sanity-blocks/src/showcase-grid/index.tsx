@@ -114,11 +114,13 @@ function ScreenshotImage({
   name,
   sizes,
   className,
+  loading,
 }: Readonly<{
   screenshot: ImageSource;
   name: string;
   sizes: string;
   className?: string;
+  loading?: "eager" | "lazy";
 }>) {
   if (screenshot.kind === "sanity") {
     return (
@@ -127,6 +129,7 @@ function ScreenshotImage({
         className={cn("absolute inset-0 size-full object-cover", className)}
         height={810}
         image={screenshot.image}
+        loading={loading}
         sizes={sizes}
         width={1440}
       />
@@ -225,6 +228,7 @@ function FeaturedBanner({
   const screenshot = (
     <div className="relative aspect-video w-full overflow-hidden bg-muted">
       <ScreenshotImage
+        loading="lazy"
         name={featured.name}
         screenshot={featured.screenshot}
         sizes="(min-width: 1024px) 66vw, 100vw"
@@ -321,6 +325,7 @@ function ShowcaseCard({ item }: Readonly<{ item: CardView }>) {
     <div className="flex flex-col bg-background">
       <div className="relative aspect-video w-full overflow-hidden bg-muted">
         <ScreenshotImage
+          loading="lazy"
           name={item.name}
           screenshot={item.screenshot}
           sizes="(min-width: 640px) 50vw, 100vw"

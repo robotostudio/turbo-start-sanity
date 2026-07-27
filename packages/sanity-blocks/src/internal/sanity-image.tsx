@@ -107,6 +107,7 @@ export function SanityImage({ image, ...props }: SanityImageProps) {
       <img
         alt={props.alt ?? image.alt ?? ""}
         className={cn("object-contain", props.className)}
+        decoding="async"
         height={props.height}
         loading={props.loading}
         src={svgUrl}

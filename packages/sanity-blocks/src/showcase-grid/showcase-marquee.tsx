@@ -48,6 +48,7 @@ export function ShowcaseMarquee({ shots }: Readonly<{ shots: MarqueeShot[] }>) {
               className="absolute inset-0 size-full object-cover"
               height={810}
               image={shot.image}
+              loading={index < 2 ? "eager" : "lazy"}
               sizes="(min-width: 1024px) 810px, (min-width: 640px) 570px, 400px"
               width={1440}
             />
