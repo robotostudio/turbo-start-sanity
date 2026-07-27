@@ -1,0 +1,5 @@
+{
+  "$schema": "https://shelve.cloud/schema.json",
+  "project": "turbo-start-sanity-studio",
+  "envFileName": ".env.local"
+}

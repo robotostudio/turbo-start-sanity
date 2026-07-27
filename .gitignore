@@ -41,3 +41,10 @@ npm-debug.log*
 
 # Claude
 .claude/settings.local.json
+# shelve-managed-block
+.env
+.env.*
+!.env.template
+!.env.example
+.shelve/
+# end shelve-managed-block
