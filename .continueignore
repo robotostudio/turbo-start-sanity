@@ -1,0 +1,9 @@
+# shelve-managed-block
+# Added by `shelve init` — do not let AI agents exfiltrate secrets
+.env
+.env.*
+!.env.template
+!.env.example
+.shelve/
+.shelve/cache/
+# end shelve-managed-block
