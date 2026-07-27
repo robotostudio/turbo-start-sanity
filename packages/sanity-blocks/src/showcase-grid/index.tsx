@@ -3,7 +3,7 @@ import {
   type SanityImageData,
 } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
-import { ArrowUpRight } from "lucide-react";
+import type { CSSProperties } from "react";
 
 import { normalizedLogoHeight } from "../internal/logo-height";
 
@@ -11,9 +11,9 @@ export interface ShowcaseGridItem {
   _key: string;
   siteName?: string | null;
   url?: string | null;
+  category?: string | null;
   screenshot?: SanityImageData | null;
   attributionLogo?: SanityImageData | null;
-  builtByRoboto?: boolean | null;
   featured?: boolean | null;
 }
 
@@ -32,9 +32,9 @@ type CardView = {
   id: string;
   name: string;
   url: string | null;
+  category: string | null;
   screenshot: ImageSource;
   logo: SanityImageData | null;
-  builtByRoboto: boolean;
 };
 
 function hasValidAssetId<T extends { id?: string | null }>(
@@ -57,27 +57,10 @@ function cmsToView(item: ShowcaseGridItem): CardView {
     id: item._key,
     name,
     url: item.url ?? null,
+    category: item.category?.trim() || null,
     screenshot,
     logo: hasValidAssetId(item.attributionLogo) ? item.attributionLogo : null,
-    builtByRoboto: item.builtByRoboto ?? false,
   };
-}
-
-function RobotoIcon({ className }: Readonly<{ className?: string }>) {
-  return (
-    <svg
-      aria-hidden="true"
-      className={className}
-      fill="none"
-      viewBox="0 0 14 12"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M10.8333 8.16L12.7593 6.24V2.4L10.3518 0H4.81481L2.40741 2.4H10.3518V6.24H4.79315L3.37037 7.6584H2.40741V2.4L0 4.8V12H2.40741V8.1384H6.72148L10.3518 12H13.2407L9.87037 8.16H10.8333Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
 }
 
 function AttributionLogo({
@@ -103,6 +86,26 @@ function AttributionLogo({
       }}
       width={96}
     />
+  );
+}
+
+function AttributionMark({ item }: Readonly<{ item: CardView }>) {
+  return (
+    <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden bg-zinc-900 text-white">
+      {item.logo ? (
+        <SanityImage
+          alt={`${item.name} logo`}
+          className="size-full object-contain"
+          height={24}
+          image={item.logo}
+          width={24}
+        />
+      ) : (
+        <span className="font-medium text-sm leading-none">
+          {item.name.charAt(0).toUpperCase()}
+        </span>
+      )}
+    </span>
   );
 }
 
@@ -132,223 +135,250 @@ function ScreenshotImage({
   return null;
 }
 
-
-function CardBadge({ builtByRoboto }: Readonly<{ builtByRoboto: boolean }>) {
-  if (builtByRoboto) {
-    return (
-      <span className="flex h-6 shrink-0 items-center gap-2 bg-muted px-2 py-1.5 font-mono text-muted-foreground text-xs uppercase tracking-[0.24px]">
-        <RobotoIcon className="h-3 w-auto shrink-0" />
-        Built by Roboto
-      </span>
-    );
-  }
+function FocusBrackets() {
+  const corner =
+    "absolute size-2 border-accent-green-foreground opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none";
   return (
-    <span className="flex h-6 shrink-0 items-center border border-border px-2 py-1.5 font-mono text-muted-foreground text-xs uppercase tracking-[0.24px]">
-      Community
-    </span>
+    <>
+      <span
+        aria-hidden="true"
+        className={cn(corner, "-top-3 -left-3 border-r border-b")}
+      />
+      <span
+        aria-hidden="true"
+        className={cn(corner, "-top-3 -right-3 border-b border-l")}
+      />
+      <span
+        aria-hidden="true"
+        className={cn(corner, "-bottom-3 -left-3 border-t border-r")}
+      />
+      <span
+        aria-hidden="true"
+        className={cn(corner, "-right-3 -bottom-3 border-t border-l")}
+      />
+    </>
   );
 }
 
-
-function ShowcaseWordmark({ word }: Readonly<{ word: string }>) {
-  const type =
-    "block whitespace-nowrap font-medium text-[clamp(3.5rem,15vw,13rem)] uppercase leading-[0.9] tracking-[-0.03em] text-foreground";
-  const crisp = "linear-gradient(to right, #000 0 44%, transparent 66%)";
-  const blurBand =
-    "linear-gradient(to right, transparent 40%, #000 60%, #000 74%, transparent 92%)";
-  const dotDissolve =
-    "radial-gradient(circle at center, #000 0 0.6px, transparent 1px), linear-gradient(to right, transparent 58%, #000 80%, transparent 100%)";
+function ShowcaseMarquee({ items }: Readonly<{ items: CardView[] }>) {
+  const shots = items.filter((item) => item.screenshot.kind === "sanity");
+  if (shots.length === 0) {
+    return null;
+  }
+  const loop = [...shots, ...shots];
+  const duration = Math.max(36, shots.length * 9);
   return (
-    <div
-      aria-hidden="true"
-      className="relative w-full select-none overflow-hidden"
-    >
-      <span
-        className={type}
-        style={{ maskImage: crisp, WebkitMaskImage: crisp }}
+    <div aria-hidden="true" className="relative w-full overflow-hidden">
+      <div
+        className="flex w-max [animation:marquee_var(--marquee-duration)_linear_infinite] hover:[animation-play-state:paused] motion-reduce:[animation:none]"
+        style={{ "--marquee-duration": `${duration}s` } as CSSProperties}
       >
-        {word}
-      </span>
-      <span
-        className={cn("absolute inset-0", type)}
-        style={{
-          filter: "blur(6px)",
-          maskImage: blurBand,
-          WebkitMaskImage: blurBand,
-        }}
-      >
-        {word}
-      </span>
-      <span
-        className={cn("absolute inset-0", type)}
-        style={{
-          maskImage: dotDissolve,
-          WebkitMaskImage: dotDissolve,
-          maskSize: "5.2px 5.2px, 100% 100%",
-          WebkitMaskSize: "5.2px 5.2px, 100% 100%",
-          maskRepeat: "round, no-repeat",
-          WebkitMaskRepeat: "round, no-repeat",
-          maskComposite: "intersect",
-          WebkitMaskComposite: "source-in",
-        }}
-      >
-        {word}
-      </span>
+        {loop.map((item, index) => (
+          <div
+            className="relative mr-2 aspect-video h-56 shrink-0 overflow-hidden bg-muted sm:h-80 lg:h-[28.5rem]"
+            key={`${item.id}-${index}`}
+          >
+            <ScreenshotImage
+              name={item.name}
+              screenshot={item.screenshot}
+              sizes="(min-width: 1024px) 810px, (min-width: 640px) 570px, 400px"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
 function ShowcaseHeader({
-  wordmark,
   title,
   description,
 }: Readonly<{
-  wordmark: string;
   title?: string | null;
   description?: string | null;
 }>) {
+  if (!(title || description)) {
+    return null;
+  }
   return (
-    <div className="flex flex-col gap-6">
-      <ShowcaseWordmark word={wordmark} />
-      {title || description ? (
-        <div className="flex flex-col items-start gap-5">
-          {title ? <h2 className="max-w-3xl block-title">{title}</h2> : null}
-          {description ? (
-            <p className="body-text max-w-xl text-muted-foreground">
-              {description}
-            </p>
-          ) : null}
-        </div>
+    <div className="mx-auto flex max-w-4xl flex-col items-center gap-4 text-center">
+      {title ? (
+        <h2 className="block-title text-balance lg:text-[64px] lg:leading-[1.1]">
+          {title}
+        </h2>
+      ) : null}
+      {description ? (
+        <p className="body-text max-w-xl text-pretty text-muted-foreground">
+          {description}
+        </p>
       ) : null}
     </div>
   );
 }
 
-/**
- * The featured build: a branding panel (the site's logo on the dot lattice)
- * beside a full-width screenshot — the split from the design, stacking on small
- * screens.
- */
-function FeaturedBanner({ featured }: Readonly<{ featured: CardView }>) {
+function FeaturedBanner({
+  featured,
+  side = "left",
+}: Readonly<{ featured: CardView; side?: "left" | "right" }>) {
+  const panelRight = side === "right";
+  const clickable = Boolean(featured.url);
+
+  const chip = (
+    <span className="relative flex items-center justify-center bg-background px-4 py-4 text-foreground transition-colors duration-200 ease-out group-hover:bg-black group-hover:text-white group-focus-visible:bg-black group-focus-visible:text-white">
+      {clickable ? <FocusBrackets /> : null}
+      {featured.logo ? (
+        <AttributionLogo
+          base={28}
+          className="invert transition-[filter] duration-200 ease-out group-hover:invert-0 group-focus-visible:invert-0 dark:invert-0"
+          item={featured}
+        />
+      ) : (
+        <span className="font-normal text-lg tracking-[-0.015em]">
+          {featured.name}
+        </span>
+      )}
+    </span>
+  );
+
+  const panel = (
+    <div
+      className="relative flex min-h-64 items-center justify-center overflow-hidden bg-grid-dots p-8 text-foreground sm:min-h-80 lg:min-h-0 lg:p-14"
+    >
+      {clickable ? (
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 bg-accent-green opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
+        />
+      ) : null}
+      {chip}
+    </div>
+  );
+
+  const screenshot = (
+    <div className="relative aspect-video w-full overflow-hidden bg-muted">
+      <ScreenshotImage
+        name={featured.name}
+        screenshot={featured.screenshot}
+        sizes="(min-width: 1024px) 66vw, 100vw"
+      />
+    </div>
+  );
+
+  const inner = (
+    <div
+      className={cn(
+        "grid gap-2 lg:grid-cols-[minmax(0,23rem)_minmax(0,1fr)]",
+        panelRight && "lg:grid-cols-[minmax(0,1fr)_minmax(0,23rem)]"
+      )}
+    >
+      {panelRight ? (
+        <>
+          <div className="order-last lg:order-none">{screenshot}</div>
+          {panel}
+        </>
+      ) : (
+        <>
+          {panel}
+          {screenshot}
+        </>
+      )}
+    </div>
+  );
+
   return (
     <div className="container">
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-        <div className="relative flex min-h-40 items-center justify-center bg-grid-dots p-8 text-zinc-800 lg:min-h-0 lg:p-14 dark:text-zinc-50">
-          {featured.logo ? (
-            <span className="bg-background px-3 py-2">
-              {/* The mark is a monochrome (black) asset; invert it in dark mode
-                  so it reads light on the dark chip instead of black-on-black. */}
-              <AttributionLogo
-                base={28}
-                className="dark:invert"
-                item={featured}
-              />
-            </span>
-          ) : (
-            <span className="bg-background px-4 py-2 font-normal text-foreground text-lg tracking-[-0.015em]">
-              {featured.name}
-            </span>
-          )}
-        </div>
-        <div className="relative aspect-video w-full overflow-hidden bg-muted">
-          <ScreenshotImage
-            name={featured.name}
-            screenshot={featured.screenshot}
-            sizes="(min-width: 1024px) 66vw, 100vw"
-          />
-        </div>
-      </div>
+      {clickable && featured.url ? (
+        <a
+          className="group block outline-none focus-ring"
+          href={featured.url}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <span className="sr-only">{`Visit ${featured.name}`}</span>
+          {inner}
+        </a>
+      ) : (
+        inner
+      )}
     </div>
   );
 }
 
-function CardBody({
+function CardCaption({
   item,
   clickable,
 }: Readonly<{ item: CardView; clickable: boolean }>) {
+  const hoverText =
+    clickable &&
+    "transition-colors duration-100 ease-out group-hover:text-accent-green-foreground group-focus-visible:text-accent-green-foreground motion-reduce:transition-none";
   return (
-    <>
-      <div className="bg-card p-6 sm:p-10 lg:p-14">
-        <div className="relative aspect-video w-full overflow-hidden bg-muted">
-          <ScreenshotImage
-            className={cn(
-              clickable &&
-                "transition-transform duration-[280ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03] motion-reduce:transition-none"
-            )}
-            name={item.name}
-            screenshot={item.screenshot}
-            sizes="(min-width: 640px) 50vw, 100vw"
-          />
-        </div>
+    <div className="relative flex items-center justify-between gap-3 overflow-hidden bg-background px-4 py-3">
+      {clickable ? (
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 origin-bottom scale-y-0 bg-accent-green transition-transform duration-150 ease-out group-hover:scale-y-100 group-focus-visible:scale-y-100 motion-reduce:transition-none"
+        />
+      ) : null}
+
+      <div className="relative flex min-w-0 items-center gap-2">
+        <AttributionMark item={item} />
+        <span
+          className={cn(
+            "truncate font-normal text-base text-foreground leading-6 tracking-[-0.015em]",
+            hoverText
+          )}
+        >
+          {item.name}
+        </span>
       </div>
 
-      {/* One caption row. On hover of a clickable card it repaints to the
-          accent bar in place and the badge crossfades to a Visit affordance —
-          no second label appears beneath it. */}
-      <div
-        className={cn(
-          "mt-4 flex items-center justify-between gap-3 px-4 py-3.5 transition-[margin,background-color] duration-200 ease-out motion-reduce:transition-none",
-          clickable &&
-            "group-hover:mt-0 group-hover:bg-accent-green group-focus-visible:mt-0 group-focus-visible:bg-accent-green"
-        )}
-      >
-        <div className="flex min-w-0 items-center gap-1.5">
-          <AttributionLogo item={item} />
-          <span
-            className={cn(
-              "truncate font-normal text-base text-foreground leading-6 tracking-[-0.015em] transition-colors duration-200 ease-out motion-reduce:transition-none",
-              clickable &&
-                "group-hover:text-accent-green-foreground group-focus-visible:text-accent-green-foreground"
-            )}
-          >
-            {item.name}
-          </span>
-        </div>
-
-        {clickable ? (
-          <span className="relative flex shrink-0 items-center">
-            <span
-              aria-hidden="true"
-              className="flex items-center transition-opacity duration-200 ease-out group-hover:opacity-0 group-focus-visible:opacity-0 motion-reduce:transition-none"
-            >
-              <CardBadge builtByRoboto={item.builtByRoboto} />
-            </span>
-            <span
-              aria-hidden="true"
-              className="absolute right-0 flex items-center gap-1.5 font-mono text-accent-green-foreground text-xs uppercase tracking-wide opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
-            >
-              Visit
-              <ArrowUpRight size={14} />
-            </span>
-          </span>
-        ) : (
-          <CardBadge builtByRoboto={item.builtByRoboto} />
-        )}
-      </div>
-    </>
+      {item.category ? (
+        <span
+          className={cn(
+            "relative shrink-0 font-normal text-base text-muted-foreground leading-6",
+            hoverText
+          )}
+        >
+          {item.category}
+        </span>
+      ) : null}
+    </div>
   );
 }
 
 function ShowcaseCard({ item }: Readonly<{ item: CardView }>) {
-  const clickable = Boolean(item.url && item.builtByRoboto);
+  const clickable = Boolean(item.url);
+
+  const body = (
+    <div className="flex flex-col bg-background">
+      <div className="relative aspect-video w-full overflow-hidden bg-muted">
+        <ScreenshotImage
+          name={item.name}
+          screenshot={item.screenshot}
+          sizes="(min-width: 640px) 50vw, 100vw"
+        />
+      </div>
+      <CardCaption clickable={clickable} item={item} />
+    </div>
+  );
 
   if (clickable && item.url) {
     return (
       <a
-        className="group flex flex-col outline-none focus-ring"
+        className="group flex flex-col bg-grid-dots p-4 text-foreground outline-none focus-ring"
         href={item.url}
         rel="noopener noreferrer"
         target="_blank"
       >
         <span className="sr-only">{`Visit ${item.name}`}</span>
-        <CardBody clickable item={item} />
+        {body}
       </a>
     );
   }
 
   return (
-    <article className="flex flex-col">
-      <CardBody clickable={false} item={item} />
+    <article className="group flex flex-col bg-grid-dots p-4 text-foreground">
+      {body}
     </article>
   );
 }
@@ -360,48 +390,63 @@ export function ShowcaseGrid({
   items,
 }: Readonly<ShowcaseGridProps>) {
   const cmsItems = items ?? [];
-  const featuredItem = cmsItems.find((item) => item.featured) ?? cmsItems[0];
-  const wordmark = eyebrow?.trim() || "Showcase";
+  const label = title?.trim() || eyebrow?.trim() || "Showcase";
+  const allViews = cmsItems.map(cmsToView);
 
-  if (!featuredItem) {
+  const explicitFeaturedKeys = new Set(
+    cmsItems.filter((item) => item.featured).map((item) => item._key)
+  );
+  const featuredItems =
+    explicitFeaturedKeys.size > 0
+      ? allViews.filter((item) => explicitFeaturedKeys.has(item.id))
+      : allViews.slice(0, 1);
+  const featuredIds = new Set(featuredItems.map((item) => item.id));
+  const cards = allViews.filter((item) => !featuredIds.has(item.id));
+
+  const [leadBanner, ...trailingBanners] = featuredItems;
+
+  if (featuredItems.length === 0) {
     return (
       <section className="bg-background pt-8 pb-24" id="showcase">
-        {title ? null : <h2 className="sr-only">{wordmark}</h2>}
+        {title ? null : <h2 className="sr-only">{label}</h2>}
         <div className="container">
-          <ShowcaseHeader
-            description={description}
-            title={title}
-            wordmark={wordmark}
-          />
+          <ShowcaseHeader description={description} title={title} />
         </div>
       </section>
     );
   }
 
-  const featured = cmsToView(featuredItem);
-  const cards = cmsItems.filter((item) => item !== featuredItem).map(cmsToView);
-
   return (
-    <section className="bg-background pt-8 pb-24" id="showcase">
-      {title ? null : <h2 className="sr-only">{wordmark}</h2>}
+    <section className="bg-background pb-24" id="showcase">
+      {title ? null : <h2 className="sr-only">{label}</h2>}
       <div className="flex flex-col gap-16">
+        <ShowcaseMarquee items={allViews} />
+
         <div className="container">
-          <ShowcaseHeader
-            description={description}
-            title={title}
-            wordmark={wordmark}
-          />
+          <ShowcaseHeader description={description} title={title} />
         </div>
-        <FeaturedBanner featured={featured} />
+
+        {leadBanner ? (
+          <FeaturedBanner featured={leadBanner} side="left" />
+        ) : null}
+
         {cards.length > 0 ? (
-          <div className="container">
-            <div className="grid gap-x-4 gap-y-12 sm:grid-cols-2 sm:gap-y-16">
+          <div className="mx-auto w-full max-w-[90rem] sm:px-2">
+            <div className="grid gap-y-12 sm:grid-cols-2 sm:gap-x-8">
               {cards.map((item) => (
                 <ShowcaseCard item={item} key={item.id} />
               ))}
             </div>
           </div>
         ) : null}
+
+        {trailingBanners.map((item, index) => (
+          <FeaturedBanner
+            featured={item}
+            key={item.id}
+            side={index % 2 === 0 ? "right" : "left"}
+          />
+        ))}
       </div>
     </section>
   );
