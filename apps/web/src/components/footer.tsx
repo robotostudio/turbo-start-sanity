@@ -248,7 +248,11 @@ function Footer({ data, settingsData }: FooterProps) {
               <span className="flex items-center gap-2">
                 <Logo
                   alt={siteTitle ?? "Turbo Start Sanity"}
-                  className={footerLogo ? "w-44" : "w-44 brightness-0"}
+                  className={
+                    footerLogo
+                      ? "h-8 w-auto object-left"
+                      : "h-8 w-auto object-left brightness-0"
+                  }
                   image={footerLogo ?? logo}
                   linkClassName="focus-visible:outline-accent-green-foreground!"
                 />
