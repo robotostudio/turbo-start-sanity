@@ -43,7 +43,7 @@ export function NavbarSkeleton() {
       <div className="container">
         <div className="flex h-16 items-center justify-between">
           <div className="flex h-10 flex-1 items-center">
-            <div className="h-7 w-28 bg-muted/50" />
+            <div className="h-5 w-14 bg-muted/50" />
           </div>
 
           <div className="hidden items-center gap-8 lg:flex">
@@ -109,7 +109,7 @@ export function Navbar({
           <div className="flex h-10 flex-1 items-center">
             <Logo
               alt={siteTitle ?? "Turbo Start Sanity"}
-              className="h-6 w-auto object-left"
+              className="h-5 w-auto object-left"
               image={logos?.logo}
               imageDark={logos?.logoDark}
             />

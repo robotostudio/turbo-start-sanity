@@ -250,8 +250,8 @@ function Footer({ data, settingsData }: FooterProps) {
                   alt={siteTitle ?? "Turbo Start Sanity"}
                   className={
                     footerLogo
-                      ? "h-6 w-auto object-left"
-                      : "h-6 w-auto object-left brightness-0"
+                      ? "h-5 w-auto object-left"
+                      : "h-5 w-auto object-left brightness-0"
                   }
                   image={footerLogo ?? logo}
                   linkClassName="focus-visible:outline-accent-green-foreground!"
@@ -274,7 +274,7 @@ function Footer({ data, settingsData }: FooterProps) {
                     {column?.title}
                   </h3>
                   {column?.links && column?.links?.length > 0 && (
-                    <ul className="space-y-1 text-accent-green-foreground text-base leading-6">
+                    <ul className="space-y-1 text-accent-green-foreground text-sm leading-6">
                       {column?.links?.map((link, columnIndex) => (
                         <li
                           key={`${link?._key}-${columnIndex}-column-${column?._key}`}
