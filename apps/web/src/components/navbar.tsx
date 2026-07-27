@@ -109,7 +109,7 @@ export function Navbar({
           <div className="flex h-10 flex-1 items-center">
             <Logo
               alt={siteTitle ?? "Turbo Start Sanity"}
-              className="h-7 w-auto object-left"
+              className="h-6 w-auto object-left"
               image={logos?.logo}
               imageDark={logos?.logoDark}
             />

@@ -6,17 +6,10 @@ import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 
 type LogoProps = {
-  // The Sanity-managed site logo (from `settings.logo`). When absent, nothing
-  // renders — the surrounding markup provides its own text fallback.
   image?: SanityImageData | null;
-  // Optional dark-mode variant (from `settings.logoDark`). When present, this is
-  // shown on dark backgrounds and `image` is hidden, so a colored icon is
-  // preserved in both themes without CSS brightness hacks.
   imageDark?: SanityImageData | null;
   alt?: string | null;
   className?: string;
-  // Extra classes for the wrapping link (e.g. to tune the focus outline color
-  // on colored backgrounds such as the footer's green).
   linkClassName?: string;
   priority?: boolean;
 };
@@ -30,8 +23,6 @@ export function Logo({
   priority = true,
 }: LogoProps) {
   if (!image?.id) {
-    // No logo configured: keep the homepage link and site identity via a text
-    // fallback rather than rendering nothing.
     return (
       <Link
         className={cn(

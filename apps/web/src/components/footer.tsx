@@ -250,8 +250,8 @@ function Footer({ data, settingsData }: FooterProps) {
                   alt={siteTitle ?? "Turbo Start Sanity"}
                   className={
                     footerLogo
-                      ? "h-8 w-auto object-left"
-                      : "h-8 w-auto object-left brightness-0"
+                      ? "h-6 w-auto object-left"
+                      : "h-6 w-auto object-left brightness-0"
                   }
                   image={footerLogo ?? logo}
                   linkClassName="focus-visible:outline-accent-green-foreground!"
