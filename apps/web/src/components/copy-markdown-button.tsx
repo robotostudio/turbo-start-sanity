@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CopyLinkIcon } from "@/components/icons";
 
-const RESET_MS = 2000;
+const RESET_MS = 1200;
 
 type CopyStatus = "idle" | "copied" | "error";
 
@@ -17,10 +17,7 @@ const LABELS: Record<CopyStatus, string> = {
   error: "Copy failed",
 };
 
-const ICON_MOTION =
-  "col-start-1 row-start-1 size-4.5 transition-[opacity,transform] duration-150 ease-out motion-reduce:transition-none";
-const ICON_SHOWN = "scale-100 opacity-100";
-const ICON_HIDDEN = "scale-90 opacity-0";
+const ICON_BASE = "col-start-1 row-start-1 size-4.5";
 
 /** Every page is also served as Markdown at its `.md` path. */
 function markdownPath(pathname: string): string {
@@ -72,7 +69,7 @@ export function CopyMarkdownButton({
     <button
       aria-label={LABELS[status]}
       className={cn(
-        "-mr-2 focus-ring inline-flex min-h-10 items-center gap-2 px-2 text-muted-foreground text-sm leading-5 tracking-[0.017em] transition-[color,transform] duration-150 ease-out hover:text-foreground active:scale-[0.96] active:duration-[80ms] motion-reduce:transition-none motion-reduce:active:scale-100",
+        "-mr-2 focus-ring inline-flex min-h-10 items-center gap-2 px-2 text-muted-foreground text-sm leading-5 tracking-[0.017em] transition-colors duration-150 ease-out hover:text-foreground motion-reduce:transition-none",
         className
       )}
       onClick={handleCopy}
@@ -81,7 +78,7 @@ export function CopyMarkdownButton({
       <span aria-hidden="true" className="grid size-4.5 flex-none">
         {icons.map(({ Icon, key, shown }) => (
           <Icon
-            className={`${ICON_MOTION} ${shown ? ICON_SHOWN : ICON_HIDDEN}`}
+            className={cn(ICON_BASE, shown ? "opacity-100" : "opacity-0")}
             key={key}
           />
         ))}
