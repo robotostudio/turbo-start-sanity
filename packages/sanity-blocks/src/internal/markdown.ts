@@ -61,6 +61,7 @@ export interface MarkdownShowcaseItem {
   _key?: string | null;
   siteName?: string | null;
   url?: string | null;
+  category?: string | null;
 }
 
 export interface MarkdownFaqCategory {

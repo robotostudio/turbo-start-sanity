@@ -20,7 +20,14 @@ const showcaseItem = defineArrayMember({
       type: "url",
       title: "URL",
       description:
-        "The live site's full web address, including https://. The card links here — but the link is only clickable when this item is marked 'Built by Roboto'.",
+        "The live site's full web address, including https://. When set, the whole card links out to it (opens in a new tab). Leave empty for a display-only card.",
+    }),
+    defineField({
+      name: "category",
+      type: "string",
+      title: "Category",
+      description:
+        "A short label shown on the right of the card (for example: 'Real Estate', 'Portfolio', 'Intelligence Software').",
     }),
     imageWithAltField({
       name: "screenshot",
@@ -33,14 +40,6 @@ const showcaseItem = defineArrayMember({
       title: "Logo",
       description:
         "Optional small logo or mark for the site, shown next to its name. Leave empty to fall back to the site's initials.",
-    }),
-    defineField({
-      name: "builtByRoboto",
-      type: "boolean",
-      title: "Built by Roboto",
-      description:
-        "Mark sites we built: shows a 'Built by Roboto' badge and makes the card link out to the live site. Cards without this are display-only.",
-      initialValue: false,
     }),
     defineField({
       name: "featured",
@@ -100,7 +99,7 @@ export const showcaseGridSchema = defineType({
       title: "Showcase Items",
       type: "array",
       description:
-        "The sites shown in the grid. Drag to reorder — visitors see them in this order. Mark one as Featured for the large card at the top; mark 'Built by Roboto' to make a card link out to its live site.",
+        "The sites shown in the grid. Drag to reorder — visitors see them in this order. Mark one as Featured for the large banner; add a URL to make a card link out to its live site.",
       of: [showcaseItem],
     }),
   ],

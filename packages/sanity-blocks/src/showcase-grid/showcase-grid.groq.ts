@@ -7,13 +7,13 @@ export const showcaseGridGroqProjection = /* groq */ `
       _key,
       siteName,
       url,
+      category,
       "screenshot": screenshot{
         ${imageFields}
       },
       "attributionLogo": attributionLogo{
         ${imageFields}
       },
-      builtByRoboto,
       featured
     })
   }

@@ -48,6 +48,29 @@ test("showcaseGridToMarkdown links the site name and skips nameless items", () =
   expect(result).not.toContain("nameless.example.com");
 });
 
+test("showcaseGridToMarkdown appends the category after the link", () => {
+  const result = showcaseGridToMarkdown(
+    {
+      items: [
+        {
+          _key: "i1",
+          siteName: "Opera Group",
+          url: "https://opera.example.com",
+          category: "Real Estate",
+        },
+        { _key: "i2", siteName: "Plain Site" },
+      ],
+    },
+    {}
+  );
+  expect(result).toContain(
+    "- [Opera Group](https://opera.example.com) — Real Estate"
+  );
+  // An item without a category has no trailing dash.
+  expect(result).toContain("- Plain Site");
+  expect(result).not.toContain("Plain Site —");
+});
+
 test("showcaseGridToMarkdown emits no HTML or JSX tags", () => {
   const result = showcaseGridToMarkdown(
     {
