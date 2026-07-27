@@ -1856,6 +1856,13 @@
                   },
                   "optional": true
                 },
+                "category": {
+                  "type": "objectAttribute",
+                  "value": {
+                    "type": "string"
+                  },
+                  "optional": true
+                },
                 "screenshot": {
                   "type": "objectAttribute",
                   "value": {
@@ -1869,13 +1876,6 @@
                   "value": {
                     "type": "inline",
                     "name": "attributionLogo"
-                  },
-                  "optional": true
-                },
-                "builtByRoboto": {
-                  "type": "objectAttribute",
-                  "value": {
-                    "type": "boolean"
                   },
                   "optional": true
                 },

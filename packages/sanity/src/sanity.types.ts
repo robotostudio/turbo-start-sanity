@@ -289,9 +289,9 @@ export type ShowcaseGrid = {
   items?: Array<{
     siteName: string;
     url?: string;
+    category?: string;
     screenshot?: Screenshot;
     attributionLogo?: AttributionLogo;
-    builtByRoboto?: boolean;
     featured?: boolean;
     _type: "showcaseItem";
     _key: string;
@@ -1581,7 +1581,7 @@ export type QueryHomePageDataResult = {
           _key: string;
           siteName: string;
           url: string | null;
-          category: null;
+          category: string | null;
           screenshot: {
             id: string | null;
             preview: string | null;
@@ -2145,7 +2145,7 @@ export type QuerySlugPageDataResult = {
           _key: string;
           siteName: string;
           url: string | null;
-          category: null;
+          category: string | null;
           screenshot: {
             id: string | null;
             preview: string | null;
@@ -2709,7 +2709,7 @@ export type QueryBlogIndexPageDataResult = {
           _key: string;
           siteName: string;
           url: string | null;
-          category: null;
+          category: string | null;
           screenshot: {
             id: string | null;
             preview: string | null;
