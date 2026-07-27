@@ -6,7 +6,7 @@ import {
 } from "@workspace/sanity-blocks/internal/sanity-image";
 import { useRef } from "react";
 
-const HOVER_PLAYBACK_RATE = 0.85;
+const HOVER_PLAYBACK_RATE = 0.6;
 
 type MarqueeShot = { id: string; name: string; image: SanityImageData };
 
