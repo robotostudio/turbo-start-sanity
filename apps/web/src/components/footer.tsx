@@ -132,7 +132,7 @@ function SystemsOperationalPill() {
 function FooterTopBar() {
   return (
     <div className="w-full bg-background [background-image:radial-gradient(circle,var(--color-zinc-500)_0.8px,transparent_1.3px)] [background-position:top] [background-repeat:repeat-x] [background-size:6.7px_1.4px]">
-      <div className="container grid grid-cols-3 items-center gap-4 py-4">
+      <div className="container flex items-center justify-center py-4 sm:grid sm:grid-cols-3 sm:gap-4">
         <div className="flex items-center gap-2">
           <span
             aria-hidden="true"
