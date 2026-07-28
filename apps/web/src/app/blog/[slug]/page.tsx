@@ -2,7 +2,7 @@ import { Logger } from "@workspace/logger";
 import {
   type DynamicFetchOptions,
   getDynamicFetchOptions,
-  previewForceDrafts,
+  resolvePageFetchOptions,
   sanityFetch,
   sanityFetchMetadata,
   sanityFetchStaticParams,
@@ -14,18 +14,17 @@ import {
 } from "@workspace/sanity-blocks/internal/rich-text";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import type { Metadata } from "next";
-import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { Breadcrumbs, BreadcrumbsSkeleton } from "@/components/breadcrumbs";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { TableOfContent } from "@/components/elements/table-of-content";
 import { ArticleJsonLd } from "@/components/json-ld";
-import { getSEOMetadata } from "@/lib/seo";
+import { BlogFallback } from "@/components/skeletons";
+import { seoFromDocument } from "@/lib/seo";
+import { formatDate, PLACEHOLDER_SLUG } from "@/utils";
 
 const logger = new Logger("BlogSlug");
-
-const PLACEHOLDER_SLUG = "__placeholder__";
 
 type BlogParams = { slug: string };
 
@@ -71,15 +70,7 @@ export async function generateMetadata({
     params: { slug: slugString },
     perspective,
   });
-  return getSEOMetadata({
-    title: data?.title ?? data?.seoTitle,
-    description: data?.description ?? data?.seoDescription,
-    ogDescription: data?.ogDescription,
-    slug: slugString,
-    contentId: data?._id,
-    contentType: data?._type,
-    pageType: "article",
-  });
+  return seoFromDocument(data, { slug: slugString, pageType: "article" });
 }
 
 export default function BlogSlugPage({
@@ -97,13 +88,9 @@ export default function BlogSlugPage({
 async function BlogSlugInner({
   params,
 }: Readonly<{ params: Promise<BlogParams> }>) {
-  const { isEnabled: isDraftMode } = await draftMode();
-  const isDraft = isDraftMode || previewForceDrafts;
   const [{ slug }, { perspective, stega }] = await Promise.all([
     params,
-    isDraft
-      ? getDynamicFetchOptions()
-      : Promise.resolve({ perspective: "published" as const, stega: false }),
+    resolvePageFetchOptions(),
   ]);
   const data = await getCachedBlogPage({ slug, perspective, stega });
   if (!data) {
@@ -126,21 +113,6 @@ async function getCachedBlogPage({
     stega,
   });
   return data;
-}
-
-function formatDate(value?: string | null): string | null {
-  if (!value) {
-    return null;
-  }
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
 }
 
 function BlogPageContent({
@@ -217,104 +189,6 @@ function BlogPageContent({
           <div className="hidden lg:block">
             <div className="sticky top-24">
               <TableOfContent richText={richText ?? []} shareTitle={title} />
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-  );
-}
-
-function TextBlockSkeleton({
-  lines,
-  lastWidth = "w-3/5",
-}: Readonly<{ lines: number; lastWidth?: string }>) {
-  return (
-    <div className="grid gap-2.5">
-      {Array.from({ length: lines }).map((_, index) => (
-        <div
-          className={`h-5 bg-muted ${index === lines - 1 ? lastWidth : "w-full"}`}
-          // biome-ignore lint/suspicious/noArrayIndexKey: fixed-length static skeleton
-          key={index}
-        />
-      ))}
-    </div>
-  );
-}
-
-function QuoteSkeleton() {
-  return (
-    <div className="bg-grid-dots p-4">
-      <div className="grid gap-2.5 bg-background p-8">
-        <div className="h-5 w-full bg-muted" />
-        <div className="h-5 w-11/12 bg-muted" />
-        <div className="h-5 w-2/3 bg-muted" />
-      </div>
-    </div>
-  );
-}
-
-function ShareItemSkeleton() {
-  return (
-    <div>
-      <div className="size-4.5 bg-muted" />
-      <div className="h-4 w-10 bg-muted" />
-    </div>
-  );
-}
-
-function BlogFallback() {
-  return (
-    <main className="bg-background">
-      <BreadcrumbsSkeleton />
-      <div className="container flex animate-pulse flex-col gap-16 pt-12 pb-24 md:gap-24 md:pt-16">
-        <div className="flex flex-col gap-6">
-          <div className="h-10 w-4/5 bg-muted sm:h-12 lg:h-16" />
-
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1.5">
-              <div className="h-5 w-56 bg-muted" />
-              <div className="h-5 w-64 bg-muted" />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <div className="size-6 rounded-full bg-muted" />
-              <div className="h-5 w-28 bg-muted" />
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-32">
-          <div className="grid min-w-0 gap-8">
-            <TextBlockSkeleton lastWidth="w-4/5" lines={3} />
-            <div className="h-7 w-2/5 bg-muted" />
-            <TextBlockSkeleton lastWidth="w-1/2" lines={4} />
-            <QuoteSkeleton />
-            <TextBlockSkeleton lastWidth="w-3/5" lines={3} />
-          </div>
-
-          <div className="hidden lg:block">
-            <div className="sticky top-24">
-              <div className="bg-grid-dots p-6">
-                <div className="flex flex-col gap-12 bg-background p-4">
-                  <div>
-                    <div className="h-7 w-32 bg-muted" />
-                    <div className="mt-6 flex flex-col gap-2">
-                      <div className="h-5 w-full bg-muted" />
-                      <div className="h-5 w-full bg-muted" />
-                      <div className="h-5 w-full bg-muted" />
-                      <div className="h-5 w-2/3 bg-muted" />
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between border-zinc-900 border-t px-1 pt-4 dark:border-zinc-50 [&>div]:grid [&>div]:justify-items-center [&>div]:gap-1">
-                    <ShareItemSkeleton />
-                    <ShareItemSkeleton />
-                    <ShareItemSkeleton />
-                    <ShareItemSkeleton />
-                    <ShareItemSkeleton />
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

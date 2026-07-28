@@ -1,19 +1,18 @@
 import {
   type DynamicFetchOptions,
   getDynamicFetchOptions,
-  previewForceDrafts,
+  resolvePageFetchOptions,
   sanityFetch,
   sanityFetchMetadata,
 } from "@workspace/sanity/live";
 import { queryHomePageData } from "@workspace/sanity/query";
 import type { Metadata } from "next";
-import { draftMode } from "next/headers";
 import { Suspense } from "react";
 
-import { HeroFallback } from "@/components/hero-fallback";
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
-import { getSEOMetadata } from "@/lib/seo";
+import { HeroFallback } from "@/components/skeletons";
+import { seoFromDocument } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { perspective } = await getDynamicFetchOptions();
@@ -21,14 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     query: queryHomePageData,
     perspective,
   });
-  return getSEOMetadata({
-    title: homePageData?.title ?? homePageData?.seoTitle,
-    description: homePageData?.description ?? homePageData?.seoDescription,
-    ogDescription: homePageData?.ogDescription,
-    slug: "/",
-    contentId: homePageData?._id,
-    contentType: homePageData?._type,
-  });
+  return seoFromDocument(homePageData, { slug: "/" });
 }
 
 export default function Page() {
@@ -43,12 +35,8 @@ export default function Page() {
 }
 
 async function HomeContent() {
-  const { isEnabled: isDraftMode } = await draftMode();
-  if (isDraftMode || previewForceDrafts) {
-    const { perspective, stega } = await getDynamicFetchOptions();
-    return <CachedHome perspective={perspective} stega={stega} />;
-  }
-  return <CachedHome perspective="published" stega={false} />;
+  const { perspective, stega } = await resolvePageFetchOptions();
+  return <CachedHome perspective={perspective} stega={stega} />;
 }
 
 async function CachedHome({ perspective, stega }: DynamicFetchOptions) {

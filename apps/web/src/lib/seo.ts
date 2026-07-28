@@ -78,6 +78,36 @@ function extractTitle({
   return siteTitle;
 }
 
+type SeoSourceDocument = {
+  title?: string | null;
+  seoTitle?: string | null;
+  description?: string | null;
+  seoDescription?: string | null;
+  ogDescription?: string | null;
+  _id?: string | null;
+  _type?: string | null;
+};
+
+/**
+ * Maps a fetched Sanity document to page metadata, applying the shared
+ * `title ?? seoTitle` / `description ?? seoDescription` fallback used by every
+ * route's `generateMetadata`.
+ */
+export function seoFromDocument(
+  doc: SeoSourceDocument | null | undefined,
+  { slug, pageType }: { slug: string; pageType?: PageSeoData["pageType"] }
+): Promise<Metadata> {
+  return getSEOMetadata({
+    title: doc?.title ?? doc?.seoTitle ?? undefined,
+    description: doc?.description ?? doc?.seoDescription ?? undefined,
+    ogDescription: doc?.ogDescription,
+    slug,
+    contentId: doc?._id ?? undefined,
+    contentType: doc?._type ?? undefined,
+    pageType,
+  });
+}
+
 export async function getSEOMetadata(
   page: PageSeoData = {}
 ): Promise<Metadata> {

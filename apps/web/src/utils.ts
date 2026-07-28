@@ -15,6 +15,31 @@ export const getBaseUrl = () => {
 export const capitalize = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
+/**
+ * Placeholder slug returned from `generateStaticParams` when no real paths
+ * exist yet, so the dynamic route still prerenders a shell.
+ */
+export const PLACEHOLDER_SLUG = "__placeholder__";
+
+/**
+ * Formats an ISO date string as `Mon D, YYYY` (en-US). Returns `null` for
+ * missing or unparseable values so callers can skip rendering.
+ */
+export function formatDate(value?: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 type Response<T> = [T, undefined] | [undefined, string];
 
 export async function handleErrors<T>(

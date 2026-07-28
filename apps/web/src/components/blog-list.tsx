@@ -1,4 +1,5 @@
 import { BlogCard } from "@/components/blog-card";
+import { BlogGridSkeleton } from "@/components/skeletons";
 import type { Blog } from "@/types";
 
 export type BlogListProps = {
@@ -8,21 +9,7 @@ export type BlogListProps = {
 
 export function BlogList({ blogs, isLoading = false }: BlogListProps) {
   if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <article
-            className="flex h-full flex-col gap-4 border border-border p-6"
-            key={`skeleton-${index.toString()}`}
-          >
-            <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-            <div className="mt-2 h-6 w-full animate-pulse rounded bg-muted" />
-            <div className="h-6 w-2/3 animate-pulse rounded bg-muted" />
-            <div className="mt-auto h-6 w-28 animate-pulse rounded bg-muted" />
-          </article>
-        ))}
-      </div>
-    );
+    return <BlogGridSkeleton count={6} />;
   }
 
   if (blogs.length === 0) {

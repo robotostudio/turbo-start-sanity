@@ -16,14 +16,11 @@ import { Suspense } from "react";
 
 import { BlogHeader } from "@/components/blog-card";
 import { BlogPageContent } from "@/components/blog-page-content";
-import {
-  Breadcrumbs,
-  BreadcrumbsSkeleton,
-  type Crumb,
-} from "@/components/breadcrumbs";
+import { Breadcrumbs, type Crumb } from "@/components/breadcrumbs";
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
-import { getSEOMetadata } from "@/lib/seo";
+import { BlogIndexFallback } from "@/components/skeletons";
+import { seoFromDocument } from "@/lib/seo";
 import {
   calculateBlogPaginationMetadata,
   getBlogPaginationRange,
@@ -119,14 +116,7 @@ export async function generateMetadata(): Promise<Metadata> {
     query: queryBlogIndexPageData,
     perspective,
   });
-  return getSEOMetadata({
-    title: result?.title ?? result?.seoTitle,
-    description: result?.description ?? result?.seoDescription,
-    ogDescription: result?.ogDescription,
-    slug: "/blog",
-    contentId: result?._id,
-    contentType: result?._type,
-  });
+  return seoFromDocument(result, { slug: "/blog" });
 }
 
 type BlogPageProps = Readonly<{
@@ -221,105 +211,5 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
         paginationMetadata={paginationMetadata}
       />
     </>
-  );
-}
-
-function CategorySkeleton() {
-  return <div className="h-5 w-20 bg-muted" />;
-}
-
-function BlogCardSkeleton() {
-  return (
-    <div className="flex flex-col gap-4 border border-border p-6">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <div className="h-5 w-24 bg-muted" />
-        <div className="h-5 w-16 bg-muted" />
-      </div>
-      <div className="flex flex-col gap-3">
-        <div className="grid gap-1.5">
-          <div className="h-[26px] w-full bg-muted" />
-          <div className="h-[26px] w-2/3 bg-muted" />
-        </div>
-        <div className="grid gap-2">
-          <div className="h-6 w-full bg-muted" />
-          <div className="h-6 w-full bg-muted" />
-          <div className="h-6 w-4/5 bg-muted" />
-        </div>
-      </div>
-      <div className="mt-auto flex items-center gap-2">
-        <div className="size-6 rounded-full bg-muted" />
-        <div className="h-5 w-24 bg-muted" />
-      </div>
-    </div>
-  );
-}
-
-function BlogIndexFallback() {
-  return (
-    <main className="bg-background">
-      <BreadcrumbsSkeleton />
-      <div className="container my-16 animate-pulse">
-        <div className="grid gap-6">
-          <div className="h-10 w-full max-w-md bg-muted sm:h-12" />
-          <div className="grid max-w-2xl gap-2">
-            <div className="h-5 w-full bg-muted" />
-            <div className="h-5 w-3/4 bg-muted" />
-          </div>
-        </div>
-
-        <div className="mt-10 grid gap-8">
-          <div className="grid grid-cols-1 border border-border lg:grid-cols-2">
-            <div className="flex flex-col justify-between gap-10 p-6 sm:p-8">
-              <div className="h-8 w-28 bg-muted" />
-              <div className="grid gap-4">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <div className="h-5 w-24 bg-muted" />
-                  <div className="h-5 w-16 bg-muted" />
-                </div>
-                <div className="grid gap-1.5">
-                  <div className="h-8 w-full bg-muted sm:h-9" />
-                  <div className="h-8 w-3/4 bg-muted sm:h-9" />
-                </div>
-                <div className="grid gap-2">
-                  <div className="h-6 w-full bg-muted" />
-                  <div className="h-6 w-5/6 bg-muted" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="size-6 rounded-full bg-muted" />
-                  <div className="h-5 w-24 bg-muted" />
-                </div>
-              </div>
-            </div>
-            <div className="order-first min-h-[240px] border-border border-b bg-muted lg:order-last lg:min-h-full lg:border-b-0 lg:border-s" />
-          </div>
-        </div>
-
-        <div className="mt-10 grid gap-8 lg:mt-14 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-          <div className="h-max bg-grid-dots p-4 lg:sticky lg:top-24 lg:self-start">
-            <div className="flex flex-col gap-6 bg-background p-4">
-              <div className="h-[34px] w-full bg-muted" />
-              <div className="grid gap-2">
-                <CategorySkeleton />
-                <CategorySkeleton />
-                <CategorySkeleton />
-                <CategorySkeleton />
-                <CategorySkeleton />
-                <CategorySkeleton />
-                <CategorySkeleton />
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <BlogCardSkeleton />
-            <BlogCardSkeleton />
-            <BlogCardSkeleton />
-            <BlogCardSkeleton />
-            <BlogCardSkeleton />
-            <BlogCardSkeleton />
-          </div>
-        </div>
-      </div>
-    </main>
   );
 }

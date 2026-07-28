@@ -1,4 +1,5 @@
 import {
+  resolveAssetId,
   SanityImage,
   type SanityImageData,
 } from "@workspace/sanity-blocks/internal/sanity-image";
@@ -35,13 +36,12 @@ type CardView = {
   logo: SanityImageData | null;
 };
 
-function hasValidAssetId<T extends { id?: string | null }>(
-  image: T | null | undefined
-): image is T {
-  if (typeof image?.id !== "string") {
-    return false;
-  }
-  return image.id.replace(/^drafts\./, "").startsWith("image-");
+// Gate on the same canonical validity as SanityImage/resolveAssetId; the local
+// type guard only exists to narrow away null/undefined for the call sites.
+function hasValidAssetId(
+  image: SanityImageData | null | undefined
+): image is SanityImageData {
+  return resolveAssetId(image) !== null;
 }
 
 function cmsToView(item: ShowcaseGridItem): CardView {

@@ -2,26 +2,24 @@ import { Logger } from "@workspace/logger";
 import {
   type DynamicFetchOptions,
   getDynamicFetchOptions,
-  previewForceDrafts,
+  resolvePageFetchOptions,
   sanityFetch,
   sanityFetchMetadata,
   sanityFetchStaticParams,
 } from "@workspace/sanity/live";
 import { querySlugPageData, querySlugPagePaths } from "@workspace/sanity/query";
 import type { Metadata } from "next";
-import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { HeroFallback } from "@/components/hero-fallback";
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
-import { getSEOMetadata } from "@/lib/seo";
+import { HeroFallback } from "@/components/skeletons";
+import { seoFromDocument } from "@/lib/seo";
+import { PLACEHOLDER_SLUG } from "@/utils";
 
 const logger = new Logger("PageSlug");
-
-const PLACEHOLDER_SLUG = "__placeholder__";
 
 type SlugParams = { slug: string[] };
 
@@ -66,14 +64,7 @@ export async function generateMetadata({
     perspective,
   });
 
-  return getSEOMetadata({
-    title: pageData?.title ?? pageData?.seoTitle,
-    description: pageData?.description ?? pageData?.seoDescription,
-    ogDescription: pageData?.ogDescription,
-    slug: slugString,
-    contentId: pageData?._id,
-    contentType: pageData?._type,
-  });
+  return seoFromDocument(pageData, { slug: slugString });
 }
 
 export default function SlugPage({
@@ -89,13 +80,9 @@ export default function SlugPage({
 async function SlugPageInner({
   params,
 }: Readonly<{ params: Promise<SlugParams> }>) {
-  const { isEnabled: isDraftMode } = await draftMode();
-  const isDraft = isDraftMode || previewForceDrafts;
   const [{ slug }, { perspective, stega }] = await Promise.all([
     params,
-    isDraft
-      ? getDynamicFetchOptions()
-      : Promise.resolve({ perspective: "published" as const, stega: false }),
+    resolvePageFetchOptions(),
   ]);
   const pageData = await getCachedSlugPage({ slug, perspective, stega });
   if (!pageData) {

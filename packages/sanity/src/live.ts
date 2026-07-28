@@ -57,6 +57,21 @@ export async function getDynamicFetchOptions(): Promise<DynamicFetchOptions> {
   return { perspective: perspective ?? "drafts", stega: true };
 }
 
+/**
+ * Resolves perspective/stega for a page route's inner (post-Suspense)
+ * component: draft-mode or forced-preview sessions get the dynamic options,
+ * every other request takes the published fast-path without touching
+ * `connection()`. Same check the routes previously inlined. Must be called
+ * outside any `'use cache'` boundary (reads draftMode).
+ */
+export async function resolvePageFetchOptions(): Promise<DynamicFetchOptions> {
+  const { isEnabled: isDraftMode } = await draftMode();
+  if (isDraftMode || previewForceDrafts) {
+    return getDynamicFetchOptions();
+  }
+  return { perspective: "published", stega: false };
+}
+
 /** For usage within `generateStaticParams` only. */
 export async function sanityFetchStaticParams<
   const QueryString extends string,

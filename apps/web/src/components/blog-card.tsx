@@ -3,8 +3,10 @@ import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 
+import { BlogCardSkeleton } from "@/components/skeletons";
 import { getBlogCategoryLabel } from "@/lib/blog-categories";
 import type { Blog } from "@/types";
+import { formatDate } from "@/utils";
 
 type BlogImageProps = {
   image: Blog["image"];
@@ -35,18 +37,6 @@ type BlogCardProps = {
   blog: Blog;
 };
 
-function formatBlogDate(publishedAt: string | null) {
-  if (!publishedAt) {
-    return "";
-  }
-
-  return new Date(publishedAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
 function BlogDate({
   publishedAt,
   className,
@@ -54,7 +44,7 @@ function BlogDate({
   publishedAt: string | null;
   className?: string;
 }>) {
-  const formatted = formatBlogDate(publishedAt);
+  const formatted = formatDate(publishedAt);
 
   if (!formatted) {
     return null;
@@ -160,16 +150,7 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
 
 export function BlogCard({ blog }: BlogCardProps) {
   if (!blog) {
-    return (
-      <article className="flex flex-col gap-4 border border-border p-6">
-        <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-        <div className="flex flex-col gap-3">
-          <div className="h-6 w-full animate-pulse rounded bg-muted" />
-          <div className="h-6 w-2/3 animate-pulse rounded bg-muted" />
-        </div>
-        <div className="h-6 w-28 animate-pulse rounded bg-muted" />
-      </article>
-    );
+    return <BlogCardSkeleton />;
   }
 
   const { title, publishedAt, slug, description, authors, category } = blog;
