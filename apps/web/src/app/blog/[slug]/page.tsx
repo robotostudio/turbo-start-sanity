@@ -105,7 +105,9 @@ export default async function BlogSlugPage({
   return <BlogPageContent data={data} />;
 }
 
-async function DynamicBlogPage({ params }: { params: Promise<BlogParams> }) {
+async function DynamicBlogPage({
+  params,
+}: Readonly<{ params: Promise<BlogParams> }>) {
   const [{ slug }, { perspective, stega }] = await Promise.all([
     params,
     getDynamicFetchOptions(),
@@ -136,9 +138,9 @@ async function getCachedBlogPage({
 
 function BlogPageContent({
   data,
-}: {
+}: Readonly<{
   data: NonNullable<Awaited<ReturnType<typeof getCachedBlogPage>>>;
-}) {
+}>) {
   const { title, description, image, richText } = data ?? {};
 
   return (

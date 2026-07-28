@@ -74,9 +74,9 @@ export async function generateMetadata({
 
 export default async function SlugPage({
   params,
-}: {
+}: Readonly<{
   params: Promise<SlugParams>;
-}) {
+}>) {
   const { isEnabled: isDraftMode } = await draftMode();
   if (isDraftMode) {
     return (
@@ -97,7 +97,9 @@ export default async function SlugPage({
   return <SlugPageContent pageData={pageData} />;
 }
 
-async function DynamicSlugPage({ params }: { params: Promise<SlugParams> }) {
+async function DynamicSlugPage({
+  params,
+}: Readonly<{ params: Promise<SlugParams> }>) {
   const [{ slug }, { perspective, stega }] = await Promise.all([
     params,
     getDynamicFetchOptions(),
@@ -128,9 +130,9 @@ async function getCachedSlugPage({
 
 function SlugPageContent({
   pageData,
-}: {
+}: Readonly<{
   pageData: NonNullable<Awaited<ReturnType<typeof getCachedSlugPage>>>;
-}) {
+}>) {
   const { title, pageBuilder, _id, _type } = pageData ?? {};
 
   if (!Array.isArray(pageBuilder) || pageBuilder?.length === 0) {

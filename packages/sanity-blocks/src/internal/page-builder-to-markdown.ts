@@ -10,16 +10,12 @@ import { faqAccordionToMarkdown } from "../faq-accordion/markdown";
 import { featureCardsIconToMarkdown } from "../feature-cards-icon/markdown";
 import { heroToMarkdown } from "../hero/markdown";
 import { imageLinkCardsToMarkdown } from "../image-link-cards/markdown";
-import {
-  type MarkdownBlock,
-  type MarkdownOptions,
-  imageToMarkdown,
-} from "./markdown";
+import type { MarkdownBlock, MarkdownOptions } from "./markdown";
 import { richTextBlockToMarkdown } from "../rich-text-block/markdown";
 import { subscribeNewsletterToMarkdown } from "../subscribe-newsletter/markdown";
 
+export { imageToMarkdown } from "./markdown";
 export type { MarkdownBlock };
-export { imageToMarkdown };
 
 function blockToMarkdown(
   block: MarkdownBlock,

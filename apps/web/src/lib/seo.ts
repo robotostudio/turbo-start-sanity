@@ -49,10 +49,7 @@ async function resolveSiteConfig(): Promise<SiteConfig> {
     query: queryGlobalSeoSettings,
     perspective,
   });
-  const twitter = settings?.socialLinks?.twitter
-    ?.split("/")
-    .filter(Boolean)
-    .pop();
+  const twitter = settings?.socialLinks?.twitter?.split("/").findLast(Boolean);
   return {
     title: settings?.siteTitle || FALLBACK_SITE_CONFIG.title,
     description: settings?.siteDescription || FALLBACK_SITE_CONFIG.description,
