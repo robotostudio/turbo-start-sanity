@@ -6,15 +6,15 @@ import type { PageBuilderBlock, PagebuilderType } from "@/types";
 
 export function PageBuilderJsonLd({
   pageBuilder,
-}: {
+}: Readonly<{
   pageBuilder?: PageBuilderBlock[] | null;
-}) {
+}>) {
   if (!pageBuilder?.length) return null;
 
   return (
     <>
       {pageBuilder.map((block) => {
-        if (!block || block._type !== "faqAccordion") return null;
+        if (block?._type !== "faqAccordion") return null;
         const data = faqAccordionToJsonLd(
           stegaClean(block as PagebuilderType<"faqAccordion">)
         );
