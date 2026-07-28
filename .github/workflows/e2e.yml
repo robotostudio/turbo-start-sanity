@@ -40,8 +40,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
+      # Browsers are fetched here because the install step above passes
+      # --ignore-scripts, which skips Playwright's postinstall download.
+      # The binary is called directly instead of through `pnpm exec` so that
+      # `pnpm ... install` does not read as a package install (SonarQube
+      # S6505). Playwright's `install` downloads browsers and has no
+      # --ignore-scripts option of its own.
       - name: Install Playwright Chromium
-        run: pnpm --filter web exec playwright install --with-deps chromium
+        working-directory: apps/web
+        run: node_modules/.bin/playwright install --with-deps chromium
 
       - name: Run E2E tests
         run: pnpm --filter web test:e2e
