@@ -148,7 +148,7 @@ export function SubscribeNewsletter({
             <div className="flex w-full flex-col items-start gap-3">
               <form
                 action={action}
-                className="flex w-full items-center gap-1.5 bg-muted py-1.5 pr-1.5 pl-4 has-[input:focus-visible]:[outline:2px_solid_var(--foreground)] has-[input:focus-visible]:outline-offset-2"
+                className="flex w-full items-center gap-1.5 bg-muted py-1.5 pr-1.5 pl-4 has-[input:focus-visible]:[outline:2px_dotted_var(--foreground)] has-[input:focus-visible]:outline-offset-2"
                 method={method ?? "post"}
                 onSubmit={onSubmit}
               >

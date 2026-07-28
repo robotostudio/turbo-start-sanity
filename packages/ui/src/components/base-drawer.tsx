@@ -70,7 +70,7 @@ function DrawerPopup({
   return (
     <DrawerPrimitive.Popup
       className={cn(
-        "relative flex flex-col overflow-hidden overscroll-contain bg-background text-foreground transition-transform duration-340 ease-[cubic-bezier(0.32,0.72,0,1)] data-swiping:select-none data-swiping:duration-0",
+        "relative flex flex-col overflow-hidden overscroll-contain bg-background text-foreground outline-none transition-transform duration-340 ease-[cubic-bezier(0.32,0.72,0,1)] data-swiping:select-none data-swiping:duration-0",
         className
       )}
       data-slot="drawer-popup"

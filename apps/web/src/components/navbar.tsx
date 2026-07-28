@@ -28,7 +28,7 @@ const fetcher = async (url: string): Promise<NavigationData> => {
 };
 
 const TRIGGER_CLASS =
-  "link-underline after:bottom-1.5! h-auto bg-transparent px-2 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-transparent focus:bg-transparent focus:text-foreground focus-visible:outline-none! data-popup-open:bg-transparent data-popup-open:text-foreground";
+  "h-auto rounded-full bg-transparent px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-zinc-100 focus:text-foreground focus-visible:bg-zinc-100 focus-visible:outline-none! data-popup-open:bg-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800 dark:data-popup-open:bg-zinc-800";
 
 const NAV_BUTTON_CLASS =
   "h-9 px-4 font-mono font-normal text-sm uppercase tracking-wide";
@@ -105,7 +105,7 @@ export function Navbar({
     <header className="sticky top-0 z-40 w-full bg-background/20 backdrop-blur-sm dark:bg-background/40">
       <div className="container">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex h-10 flex-1 items-center">
+          <div className="flex h-10 flex-1 items-center pl-3 lg:pl-0">
             <Logo
               alt={siteTitle ?? "Turbo Start Sanity"}
               className="h-5 w-auto object-left"
@@ -133,7 +133,7 @@ export function Navbar({
                           {column.links?.map((link: ColumnLink) => (
                             <li key={link._key}>
                               <NavigationMenuLink
-                                className="group flex items-start gap-3 rounded-md px-2 py-2 transition-colors hover:bg-accent"
+                                className="group flex items-start gap-3 rounded-md px-2 py-2 hover:bg-accent"
                                 closeOnClick
                                 render={<Link href={link.href ?? "#"} />}
                               >
@@ -168,7 +168,7 @@ export function Navbar({
                   return (
                     <NavigationMenuItem key={column._key}>
                       <NavigationMenuLink
-                        className="link-underline flex h-auto items-center rounded-md px-2 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none focus-visible:outline-none!"
+                        className="flex h-auto items-center rounded-full px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-zinc-100 focus-visible:bg-zinc-100 focus-visible:outline-none! dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800"
                         render={<Link href={column.href} />}
                       >
                         {column.name}

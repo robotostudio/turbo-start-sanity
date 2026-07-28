@@ -95,18 +95,18 @@ function SocialLinks({ data }: SocialLinksProps) {
   ].filter((link) => link.url);
 
   return (
-    <ul className="flex items-center gap-3">
+    <ul className="-mx-1.5 flex items-center">
       {socialLinks.map(({ url, Icon, label }, index) => (
         <li key={`social-link-${url}-${index.toString()}`}>
           <Link
             aria-label={label}
-            className="focus-ring inline-block cursor-pointer focus-visible:outline-accent-green-foreground!"
+            className="focus-ring-inset group inline-flex cursor-pointer items-center justify-center p-1.5 hover:bg-accent-green-foreground focus-visible:outline-accent-green-foreground!"
             href={url ?? "#"}
             prefetch={false}
             rel="noopener noreferrer"
             target="_blank"
           >
-            <Icon className="h-[18px] w-auto fill-accent-green-foreground" />
+            <Icon className="h-[18px] w-auto fill-accent-green-foreground group-hover:fill-accent-green" />
             <span className="sr-only">{label}</span>
           </Link>
         </li>
@@ -280,7 +280,7 @@ function Footer({ data, settingsData }: FooterProps) {
                           key={`${link?._key}-${columnIndex}-column-${column?._key}`}
                         >
                           <Link
-                            className="link-underline after:-bottom-0.5! rounded-sm outline-none"
+                            className="link-underline after:-bottom-0.5! rounded-sm outline-none after:transition-none!"
                             href={link.href ?? "#"}
                             rel={
                               link.openInNewTab
@@ -342,7 +342,7 @@ function Footer({ data, settingsData }: FooterProps) {
                         )}
                         {item.url ? (
                           <a
-                            className="focus-ring rounded-none transition-opacity hover:opacity-90 focus-visible:outline-accent-green-foreground!"
+                            className="focus-ring rounded-none hover:opacity-90 focus-visible:outline-accent-green-foreground!"
                             href={item.url}
                             rel="noopener noreferrer"
                             target="_blank"

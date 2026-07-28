@@ -131,7 +131,7 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
   if (href) {
     return (
       <Link
-        className="focus-ring-inset block"
+        className="focus-ring-inset block focus-visible:[outline-style:solid]!"
         href={href}
         rel={openInNewTab ? "noopener noreferrer" : undefined}
         target={openInNewTab ? "_blank" : undefined}

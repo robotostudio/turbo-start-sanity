@@ -38,7 +38,7 @@ export interface FaqAccordionProps {
 }
 
 const DISCLOSURE_BASE_CLASS =
-  "faq-disclosure hover-surface group border border-border bg-background px-4 has-[summary:focus-visible]:[outline:2px_solid_var(--foreground)] has-[summary:focus-visible]:[outline-offset:-2px]";
+  "faq-disclosure hover-surface group border border-border bg-background px-4 has-[summary:focus-visible]:[outline:2px_dotted_var(--foreground)] has-[summary:focus-visible]:[outline-offset:-2px]";
 const DISCLOSURE_ANIMATION_CLASS =
   "fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-300 ease-out";
 
@@ -119,7 +119,7 @@ function CategoryTabs({
             <li key={`faq-category-${category._key ?? index}`}>
               <button
                 aria-pressed={isActive}
-                className="focus-ring flex items-start gap-2 rounded-none px-1 py-0.5 text-left"
+                className="focus-ring group flex w-full items-center gap-2 rounded-none px-1 py-0.5 text-left"
                 onClick={() => onSelect(index)}
                 type="button"
               >
@@ -127,7 +127,7 @@ function CategoryTabs({
                   className={`shrink-0 px-1 py-px font-light font-mono text-sm uppercase leading-5 tracking-[0.28px] ${
                     isActive
                       ? "bg-accent-green text-accent-green-foreground"
-                      : "text-muted-foreground"
+                      : "text-muted-foreground group-hover:bg-foreground group-hover:text-background"
                   }`}
                 >
                   {number}
@@ -136,7 +136,7 @@ function CategoryTabs({
                   className={`font-light font-mono text-sm uppercase leading-5 tracking-[0.28px] ${
                     isActive
                       ? "text-zinc-900 dark:text-zinc-100"
-                      : "text-muted-foreground"
+                      : "text-muted-foreground group-hover:text-foreground"
                   }`}
                 >
                   {category.title}
@@ -190,7 +190,7 @@ function FaqContactLink({ link }: Readonly<{ link: FaqLink }>) {
       )}
       <Link
         aria-label={link.description ?? link.title ?? "Learn more"}
-        className="focus-ring group inline-flex items-center gap-2 rounded-full py-1.5 pr-1.5 pl-4 focus-visible:outline-offset-0!"
+        className="focus-ring group inline-flex items-center gap-2 rounded-full py-1.5 pr-1.5 pl-1 focus-visible:outline-offset-0!"
         href={link.href}
         rel={link.openInNewTab ? "noopener noreferrer" : undefined}
         target={link.openInNewTab ? "_blank" : "_self"}

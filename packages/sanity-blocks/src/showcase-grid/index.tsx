@@ -138,7 +138,7 @@ function ScreenshotImage({
 
 function FocusBrackets() {
   const corner =
-    "absolute size-2 border-accent-green-foreground opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none";
+    "absolute size-2 border-accent-green-foreground opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100";
   return (
     <>
       <span
@@ -195,12 +195,12 @@ function FeaturedBanner({
   const clickable = Boolean(featured.url);
 
   const chip = (
-    <span className="relative flex items-center justify-center bg-background px-4 py-4 text-foreground transition-colors duration-[130ms] ease-out group-hover:bg-black group-hover:text-white group-focus-visible:bg-black group-focus-visible:text-white">
+    <span className="relative flex items-center justify-center bg-background px-4 py-4 text-foreground group-hover:bg-black group-hover:text-white group-focus-visible:bg-black group-focus-visible:text-white">
       {clickable ? <FocusBrackets /> : null}
       {featured.logo ? (
         <AttributionLogo
           base={28}
-          className="invert transition-[filter] duration-[130ms] ease-out group-hover:invert-0 group-focus-visible:invert-0 dark:invert-0"
+          className="invert group-hover:invert-0 group-focus-visible:invert-0 dark:invert-0"
           item={featured}
         />
       ) : (
@@ -216,7 +216,7 @@ function FeaturedBanner({
       {clickable ? (
         <span
           aria-hidden="true"
-          className="absolute inset-0 bg-accent-green opacity-0 transition-opacity duration-[130ms] ease-out group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
+          className="absolute inset-0 bg-accent-green opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
         />
       ) : null}
       {chip}
@@ -280,16 +280,13 @@ function CardCaption({
 }: Readonly<{ item: CardView; clickable: boolean }>) {
   const hoverText =
     clickable &&
-    "transition-colors duration-[130ms] ease-out group-hover:text-accent-green-foreground group-focus-visible:text-accent-green-foreground motion-reduce:transition-none";
-  const categoryUnderline =
-    clickable &&
-    "after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-150 after:ease-out group-hover:after:scale-x-100 group-focus-visible:after:scale-x-100 motion-reduce:after:transition-none";
+    "group-hover:text-accent-green-foreground group-focus-visible:text-accent-green-foreground";
   return (
     <div className="relative flex items-center justify-between gap-3 overflow-hidden bg-background px-4 py-3">
       {clickable ? (
         <span
           aria-hidden="true"
-          className="absolute inset-0 origin-bottom scale-y-0 bg-accent-green transition-transform duration-[130ms] ease-out group-hover:scale-y-100 group-focus-visible:scale-y-100 motion-reduce:transition-none"
+          className="absolute inset-0 origin-bottom scale-y-0 bg-accent-green group-hover:scale-y-100 group-focus-visible:scale-y-100"
         />
       ) : null}
 
@@ -309,8 +306,7 @@ function CardCaption({
         <span
           className={cn(
             "relative shrink-0 font-normal text-base text-muted-foreground leading-6",
-            hoverText,
-            categoryUnderline
+            hoverText
           )}
         >
           {item.category}

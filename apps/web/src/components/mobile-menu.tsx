@@ -29,8 +29,6 @@ import type { ColumnLink, NavigationData } from "@/types";
 import { MenuLink } from "./elements/menu-link";
 import { Logo } from "./logo";
 
-const FOCUS_RING = "focus-ring";
-
 const TABLET_QUERY = "(min-width: 768px) and (max-width: 1024px)";
 
 const VIEWPORT_ANCHOR = {
@@ -79,7 +77,11 @@ export function MobileMenu({
     >
       <DrawerTrigger
         render={
-          <Button size="icon" variant="ghost">
+          <Button
+            className="rounded-none focus-visible:outline-offset-0!"
+            size="icon"
+            variant="ghost"
+          >
             <Menu className="size-4" />
             <span className="sr-only">Open menu</span>
           </Button>
@@ -100,7 +102,7 @@ export function MobileMenu({
                 <DrawerTitle className="sr-only">
                   {siteTitle || "Menu"}
                 </DrawerTitle>
-                <div className="flex items-center [&_img]:h-auto [&_img]:w-40 [&_img]:rounded-none">
+                <div className="flex items-center [&_img]:h-6 [&_img]:w-auto [&_img]:rounded-none">
                   <Logo
                     alt={siteTitle ?? "Turbo Start Sanity"}
                     image={logos?.logo}
@@ -109,7 +111,11 @@ export function MobileMenu({
                 </div>
                 <DrawerClose
                   render={
-                    <Button className="-mr-3" size="icon" variant="ghost">
+                    <Button
+                      className="-mr-3 rounded-none focus-visible:outline-offset-0!"
+                      size="icon"
+                      variant="ghost"
+                    >
                       <X className="size-4" />
                       <span className="sr-only">Close</span>
                     </Button>
@@ -129,10 +135,7 @@ export function MobileMenu({
                       }
                       return (
                         <Link
-                          className={cn(
-                            "-mx-3 flex items-center rounded-md px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal",
-                            FOCUS_RING
-                          )}
+                          className="focus-ring-inset -mx-3 flex items-center rounded-none px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:bg-zinc-100 dark:hover:bg-zinc-800"
                           href={column.href}
                           key={column._key}
                           onClick={closeMenu}
@@ -149,7 +152,7 @@ export function MobileMenu({
                           key={column._key}
                           value={column._key}
                         >
-                          <AccordionTrigger className="-mx-3 px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:no-underline">
+                          <AccordionTrigger className="focus-ring-inset -mx-3 rounded-none px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:bg-zinc-100 hover:no-underline dark:hover:bg-zinc-800">
                             {column.title}
                           </AccordionTrigger>
                           <AccordionContent>
