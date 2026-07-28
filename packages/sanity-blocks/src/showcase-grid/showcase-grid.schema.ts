@@ -73,13 +73,6 @@ export const showcaseGridSchema = defineType({
     "A section that shows off real websites built with the template. Add the sites as items below — the one marked 'Featured' is shown in the large card at the top.",
   fields: [
     defineField({
-      name: "eyebrow",
-      title: "Eyebrow",
-      type: "string",
-      description:
-        "Optional short label shown in a pill above the title (for example: 'Showcase').",
-    }),
-    defineField({
       name: "title",
       title: "Title",
       type: "string",

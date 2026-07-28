@@ -1,5 +1,4 @@
 import {
-  eyebrowToMarkdown,
   headingToMarkdown,
   joinSections,
   type MarkdownBlock,
@@ -27,7 +26,6 @@ export function showcaseGridToMarkdown(
   const description = block.description?.trim();
 
   return joinSections([
-    eyebrowToMarkdown(block.eyebrow),
     headingToMarkdown(block.title, 2),
     description ? escapeMarkdown(description) : "",
     items.length > 0 ? items.join("\n") : "",

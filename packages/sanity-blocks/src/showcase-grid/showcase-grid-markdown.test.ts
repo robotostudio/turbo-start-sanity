@@ -4,16 +4,14 @@ test("showcaseGridToMarkdown returns empty string for a fully empty block", () =
   expect(showcaseGridToMarkdown({}, {})).toBe("");
 });
 
-test("showcaseGridToMarkdown renders the eyebrow, title and description", () => {
+test("showcaseGridToMarkdown renders the title and description", () => {
   const result = showcaseGridToMarkdown(
     {
-      eyebrow: "Showcase",
       title: "Real sites. Real traffic.",
       description: "Every site here started from the same template.",
     },
     {}
   );
-  expect(result).toContain("**Showcase**");
   expect(result).toContain("## Real sites. Real traffic.");
   expect(result).toContain("Every site here started from the same template.");
 });
@@ -74,7 +72,6 @@ test("showcaseGridToMarkdown appends the category after the link", () => {
 test("showcaseGridToMarkdown emits no HTML or JSX tags", () => {
   const result = showcaseGridToMarkdown(
     {
-      eyebrow: "Showcase",
       title: "Real sites",
       description: "Built with the template.",
       items: [

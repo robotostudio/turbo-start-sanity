@@ -5,7 +5,6 @@ import {
 import { cn } from "@workspace/tailwind-config/utils";
 
 import { normalizedLogoHeight } from "../internal/logo-height";
-import { ShowcaseMarquee } from "./showcase-marquee";
 
 export interface ShowcaseGridItem {
   _key: string;
@@ -18,7 +17,6 @@ export interface ShowcaseGridItem {
 }
 
 export interface ShowcaseGridProps {
-  eyebrow?: string | null;
   title?: string | null;
   description?: string | null;
   items?: ShowcaseGridItem[] | null;
@@ -197,12 +195,12 @@ function FeaturedBanner({
   const clickable = Boolean(featured.url);
 
   const chip = (
-    <span className="relative flex items-center justify-center bg-background px-4 py-4 text-foreground transition-colors duration-200 ease-out group-hover:bg-black group-hover:text-white group-focus-visible:bg-black group-focus-visible:text-white">
+    <span className="relative flex items-center justify-center bg-background px-4 py-4 text-foreground transition-colors duration-[130ms] ease-out group-hover:bg-black group-hover:text-white group-focus-visible:bg-black group-focus-visible:text-white">
       {clickable ? <FocusBrackets /> : null}
       {featured.logo ? (
         <AttributionLogo
           base={28}
-          className="invert transition-[filter] duration-200 ease-out group-hover:invert-0 group-focus-visible:invert-0 dark:invert-0"
+          className="invert transition-[filter] duration-[130ms] ease-out group-hover:invert-0 group-focus-visible:invert-0 dark:invert-0"
           item={featured}
         />
       ) : (
@@ -218,7 +216,7 @@ function FeaturedBanner({
       {clickable ? (
         <span
           aria-hidden="true"
-          className="absolute inset-0 bg-accent-green opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
+          className="absolute inset-0 bg-accent-green opacity-0 transition-opacity duration-[130ms] ease-out group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none"
         />
       ) : null}
       {chip}
@@ -282,13 +280,16 @@ function CardCaption({
 }: Readonly<{ item: CardView; clickable: boolean }>) {
   const hoverText =
     clickable &&
-    "transition-colors duration-100 ease-out group-hover:text-accent-green-foreground group-focus-visible:text-accent-green-foreground motion-reduce:transition-none";
+    "transition-colors duration-[130ms] ease-out group-hover:text-accent-green-foreground group-focus-visible:text-accent-green-foreground motion-reduce:transition-none";
+  const categoryUnderline =
+    clickable &&
+    "after:absolute after:inset-x-0 after:-bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-150 after:ease-out group-hover:after:scale-x-100 group-focus-visible:after:scale-x-100 motion-reduce:after:transition-none";
   return (
     <div className="relative flex items-center justify-between gap-3 overflow-hidden bg-background px-4 py-3">
       {clickable ? (
         <span
           aria-hidden="true"
-          className="absolute inset-0 origin-bottom scale-y-0 bg-accent-green transition-transform duration-150 ease-out group-hover:scale-y-100 group-focus-visible:scale-y-100 motion-reduce:transition-none"
+          className="absolute inset-0 origin-bottom scale-y-0 bg-accent-green transition-transform duration-[130ms] ease-out group-hover:scale-y-100 group-focus-visible:scale-y-100 motion-reduce:transition-none"
         />
       ) : null}
 
@@ -308,7 +309,8 @@ function CardCaption({
         <span
           className={cn(
             "relative shrink-0 font-normal text-base text-muted-foreground leading-6",
-            hoverText
+            hoverText,
+            categoryUnderline
           )}
         >
           {item.category}
@@ -357,19 +359,13 @@ function ShowcaseCard({ item }: Readonly<{ item: CardView }>) {
 }
 
 export function ShowcaseGrid({
-  eyebrow,
   title,
   description,
   items,
 }: Readonly<ShowcaseGridProps>) {
   const cmsItems = items ?? [];
-  const label = title?.trim() || eyebrow?.trim() || "Showcase";
+  const label = title?.trim() || "Showcase";
   const allViews = cmsItems.map(cmsToView);
-  const marqueeShots = allViews.flatMap((view) =>
-    view.screenshot.kind === "sanity"
-      ? [{ id: view.id, name: view.name, image: view.screenshot.image }]
-      : []
-  );
 
   const explicitFeaturedKeys = new Set(
     cmsItems.filter((item) => item.featured).map((item) => item._key)
@@ -385,7 +381,7 @@ export function ShowcaseGrid({
 
   if (featuredItems.length === 0) {
     return (
-      <section className="bg-background pt-8 pb-24" id="showcase">
+      <section className="bg-background pt-16 pb-24" id="showcase">
         {title ? null : <h2 className="sr-only">{label}</h2>}
         <div className="container">
           <ShowcaseHeader description={description} title={title} />
@@ -395,11 +391,9 @@ export function ShowcaseGrid({
   }
 
   return (
-    <section className="bg-background pb-24" id="showcase">
+    <section className="bg-background pt-16 pb-24" id="showcase">
       {title ? null : <h2 className="sr-only">{label}</h2>}
       <div className="flex flex-col gap-16">
-        <ShowcaseMarquee shots={marqueeShots} />
-
         <div className="container">
           <ShowcaseHeader description={description} title={title} />
         </div>

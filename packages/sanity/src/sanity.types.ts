@@ -283,7 +283,6 @@ export type RichTextBlock = {
 
 export type ShowcaseGrid = {
   _type: "showcaseGrid";
-  eyebrow?: string;
   title?: string;
   description?: string;
   items?: Array<{
@@ -1574,7 +1573,6 @@ export type QueryHomePageDataResult = {
     | {
         _key: string;
         _type: "showcaseGrid";
-        eyebrow?: string;
         title?: string;
         description?: string;
         items: Array<{
@@ -2138,7 +2136,6 @@ export type QuerySlugPageDataResult = {
     | {
         _key: string;
         _type: "showcaseGrid";
-        eyebrow?: string;
         title?: string;
         description?: string;
         items: Array<{
@@ -2702,7 +2699,6 @@ export type QueryBlogIndexPageDataResult = {
     | {
         _key: string;
         _type: "showcaseGrid";
-        eyebrow?: string;
         title?: string;
         description?: string;
         items: Array<{
