@@ -27,11 +27,6 @@ interface PageSeoData extends Metadata {
   pageType?: Extract<Metadata["openGraph"], { type: string }>["type"];
 }
 
-type OgImageParams = {
-  type?: string;
-  id?: string;
-};
-
 const FALLBACK_SITE_CONFIG: SiteConfig = {
   title: "Turbo Start Sanity",
   description: "Turbo Start Sanity",
@@ -55,21 +50,6 @@ async function resolveSiteConfig(): Promise<SiteConfig> {
     twitterHandle: twitter ? `@${twitter}` : FALLBACK_SITE_CONFIG.twitterHandle,
     keywords: FALLBACK_SITE_CONFIG.keywords,
   };
-}
-
-function generateOgImageUrl(params: OgImageParams = {}): string {
-  const { type, id } = params;
-  const searchParams = new URLSearchParams();
-
-  if (id) {
-    searchParams.set("id", id);
-  }
-  if (type) {
-    searchParams.set("type", type);
-  }
-
-  const baseUrl = getBaseUrl();
-  return `${baseUrl}/api/og?${searchParams.toString()}`;
 }
 
 function buildPageUrl({
@@ -130,10 +110,7 @@ export async function getSEOMetadata(
   const socialDescription = ogDescription || defaultDescription;
   const allKeywords = [...siteConfig.keywords, ...pageKeywords];
 
-  const ogImage = generateOgImageUrl({
-    type: contentType,
-    id: contentId,
-  });
+  const ogImage = `${baseUrl}/opengraph.png`;
 
   const fullTitle =
     defaultTitle === siteConfig.title

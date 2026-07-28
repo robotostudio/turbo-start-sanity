@@ -198,41 +198,6 @@ export const queryBlogPaths = defineQuery(`
   *[_type == "blog" && defined(slug.current)].slug.current
 `);
 
-const ogFieldsFragment = /* groq */ `
-  _type,
-  "title": select(
-    defined(ogTitle) => ogTitle,
-    defined(seoTitle) => seoTitle,
-    title
-  ),
-  "seoImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
-  "siteTitle": *[_type == "settings"][0].siteTitle
-`;
-
-export const queryHomePageOGData = defineQuery(`
-  *[_type == "homePage" && _id == $id][0]{
-    ${ogFieldsFragment}
-  }
-  `);
-
-export const querySlugPageOGData = defineQuery(`
-  *[_type == "page" && _id == $id][0]{
-    ${ogFieldsFragment}
-  }
-`);
-
-export const queryBlogPageOGData = defineQuery(`
-  *[_type == "blog" && _id == $id][0]{
-    ${ogFieldsFragment}
-  }
-`);
-
-export const queryGenericPageOGData = defineQuery(`
-  *[ defined(slug.current) && _id == $id][0]{
-    ${ogFieldsFragment}
-  }
-`);
-
 export const queryFooterData = defineQuery(`
   *[_type == "footer" && _id == "footer"][0]{
     _id,
