@@ -309,6 +309,13 @@
     background-color: var(--accent-green);
     color: var(--accent-green-foreground);
   }
+  /* On solid accent-green surfaces (e.g. the footer) the green-on-green
+     selection is invisible, so invert it: dark highlight, green text. */
+  [class~="bg-accent-green"] ::selection,
+  [class~="bg-accent-green"]::selection {
+    background-color: var(--accent-green-foreground);
+    color: var(--accent-green);
+  }
   /* Global keyboard focus indicator; components opt out with `outline-none`. */
   :focus-visible {
     outline: 2px dotted var(--foreground);
