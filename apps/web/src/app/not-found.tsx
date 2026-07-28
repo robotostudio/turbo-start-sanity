@@ -1,43 +1,35 @@
 import { Button } from "@workspace/ui/components/button";
 import Link from "next/link";
 
-const ACTION_CLASS = "font-mono font-normal text-sm uppercase tracking-wide";
-
 export default function NotFound() {
   return (
-    <main className="container flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center py-24">
-      <div className="grid max-w-xl justify-items-center gap-8 text-center">
-        <div className="inline-flex items-center gap-2 border border-border px-3 py-1.5">
-          <span className="size-2 rounded-[1px] bg-accent-green" />
-          <span className="font-light font-mono text-foreground text-sm uppercase tracking-wide">
-            Error 404
+    <main className="flex min-h-[calc(100svh-4rem)] flex-col items-center justify-center px-6 py-24">
+      <div className="grid w-full max-w-2xl justify-items-center gap-8 text-center">
+        <div className="inline-flex items-center gap-2.5 border border-border px-3 py-1.5 font-light font-mono text-foreground text-sm uppercase tracking-[0.28px]">
+          <span className="size-2 shrink-0 rounded-[1px] bg-accent-green" />
+          Not found
+        </div>
+
+        <h1 className="font-normal text-[clamp(6rem,26vw,15rem)] text-foreground leading-[0.8] tracking-tighter">
+          4
+          <span className="bg-grid-dots bg-clip-text text-foreground [-webkit-text-fill-color:transparent]">
+            0
           </span>
-        </div>
+          4
+        </h1>
 
-        <div className="inline-flex items-center justify-center bg-grid-dots bg-size-[5.6px_4.6px] px-12 py-8 text-zinc-800 sm:px-20 sm:py-10 dark:text-zinc-50">
-          <h1 className="font-normal text-7xl text-foreground leading-none tracking-tight sm:text-8xl md:text-9xl">
-            404
-          </h1>
-        </div>
+        <h2 className="max-w-2xl text-balance font-normal text-3xl tracking-tight sm:text-4xl">
+          The page you are looking for does not exist.
+        </h2>
 
-        <div className="flex flex-col gap-4">
-          <h2 className="text-balance font-normal text-2xl tracking-tight sm:text-3xl">
-            This page could not be found
-          </h2>
-          <p className="body-text text-balance text-muted-foreground">
-            The page you are looking for doesn&apos;t exist or may have been
-            moved. Let&apos;s get you back on track.
-          </p>
-        </div>
-
-        <div className="flex flex-col items-center gap-3 sm:flex-row">
-          <Button asChild className={ACTION_CLASS} size="sm">
-            <Link href="/">Return home</Link>
-          </Button>
-          <Button asChild className={ACTION_CLASS} size="sm" variant="outline">
-            <Link href="/blog">Browse the blog</Link>
-          </Button>
-        </div>
+        <Button
+          asChild
+          className="h-9 rounded-full px-4 font-mono font-normal text-sm uppercase tracking-wide"
+          size="sm"
+          variant="secondary"
+        >
+          <Link href="/">Return home</Link>
+        </Button>
       </div>
     </main>
   );
