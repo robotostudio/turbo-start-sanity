@@ -10,14 +10,10 @@ import { richTextBlockToMarkdown } from "../rich-text-block/markdown";
 import { showcaseGridToMarkdown } from "../showcase-grid/markdown";
 import { socialGridToMarkdown } from "../social-grid/markdown";
 import { subscribeNewsletterToMarkdown } from "../subscribe-newsletter/markdown";
-import {
-  imageToMarkdown,
-  type MarkdownBlock,
-  type MarkdownOptions,
-} from "./markdown";
+import type { MarkdownBlock, MarkdownOptions } from "./markdown";
 
+export { imageToMarkdown } from "./markdown";
 export type { MarkdownBlock };
-export { imageToMarkdown };
 
 function blockToMarkdown(
   block: MarkdownBlock,

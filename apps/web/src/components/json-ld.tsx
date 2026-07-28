@@ -23,9 +23,9 @@ import { getBaseUrl } from "@/utils";
 // matters; the result stays valid JSON for crawlers.
 function serializeJsonLd<T>(data: T): string {
   return JSON.stringify(data)
-    .replaceAll("<", "\\u003c")
-    .replaceAll(">", "\\u003e")
-    .replaceAll("&", "\\u0026");
+    .replaceAll("<", String.raw`\u003c`)
+    .replaceAll(">", String.raw`\u003e`)
+    .replaceAll("&", String.raw`\u0026`);
 }
 
 export function JsonLdScript<T>({ data, id }: { data: T; id: string }) {

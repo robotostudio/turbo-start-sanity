@@ -1,9 +1,9 @@
 import { Card, Stack, Text } from "@sanity/ui";
 
-type ValidationMessagesProps = {
+type ValidationMessagesProps = Readonly<{
   errors?: string[];
   warnings?: string[];
-};
+}>;
 
 const errorTextStyle = {
   color: "var(--card-badge-critical-fg-color)",

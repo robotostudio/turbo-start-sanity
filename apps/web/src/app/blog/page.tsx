@@ -129,12 +129,12 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-type BlogPageProps = {
+type BlogPageProps = Readonly<{
   searchParams: Promise<{
     page?: string;
     category?: string;
   }>;
-};
+}>;
 
 export default function BlogIndexPage({ searchParams }: BlogPageProps) {
   return (
