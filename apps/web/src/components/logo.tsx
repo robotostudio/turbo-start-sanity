@@ -26,7 +26,7 @@ export function Logo({
     return (
       <Link
         className={cn(
-          "inline-block rounded-md font-semibold text-lg focus-ring",
+          "focus-ring inline-block rounded-none font-semibold text-lg",
           linkClassName
         )}
         href="/"
@@ -40,7 +40,7 @@ export function Logo({
 
   return (
     <Link
-      className={cn("inline-block rounded-md focus-ring", linkClassName)}
+      className={cn("focus-ring inline-block rounded-none", linkClassName)}
       href="/"
     >
       {imageDark?.id ? (

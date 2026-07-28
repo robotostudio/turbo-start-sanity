@@ -28,7 +28,7 @@ const fetcher = async (url: string): Promise<NavigationData> => {
 };
 
 const TRIGGER_CLASS =
-  "h-auto bg-transparent px-2 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal transition-opacity hover:bg-transparent hover:opacity-70 focus:bg-transparent focus:text-foreground data-popup-open:bg-transparent data-popup-open:text-foreground";
+  "link-underline after:bottom-1.5! h-auto bg-transparent px-2 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-transparent focus:bg-transparent focus:text-foreground focus-visible:outline-none! data-popup-open:bg-transparent data-popup-open:text-foreground";
 
 const NAV_BUTTON_CLASS =
   "h-9 px-4 font-mono font-normal text-sm uppercase tracking-wide";
@@ -83,7 +83,6 @@ export function Navbar({
       revalidateOnFocus: false,
       revalidateOnMount: false,
       revalidateOnReconnect: true,
-      refreshInterval: 30_000,
       errorRetryCount: 3,
       errorRetryInterval: 5000,
     }
@@ -169,7 +168,7 @@ export function Navbar({
                   return (
                     <NavigationMenuItem key={column._key}>
                       <NavigationMenuLink
-                        className="flex h-auto items-center rounded-md px-2 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal transition-opacity hover:opacity-70"
+                        className="link-underline flex h-auto items-center rounded-md px-2 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none focus-visible:outline-none!"
                         render={<Link href={column.href} />}
                       >
                         {column.name}

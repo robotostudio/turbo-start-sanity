@@ -100,7 +100,7 @@ function SocialLinks({ data }: SocialLinksProps) {
         <li key={`social-link-${url}-${index.toString()}`}>
           <Link
             aria-label={label}
-            className="focus-ring inline-block transition-opacity hover:opacity-70 focus-visible:outline-accent-green-foreground!"
+            className="focus-ring inline-block cursor-pointer focus-visible:outline-accent-green-foreground!"
             href={url ?? "#"}
             prefetch={false}
             rel="noopener noreferrer"
@@ -254,7 +254,7 @@ function Footer({ data, settingsData }: FooterProps) {
                       : "h-5 w-auto object-left brightness-0"
                   }
                   image={footerLogo ?? logo}
-                  linkClassName="focus-visible:outline-accent-green-foreground!"
+                  linkClassName="focus-ring focus-visible:outline-accent-green-foreground!"
                 />
               </span>
               {subtitle && (
@@ -280,7 +280,7 @@ function Footer({ data, settingsData }: FooterProps) {
                           key={`${link?._key}-${columnIndex}-column-${column?._key}`}
                         >
                           <Link
-                            className="focus-ring rounded-sm transition-colors hover:text-accent-green-foreground/80 focus-visible:outline-accent-green-foreground!"
+                            className="link-underline after:-bottom-0.5! rounded-sm outline-none"
                             href={link.href ?? "#"}
                             rel={
                               link.openInNewTab
@@ -342,7 +342,7 @@ function Footer({ data, settingsData }: FooterProps) {
                         )}
                         {item.url ? (
                           <a
-                            className="focus-ring rounded-sm transition-opacity hover:opacity-90 focus-visible:outline-accent-green-foreground!"
+                            className="focus-ring rounded-none transition-opacity hover:opacity-90 focus-visible:outline-accent-green-foreground!"
                             href={item.url}
                             rel="noopener noreferrer"
                             target="_blank"

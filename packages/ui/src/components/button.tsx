@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 
 const buttonVariants = cva(
-  "focus-ring inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full font-medium text-base leading-6 transition-[color,background-color,border-color,opacity,transform] duration-150 ease-out active:scale-[0.96] motion-reduce:transition-none motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "focus-ring inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-none font-medium text-base leading-6 transition-[color,background-color,border-color,opacity,transform] duration-150 ease-out active:scale-[0.96] motion-reduce:transition-none motion-reduce:active:scale-100 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -13,7 +13,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
         outline:
-          "box-border border border-foreground bg-transparent text-foreground duration-150 ease-out hover:bg-foreground hover:text-background active:bg-foreground/90",
+          "box-border border border-foreground bg-transparent text-foreground duration-150 ease-out hover:bg-foreground hover:text-background active:bg-foreground/90 focus-visible:outline-offset-0!",
         secondary:
           "bg-accent-green text-accent-green-foreground duration-150 ease-out hover:bg-primary hover:text-primary-foreground",
         ghost:

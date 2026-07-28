@@ -64,7 +64,7 @@ function FaqDisclosure({
         <h3 className="font-normal text-foreground text-lg leading-6">
           {faq.title}
         </h3>
-        <Plus className="pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-open:rotate-45 dark:text-accent-green" />
+        <Plus className="pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-open:rotate-45 motion-reduce:transition-none dark:text-accent-green" />
       </summary>
       {faq.richText?.length ? (
         <div className="min-h-0 overflow-hidden pb-4 text-muted-foreground">
@@ -190,7 +190,7 @@ function FaqContactLink({ link }: Readonly<{ link: FaqLink }>) {
       )}
       <Link
         aria-label={link.description ?? link.title ?? "Learn more"}
-        className="focus-ring group flex items-center gap-2 rounded-full px-1 py-0.5"
+        className="focus-ring group inline-flex items-center gap-2 rounded-full py-1.5 pr-1.5 pl-4 focus-visible:outline-offset-0!"
         href={link.href}
         rel={link.openInNewTab ? "noopener noreferrer" : undefined}
         target={link.openInNewTab ? "_blank" : "_self"}
@@ -235,7 +235,7 @@ export function FaqAccordion({
 
   return (
     <section
-      className="bg-background pt-20 pb-0 sm:pt-28 lg:pt-[136px]"
+      className="bg-background pt-20 pb-0.5 sm:pt-28 lg:pt-[136px]"
       id="faq"
     >
       <div className="container">

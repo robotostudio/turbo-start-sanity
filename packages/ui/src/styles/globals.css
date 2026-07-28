@@ -229,6 +229,39 @@
   }
 }
 
+/* Shared link affordance: an underline that wipes in from the left on hover /
+   focus. currentColor so it adapts to any surface (foreground on the navbar,
+   accent-green-foreground on the green footer). Add `link-underline` to a link
+   and it also fires while a Base-UI popup trigger is open. */
+@utility link-underline {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    /* Baseline for unpadded links (e.g. footer, leading-6): a small gap under
+       the descenders. Padded links (navbar py-2) pin it higher with
+       `after:bottom-*`. */
+    bottom: 0.125rem;
+    height: 1px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  &:hover::after,
+  &:focus-visible::after,
+  &[data-popup-open]::after {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link-underline::after {
+    transition: none;
+  }
+}
+
 /* Keyboard focus ring, for elements that re-enable or scope :focus-visible. */
 @layer utilities {
   .focus-ring {
@@ -409,30 +442,6 @@
   display: block;
 }
 
-/* Failure shake: decaying segments, transform only. */
-@keyframes copy-shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  20% {
-    transform: translateX(-8px);
-  }
-  40% {
-    transform: translateX(6px);
-  }
-  60% {
-    transform: translateX(-3px);
-  }
-  80% {
-    transform: translateX(2px);
-  }
-}
-
-@utility copy-shake {
-  animation: copy-shake 400ms ease-in-out both;
-}
-
 @keyframes hero-enter {
   from {
     opacity: 0;
@@ -447,7 +456,6 @@
 
 /* Reduced motion: land on the final state instead of animating to it. */
 @media (prefers-reduced-motion: reduce) {
-  .copy-shake,
   .hero-enter {
     animation: none;
   }

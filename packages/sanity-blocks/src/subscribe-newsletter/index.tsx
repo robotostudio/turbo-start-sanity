@@ -34,7 +34,7 @@ function SubscribeNewsletterButton() {
   return (
     <Button
       aria-label={pending ? "Subscribing..." : "Subscribe to newsletter"}
-      className="h-10 shrink-0 rounded-none px-6"
+      className="shrink-0 rounded-none px-5 py-2.5"
       disabled={pending}
       size="sm"
       type="submit"
@@ -50,6 +50,9 @@ function SubscribeNewsletterButton() {
       ) : (
         "Subscribe"
       )}
+      <span aria-live="polite" className="sr-only" role="status">
+        {pending ? "Subscribing…" : ""}
+      </span>
     </Button>
   );
 }
@@ -145,13 +148,13 @@ export function SubscribeNewsletter({
             <div className="flex w-full flex-col items-start gap-3">
               <form
                 action={action}
-                className="flex w-full items-center gap-1.5 bg-muted py-1 pr-1.5 pl-4 has-[input:focus-visible]:[outline:1px_solid_var(--foreground)] has-[input:focus-visible]:outline-offset-2"
+                className="flex w-full items-center gap-1.5 bg-muted py-1.5 pr-1.5 pl-4 has-[input:focus-visible]:[outline:2px_solid_var(--foreground)] has-[input:focus-visible]:outline-offset-2"
                 method={method ?? "post"}
                 onSubmit={onSubmit}
               >
                 <input
                   aria-label="Email address"
-                  className="w-full min-w-0 flex-1 bg-transparent py-1 text-base text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="w-full min-w-0 flex-1 bg-transparent py-1.5 text-base text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
                   name="email"
                   placeholder="Enter your email address"
                   required
@@ -161,7 +164,7 @@ export function SubscribeNewsletter({
               </form>
               {helperText && (
                 <RichText
-                  className="text-muted-foreground text-sm leading-5 [&_a]:rounded-full [&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-solid"
+                  className="text-muted-foreground text-sm leading-5 [&_a]:rounded-none [&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-solid"
                   richText={helperText}
                 />
               )}
