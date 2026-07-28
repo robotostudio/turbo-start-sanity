@@ -12,7 +12,7 @@ const showcaseItem = defineArrayMember({
       type: "string",
       title: "Site Name",
       description:
-        "The name of the site, shown as the label beneath its screenshot (for example: 'Volvo Chile').",
+        "The name of the site, shown as the label beneath its screenshot (for example: 'Acme Store').",
       validation: (Rule) => Rule.required().error("A site name is required"),
     }),
     defineField({
@@ -77,7 +77,7 @@ export const showcaseGridSchema = defineType({
       title: "Title",
       type: "string",
       description:
-        "The large heading at the top of the section (for example: 'Real sites. Real traffic. Same starting point as yours.').",
+        "The large heading at the top of the section (for example: 'Sites built with this starter').",
     }),
     defineField({
       name: "description",

@@ -49,14 +49,14 @@ export const subscribeNewsletterSchema = defineType({
           title: "Author Name",
           type: "string",
           description:
-            'The full name of the person giving the testimonial, for example "Eric Yang"',
+            'The full name of the person giving the testimonial, for example "Jane Doe"',
         }),
         defineField({
           name: "authorRole",
           title: "Author Role",
           type: "string",
           description:
-            'The job title and company of the person, for example "CEO at Topaz Labs"',
+            'The job title and company of the person, for example "CEO at Acme Inc"',
         }),
         imageWithAltField({
           name: "authorImage",

@@ -42,7 +42,7 @@ export const ctaSchema = defineType({
           title: "Title",
           type: "string",
           description:
-            'Short label displayed above the logo grid, for example "Used by teams on Turbo Start Sanity"',
+            'Short label displayed above the logo grid, for example "Trusted by teams at leading companies"',
         }),
         defineField({
           name: "logos",
