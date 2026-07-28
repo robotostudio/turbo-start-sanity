@@ -88,9 +88,7 @@ export function CopyLinkIcon({ className }: Readonly<IconProps>) {
   );
 }
 
-// ---------------------------------------------------------------------------
 // Brand marks — full-color social logos used by the footer social links.
-// ---------------------------------------------------------------------------
 
 export function LinkedinBrandIcon({ className }: Readonly<IconProps>) {
   return (
