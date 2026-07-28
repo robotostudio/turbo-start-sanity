@@ -23,6 +23,7 @@ import { Navbar, NavbarSkeleton } from "@/components/navbar";
 import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
 import { ScrollToTop } from "@/components/scroll-to-top";
+import { StickyFooter } from "@/components/sticky-footer";
 import { getGithubStars } from "@/lib/github-stars";
 import { getNavigationData } from "@/lib/navigation";
 
@@ -58,8 +59,13 @@ export default async function RootLayout({
           ) : (
             <CachedNavbar perspective="published" stega={false} />
           )}
-          {children}
-          <div className="relative z-10">
+          <div
+            className="relative z-10 bg-background"
+            style={{ marginBottom: "var(--footer-height)" }}
+          >
+            {children}
+          </div>
+          <StickyFooter>
             {isDraftMode || previewForceDrafts ? (
               <Suspense fallback={<FooterSkeleton />}>
                 <DynamicFooter />
@@ -67,7 +73,7 @@ export default async function RootLayout({
             ) : (
               <CachedFooter perspective="published" stega={false} />
             )}
-          </div>
+          </StickyFooter>
           <SanityLive action={revalidateSyncTags} includeDrafts={isDraftMode} />
           <Suspense fallback={null}>
             <CombinedJsonLd includeOrganization includeWebsite />

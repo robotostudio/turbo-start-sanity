@@ -49,7 +49,7 @@
   /* Dot ink strength — bg-grid-dots mixes currentColor at this alpha. */
   --dot-alpha: 80%;
 
-  /* Top overscroll gutter surface; a theme can lift it off the background. */
+  /* Overscroll gutter surface, shown on the top rubber-band by the navbar. */
   --overscroll-top: var(--background);
 
   /* Height the leading hero's copy occupies. The pinned banner is sized to the
@@ -299,17 +299,10 @@
   body {
     @apply bg-background text-foreground;
   }
-  /* Overscroll gutters match the page instead of flashing white. Fixed to the
-     viewport so each end shows the right colour at any scroll position. */
+  /* Colour the overscroll gutters — mainly the top rubber-band by the navbar.
+     The sticky footer owns the bottom, so there's no accent split here. */
   html {
-    background: linear-gradient(
-      to bottom,
-      var(--overscroll-top) 0 50%,
-      var(--accent-green) 50% 100%
-    );
-    background-attachment: fixed;
-    /* Only the vertical rubber-band should reveal the page/footer colors;
-       kill the horizontal bounce so it never flashes the accent green. */
+    background: var(--overscroll-top);
     overscroll-behavior-x: none;
   }
   ::selection {
@@ -336,29 +329,6 @@
   /* Nearest-neighbor upscale so LQIP placeholders load in pixelated, not blurred. */
   img[data-lqip] {
     image-rendering: pixelated;
-  }
-}
-
-/* Scroll-timeline version of the gutter colours above; falls back to the fixed
-   gradient in @layer base. Unlayered so it wins the cascade. */
-@keyframes page-bg-scroll {
-  from {
-    background-color: var(--overscroll-top);
-  }
-  to {
-    background-color: var(--accent-green);
-  }
-}
-
-@supports (animation-timeline: scroll()) {
-  @media (prefers-reduced-motion: no-preference) {
-    html {
-      /* Replace the fixed split-gradient with a single solid color that the
-         keyframes animate across the scroll range. */
-      background: var(--background);
-      animation: page-bg-scroll linear both;
-      animation-timeline: scroll(root block);
-    }
   }
 }
 
