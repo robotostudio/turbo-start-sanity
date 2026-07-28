@@ -82,9 +82,9 @@ export async function generateMetadata({
 
 export default async function BlogSlugPage({
   params,
-}: {
+}: Readonly<{
   params: Promise<BlogParams>;
-}) {
+}>) {
   const { isEnabled: isDraftMode } = await draftMode();
   if (isDraftMode) {
     return (
