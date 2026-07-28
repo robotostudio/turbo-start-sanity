@@ -236,14 +236,14 @@ function BlogCardSkeleton() {
         <div className="h-5 w-16 bg-muted" />
       </div>
       <div className="flex flex-col gap-3">
-        <div className="grid gap-2">
+        <div className="grid gap-1.5">
           <div className="h-[26px] w-full bg-muted" />
           <div className="h-[26px] w-2/3 bg-muted" />
         </div>
         <div className="grid gap-2">
-          <div className="h-5 w-full bg-muted" />
-          <div className="h-5 w-full bg-muted" />
-          <div className="h-5 w-4/5 bg-muted" />
+          <div className="h-6 w-full bg-muted" />
+          <div className="h-6 w-full bg-muted" />
+          <div className="h-6 w-4/5 bg-muted" />
         </div>
       </div>
       <div className="mt-auto flex items-center gap-2">
@@ -276,13 +276,13 @@ function BlogIndexFallback() {
                   <div className="h-5 w-24 bg-muted" />
                   <div className="h-5 w-16 bg-muted" />
                 </div>
-                <div className="grid gap-2">
-                  <div className="h-7 w-full bg-muted sm:h-9" />
-                  <div className="h-7 w-3/4 bg-muted sm:h-9" />
+                <div className="grid gap-1.5">
+                  <div className="h-8 w-full bg-muted sm:h-9" />
+                  <div className="h-8 w-3/4 bg-muted sm:h-9" />
                 </div>
                 <div className="grid gap-2">
-                  <div className="h-5 w-full bg-muted" />
-                  <div className="h-5 w-5/6 bg-muted" />
+                  <div className="h-6 w-full bg-muted" />
+                  <div className="h-6 w-5/6 bg-muted" />
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="size-6 rounded-full bg-muted" />

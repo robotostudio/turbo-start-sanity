@@ -225,13 +225,31 @@ function BlogPageContent({
   );
 }
 
-function ParagraphSkeleton() {
+function TextBlockSkeleton({
+  lines,
+  lastWidth = "w-3/5",
+}: Readonly<{ lines: number; lastWidth?: string }>) {
   return (
-    <div className="grid gap-2">
-      <div className="h-5 w-full bg-muted" />
-      <div className="h-5 w-full bg-muted" />
-      <div className="h-5 w-full bg-muted" />
-      <div className="h-5 w-3/5 bg-muted" />
+    <div className="grid gap-2.5">
+      {Array.from({ length: lines }).map((_, index) => (
+        <div
+          className={`h-5 bg-muted ${index === lines - 1 ? lastWidth : "w-full"}`}
+          // biome-ignore lint/suspicious/noArrayIndexKey: fixed-length static skeleton
+          key={index}
+        />
+      ))}
+    </div>
+  );
+}
+
+function QuoteSkeleton() {
+  return (
+    <div className="bg-grid-dots p-4">
+      <div className="grid gap-2.5 bg-background p-8">
+        <div className="h-5 w-full bg-muted" />
+        <div className="h-5 w-11/12 bg-muted" />
+        <div className="h-5 w-2/3 bg-muted" />
+      </div>
     </div>
   );
 }
@@ -251,13 +269,10 @@ function BlogFallback() {
       <BreadcrumbsSkeleton />
       <div className="container flex animate-pulse flex-col gap-16 pt-12 pb-24 md:gap-24 md:pt-16">
         <div className="flex flex-col gap-6">
-          <div className="grid gap-2">
-            <div className="h-8 w-full bg-muted sm:h-10 lg:h-[58px]" />
-            <div className="h-8 w-2/3 bg-muted sm:h-10 lg:h-[58px]" />
-          </div>
+          <div className="h-10 w-4/5 bg-muted sm:h-12 lg:h-16" />
 
           <div className="flex flex-col gap-4">
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-1.5">
               <div className="h-5 w-56 bg-muted" />
               <div className="h-5 w-64 bg-muted" />
             </div>
@@ -271,9 +286,11 @@ function BlogFallback() {
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-32">
           <div className="grid min-w-0 gap-8">
-            <ParagraphSkeleton />
-            <ParagraphSkeleton />
-            <ParagraphSkeleton />
+            <TextBlockSkeleton lastWidth="w-4/5" lines={3} />
+            <div className="h-7 w-2/5 bg-muted" />
+            <TextBlockSkeleton lastWidth="w-1/2" lines={4} />
+            <QuoteSkeleton />
+            <TextBlockSkeleton lastWidth="w-3/5" lines={3} />
           </div>
 
           <div className="hidden lg:block">
