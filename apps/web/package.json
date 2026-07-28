@@ -11,6 +11,7 @@
     "format": "biome format --write .",
     "format:check": "biome format .",
     "check-types": "tsc --noEmit",
+    "test": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },
@@ -49,6 +50,7 @@
     "@types/react-dom": "catalog:",
     "@workspace/typescript-config": "workspace:*",
     "baseline-browser-mapping": "^2.10.8",
-    "dotenv": "^17.3.1"
+    "dotenv": "^17.3.1",
+    "vitest": "catalog:"
   }
 }

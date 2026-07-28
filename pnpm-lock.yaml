@@ -283,6 +283,9 @@ importers:
       dotenv:
         specifier: ^17.3.1
         version: 17.3.1
+      vitest:
+        specifier: 'catalog:'
+        version: 3.2.6(@types/node@25.5.0)(jiti@2.7.0)(jsdom@29.1.1(@noble/hashes@2.0.1))(lightningcss@1.32.0)(terser@5.37.0)(tsx@4.23.0)(yaml@2.9.0)
 
   packages/env:
     dependencies:
