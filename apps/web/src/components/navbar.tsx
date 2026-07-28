@@ -96,7 +96,6 @@ export function Navbar({
   const { columns, buttons, gitHubUrl } = navbarData || {};
   const { siteTitle, logos } = settingsData || {};
 
-  // Show skeleton only on initial mount when no fallback data is available
   if (isLoading && !data && !(initialNavbarData && initialSettingsData)) {
     return <NavbarSkeleton />;
   }
