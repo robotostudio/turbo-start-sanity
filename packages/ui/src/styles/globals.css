@@ -179,6 +179,12 @@
   @apply text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] md:text-5xl;
 }
 
+/* Vertical rhythm for top-anchored page-builder sections; keeps the pt scale
+   and the 136px magic number in one place. */
+@utility block-section {
+  @apply bg-background pt-20 pb-0 sm:pt-28 lg:pt-[136px];
+}
+
 /* Preflight resets buttons to cursor:default — restore the pointer. */
 @layer base {
   button:not(:disabled),

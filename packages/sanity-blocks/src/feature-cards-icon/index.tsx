@@ -1,4 +1,4 @@
-import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
+import { BlockHeader } from "@workspace/sanity-blocks/internal/block-header";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import { SanityIcon } from "@workspace/sanity-blocks/internal/sanity-icon";
@@ -56,21 +56,14 @@ export function FeatureCardsWithIcon({
   cards,
 }: Readonly<FeatureCardsIconProps>) {
   return (
-    <section
-      className="bg-background pt-20 pb-0 sm:pt-28 lg:pt-[136px]"
-      id="features"
-    >
+    <section className="block-section" id="features">
       <div className="mx-auto w-full max-w-6xl px-2">
-        <div className="flex flex-col items-start gap-6">
-          <BlockEyebrow eyebrow={eyebrow} />
-          <div className="flex flex-col items-start gap-5">
-            {title ? <h2 className="max-w-2xl block-title">{title}</h2> : null}
-            <RichText
-              className="body-text max-w-xl text-muted-foreground"
-              richText={richText}
-            />
-          </div>
-        </div>
+        <BlockHeader eyebrow={eyebrow} title={title}>
+          <RichText
+            className="body-text max-w-xl text-muted-foreground"
+            richText={richText}
+          />
+        </BlockHeader>
       </div>
       <div className="mt-12 bg-grid-dots p-[42px] text-zinc-800 md:mt-16 dark:text-zinc-50 [background-size:7px_7px]">
         <div className="grid bg-background lg:grid-cols-3">

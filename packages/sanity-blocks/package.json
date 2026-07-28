@@ -50,6 +50,7 @@
     "./*.schema": "./src/*.schema.ts",
     "./*.groq": "./src/*.groq.ts",
     "./internal/block-eyebrow": "./src/internal/block-eyebrow.tsx",
+    "./internal/block-header": "./src/internal/block-header.tsx",
     "./internal/logo-height": "./src/internal/logo-height.ts",
     "./internal/lucide-icon-preview": "./src/internal/lucide-icon-preview.tsx",
     "./internal/page-builder-to-markdown": "./src/internal/page-builder-to-markdown.ts",

@@ -1,4 +1,4 @@
-import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
+import { BlockHeader } from "@workspace/sanity-blocks/internal/block-header";
 import {
   SanityImage,
   type SanityImageData,
@@ -155,22 +155,15 @@ export function SocialGrid({
   }
 
   return (
-    <section
-      className="bg-background pt-20 pb-0 sm:pt-28 lg:pt-[136px]"
-      id="socials"
-    >
+    <section className="block-section" id="socials">
       <div className="mx-auto w-full max-w-6xl px-2">
-        <div className="flex flex-col items-start gap-6">
-          <BlockEyebrow eyebrow={eyebrow} />
-          <div className="flex flex-col items-start gap-5">
-            {title ? <h2 className="max-w-2xl block-title">{title}</h2> : null}
-            {subtitle ? (
-              <p className="body-text max-w-xl text-muted-foreground">
-                {subtitle}
-              </p>
-            ) : null}
-          </div>
-        </div>
+        <BlockHeader eyebrow={eyebrow} title={title}>
+          {subtitle ? (
+            <p className="body-text max-w-xl text-muted-foreground">
+              {subtitle}
+            </p>
+          ) : null}
+        </BlockHeader>
       </div>
       <div className="mt-12 grid grid-cols-1 bg-grid-dots bg-background bg-size-[5.7px_6px] text-zinc-800 sm:grid-cols-2 md:mt-16 lg:grid-cols-4 dark:text-zinc-50">
         {socials.map((social) => (

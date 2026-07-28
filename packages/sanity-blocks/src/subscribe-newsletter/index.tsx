@@ -120,10 +120,7 @@ export function SubscribeNewsletter({
   );
 
   return (
-    <section
-      className="bg-background pt-20 pb-0 sm:pt-28 lg:pt-[136px]"
-      id="subscribe"
-    >
+    <section className="block-section" id="subscribe">
       <div className="container">
         <div
           className={cn(
