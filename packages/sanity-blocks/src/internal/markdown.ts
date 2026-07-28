@@ -77,6 +77,15 @@ export interface MarkdownTestimonial {
   authorRole?: string | null;
 }
 
+export interface MarkdownVideoVariant {
+  poster?: MarkdownImage | null;
+}
+
+export interface MarkdownVideo {
+  light?: MarkdownVideoVariant | null;
+  dark?: MarkdownVideoVariant | null;
+}
+
 export interface MarkdownBlock {
   _type?: string;
   _key?: string;
@@ -95,7 +104,7 @@ export interface MarkdownBlock {
   link?: MarkdownLink | null;
   logos?: MarkdownLogo[] | null;
   socials?: MarkdownSocial[] | null;
-  image?: MarkdownImage | null;
+  video?: MarkdownVideo | null;
   testimonial?: MarkdownTestimonial | null;
 }
 

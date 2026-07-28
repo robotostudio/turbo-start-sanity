@@ -30,24 +30,43 @@ test("heroToMarkdown escapes markdown chars in title", () => {
   expect(result).toBe("## \\[New\\] Release");
 });
 
-test("heroToMarkdown renders image markup when resolver is provided", () => {
+test("heroToMarkdown renders the video poster markup when resolver is provided", () => {
   const result = heroToMarkdown(
-    { title: "H", image: { id: "img1", alt: "Hero image" } },
+    {
+      title: "H",
+      video: { light: { poster: { id: "img1", alt: "Hero image" } } },
+    },
     { resolveImageUrl: (img) => `https://cdn.example.com/${img.id}.webp` }
   );
   expect(result).toContain("![Hero image](https://cdn.example.com/img1.webp)");
 });
 
+test("heroToMarkdown falls back to the dark poster when light is absent", () => {
+  const result = heroToMarkdown(
+    {
+      title: "H",
+      video: { dark: { poster: { id: "dark1", alt: "Dark poster" } } },
+    },
+    { resolveImageUrl: (img) => `https://cdn.example.com/${img.id}.webp` }
+  );
+  expect(result).toContain(
+    "![Dark poster](https://cdn.example.com/dark1.webp)"
+  );
+});
+
 test("heroToMarkdown falls back to alt text when no resolver is provided", () => {
   const result = heroToMarkdown(
-    { title: "H", image: { id: "img1", alt: "Fallback text" } },
+    {
+      title: "H",
+      video: { light: { poster: { id: "img1", alt: "Fallback text" } } },
+    },
     {}
   );
   expect(result).toContain("Fallback text");
   expect(result).not.toContain("![");
 });
 
-test("heroToMarkdown omits image section entirely when image is absent", () => {
+test("heroToMarkdown omits the image section entirely when there is no poster", () => {
   const result = heroToMarkdown({ title: "No image" }, {});
   expect(result).toBe("## No image");
   expect(result).not.toContain("![");
