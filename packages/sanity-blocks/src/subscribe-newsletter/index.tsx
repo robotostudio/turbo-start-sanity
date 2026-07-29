@@ -151,7 +151,7 @@ export function SubscribeNewsletter({
               >
                 <input
                   aria-label="Email address"
-                  className="w-full min-w-0 flex-1 bg-transparent py-1.5 text-base text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+                  className="w-full min-w-0 flex-1 bg-transparent py-1.5 text-base text-foreground outline-none [--autofill-bg:var(--muted)] placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
                   name="email"
                   placeholder="Enter your email address"
                   required
