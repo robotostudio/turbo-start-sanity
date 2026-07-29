@@ -1,4 +1,4 @@
-import { GithubIcon } from "@/components/icons";
+import { GithubIcon } from "@workspace/sanity-blocks/internal/icons";
 
 function formatStars(stars: number): string {
   if (stars < 1000) {

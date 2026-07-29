@@ -56,7 +56,12 @@ export function CodeBlock({
             <span key={index + 1}>{index + 1}</span>
           ))}
         </div>
-        <pre className="rich-code-pre overflow-x-auto font-mono">
+        {/* biome-ignore lint/a11y/useSemanticElements: region is the correct role for a labelled scrollable code block */}
+        <pre
+          aria-label={language ? `${language} code` : "Code"}
+          className="rich-code-pre overflow-x-auto font-mono"
+          role="region"
+        >
           <code>{code}</code>
         </pre>
       </div>

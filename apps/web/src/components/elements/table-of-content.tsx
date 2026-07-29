@@ -1,16 +1,23 @@
 "use client";
-import { cn } from "@workspace/tailwind-config/utils";
-import { Check } from "lucide-react";
-import { type FC, type MouseEvent, useEffect, useRef, useState } from "react";
-import slugify from "slugify";
-
 import {
-  CopyLinkIcon,
+  CopyIcon,
   InstagramIcon,
   LinkedInIcon,
   RedditIcon,
   XIcon,
-} from "@/components/icons";
+} from "@workspace/sanity-blocks/internal/icons";
+import { useCopyToClipboard } from "@workspace/sanity-blocks/internal/use-copy";
+import { cn } from "@workspace/tailwind-config/utils";
+import { Check } from "lucide-react";
+import {
+  type FC,
+  type MouseEvent,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+import slugify from "slugify";
+
 import type { SanityRichTextBlock, SanityRichTextProps } from "@/types";
 
 type TableOfContentProps = {
@@ -523,38 +530,17 @@ const SHARE_TARGETS: readonly ShareTarget[] = [
 
 function ShareOptions({ title }: Readonly<{ title?: string }>) {
   const [url, setUrl] = useState("");
-  const [copied, setCopied] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setUrl(window.location.href);
   }, []);
 
-  useEffect(
-    () => () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    },
-    []
-  );
+  const getShareUrl = useCallback(() => url || window.location.href, [url]);
+  const { status: copyStatus, copy } = useCopyToClipboard(getShareUrl);
+  const copied = copyStatus === "copied";
 
   const encodedUrl = encodeURIComponent(url);
   const encodedTitle = encodeURIComponent(title ?? "");
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(url || window.location.href);
-      setCopied(true);
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      timeoutRef.current = setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Clipboard access can be denied; reset so the UI reflects the failure.
-      setCopied(false);
-    }
-  };
 
   const handleWebShare = async (fallbackUrl: string) => {
     const shareUrl = url || window.location.href;
@@ -573,7 +559,7 @@ function ShareOptions({ title }: Readonly<{ title?: string }>) {
     <div className="flex items-center justify-between border-t border-zinc-900 px-1 pt-4 dark:border-zinc-50">
       {SHARE_TARGETS.map((target) => {
         const shareClass =
-          "focus-ring flex flex-col items-center justify-center gap-1 rounded-sm text-muted-foreground transition-colors hover:text-foreground";
+          "focus-ring-inset flex flex-col items-center justify-center gap-1 rounded-none px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground";
         if (target.webShare) {
           return (
             <button
@@ -605,15 +591,17 @@ function ShareOptions({ title }: Readonly<{ title?: string }>) {
         );
       })}
       <button
-        className="focus-ring flex flex-col items-center justify-center gap-1 rounded-sm text-muted-foreground transition-colors hover:text-foreground"
-        onClick={handleCopy}
+        className="focus-ring-inset flex flex-col items-center justify-center gap-1 rounded-none px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground"
+        onClick={copy}
         type="button"
       >
-        {copied ? (
-          <Check aria-hidden="true" className="size-4.5" />
-        ) : (
-          <CopyLinkIcon className="size-4.5" />
-        )}
+        <span className="grid size-4.5 place-items-center">
+          {copied ? (
+            <Check aria-hidden="true" className="size-4.5" />
+          ) : (
+            <CopyIcon className="size-4.5" />
+          )}
+        </span>
         {/* Stack both labels in one grid cell so the button always reserves the
             wider "Copied" width — the hidden label holds the space, so toggling
             copied↔not never shifts the justify-between row. */}

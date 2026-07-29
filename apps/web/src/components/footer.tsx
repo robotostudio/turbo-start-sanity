@@ -24,7 +24,7 @@ import {
   RedditBrandIcon,
   XBrandIcon,
   YoutubeIcon,
-} from "@/components/icons";
+} from "@workspace/sanity-blocks/internal/icons";
 import { FooterThemeToggle } from "./footer-theme-toggle";
 import { Logo } from "./logo";
 

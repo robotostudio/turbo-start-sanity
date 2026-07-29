@@ -51,6 +51,8 @@
     "./*.groq": "./src/*.groq.ts",
     "./internal/block-eyebrow": "./src/internal/block-eyebrow.tsx",
     "./internal/block-header": "./src/internal/block-header.tsx",
+    "./internal/blog-categories": "./src/internal/blog-categories.ts",
+    "./internal/icons": "./src/internal/icons.tsx",
     "./internal/logo-height": "./src/internal/logo-height.ts",
     "./internal/lucide-icon-preview": "./src/internal/lucide-icon-preview.tsx",
     "./internal/page-builder-to-markdown": "./src/internal/page-builder-to-markdown.ts",
@@ -61,6 +63,7 @@
     "./internal/sanity-image": "./src/internal/sanity-image.tsx",
     "./internal/sanity-icon": "./src/internal/sanity-icon.tsx",
     "./internal/sanity-rich-text": "./src/internal/sanity-rich-text.ts",
-    "./internal/schema-fields": "./src/internal/schema-fields.ts"
+    "./internal/schema-fields": "./src/internal/schema-fields.ts",
+    "./internal/use-copy": "./src/internal/use-copy.ts"
   }
 }
