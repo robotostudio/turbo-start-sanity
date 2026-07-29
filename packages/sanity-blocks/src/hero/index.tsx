@@ -136,7 +136,7 @@ export function HeroBlock({
         id="hero"
       >
         <div className="relative min-h-0 flex-1 overflow-hidden">{banner}</div>
-        <div className="relative z-10 bg-background pt-10 pb-8 md:pt-12 md:pb-12">
+        <div className="relative z-10 bg-background pt-6 pb-8 md:pt-8 md:pb-12">
           {copy}
         </div>
       </section>
@@ -151,7 +151,7 @@ export function HeroBlock({
       >
         {banner}
       </div>
-      <div className="relative z-10 bg-background pt-10 pb-8 md:pt-12 md:pb-12">
+      <div className="relative z-10 bg-background pt-6 pb-8 md:pt-8 md:pb-12">
         {copy}
       </div>
     </>
