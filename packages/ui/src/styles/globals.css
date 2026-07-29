@@ -52,10 +52,16 @@
   /* Overscroll gutter surface, shown on the top rubber-band by the navbar. */
   --overscroll-top: var(--background);
 
-  /* Height the leading hero's copy occupies. The pinned banner is sized to the
-     viewport minus this, so the copy lands exactly on the fold. Retune if the
-     hero copy grows past two title lines. */
-  --hero-copy: 300px;
+  /* Space the leading hero's copy takes. The pinned banner is `100svh` minus
+     this, so the copy sits on the fold. Mobile reserves more (taller wrapped
+     title + full-width button); retune if the title grows past two lines. */
+  --hero-copy: 420px;
+}
+
+@media (width >= 40rem) {
+  :root {
+    --hero-copy: 340px;
+  }
 }
 
 @media (width >= 64rem) {
@@ -154,14 +160,13 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Overrides Tailwind's own `container`. Inset defaults to 8px; a fallback, not
- * a declaration, so [--container-px:…] can override it per instance. */
+/* Overrides Tailwind's `container`. Inset defaults to 8px via a fallback var,
+ * so [--container-px:…] can override it per instance. */
 @utility container {
   @apply mx-auto w-full max-w-[90rem] px-[var(--container-px,0.5rem)];
 }
 
-/* Cancels the container's padding, whatever it is — hardcoding it caused
- * mobile horizontal scroll. */
+/* Cancels the container's padding (hardcoding it caused mobile scroll). */
 @utility bleed-x {
   margin-inline: calc(var(--container-px, 0.5rem) * -1);
 }
@@ -179,8 +184,7 @@
   @apply text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] md:text-5xl;
 }
 
-/* Vertical rhythm for top-anchored page-builder sections; keeps the pt scale
-   and the 136px magic number in one place. */
+/* Top padding scale for top-anchored page-builder sections, in one place. */
 @utility block-section {
   @apply bg-background pt-20 pb-0 sm:pt-28 lg:pt-[136px];
 }
@@ -199,23 +203,14 @@
   }
 }
 
-/* Canonical dot lattice — the SINGLE dotted-surface utility for the whole app.
+/* The app's single dotted-surface utility: a 5.2px tile with a 1.2px dot,
+ * tinted by currentColor at `--dot-alpha`.
  *
- * SPEC: a 5.2px tile whose dot is a
- * `circle at center` of 1.2px diameter (0.6px radius) with a 0.4px feather to
- * `transparent` at 1px. currentColor keeps the dots tinting per context
- * (light/dark, or inverting on the green highlighted feature card);
- * `--dot-alpha` sets ink strength.
+ * `background-repeat: round` fits a whole number of dots per box on both axes,
+ * so edges land between dots (no half-cut dots) and grid seams stay aligned.
  *
- * FIXED 5.2px PITCH: the dot grid is always a 5.2px lattice.
- * `background-repeat: round` scales each tile so
- * a WHOLE number of dots fits the box on both axes, so the box edges always
- * land in the gaps between dots (no half-cut dots) and equal-width grid cells
- * stay phase-aligned at their seams.
- *
- * CONTROL LAYERS VIA PADDING: because the pitch is fixed, the number of dot
- * "layers" (rows) that frame a component's content = its padding ÷ 5.2px.
- * Control density purely through padding — do NOT resize the tile. */
+ * The pitch is fixed at 5.2px, so a component's dot rows = padding ÷ 5.2px.
+ * Change density via padding — do NOT resize the tile. */
 @utility bg-grid-dots {
   background-image: radial-gradient(
     circle at center,
@@ -235,10 +230,8 @@
   }
 }
 
-/* Shared link affordance: an underline that wipes in from the left on hover /
-   focus. currentColor so it adapts to any surface (foreground on the navbar,
-   accent-green-foreground on the green footer). Add `link-underline` to a link
-   and it also fires while a Base-UI popup trigger is open. */
+/* Underline that wipes in from the left on hover/focus (and while a Base-UI
+   popup trigger is open). currentColor adapts it to any surface. */
 @layer utilities {
   .link-underline {
     position: relative;
@@ -247,9 +240,7 @@
     content: "";
     position: absolute;
     inset-inline: 0;
-    /* Baseline for unpadded links (e.g. footer, leading-6): a small gap under
-       the descenders. Padded links (navbar py-2) pin it higher with
-       `after:bottom-*`. */
+    /* Baseline for unpadded links; padded links override with `after:bottom-*`. */
     bottom: 0.125rem;
     height: 1px;
     background-color: currentColor;
@@ -280,9 +271,8 @@
     outline-offset: 2px;
   }
 
-  /* Inset variant: the outline is drawn INSIDE the element (negative offset) so
-     it can't be clipped by an overflow-hidden ancestor or painted over by a
-     flush-packed sibling. Use on tightly-packed cards / edge-hugging links. */
+  /* Inset variant: outline drawn inside the element so an overflow-hidden
+     ancestor or packed sibling can't clip it. For tight cards / edge links. */
   .focus-ring-inset {
     outline: none;
   }
@@ -328,9 +318,8 @@
     outline-offset: 2px;
   }
 
-  /* Base image defaults live inside @layer base so utility classes
-     (w-40, dark:hidden, object-contain, …) can still override them. An
-     unlayered rule here would beat every Tailwind utility in v4's cascade. */
+  /* In @layer base so Tailwind utilities (w-40, object-contain, …) still win;
+     an unlayered rule would beat every utility in v4's cascade. */
   img {
     display: block;
     max-width: 100%;
@@ -347,12 +336,10 @@
 
 /* FAQ disclosure: smooth open/close, instant fallback where unsupported. */
 @media (prefers-reduced-motion: no-preference) {
-  /* PRIMARY (Chromium 129+, and any engine shipping interpolate-size):
-     animate the real `height` from 0 → auto. Interpolating `height` runs a much
-     cheaper per-frame path than the grid `grid-template-rows: 0fr→1fr` trick,
-     whose grid-sizing algorithm re-solves every frame and visibly stutters on
-     tall panels. `interpolate-size` inherits, so setting it on the <details>
-     unlocks keyword (auto) interpolation for ::details-content. */
+  /* PRIMARY (Chromium 129+ / engines with interpolate-size): animate real
+     `height` 0 → auto. Cheaper per-frame than the grid-rows trick, which
+     re-solves grid sizing every frame and stutters on tall panels.
+     interpolate-size inherits from <details> onto ::details-content. */
   @supports (interpolate-size: allow-keywords) {
     .faq-disclosure {
       interpolate-size: allow-keywords;
@@ -375,9 +362,9 @@
   }
 
   /* FALLBACK (Firefox/Safari, older Chromium): the grid 0fr→1fr trick, which
-     interpolates without `interpolate-size`. The inner content clips via
-     min-h-0 + overflow-hidden (set on the component). content-visibility with
-     allow-discrete keeps the panel rendered while it collapses on close. */
+     animates without interpolate-size. Content clips via min-h-0 +
+     overflow-hidden on the component; content-visibility allow-discrete keeps
+     the panel rendered while it collapses on close. */
   @supports not (interpolate-size: allow-keywords) {
     .faq-disclosure::details-content {
       display: grid;
@@ -402,8 +389,7 @@
 .rich-code-pre {
   margin: 0;
   padding: 1rem 1.25rem;
-  /* max-content + min-width keeps the background spanning the full scroll
-     width when long lines overflow the container. */
+  /* max-content + min-width keeps the background full-width when lines overflow. */
   width: max-content;
   min-width: 100%;
   white-space: pre;
