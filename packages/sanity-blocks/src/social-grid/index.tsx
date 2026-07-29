@@ -156,7 +156,7 @@ export function SocialGrid({
 
   return (
     <section className="block-section" id="socials">
-      <div className="mx-auto w-full max-w-6xl px-2">
+      <div className="mx-auto w-full max-w-6xl px-[var(--container-px,0.5rem)]">
         <BlockHeader eyebrow={eyebrow} title={title}>
           {subtitle ? (
             <p className="body-text max-w-xl text-muted-foreground">

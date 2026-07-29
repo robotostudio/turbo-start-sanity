@@ -56,6 +56,10 @@
      this, so the copy sits on the fold. Mobile reserves more (taller wrapped
      title + full-width button); retune if the title grows past two lines. */
   --hero-copy: 420px;
+
+  /* Inline gutter shared by the navbar's `container` and page content, so they
+     line up. Roomier on mobile; tightened on large screens below. */
+  --container-px: 1.25rem;
 }
 
 @media (width >= 40rem) {
@@ -66,6 +70,7 @@
 
 @media (width >= 64rem) {
   :root {
+    --container-px: 0.5rem;
     --hero-copy: 285px;
   }
 }
@@ -328,6 +333,27 @@
     object-fit: cover;
   }
 
+  /* Media isn't text — keep it out of selections and iOS long-press callouts. */
+  img,
+  svg,
+  video {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Autofill: paint with the app palette, not the browser's yellow/blue. The
+     inset box-shadow overrides the UA background in both themes. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px var(--background) inset;
+    -webkit-text-fill-color: var(--foreground);
+    caret-color: var(--foreground);
+    transition: background-color 9999s ease-out 0s;
+  }
+
   /* Nearest-neighbor upscale so LQIP placeholders load in pixelated, not blurred. */
   img[data-lqip] {
     image-rendering: pixelated;
@@ -350,9 +376,9 @@
       overflow: hidden;
       opacity: 0;
       transition:
-        height 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-        opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-        content-visibility 0.3s allow-discrete;
+        height 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+        content-visibility 0.2s allow-discrete;
     }
 
     .faq-disclosure[open]::details-content {
@@ -372,9 +398,9 @@
       overflow: hidden;
       opacity: 0;
       transition:
-        grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-        opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-        content-visibility 0.3s allow-discrete;
+        grid-template-rows 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+        content-visibility 0.2s allow-discrete;
     }
 
     .faq-disclosure[open]::details-content {

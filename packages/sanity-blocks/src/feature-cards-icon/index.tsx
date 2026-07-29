@@ -57,7 +57,7 @@ export function FeatureCardsWithIcon({
 }: Readonly<FeatureCardsIconProps>) {
   return (
     <section className="block-section" id="features">
-      <div className="mx-auto w-full max-w-6xl px-2">
+      <div className="mx-auto w-full max-w-6xl px-[var(--container-px,0.5rem)]">
         <BlockHeader eyebrow={eyebrow} title={title}>
           <RichText
             className="body-text max-w-xl text-muted-foreground"
