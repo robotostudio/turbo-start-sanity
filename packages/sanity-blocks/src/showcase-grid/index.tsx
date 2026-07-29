@@ -224,7 +224,10 @@ function FeaturedBanner({
   );
 
   const screenshot = (
-    <div className="relative aspect-video w-full overflow-hidden bg-muted">
+    <div
+      className="relative aspect-video w-full overflow-hidden bg-muted before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-10 before:h-28 before:bg-gradient-to-b before:from-black/60 before:to-transparent before:content-['']"
+      data-nav-contrast="dark"
+    >
       <ScreenshotImage
         loading="lazy"
         name={featured.name}
@@ -321,7 +324,10 @@ function ShowcaseCard({ item }: Readonly<{ item: CardView }>) {
 
   const body = (
     <div className="flex flex-col bg-background">
-      <div className="relative aspect-video w-full overflow-hidden bg-muted">
+      <div
+        className="relative aspect-video w-full overflow-hidden bg-muted before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-10 before:h-28 before:bg-gradient-to-b before:from-black/60 before:to-transparent before:content-['']"
+        data-nav-contrast="dark"
+      >
         <ScreenshotImage
           loading="lazy"
           name={item.name}

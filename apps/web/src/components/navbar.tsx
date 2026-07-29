@@ -10,6 +10,7 @@ import {
   NavigationMenuTrigger,
 } from "@workspace/ui/components/navigation-menu";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 
 import type { ColumnLink, NavigationData } from "@/types";
 import { GithubStars } from "./github-stars";
@@ -17,7 +18,7 @@ import { Logo } from "./logo";
 import { MobileMenu } from "./mobile-menu";
 
 const TRIGGER_CLASS =
-  "h-auto rounded-full bg-transparent px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-zinc-100 focus:text-foreground focus-visible:bg-zinc-200 focus-visible:outline-none! data-popup-open:bg-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800 dark:data-popup-open:bg-zinc-800";
+  "h-auto rounded-full bg-transparent px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none data-[nav-on=dark]:not-hover:text-white data-[nav-on=light]:not-hover:text-zinc-900 hover:bg-zinc-100 focus:text-foreground focus-visible:bg-zinc-200 focus-visible:outline-none! data-popup-open:bg-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800 dark:data-popup-open:bg-zinc-800";
 
 const NAV_BUTTON_CLASS =
   "h-9 px-4 font-mono font-normal text-sm uppercase tracking-wide";
@@ -113,6 +114,83 @@ function ProgressiveBlur() {
   );
 }
 
+// Section-aware contrast: sections that read dark or bright regardless of
+// theme carry data-nav-contrast="dark|light". While one covers most of the
+// bar, its value is stamped on the header so the links can invert instantly.
+function useNavContrast(headerRef: React.RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) {
+      return;
+    }
+    let frame = 0;
+    // Cached and refreshed only when the DOM actually changes (route
+    // transitions, streamed content) — scrolling never re-queries.
+    let markedEls: Element[] = [];
+    let adaptiveEls: Element[] = [];
+    const refresh = () => {
+      markedEls = [...document.querySelectorAll("[data-nav-contrast]")];
+      adaptiveEls = [...header.querySelectorAll("[data-nav-adaptive]")];
+    };
+    const update = () => {
+      frame = 0;
+      if (markedEls.length === 0 && adaptiveEls.length === 0) {
+        return;
+      }
+      const barBottom = header.getBoundingClientRect().bottom;
+      const marked = markedEls.map((el) => ({
+        rect: el.getBoundingClientRect(),
+        value: el.getAttribute("data-nav-contrast") ?? "",
+      }));
+      for (const item of adaptiveEls) {
+        const itemRect = item.getBoundingClientRect();
+        const itemX = itemRect.left + itemRect.width / 2;
+        let value = "";
+        for (const { rect, value: markedValue } of marked) {
+          const covered =
+            Math.min(rect.bottom, barBottom) - Math.max(rect.top, 0);
+          if (
+            covered >= barBottom * 0.6 &&
+            rect.left < itemX &&
+            rect.right > itemX
+          ) {
+            value = markedValue;
+          }
+        }
+        if ((item.getAttribute("data-nav-on") ?? "") !== value) {
+          if (value) {
+            item.setAttribute("data-nav-on", value);
+          } else {
+            item.removeAttribute("data-nav-on");
+          }
+        }
+      }
+    };
+    const schedule = () => {
+      if (!frame) {
+        frame = requestAnimationFrame(update);
+      }
+    };
+    // Route changes swap page content without remounting the navbar and
+    // without a scroll event — the observer keeps colors fresh there too.
+    const observer = new MutationObserver(() => {
+      refresh();
+      schedule();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    refresh();
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [headerRef]);
+}
+
 export function Navbar({
   navbarData,
   settingsData,
@@ -120,9 +198,14 @@ export function Navbar({
 }: Readonly<NavigationData & { stars?: number | null }>) {
   const { columns, buttons, gitHubUrl } = navbarData || {};
   const { siteTitle, logos } = settingsData || {};
+  const headerRef = useRef<HTMLElement>(null);
+  useNavContrast(headerRef);
 
   return (
-    <header className="sticky top-0 z-40 w-full before:absolute before:inset-x-0 before:bottom-full before:h-screen before:bg-background before:content-['']">
+    <header
+      className="sticky top-0 z-40 w-full before:absolute before:inset-x-0 before:bottom-full before:h-screen before:bg-background before:content-['']"
+      ref={headerRef}
+    >
       <ProgressiveBlur />
       <div className="container relative">
         <div className="flex h-16 items-center justify-between">
@@ -146,7 +229,10 @@ export function Navbar({
                 if (column.type === "column") {
                   return (
                     <NavigationMenuItem key={column._key}>
-                      <NavigationMenuTrigger className={TRIGGER_CLASS}>
+                      <NavigationMenuTrigger
+                        className={TRIGGER_CLASS}
+                        data-nav-adaptive=""
+                      >
                         {column.title}
                       </NavigationMenuTrigger>
                       <NavigationMenuContent>
@@ -181,7 +267,8 @@ export function Navbar({
                   return (
                     <NavigationMenuItem key={column._key}>
                       <NavigationMenuLink
-                        className="flex h-auto items-center rounded-full px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-zinc-100 focus-visible:bg-zinc-200 focus-visible:outline-none! dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800"
+                        data-nav-adaptive=""
+                        className="flex h-auto items-center rounded-full px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none data-[nav-on=dark]:not-hover:text-white data-[nav-on=light]:not-hover:text-zinc-900 hover:bg-zinc-100 focus-visible:bg-zinc-200 focus-visible:outline-none! dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800"
                         render={<Link href={column.href} />}
                       >
                         {column.name}
