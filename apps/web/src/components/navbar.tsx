@@ -56,18 +56,61 @@ export function NavbarSkeleton() {
   );
 }
 
-// Frosted bar over content that scrolls under it: one uniform backdrop-blur
-// (masked/stacked backdrop-filters don't render on iOS Safari, so a single
-// unmasked layer is used) plus a theme scrim that keeps the nav readable and
-// stops content/footer bleeding through.
+// Masked blur bands, bottom of the bar → top. Radii double per band and the
+// soft mask edges overlap, so the bands read as one continuous macOS-style
+// variable blur: near-sharp at the bottom edge, heavy at the top.
+const BLUR_LAYERS = [
+  {
+    radius: 1,
+    mask: "linear-gradient(to top, black 0%, black 10%, transparent 24%)",
+  },
+  {
+    radius: 2,
+    mask: "linear-gradient(to top, transparent 0%, black 10%, black 24%, transparent 38%)",
+  },
+  {
+    radius: 4,
+    mask: "linear-gradient(to top, transparent 10%, black 24%, black 38%, transparent 52%)",
+  },
+  {
+    radius: 8,
+    mask: "linear-gradient(to top, transparent 24%, black 38%, black 52%, transparent 66%)",
+  },
+  {
+    radius: 16,
+    mask: "linear-gradient(to top, transparent 38%, black 52%, black 66%, transparent 80%)",
+  },
+  {
+    radius: 32,
+    mask: "linear-gradient(to top, transparent 52%, black 66%, black 100%)",
+  },
+];
+
+// Progressive blur (motion-primitives style): stacked backdrop-blur layers,
+// each masked to its own soft band. Inline styles set the -webkit- prefixed
+// properties explicitly — Tailwind's arbitrary props emit only the unprefixed
+// ones, which iOS Safari ignores. The unmasked saturate layer adds the glassy
+// color glow; the gradient scrim keeps the nav readable.
 function ProgressiveBlur() {
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 overflow-hidden"
     >
-      <div className="absolute inset-0 [-webkit-backdrop-filter:blur(28px)_saturate(1.5)] [backdrop-filter:blur(28px)_saturate(1.5)]" />
-      <div className="absolute inset-0 bg-gradient-to-b from-background/65 via-background/45 to-background/30" />
+      <div className="absolute inset-0 [-webkit-backdrop-filter:saturate(1.5)] [backdrop-filter:saturate(1.5)]" />
+      {BLUR_LAYERS.map(({ radius, mask }) => (
+        <div
+          className="absolute inset-0"
+          key={radius}
+          style={{
+            WebkitMaskImage: mask,
+            maskImage: mask,
+            WebkitBackdropFilter: `blur(${radius}px)`,
+            backdropFilter: `blur(${radius}px)`,
+          }}
+        />
+      ))}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/65 via-background/45 to-background/25" />
     </div>
   );
 }
