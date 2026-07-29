@@ -56,48 +56,50 @@ export function NavbarSkeleton() {
   );
 }
 
-// Masked blur bands, bottom of the bar → top. Radii double per band and the
-// soft mask edges overlap, so the bands read as one continuous macOS-style
-// variable blur: near-sharp at the bottom edge, heavy at the top.
+// Blur bands, heaviest at the top. Overlapping soft masks fade each band to
+// nothing, so the blur dissolves into the page with no hard edge.
 const BLUR_LAYERS = [
   {
-    radius: 1,
-    mask: "linear-gradient(to top, black 0%, black 10%, transparent 24%)",
-  },
-  {
-    radius: 2,
-    mask: "linear-gradient(to top, transparent 0%, black 10%, black 24%, transparent 38%)",
-  },
-  {
-    radius: 4,
-    mask: "linear-gradient(to top, transparent 10%, black 24%, black 38%, transparent 52%)",
-  },
-  {
-    radius: 8,
-    mask: "linear-gradient(to top, transparent 24%, black 38%, black 52%, transparent 66%)",
+    radius: 32,
+    mask: "linear-gradient(to bottom, black 0%, black 20%, transparent 32%)",
   },
   {
     radius: 16,
-    mask: "linear-gradient(to top, transparent 38%, black 52%, black 66%, transparent 80%)",
+    mask: "linear-gradient(to bottom, transparent 8%, black 20%, black 32%, transparent 46%)",
   },
   {
-    radius: 32,
-    mask: "linear-gradient(to top, transparent 52%, black 66%, black 100%)",
+    radius: 8,
+    mask: "linear-gradient(to bottom, transparent 20%, black 32%, black 46%, transparent 60%)",
+  },
+  {
+    radius: 4,
+    mask: "linear-gradient(to bottom, transparent 32%, black 46%, black 60%, transparent 72%)",
+  },
+  {
+    radius: 2,
+    mask: "linear-gradient(to bottom, transparent 46%, black 60%, black 72%, transparent 84%)",
+  },
+  {
+    radius: 1,
+    mask: "linear-gradient(to bottom, transparent 60%, black 72%, black 84%, transparent 96%)",
   },
 ];
 
-// Progressive blur (motion-primitives style): stacked backdrop-blur layers,
-// each masked to its own soft band. Inline styles set the -webkit- prefixed
-// properties explicitly — Tailwind's arbitrary props emit only the unprefixed
-// ones, which iOS Safari ignores. The unmasked saturate layer adds the glassy
-// color glow; the gradient scrim keeps the nav readable.
+const SATURATE_MASK =
+  "linear-gradient(to bottom, black 0%, black 50%, transparent 95%)";
+
+// Progressive blur: masked blur bands + saturate glow + fading scrim. Inline
+// styles carry the -webkit- prefixes.
 function ProgressiveBlur() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 overflow-hidden"
+      className="pointer-events-none absolute inset-x-0 top-0 h-[140%]"
     >
-      <div className="absolute inset-0 [-webkit-backdrop-filter:saturate(1.5)] [backdrop-filter:saturate(1.5)]" />
+      <div
+        className="absolute inset-0 [-webkit-backdrop-filter:saturate(1.5)] [backdrop-filter:saturate(1.5)]"
+        style={{ WebkitMaskImage: SATURATE_MASK, maskImage: SATURATE_MASK }}
+      />
       {BLUR_LAYERS.map(({ radius, mask }) => (
         <div
           className="absolute inset-0"
@@ -110,7 +112,7 @@ function ProgressiveBlur() {
           }}
         />
       ))}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/65 via-background/45 to-background/25" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/15 via-55% to-transparent" />
     </div>
   );
 }
