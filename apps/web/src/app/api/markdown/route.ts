@@ -2,7 +2,6 @@ import { Logger } from "@workspace/logger";
 import {
   type DynamicFetchOptions,
   getDynamicFetchOptions,
-  previewForceDrafts,
   sanityFetch,
 } from "@workspace/sanity/live";
 import {
@@ -116,7 +115,7 @@ async function findRedirect(
 
 async function resolveFetchOptions(): Promise<DynamicFetchOptions> {
   const { isEnabled } = await draftMode();
-  if (!(isEnabled || previewForceDrafts)) {
+  if (!isEnabled) {
     return PUBLISHED;
   }
   // Perspective follows draft mode, but stega stays off: its invisible
