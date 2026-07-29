@@ -1,21 +1,18 @@
+import { BLOG_CATEGORY_OPTIONS } from "@workspace/sanity-blocks/internal/blog-categories";
+
 export type BlogCategory = {
   label: string;
   value: string;
 };
 
-/**
- * Category filter options for the blog index sidebar. The first entry ("All")
- * uses an empty value to represent "no filter"; the remaining values must match
- * the `category` field options defined on the blog document schema.
- */
+// Sidebar filter options from the shared taxonomy (can't drift from the Studio
+// schema). "All" uses an empty value to mean "no filter".
 export const BLOG_CATEGORIES: BlogCategory[] = [
   { label: "All", value: "" },
-  { label: "Sanity", value: "sanity" },
-  { label: "Skills", value: "skills" },
-  { label: "Next.js", value: "nextjs" },
-  { label: "SEO", value: "seo" },
-  { label: "AEO", value: "aeo" },
-  { label: "Changelog", value: "changelog" },
+  ...BLOG_CATEGORY_OPTIONS.map(({ title, value }) => ({
+    label: title,
+    value,
+  })),
 ];
 
 export function getBlogCategoryLabel(value?: string | null): string | null {

@@ -2,6 +2,7 @@ import {
   orderRankField,
   orderRankOrdering,
 } from "@sanity/orderable-document-list";
+import { BLOG_CATEGORY_OPTIONS } from "@workspace/sanity-blocks/internal/blog-categories";
 import { FileTextIcon } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
@@ -99,14 +100,7 @@ export const blog = defineType({
         "The topic this post belongs to. Used to group and filter posts in the sidebar on the blog listing page.",
       group: GROUP.MAIN_CONTENT,
       options: {
-        list: [
-          { title: "Sanity", value: "sanity" },
-          { title: "Skills", value: "skills" },
-          { title: "Next.js", value: "nextjs" },
-          { title: "SEO", value: "seo" },
-          { title: "AEO", value: "aeo" },
-          { title: "Changelog", value: "changelog" },
-        ],
+        list: BLOG_CATEGORY_OPTIONS,
         layout: "dropdown",
       },
     }),
