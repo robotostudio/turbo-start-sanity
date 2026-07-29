@@ -392,7 +392,7 @@
      overflow-hidden on the component; content-visibility allow-discrete keeps
      the panel rendered while it collapses on close. */
   @supports not (interpolate-size: allow-keywords) {
-    .faq-disclosure::details-content {
+    .faq-disclosure .faq-content {
       display: grid;
       grid-template-rows: 0fr;
       overflow: hidden;
@@ -403,7 +403,7 @@
         content-visibility 0.2s allow-discrete;
     }
 
-    .faq-disclosure[open]::details-content {
+    .faq-disclosure[open] .faq-content {
       grid-template-rows: 1fr;
       opacity: 1;
     }

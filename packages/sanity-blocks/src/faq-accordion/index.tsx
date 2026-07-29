@@ -67,8 +67,10 @@ function FaqDisclosure({
         <Plus className="pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-open:rotate-45 motion-reduce:transition-none dark:text-accent-green" />
       </summary>
       {faq.richText?.length ? (
-        <div className="min-h-0 overflow-hidden pb-4 text-muted-foreground">
-          <RichText className="body-text" richText={faq.richText} />
+        <div className="faq-content">
+          <div className="min-h-0 overflow-hidden pb-4 text-muted-foreground">
+            <RichText className="body-text" richText={faq.richText} />
+          </div>
         </div>
       ) : null}
     </details>
