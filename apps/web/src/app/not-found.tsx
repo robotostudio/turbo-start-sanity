@@ -11,11 +11,11 @@ export default function NotFound() {
         </div>
 
         <h1 className="font-normal text-[clamp(6rem,26vw,15rem)] text-foreground leading-[0.8] tracking-tighter">
-          4
+          {"4"}
           <span className="bg-grid-dots bg-clip-text text-foreground [-webkit-text-fill-color:transparent]">
-            0
+            {"0"}
           </span>
-          4
+          {"4"}
         </h1>
 
         <h2 className="max-w-2xl text-balance font-normal text-3xl tracking-tight sm:text-4xl">
