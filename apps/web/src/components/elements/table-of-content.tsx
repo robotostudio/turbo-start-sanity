@@ -7,6 +7,10 @@ import {
   XIcon,
 } from "@workspace/sanity-blocks/internal/icons";
 import { useCopyToClipboard } from "@workspace/sanity-blocks/internal/use-copy";
+import {
+  DISCLOSURE_ANIMATION_MS,
+  useDisclosureAnimation,
+} from "@workspace/sanity-blocks/internal/use-disclosure-animation";
 import { cn } from "@workspace/tailwind-config/utils";
 import { Check, ChevronDown } from "lucide-react";
 import {
@@ -14,7 +18,6 @@ import {
   type MouseEvent,
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import slugify from "slugify";
@@ -95,7 +98,8 @@ const SLUGIFY_OPTIONS = {
 
 const DEFAULT_MAX_DEPTH = 6;
 const MIN_HEADINGS_TO_SHOW = 1;
-const DISCLOSURE_CLOSE_MS = 220;
+// Close animation duration plus a settle frame — scrolling waits this long.
+const DISCLOSURE_CLOSE_MS = DISCLOSURE_ANIMATION_MS + 20;
 
 function isValidHeadingStyle(style: unknown): style is HeadingStyle {
   return typeof style === "string" && style in HEADING_STYLES;
@@ -720,50 +724,60 @@ export const MobileTableOfContent: FC<TableOfContentProps> = ({
 
   const slugKey = flattenSlugs(headings).join("|");
   const activeSlug = useActiveHeading(slugKey);
-  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const [open, setOpen] = useState(true);
+  const { detailsRef, contentRef } = useDisclosureAnimation(open);
 
   if (error || !shouldShow || headings.length === 0) {
     return null;
   }
 
-  const closeDisclosure = () => {
-    if (detailsRef.current) {
-      detailsRef.current.open = false;
-    }
+  const handleSummaryClick = (event: MouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    setOpen((current) => !current);
   };
 
   return (
     <details
       className={cn(
-        "faq-disclosure group bg-grid-dots p-2.5 text-zinc-800 lg:hidden dark:text-zinc-50",
+        "bg-grid-dots p-2.5 text-zinc-800 lg:hidden dark:text-zinc-50",
         className
       )}
+      open
       ref={detailsRef}
     >
-      <summary className="focus-ring-inset flex cursor-pointer list-none items-center justify-between gap-2 bg-background px-4 py-3 text-foreground text-lg [&::-webkit-details-marker]:hidden">
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: summary is natively interactive */}
+      <summary
+        className="focus-ring-inset flex cursor-pointer list-none items-center justify-between gap-2 bg-background px-4 py-3 text-foreground text-lg [&::-webkit-details-marker]:hidden"
+        onClick={handleSummaryClick}
+      >
         On this page
         <ChevronDown
           aria-hidden="true"
-          className="size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
+          className={cn(
+            "size-5 shrink-0 text-muted-foreground transition-transform",
+            open && "rotate-180"
+          )}
         />
       </summary>
-      <div className="flex flex-col gap-8 bg-background px-4 pb-4">
-        <nav aria-label="On this page">
-          <ul className="flex flex-col gap-2">
-            {headings.map((heading, index) => (
-              <TableOfContentAnchor
-                activeSlug={activeSlug}
-                currentDepth={1}
-                heading={heading}
-                idPrefix="mobile-"
-                key={heading.id || `${heading.text}-${index}`}
-                maxDepth={maxDepth}
-                onNavigate={closeDisclosure}
-              />
-            ))}
-          </ul>
-        </nav>
-        <ShareOptions title={shareTitle} />
+      <div className="overflow-hidden" ref={contentRef}>
+        <div className="flex flex-col gap-8 bg-background px-4 pb-4">
+          <nav aria-label="On this page">
+            <ul className="flex flex-col gap-2">
+              {headings.map((heading, index) => (
+                <TableOfContentAnchor
+                  activeSlug={activeSlug}
+                  currentDepth={1}
+                  heading={heading}
+                  idPrefix="mobile-"
+                  key={heading.id || `${heading.text}-${index}`}
+                  maxDepth={maxDepth}
+                  onNavigate={() => setOpen(false)}
+                />
+              ))}
+            </ul>
+          </nav>
+          <ShareOptions title={shareTitle} />
+        </div>
       </div>
     </details>
   );

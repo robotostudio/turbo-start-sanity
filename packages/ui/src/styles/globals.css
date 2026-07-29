@@ -360,56 +360,6 @@
   }
 }
 
-/* FAQ disclosure: smooth open/close, instant fallback where unsupported. */
-@media (prefers-reduced-motion: no-preference) {
-  /* PRIMARY (Chromium 129+ / engines with interpolate-size): animate real
-     `height` 0 → auto. Cheaper per-frame than the grid-rows trick, which
-     re-solves grid sizing every frame and stutters on tall panels.
-     interpolate-size inherits from <details> onto ::details-content. */
-  @supports (interpolate-size: allow-keywords) {
-    .faq-disclosure {
-      interpolate-size: allow-keywords;
-    }
-
-    .faq-disclosure::details-content {
-      height: 0;
-      overflow: hidden;
-      opacity: 0;
-      transition:
-        height 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-        opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-        content-visibility 0.2s allow-discrete;
-    }
-
-    .faq-disclosure[open]::details-content {
-      height: auto;
-      opacity: 1;
-    }
-  }
-
-  /* FALLBACK (Firefox/Safari, older Chromium): the grid 0fr→1fr trick, which
-     animates without interpolate-size. Content clips via min-h-0 +
-     overflow-hidden on the component; content-visibility allow-discrete keeps
-     the panel rendered while it collapses on close. */
-  @supports not (interpolate-size: allow-keywords) {
-    .faq-disclosure .faq-content {
-      display: grid;
-      grid-template-rows: 0fr;
-      overflow: hidden;
-      opacity: 0;
-      transition:
-        grid-template-rows 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-        opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1),
-        content-visibility 0.2s allow-discrete;
-    }
-
-    .faq-disclosure[open] .faq-content {
-      grid-template-rows: 1fr;
-      opacity: 1;
-    }
-  }
-}
-
 /* Code blocks (rich-text). Plain, unhighlighted monospace with a line-number
    gutter — no syntax coloring, tabs preserved. */
 .rich-code-pre {

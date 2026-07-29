@@ -3,9 +3,10 @@
 import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
+import { useDisclosureAnimation } from "@workspace/sanity-blocks/internal/use-disclosure-animation";
 import { ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { type MouseEvent as ReactMouseEvent, useRef, useState } from "react";
 
 export interface FaqItem {
   _key?: string | null;
@@ -38,37 +39,55 @@ export interface FaqAccordionProps {
 }
 
 const DISCLOSURE_BASE_CLASS =
-  "faq-disclosure hover-surface group border border-border bg-background px-4 has-[summary:focus-visible]:[outline:2px_dotted_var(--foreground)] has-[summary:focus-visible]:[outline-offset:-2px]";
+  "hover-surface group border border-border bg-background px-4 has-[summary:focus-visible]:[outline:2px_dotted_var(--foreground)] has-[summary:focus-visible]:[outline-offset:-2px]";
 const DISCLOSURE_ANIMATION_CLASS =
   "fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-300 ease-out";
 
 function FaqDisclosure({
   animationDelay,
   faq,
-  name,
-  open,
+  isOpen,
+  onToggle,
 }: Readonly<{
   animationDelay: string;
   faq: FaqItem;
-  name: string;
-  open: boolean;
+  isOpen: boolean;
+  onToggle: () => void;
 }>) {
+  const { detailsRef, contentRef } = useDisclosureAnimation(isOpen);
+  // The `open` attribute is set once (SSR/no-JS state); afterwards the hook
+  // owns `details.open` so the close animation can finish before it flips.
+  const initialOpen = useRef(isOpen).current;
+
+  const handleSummaryClick = (event: ReactMouseEvent<HTMLElement>) => {
+    event.preventDefault();
+    onToggle();
+  };
+
   return (
     <details
       className={`${DISCLOSURE_BASE_CLASS} ${DISCLOSURE_ANIMATION_CLASS}`}
-      name={name}
-      open={open}
+      open={initialOpen}
+      ref={detailsRef}
       style={{ animationDelay }}
     >
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-2.5 py-4 outline-none [&::-webkit-details-marker]:hidden">
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: summary is natively interactive */}
+      <summary
+        className="flex cursor-pointer list-none items-center justify-between gap-2.5 py-4 outline-none [&::-webkit-details-marker]:hidden"
+        onClick={handleSummaryClick}
+      >
         <h3 className="font-normal text-foreground text-lg leading-6">
           {faq.title}
         </h3>
-        <Plus className="pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-open:rotate-45 motion-reduce:transition-none dark:text-accent-green" />
+        <Plus
+          className={`pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none dark:text-accent-green ${
+            isOpen ? "rotate-45" : ""
+          }`}
+        />
       </summary>
       {faq.richText?.length ? (
-        <div className="faq-content">
-          <div className="min-h-0 overflow-hidden pb-4 text-muted-foreground">
+        <div className="overflow-hidden" ref={contentRef}>
+          <div className="min-h-0 pb-4 text-muted-foreground">
             <RichText className="body-text" richText={faq.richText} />
           </div>
         </div>
@@ -77,11 +96,14 @@ function FaqDisclosure({
   );
 }
 
-function FaqList({ faqs, name }: Readonly<{ faqs: FaqItem[]; name: string }>) {
+function FaqList({ faqs }: Readonly<{ faqs: FaqItem[] }>) {
   const defaultFaq = faqs.find((faq) => faq?.title);
   const defaultOpenId = defaultFaq
     ? (defaultFaq._key ?? defaultFaq._id)
     : undefined;
+  // Exclusive-open lives in state (not the details `name` attribute) so the
+  // sibling that closes animates instead of snapping shut.
+  const [openId, setOpenId] = useState(defaultOpenId);
 
   return (
     <div className="grid content-start gap-4">
@@ -92,9 +114,11 @@ function FaqList({ faqs, name }: Readonly<{ faqs: FaqItem[]; name: string }>) {
           <FaqDisclosure
             animationDelay={`${Math.min(index, 8) * 45}ms`}
             faq={faq}
+            isOpen={itemId === openId}
             key={`faq-${itemId}`}
-            name={name}
-            open={itemId === defaultOpenId}
+            onToggle={() =>
+              setOpenId((current) => (current === itemId ? undefined : itemId))
+            }
           />
         );
       })}
@@ -233,7 +257,8 @@ export function FaqAccordion({
     : 0;
   const activeCategory = validCategories[boundedIndex];
   const activeFaqs = activeCategory?.faqs ?? [];
-  const accordionName = `faq-${_key}-${activeCategory?._key ?? boundedIndex}`;
+  // Remounts FaqList per category so the default-open item resets.
+  const accordionKey = `faq-${_key}-${activeCategory?._key ?? boundedIndex}`;
 
   return (
     <section
@@ -258,11 +283,7 @@ export function FaqAccordion({
             )}
 
             <div className="flex flex-col gap-6">
-              <FaqList
-                faqs={activeFaqs}
-                key={accordionName}
-                name={accordionName}
-              />
+              <FaqList faqs={activeFaqs} key={accordionKey} />
               {link && <FaqContactLink link={link} />}
             </div>
           </div>

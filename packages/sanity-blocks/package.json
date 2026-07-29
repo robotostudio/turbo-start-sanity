@@ -64,6 +64,7 @@
     "./internal/sanity-icon": "./src/internal/sanity-icon.tsx",
     "./internal/sanity-rich-text": "./src/internal/sanity-rich-text.ts",
     "./internal/schema-fields": "./src/internal/schema-fields.ts",
-    "./internal/use-copy": "./src/internal/use-copy.ts"
+    "./internal/use-copy": "./src/internal/use-copy.ts",
+    "./internal/use-disclosure-animation": "./src/internal/use-disclosure-animation.ts"
   }
 }
