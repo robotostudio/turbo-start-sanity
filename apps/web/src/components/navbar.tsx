@@ -56,20 +56,18 @@ export function NavbarSkeleton() {
   );
 }
 
-// Progressive (gradient) blur: blur ramps up toward the top edge where page
-// content scrolls under the bar. Layered masked backdrop-blur bands approximate
-// a variable-radius blur; the theme scrim keeps the nav readable on any
-// background and stops content/footer bleeding through.
+// Frosted bar over content that scrolls under it: one uniform backdrop-blur
+// (masked/stacked backdrop-filters don't render on iOS Safari, so a single
+// unmasked layer is used) plus a theme scrim that keeps the nav readable and
+// stops content/footer bleeding through.
 function ProgressiveBlur() {
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 overflow-hidden"
     >
-      <div className="absolute inset-0 backdrop-blur-[5px]" />
-      <div className="absolute inset-0 backdrop-blur-[10px] [mask-image:linear-gradient(to_top,transparent_25%,black_65%)]" />
-      <div className="absolute inset-0 backdrop-blur-[20px] [mask-image:linear-gradient(to_top,transparent_55%,black_90%)]" />
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/75 to-background/55" />
+      <div className="absolute inset-0 [-webkit-backdrop-filter:blur(28px)_saturate(1.5)] [backdrop-filter:blur(28px)_saturate(1.5)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/65 via-background/45 to-background/30" />
     </div>
   );
 }
