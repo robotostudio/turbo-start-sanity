@@ -38,11 +38,14 @@ const DRAFTS_FETCH_OPTIONS: DynamicFetchOptions = {
 };
 
 /**
- * Draft-mode preview is local-dev only. In production this is `false`, so the
- * helpers below never read `draftMode()` and pages prerender fully static
+ * Draft-mode preview runs in local dev and on Vercel Preview deployments (so a
+ * preview branch can show drafts for review). In production this is `false`, so
+ * the helpers below never read `draftMode()` and pages prerender fully static
  * (published) — no streaming, no skeletons, instant navigation.
  */
-export const DRAFT_MODE_ENABLED = process.env.NODE_ENV === "development";
+export const DRAFT_MODE_ENABLED =
+  process.env.NODE_ENV === "development" ||
+  process.env.VERCEL_ENV === "preview";
 
 /** Resolves perspective/stega outside any `'use cache'` boundary (reads draftMode/cookies). */
 export async function getDynamicFetchOptions(): Promise<DynamicFetchOptions> {
