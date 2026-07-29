@@ -1,15 +1,14 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { useEffect, useRef } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useRef } from "react";
 
-// The App Router scrolls to top on navigation for plain `next/link`, but some
-// link components (e.g. the base-ui NavigationMenuLink used in the navbar)
-// bypass that. Reset scroll on forward route changes, but preserve the browser's
-// native scroll restoration on back/forward (popstate) so returning to a page
-// keeps its previous scroll position instead of jumping to the top.
-export function ScrollToTop() {
+// Some link components (e.g. base-ui NavigationMenuLink) bypass the App
+// Router's scroll-to-top. Reset scroll on forward navigation, but let the
+// browser restore position on back/forward (popstate).
+function ScrollToTopInner() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const isPopNavigation = useRef(false);
 
   useEffect(() => {
@@ -20,7 +19,11 @@ export function ScrollToTop() {
     return () => window.removeEventListener("popstate", markPop);
   }, []);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: pathname is a route-change trigger, not read inside the effect body.
+  // Key on pathname + query so a query-only popstate still re-runs the effect
+  // to clear the flag; a pathname-only key would strand the next navigation.
+  const routeKey = `${pathname}?${searchParams.toString()}`;
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: routeKey is a route-change trigger, not read inside the effect body.
   useEffect(() => {
     // Back/forward: let the browser restore the saved scroll position.
     if (isPopNavigation.current) {
@@ -32,7 +35,16 @@ export function ScrollToTop() {
       return;
     }
     window.scrollTo(0, 0);
-  }, [pathname]);
+  }, [routeKey]);
 
   return null;
+}
+
+export function ScrollToTop() {
+  // `useSearchParams` reads request-time data, so it needs a Suspense boundary.
+  return (
+    <Suspense fallback={null}>
+      <ScrollToTopInner />
+    </Suspense>
+  );
 }

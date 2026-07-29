@@ -1,21 +1,31 @@
 "use client";
 
-import { type ReactNode, useLayoutEffect, useRef, useState } from "react";
+import {
+  type ReactNode,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+
+// Layout effect in the browser (measure before paint), plain effect on the
+// server to avoid React's SSR "useLayoutEffect does nothing" warning.
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 /**
- * Sticky-reveal footer — the mirror of the sticky hero. When the footer fits in
- * the viewport it is pinned to the bottom BEHIND the page content; the content
- * scrolls up over it and slides away at the end to reveal it. A pinned element
- * can only ever show what fits on screen, so on viewports shorter than the
- * footer it falls back to a normal in-flow footer (no clipping). The footer's
- * height is measured into `--footer-height` so the content can reserve exactly
- * that much space above it.
+ * Sticky-reveal footer: when it fits the viewport it's pinned to the bottom
+ * behind the page content, which scrolls up to reveal it. On viewports shorter
+ * than the footer it falls back to a normal in-flow footer. Its height is
+ * measured into `--footer-height` so the content reserves space above it.
  */
 export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
   const ref = useRef<HTMLDivElement>(null);
-  const [pinned, setPinned] = useState(false);
+  // Default to pinned so SSR and first paint agree (no relative→fixed hydration
+  // flip / CLS). The effect only flips to in-flow when the footer is too tall.
+  const [pinned, setPinned] = useState(true);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = ref.current;
     if (!el) {
       return;

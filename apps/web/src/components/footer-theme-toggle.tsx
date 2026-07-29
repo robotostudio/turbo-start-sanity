@@ -3,13 +3,7 @@
 import { cn } from "@workspace/tailwind-config/utils";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const THEMES = [
   { value: "light", label: "Light", Icon: Sun },
@@ -32,7 +26,7 @@ export function FooterThemeToggle() {
     THEMES.findIndex(({ value }) => value === theme)
   );
 
-  const positionPill = useCallback((index: number) => {
+  const positionPill = (index: number) => {
     const el = buttonRefs.current[index];
     const container = containerRef.current;
     const pill = pillRef.current;
@@ -41,7 +35,7 @@ export function FooterThemeToggle() {
     }
     pill.style.left = `${el.offsetLeft}px`;
     pill.style.right = `${container.clientWidth - (el.offsetLeft + el.offsetWidth)}px`;
-  }, []);
+  };
 
   useIsomorphicLayoutEffect(() => {
     setMounted(true);

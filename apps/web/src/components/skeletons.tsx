@@ -71,84 +71,18 @@ export function HeroFallback() {
   );
 }
 
-function CategorySkeleton() {
-  return <Skeleton className="h-5 w-20" />;
-}
-
-export function BlogIndexFallback() {
-  return (
-    <main className="bg-background">
-      <BreadcrumbsSkeleton />
-      <div className="container my-16 animate-pulse">
-        <div className="grid gap-6">
-          <Skeleton className="h-10 w-full max-w-md sm:h-12" />
-          <div className="grid max-w-2xl gap-2">
-            <Skeleton className="h-5 w-full" />
-            <Skeleton className="h-5 w-3/4" />
-          </div>
-        </div>
-
-        <div className="mt-10 grid gap-8">
-          <div className="grid grid-cols-1 border border-border lg:grid-cols-2">
-            <div className="flex flex-col justify-between gap-10 p-6 sm:p-8">
-              <Skeleton className="h-8 w-28" />
-              <div className="grid gap-4">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <Skeleton className="h-5 w-24" />
-                  <Skeleton className="h-5 w-16" />
-                </div>
-                <div className="grid gap-1.5">
-                  <Skeleton className="h-8 w-full sm:h-9" />
-                  <Skeleton className="h-8 w-3/4 sm:h-9" />
-                </div>
-                <div className="grid gap-2">
-                  <Skeleton className="h-6 w-full" />
-                  <Skeleton className="h-6 w-5/6" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <Skeleton className="size-6 rounded-full" />
-                  <Skeleton className="h-5 w-24" />
-                </div>
-              </div>
-            </div>
-            <Skeleton className="order-first min-h-[240px] border-border border-b lg:order-last lg:min-h-full lg:border-b-0 lg:border-s" />
-          </div>
-        </div>
-
-        <div className="mt-10 grid gap-8 lg:mt-14 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-          <div className="h-max bg-grid-dots p-4 lg:sticky lg:top-24 lg:self-start">
-            <div className="flex flex-col gap-6 bg-background p-4">
-              <Skeleton className="h-[34px] w-full" />
-              <div className="grid gap-2">
-                <CategorySkeleton />
-                <CategorySkeleton />
-                <CategorySkeleton />
-                <CategorySkeleton />
-                <CategorySkeleton />
-                <CategorySkeleton />
-                <CategorySkeleton />
-              </div>
-            </div>
-          </div>
-
-          <BlogGridSkeleton count={6} />
-        </div>
-      </div>
-    </main>
-  );
-}
-
 function TextBlockSkeleton({
   lines,
   lastWidth = "w-3/5",
 }: Readonly<{ lines: number; lastWidth?: string }>) {
+  const rows = Array.from({ length: lines }, (_, index) => ({
+    id: `skeleton-line-${index}`,
+    width: index === lines - 1 ? lastWidth : "w-full",
+  }));
   return (
     <div className="grid gap-2.5">
-      {Array.from({ length: lines }).map((_, index) => (
-        <Skeleton
-          className={`h-5 ${index === lines - 1 ? lastWidth : "w-full"}`}
-          key={index}
-        />
+      {rows.map((row) => (
+        <Skeleton className={`h-5 ${row.width}`} key={row.id} />
       ))}
     </div>
   );
