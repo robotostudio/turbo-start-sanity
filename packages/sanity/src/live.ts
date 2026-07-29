@@ -1,6 +1,5 @@
 import { env } from "@workspace/env/server";
 import { cookies, draftMode } from "next/headers";
-import { connection } from "next/server";
 import type { QueryParams } from "next-sanity";
 import {
   defineLive,
@@ -28,28 +27,33 @@ export type DynamicFetchOptions = {
   stega: boolean;
 };
 
-// TEMP(preview-drafts): render draft content on ALL Vercel Preview deployments
-// so the shared preview URL can be reviewed without Presentation / draft-mode.
-// `VERCEL_ENV` is set by Vercel at build AND runtime ("preview" | "production" |
-// "development"); production stays on published. The manual
-// SANITY_PREVIEW_FORCE_DRAFTS flag still works (e.g. locally). REMOVE this whole
-// force-drafts mechanism (this const, the getDynamicFetchOptions branch, and the
-// `previewForceDrafts` uses in pages/layout) before merging.
-export const previewForceDrafts =
-  process.env.SANITY_PREVIEW_FORCE_DRAFTS === "true" ||
-  process.env.VERCEL_ENV === "preview";
+const PUBLISHED_FETCH_OPTIONS: DynamicFetchOptions = {
+  perspective: "published",
+  stega: false,
+};
+
+const DRAFTS_FETCH_OPTIONS: DynamicFetchOptions = {
+  perspective: "drafts",
+  stega: false,
+};
+
+/**
+ * Draft-mode preview is local-dev only. In production this is `false`, so the
+ * helpers below never read `draftMode()` and pages prerender fully static
+ * (published) — no streaming, no skeletons, instant navigation.
+ */
+export const DRAFT_MODE_ENABLED = process.env.NODE_ENV === "development";
 
 /** Resolves perspective/stega outside any `'use cache'` boundary (reads draftMode/cookies). */
 export async function getDynamicFetchOptions(): Promise<DynamicFetchOptions> {
+  if (!DRAFT_MODE_ENABLED) {
+    return PUBLISHED_FETCH_OPTIONS;
+  }
   const { isEnabled: isDraftMode } = await draftMode();
   if (!isDraftMode) {
-    if (previewForceDrafts) {
-      // TEMP(preview-drafts): opt out of the published prerender and render this
-      // request dynamically so the preview reflects the CURRENT drafts.
-      await connection();
-      return { perspective: "drafts", stega: false };
-    }
-    return { perspective: "published", stega: false };
+    // Dev without a Presentation session still shows drafts, so draft-only
+    // pages are visible while developing. Stega stays off here.
+    return DRAFTS_FETCH_OPTIONS;
   }
 
   const jar = await cookies();
@@ -58,18 +62,15 @@ export async function getDynamicFetchOptions(): Promise<DynamicFetchOptions> {
 }
 
 /**
- * Resolves perspective/stega for a page route's inner (post-Suspense)
- * component: draft-mode or forced-preview sessions get the dynamic options,
- * every other request takes the published fast-path without touching
- * `connection()`. Same check the routes previously inlined. Must be called
- * outside any `'use cache'` boundary (reads draftMode).
+ * Perspective/stega for a page route's inner (post-Suspense) component:
+ * published in production (stays static), drafts in dev. Must be called outside
+ * any `'use cache'` boundary (reads draftMode).
  */
 export async function resolvePageFetchOptions(): Promise<DynamicFetchOptions> {
-  const { isEnabled: isDraftMode } = await draftMode();
-  if (isDraftMode || previewForceDrafts) {
-    return getDynamicFetchOptions();
+  if (!DRAFT_MODE_ENABLED) {
+    return PUBLISHED_FETCH_OPTIONS;
   }
-  return { perspective: "published", stega: false };
+  return getDynamicFetchOptions();
 }
 
 /** For usage within `generateStaticParams` only. */

@@ -2,8 +2,8 @@ import "@workspace/ui/globals.css";
 
 import {
   type DynamicFetchOptions,
+  DRAFT_MODE_ENABLED,
   getDynamicFetchOptions,
-  previewForceDrafts,
   SanityLive,
 } from "@workspace/sanity/live";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -44,7 +44,12 @@ export default async function RootLayout({
 }>) {
   preconnect("https://cdn.sanity.io");
   prefetchDNS("https://cdn.sanity.io");
-  const { isEnabled: isDraftMode } = await draftMode();
+  // In local dev, nav/footer follow drafts too (like page content), so draft
+  // navbar/footer/settings edits are visible without a Presentation session.
+  // Production stays static published (DRAFT_MODE_ENABLED is false).
+  const showDrafts = DRAFT_MODE_ENABLED;
+  // Presentation overlay (preview bar, visual editing) needs a real session.
+  const isDraftMode = DRAFT_MODE_ENABLED && (await draftMode()).isEnabled;
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -52,7 +57,7 @@ export default async function RootLayout({
       >
         <Providers>
           <ScrollToTop />
-          {isDraftMode || previewForceDrafts ? (
+          {showDrafts ? (
             <Suspense fallback={<NavbarSkeleton />}>
               <DynamicNavbar />
             </Suspense>
@@ -66,7 +71,7 @@ export default async function RootLayout({
             {children}
           </div>
           <StickyFooter>
-            {isDraftMode || previewForceDrafts ? (
+            {showDrafts ? (
               <Suspense fallback={<FooterSkeleton />}>
                 <DynamicFooter />
               </Suspense>

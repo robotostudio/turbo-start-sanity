@@ -1,6 +1,7 @@
 import { Logger } from "@workspace/logger";
 import {
   type DynamicFetchOptions,
+  DRAFT_MODE_ENABLED,
   getDynamicFetchOptions,
   resolvePageFetchOptions,
   sanityFetch,
@@ -73,17 +74,44 @@ export async function generateMetadata({
   return seoFromDocument(data, { slug: slugString, pageType: "article" });
 }
 
-export default function BlogSlugPage({
+export default async function BlogSlugPage({
   params,
 }: Readonly<{
   params: Promise<BlogParams>;
 }>) {
-  return (
-    <Suspense fallback={<BlogFallback />}>
-      <BlogSlugInner params={params} />
-    </Suspense>
-  );
+  // Dev/preview: draft-aware path so unpublished posts still render.
+  if (DRAFT_MODE_ENABLED) {
+    return (
+      <Suspense fallback={<BlogFallback />}>
+        <BlogSlugInner params={params} />
+      </Suspense>
+    );
+  }
+  // Production: static published render with a real 404, no skeleton.
+  const { slug } = await params;
+  const data = await getPublishedBlogPage(slug);
+  if (!data) {
+    notFound();
+  }
+  return <BlogPageContent data={data} />;
 }
+
+// Cached published fetch; a miss lets the caller return a real 404.
+async function getPublishedBlogPage(slug: string) {
+  "use cache";
+  const slugString = `/blog/${slug}`;
+  const { data } = await sanityFetch({
+    query: queryBlogSlugPageData,
+    params: { slug: slugString },
+    perspective: "published",
+    stega: false,
+  });
+  return data;
+}
+
+type BlogPageData = NonNullable<
+  Awaited<ReturnType<typeof getPublishedBlogPage>>
+>;
 
 async function BlogSlugInner({
   params,
@@ -92,14 +120,14 @@ async function BlogSlugInner({
     params,
     resolvePageFetchOptions(),
   ]);
-  const data = await getCachedBlogPage({ slug, perspective, stega });
+  const data = await getDraftBlogPage({ slug, perspective, stega });
   if (!data) {
     notFound();
   }
   return <BlogPageContent data={data} />;
 }
 
-async function getCachedBlogPage({
+async function getDraftBlogPage({
   slug,
   perspective,
   stega,
@@ -115,11 +143,7 @@ async function getCachedBlogPage({
   return data;
 }
 
-function BlogPageContent({
-  data,
-}: {
-  data: NonNullable<Awaited<ReturnType<typeof getCachedBlogPage>>>;
-}) {
+function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
   const { title, richText, publishedAt, _updatedAt } = data ?? {};
   const author = data?.authors;
   const publishedDate = formatDate(publishedAt);

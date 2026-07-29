@@ -1,5 +1,6 @@
 import {
   type DynamicFetchOptions,
+  DRAFT_MODE_ENABLED,
   getDynamicFetchOptions,
   resolvePageFetchOptions,
   sanityFetch,
@@ -24,9 +25,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Page() {
-  // Non-async + Suspense-first so Next prerenders/prefetches a static shell and
-  // streams the content. Reading draftMode() at the top would make the whole
-  // route dynamic, leaving nothing for <Link> to prefetch — the navigation jank.
+  // Production static-renders published; dev/preview streams drafts below.
+  if (!DRAFT_MODE_ENABLED) {
+    return <CachedHome perspective="published" stega={false} />;
+  }
   return (
     <Suspense fallback={<HeroFallback />}>
       <HomeContent />

@@ -1,6 +1,7 @@
 import { Logger } from "@workspace/logger";
 import {
   type DynamicFetchOptions,
+  DRAFT_MODE_ENABLED,
   getDynamicFetchOptions,
   resolvePageFetchOptions,
   sanityFetch,
@@ -67,15 +68,42 @@ export async function generateMetadata({
   return seoFromDocument(pageData, { slug: slugString });
 }
 
-export default function SlugPage({
+export default async function SlugPage({
   params,
 }: Readonly<{ params: Promise<SlugParams> }>) {
-  return (
-    <Suspense fallback={<HeroFallback />}>
-      <SlugPageInner params={params} />
-    </Suspense>
-  );
+  // Dev/preview: draft-aware path so unpublished pages still render.
+  if (DRAFT_MODE_ENABLED) {
+    return (
+      <Suspense fallback={<HeroFallback />}>
+        <SlugPageInner params={params} />
+      </Suspense>
+    );
+  }
+  // Production: static published render with a real 404, no skeleton.
+  const { slug } = await params;
+  const pageData = await getPublishedSlugPage(slug);
+  if (!pageData) {
+    notFound();
+  }
+  return <SlugPageContent pageData={pageData} />;
 }
+
+// Cached published fetch; a miss lets the caller return a real 404.
+async function getPublishedSlugPage(slug: string[]) {
+  "use cache";
+  const slugString = `/${slug.join("/")}`;
+  const { data: pageData } = await sanityFetch({
+    query: querySlugPageData,
+    params: { slug: slugString },
+    perspective: "published",
+    stega: false,
+  });
+  return pageData;
+}
+
+type SlugPageData = NonNullable<
+  Awaited<ReturnType<typeof getPublishedSlugPage>>
+>;
 
 async function SlugPageInner({
   params,
@@ -84,14 +112,14 @@ async function SlugPageInner({
     params,
     resolvePageFetchOptions(),
   ]);
-  const pageData = await getCachedSlugPage({ slug, perspective, stega });
+  const pageData = await getDraftSlugPage({ slug, perspective, stega });
   if (!pageData) {
     notFound();
   }
   return <SlugPageContent pageData={pageData} />;
 }
 
-async function getCachedSlugPage({
+async function getDraftSlugPage({
   slug,
   perspective,
   stega,
@@ -107,14 +135,10 @@ async function getCachedSlugPage({
   return pageData;
 }
 
-function SlugPageContent({
-  pageData,
-}: {
-  pageData: NonNullable<Awaited<ReturnType<typeof getCachedSlugPage>>>;
-}) {
+function SlugPageContent({ pageData }: Readonly<{ pageData: SlugPageData }>) {
   const { title, pageBuilder, _id, _type } = pageData ?? {};
 
-  if (!Array.isArray(pageBuilder) || pageBuilder?.length === 0) {
+  if (!Array.isArray(pageBuilder) || pageBuilder.length === 0) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center p-4 text-center">
         <h1 className="mb-4 font-semibold text-2xl capitalize">{title}</h1>
