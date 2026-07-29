@@ -80,6 +80,7 @@ const richTextMembers = [
         name: "caption",
         title: "Caption Text",
         type: "string",
+        description: "Optional caption shown beneath the image.",
       }),
     ],
   }),

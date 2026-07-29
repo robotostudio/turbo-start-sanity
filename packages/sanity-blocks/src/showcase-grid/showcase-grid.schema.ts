@@ -46,7 +46,7 @@ const showcaseItem = defineArrayMember({
       type: "boolean",
       title: "Featured",
       description:
-        "Show this site in the large card at the top of the section. If several are marked, only the first is used.",
+        "Show this site as a large banner at the top of the section. Each site marked here becomes its own banner.",
       initialValue: false,
     }),
   ],

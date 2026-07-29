@@ -57,6 +57,7 @@ export const heroVideoField = defineField({
       name: "light",
       type: "object",
       title: "Light mode",
+      description: "The files shown when the site is in light mode.",
       options: { collapsible: true, collapsed: false },
       fields: videoVariantFields(),
     }),
