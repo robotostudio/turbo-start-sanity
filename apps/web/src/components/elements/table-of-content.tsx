@@ -8,12 +8,13 @@ import {
 } from "@workspace/sanity-blocks/internal/icons";
 import { useCopyToClipboard } from "@workspace/sanity-blocks/internal/use-copy";
 import { cn } from "@workspace/tailwind-config/utils";
-import { Check } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import {
   type FC,
   type MouseEvent,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import slugify from "slugify";
@@ -43,6 +44,11 @@ type AnchorProps = {
   readonly activeSlug: string | null;
   readonly maxDepth?: number;
   readonly currentDepth?: number;
+  // Namespaces the anchor's own DOM id so the desktop and mobile trees can both
+  // render without producing duplicate ids.
+  readonly idPrefix?: string;
+  // Fires after a heading link activates, letting the mobile disclosure close.
+  readonly onNavigate?: () => void;
 };
 
 type TableOfContentState = {
@@ -412,6 +418,8 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
   activeSlug,
   maxDepth = DEFAULT_MAX_DEPTH,
   currentDepth = 1,
+  idPrefix = "",
+  onNavigate,
 }) => {
   const { href, text, children, id } = heading;
 
@@ -454,6 +462,7 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
     event.preventDefault();
     target.scrollIntoView({ behavior: "smooth" });
     window.history.pushState(null, "", href);
+    onNavigate?.();
   };
 
   return (
@@ -461,13 +470,13 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
       <a
         aria-current={isActive ? "location" : undefined}
         className={cn(
-          "focus-ring block rounded-none px-2 py-0.5 text-base leading-6 tracking-[0.01em] transition-colors",
+          "block rounded-none px-2 py-1.5 text-base leading-6 outline-none tracking-[0.01em] transition-colors focus-visible:[outline:2px_dotted_currentColor] focus-visible:[outline-offset:-3px]",
           isActive
             ? "bg-accent-green font-medium text-accent-green-foreground"
             : "text-muted-foreground hover:text-foreground"
         )}
         href={href}
-        id={id}
+        id={`${idPrefix}${id}`}
         onClick={handleClick}
       >
         {text}
@@ -480,8 +489,10 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
               activeSlug={activeSlug}
               currentDepth={currentDepth + 1}
               heading={child}
+              idPrefix={idPrefix}
               key={child.id || `${child.text}-${index}-${currentDepth}`}
               maxDepth={maxDepth}
+              onNavigate={onNavigate}
             />
           ))}
         </ul>
@@ -681,5 +692,67 @@ export const TableOfContent: FC<TableOfContentProps> = ({
         <ShareOptions title={shareTitle} />
       </aside>
     </div>
+  );
+};
+
+export const MobileTableOfContent: FC<TableOfContentProps> = ({
+  richText,
+  className,
+  maxDepth = DEFAULT_MAX_DEPTH,
+  shareTitle,
+}) => {
+  const { shouldShow, headings, error } = useTableOfContentState(
+    richText,
+    maxDepth
+  );
+
+  const slugKey = flattenSlugs(headings).join("|");
+  const activeSlug = useActiveHeading(slugKey);
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+
+  if (error || !shouldShow || headings.length === 0) {
+    return null;
+  }
+
+  const closeDisclosure = () => {
+    if (detailsRef.current) {
+      detailsRef.current.open = false;
+    }
+  };
+
+  return (
+    <details
+      className={cn(
+        "faq-disclosure group bg-grid-dots p-2.5 text-zinc-800 lg:hidden dark:text-zinc-50",
+        className
+      )}
+      ref={detailsRef}
+    >
+      <summary className="focus-ring-inset flex cursor-pointer list-none items-center justify-between gap-2 bg-background px-4 py-3 text-foreground text-lg [&::-webkit-details-marker]:hidden">
+        On this page
+        <ChevronDown
+          aria-hidden="true"
+          className="size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
+        />
+      </summary>
+      <div className="flex flex-col gap-8 bg-background px-4 pb-4">
+        <nav aria-label="On this page">
+          <ul className="flex flex-col gap-2">
+            {headings.map((heading, index) => (
+              <TableOfContentAnchor
+                activeSlug={activeSlug}
+                currentDepth={1}
+                heading={heading}
+                idPrefix="mobile-"
+                key={heading.id || `${heading.text}-${index}`}
+                maxDepth={maxDepth}
+                onNavigate={closeDisclosure}
+              />
+            ))}
+          </ul>
+        </nav>
+        <ShareOptions title={shareTitle} />
+      </div>
+    </details>
   );
 };

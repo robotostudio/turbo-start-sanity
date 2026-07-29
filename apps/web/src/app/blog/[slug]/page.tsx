@@ -19,7 +19,10 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { TableOfContent } from "@/components/elements/table-of-content";
+import {
+  MobileTableOfContent,
+  TableOfContent,
+} from "@/components/elements/table-of-content";
 import { ArticleJsonLd } from "@/components/json-ld";
 import { BlogFallback } from "@/components/skeletons";
 import { seoFromDocument } from "@/lib/seo";
@@ -204,6 +207,11 @@ function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-32">
           <article className="min-w-0">
+            <MobileTableOfContent
+              className="mb-12"
+              richText={richText ?? []}
+              shareTitle={title}
+            />
             <RichText
               className="prose-lg prose-p:my-0 prose-p:leading-7 prose-p:tracking-[0.013em] prose-li:leading-7 [&>p+p]:mt-8 [&_blockquote]:border-none [&_blockquote]:bg-grid-dots [&_blockquote]:p-4 [&_blockquote]:font-normal [&_blockquote]:not-italic [&_blockquote]:text-zinc-800 dark:[&_blockquote]:text-zinc-50 [&_blockquote_p]:my-0 [&_blockquote_p]:bg-background [&_blockquote_p]:p-8 [&_blockquote_p]:text-lg [&_blockquote_p]:text-muted-foreground [&_blockquote_p]:leading-7 [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none [&_blockquote_strong]:font-normal [&_blockquote_strong]:text-foreground"
               richText={richText as RichTextValue}
