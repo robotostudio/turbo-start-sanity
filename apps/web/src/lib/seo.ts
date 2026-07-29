@@ -13,15 +13,16 @@ type SiteConfig = {
   description: string;
   twitterHandle: string;
   keywords: string[];
+  ogImage?: string | null;
 };
 
 interface PageSeoData extends Metadata {
   title?: string;
   description?: string;
+  ogTitle?: Maybe<string>;
   ogDescription?: Maybe<string>;
+  ogImage?: Maybe<string>;
   slug?: string;
-  contentId?: string;
-  contentType?: string;
   keywords?: string[];
   seoNoIndex?: boolean;
   pageType?: Extract<Metadata["openGraph"], { type: string }>["type"];
@@ -46,6 +47,7 @@ async function resolveSiteConfig(): Promise<SiteConfig> {
     description: settings?.siteDescription || FALLBACK_SITE_CONFIG.description,
     twitterHandle: twitter ? `@${twitter}` : FALLBACK_SITE_CONFIG.twitterHandle,
     keywords: FALLBACK_SITE_CONFIG.keywords,
+    ogImage: settings?.ogImage ?? null,
   };
 }
 
@@ -83,7 +85,9 @@ type SeoSourceDocument = {
   seoTitle?: string | null;
   description?: string | null;
   seoDescription?: string | null;
+  ogTitle?: string | null;
   ogDescription?: string | null;
+  ogImage?: string | null;
   _id?: string | null;
   _type?: string | null;
 };
@@ -100,10 +104,10 @@ export function seoFromDocument(
   return getSEOMetadata({
     title: doc?.title ?? doc?.seoTitle ?? undefined,
     description: doc?.description ?? doc?.seoDescription ?? undefined,
+    ogTitle: doc?.ogTitle,
     ogDescription: doc?.ogDescription,
+    ogImage: doc?.ogImage,
     slug,
-    contentId: doc?._id ?? undefined,
-    contentType: doc?._type ?? undefined,
     pageType,
   });
 }
@@ -114,10 +118,10 @@ export async function getSEOMetadata(
   const {
     title: pageTitle,
     description: pageDescription,
+    ogTitle,
     ogDescription,
+    ogImage: pageOgImage,
     slug = "/",
-    contentId,
-    contentType,
     keywords: pageKeywords = [],
     seoNoIndex = false,
     pageType = "website",
@@ -134,10 +138,23 @@ export async function getSEOMetadata(
     siteTitle: siteConfig.title,
   });
   const defaultDescription = pageDescription || siteConfig.description;
+  const socialTitle = ogTitle || defaultTitle;
   const socialDescription = ogDescription || defaultDescription;
   const allKeywords = [...siteConfig.keywords, ...pageKeywords];
 
-  const ogImage = `${baseUrl}/opengraph.png`;
+  // Per-page image wins, else the Settings default; neither = no OG image.
+  const ogImage = pageOgImage ?? siteConfig.ogImage ?? undefined;
+  const ogImages = ogImage
+    ? [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: socialTitle,
+          secureUrl: ogImage,
+        },
+      ]
+    : undefined;
 
   const fullTitle =
     defaultTitle === siteConfig.title
@@ -163,9 +180,9 @@ export async function getSEOMetadata(
     robots: seoNoIndex ? "noindex, nofollow" : "index, follow",
     twitter: {
       card: "summary_large_image",
-      images: [ogImage],
+      images: ogImage ? [ogImage] : undefined,
       creator: siteConfig.twitterHandle,
-      title: defaultTitle,
+      title: socialTitle,
       description: socialDescription,
     },
     alternates: {
@@ -176,16 +193,8 @@ export async function getSEOMetadata(
       type: pageType ?? "website",
       countryName: "UK",
       description: socialDescription,
-      title: defaultTitle,
-      images: [
-        {
-          url: ogImage,
-          width: 1200,
-          height: 630,
-          alt: defaultTitle,
-          secureUrl: ogImage,
-        },
-      ],
+      title: socialTitle,
+      images: ogImages,
       url: pageUrl,
     },
   };

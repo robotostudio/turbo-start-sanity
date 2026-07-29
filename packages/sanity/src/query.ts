@@ -139,6 +139,8 @@ export const queryHomePageData =
     "slug": slug.current,
     title,
     description,
+    ogTitle,
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${pageBuilderFragment}
   }`);
 
@@ -146,6 +148,8 @@ export const querySlugPageData = defineQuery(`
   *[_type == "page" && defined(slug.current) && slug.current == $slug][0]{
     ...,
     "slug": slug.current,
+    ogTitle,
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${pageBuilderFragment}
   }
   `);
@@ -163,6 +167,8 @@ export const queryBlogIndexPageData = defineQuery(`
     description,
     "displayFeaturedBlogs" : displayFeaturedBlogs == "yes",
     "featuredBlogsCount" : featuredBlogsCount,
+    ogTitle,
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${pageBuilderFragment},
     "slug": slug.current
   }
@@ -187,6 +193,8 @@ export const queryBlogSlugPageData = defineQuery(`
   *[_type == "blog" && slug.current == $slug][0]{
     ...,
     "slug": slug.current,
+    ogTitle,
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${blogAuthorFragment},
     ${imageFragment},
     ${richTextFragment},
@@ -292,6 +300,7 @@ export const queryGlobalSeoSettings = defineQuery(`
         ${imageFields}
       }
     },
+    "ogImage": ogImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     siteDescription,
     socialLinks{
       linkedin,

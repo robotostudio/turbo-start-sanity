@@ -110,6 +110,14 @@ export const settings = defineType({
       ],
     }),
     defineField({
+      name: "ogImage",
+      type: "image",
+      title: "Default social share image",
+      description:
+        "The fallback image shown when a page is shared on social media (Open Graph / Twitter). Used whenever a page has no SEO image of its own. Recommended size 1200×630.",
+      options: { hotspot: true },
+    }),
+    defineField({
       name: "contactEmail",
       type: "string",
       title: "Contact Email",
