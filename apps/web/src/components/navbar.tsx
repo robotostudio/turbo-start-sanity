@@ -1,8 +1,6 @@
 "use client";
 
-import { env } from "@workspace/env/client";
 import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
-import { SanityIcon } from "@workspace/sanity-blocks/internal/sanity-icon";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -11,21 +9,13 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@workspace/ui/components/navigation-menu";
+import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
-import useSWR from "swr";
 
 import type { ColumnLink, NavigationData } from "@/types";
 import { GithubStars } from "./github-stars";
 import { Logo } from "./logo";
 import { MobileMenu } from "./mobile-menu";
-
-const fetcher = async (url: string): Promise<NavigationData> => {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error("Failed to fetch navigation data");
-  }
-  return response.json();
-};
 
 const TRIGGER_CLASS =
   "h-auto rounded-full bg-transparent px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-zinc-100 focus:text-foreground focus-visible:bg-zinc-100 focus-visible:outline-none! data-popup-open:bg-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800 dark:data-popup-open:bg-zinc-800";
@@ -67,42 +57,47 @@ export function NavbarSkeleton() {
   );
 }
 
-export function Navbar({
-  navbarData: initialNavbarData,
-  settingsData: initialSettingsData,
-  stars,
-}: Readonly<NavigationData & { stars?: number | null }>) {
-  const { data, error, isLoading } = useSWR<NavigationData>(
-    "/api/navigation",
-    fetcher,
-    {
-      fallbackData: {
-        navbarData: initialNavbarData,
-        settingsData: initialSettingsData,
-      },
-      revalidateOnFocus: false,
-      revalidateOnMount: false,
-      revalidateOnReconnect: true,
-      errorRetryCount: 3,
-      errorRetryInterval: 5000,
-    }
-  );
+type NavbarBlurVariant = "solid" | "progressive";
 
-  const navigationData = data || {
-    navbarData: initialNavbarData,
-    settingsData: initialSettingsData,
-  };
-  const { navbarData, settingsData } = navigationData;
+// Progressive (gradient) blur variant: blur ramps up toward the top edge where
+// page content scrolls under the bar. Layered masked backdrop-blur bands
+// approximate a variable-radius blur; the theme-colored scrim underneath keeps
+// the nav readable on any background — light, dark, or a colorful block.
+function ProgressiveBlur() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+    >
+      <div className="absolute inset-0 backdrop-blur-[1px] [mask-image:linear-gradient(to_top,transparent_0%,black_35%)]" />
+      <div className="absolute inset-0 backdrop-blur-[3px] [mask-image:linear-gradient(to_top,transparent_25%,black_65%)]" />
+      <div className="absolute inset-0 backdrop-blur-[8px] [mask-image:linear-gradient(to_top,transparent_55%,black_90%)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-transparent" />
+    </div>
+  );
+}
+
+export function Navbar({
+  navbarData,
+  settingsData,
+  stars,
+  variant = "solid",
+}: Readonly<
+  NavigationData & { stars?: number | null; variant?: NavbarBlurVariant }
+>) {
   const { columns, buttons, gitHubUrl } = navbarData || {};
   const { siteTitle, logos } = settingsData || {};
 
-  if (isLoading && !data && !(initialNavbarData && initialSettingsData)) {
-    return <NavbarSkeleton />;
-  }
-
   return (
-    <header className="sticky top-0 z-40 w-full bg-background/20 backdrop-blur-sm dark:bg-background/40">
-      <div className="container">
+    <header
+      className={cn(
+        "sticky top-0 z-40 w-full",
+        variant === "solid" &&
+          "bg-background/20 backdrop-blur-sm dark:bg-background/40"
+      )}
+    >
+      {variant === "progressive" ? <ProgressiveBlur /> : null}
+      <div className="container relative">
         <div className="flex h-16 items-center justify-between">
           <div className="flex h-10 flex-1 items-center pl-3 lg:pl-0">
             <Logo
@@ -128,30 +123,22 @@ export function Navbar({
                         {column.title}
                       </NavigationMenuTrigger>
                       <NavigationMenuContent>
-                        <ul className="grid w-72 gap-1 bg-background p-2">
+                        <ul className="flex w-max max-w-sm flex-col gap-1 p-2">
                           {column.links?.map((link: ColumnLink) => (
                             <li key={link._key}>
                               <NavigationMenuLink
-                                className="group flex items-start gap-3 rounded-md px-2 py-2 hover:bg-accent"
+                                className="group flex flex-col gap-0.5 rounded-none px-3 py-2.5 transition-colors focus-ring-inset hover:bg-zinc-100 dark:hover:bg-zinc-800"
                                 closeOnClick
                                 render={<Link href={link.href ?? "#"} />}
                               >
-                                {link.icon ? (
-                                  <SanityIcon
-                                    className="mt-0.5 size-4 shrink-0 text-muted-foreground"
-                                    icon={link.icon}
-                                  />
+                                <span className="font-light font-mono text-foreground text-sm uppercase tracking-normal">
+                                  {link.name}
+                                </span>
+                                {link.description ? (
+                                  <span className="line-clamp-2 text-muted-foreground text-sm">
+                                    {link.description}
+                                  </span>
                                 ) : null}
-                                <div className="grid gap-0.5">
-                                  <div className="font-light font-mono text-foreground text-sm uppercase tracking-wide">
-                                    {link.name}
-                                  </div>
-                                  {link.description ? (
-                                    <div className="line-clamp-2 text-muted-foreground text-sm">
-                                      {link.description}
-                                    </div>
-                                  ) : null}
-                                </div>
                               </NavigationMenuLink>
                             </li>
                           ))}
@@ -200,12 +187,6 @@ export function Navbar({
           </div>
         </div>
       </div>
-
-      {error && env.NODE_ENV === "development" && (
-        <div className="border-destructive/20 border-b bg-destructive/10 px-4 py-2 text-destructive text-xs">
-          Navigation data fetch error: {error.message}
-        </div>
-      )}
     </header>
   );
 }
