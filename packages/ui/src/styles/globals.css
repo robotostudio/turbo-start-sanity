@@ -58,7 +58,7 @@
   --hero-copy: 420px;
 
   /* Inline gutter shared by the navbar's `container` and page content, so they
-     line up. Roomier on mobile; tightened on large screens below. */
+     line up at every width. */
   --container-px: 1.25rem;
 }
 
@@ -70,7 +70,6 @@
 
 @media (width >= 64rem) {
   :root {
-    --container-px: 0.5rem;
     --hero-copy: 285px;
   }
 }
