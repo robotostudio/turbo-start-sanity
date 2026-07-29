@@ -95,6 +95,7 @@ const SLUGIFY_OPTIONS = {
 
 const DEFAULT_MAX_DEPTH = 6;
 const MIN_HEADINGS_TO_SHOW = 1;
+const DISCLOSURE_CLOSE_MS = 220;
 
 function isValidHeadingStyle(style: unknown): style is HeadingStyle {
   return typeof style === "string" && style in HEADING_STYLES;
@@ -460,9 +461,20 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
       return;
     }
     event.preventDefault();
-    target.scrollIntoView({ behavior: "smooth" });
     window.history.pushState(null, "", href);
-    onNavigate?.();
+    if (onNavigate) {
+      // Mobile: collapse the disclosure first, then scroll once its close
+      // animation has settled. Scrolling immediately overshoots — the TOC
+      // above the target shrinks mid-scroll, pulling the heading up and past
+      // the viewport top.
+      onNavigate();
+      window.setTimeout(
+        () => target.scrollIntoView({ behavior: "smooth" }),
+        DISCLOSURE_CLOSE_MS
+      );
+      return;
+    }
+    target.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
