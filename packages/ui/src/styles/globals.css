@@ -177,7 +177,7 @@
 
 /* Card hover tint — kept here so every card shares one definition. */
 @utility hover-surface {
-  @apply transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900;
+  @apply transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-900;
 }
 
 @utility body-text {
