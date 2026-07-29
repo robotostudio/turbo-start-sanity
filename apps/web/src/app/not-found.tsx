@@ -7,7 +7,7 @@ export default function NotFound() {
       <div className="grid w-full max-w-2xl justify-items-center gap-8 text-center">
         <div className="inline-flex items-center gap-2.5 border border-border px-3 py-1.5 font-light font-mono text-foreground text-sm uppercase tracking-[0.28px]">
           <span className="size-2 shrink-0 rounded-[1px] bg-accent-green" />
-          Not found
+          <span>Not found</span>
         </div>
 
         <h1 className="font-normal text-[clamp(6rem,26vw,15rem)] text-foreground leading-[0.8] tracking-tighter">
