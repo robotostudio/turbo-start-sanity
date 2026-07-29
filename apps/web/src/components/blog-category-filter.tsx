@@ -2,16 +2,13 @@
 
 import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 
 import { BLOG_CATEGORIES } from "@/lib/blog-categories";
 
 export function BlogCategoryFilter({
+  activeCategory,
   className,
-}: Readonly<{ className?: string }>) {
-  const searchParams = useSearchParams();
-  const activeCategory = searchParams.get("category") ?? "";
-
+}: Readonly<{ activeCategory: string; className?: string }>) {
   return (
     <nav
       aria-label="Filter posts by category"

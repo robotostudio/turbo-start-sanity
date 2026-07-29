@@ -19,7 +19,6 @@ import { BlogPageContent } from "@/components/blog-page-content";
 import { Breadcrumbs, type Crumb } from "@/components/breadcrumbs";
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
-import { BlogIndexFallback } from "@/components/skeletons";
 import { seoFromDocument } from "@/lib/seo";
 import {
   calculateBlogPaginationMetadata,
@@ -127,8 +126,21 @@ type BlogPageProps = Readonly<{
 }>;
 
 export default function BlogIndexPage({ searchParams }: BlogPageProps) {
+  // The fallback is the real default view (page 1, unfiltered, published), not a
+  // skeleton. Under PPR it prerenders as the static shell, so /blog shows content
+  // instantly; the dynamic island below streams in and only changes anything when
+  // a `category`/`page` filter is actually present.
   return (
-    <Suspense fallback={<BlogIndexFallback />}>
+    <Suspense
+      fallback={
+        <BlogIndexView
+          activeCategory=""
+          currentPage={1}
+          perspective="published"
+          stega={false}
+        />
+      }
+    >
       <DynamicBlogIndex searchParams={searchParams} />
     </Suspense>
   );
@@ -144,6 +156,22 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
     Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const activeCategory = category ?? "";
 
+  return (
+    <BlogIndexView
+      activeCategory={activeCategory}
+      currentPage={currentPage}
+      perspective={perspective}
+      stega={stega}
+    />
+  );
+}
+
+async function BlogIndexView({
+  currentPage,
+  activeCategory,
+  perspective,
+  stega,
+}: { currentPage: number; activeCategory: string } & DynamicFetchOptions) {
   const [[indexPageData, errIndexPageData], [totalCount, errTotalCount]] =
     await Promise.all([
       handleErrors(fetchBlogIndexPageData({ perspective, stega })),
@@ -206,10 +234,21 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
     <>
       <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
       <BlogPageContent
+        activeCategory={activeCategory}
         blogs={blogs}
         indexPageData={indexPageData}
         paginationMetadata={paginationMetadata}
-      />
+      >
+        {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 ? (
+          <div className="pb-16">
+            <PageBuilder
+              id={indexPageData._id}
+              pageBuilder={indexPageData.pageBuilder}
+              type={indexPageData._type}
+            />
+          </div>
+        ) : null}
+      </BlogPageContent>
     </>
   );
 }

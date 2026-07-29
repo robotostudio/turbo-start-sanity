@@ -1,7 +1,7 @@
 "use client";
 
 import type { QueryBlogIndexPageDataResult } from "@workspace/sanity/types";
-import { useSearchParams } from "next/navigation";
+import type { ReactNode } from "react";
 
 import { BlogHeader, FeaturedBlogCard } from "@/components/blog-card";
 import { BlogCategoryFilter } from "@/components/blog-category-filter";
@@ -9,7 +9,6 @@ import { BlogList } from "@/components/blog-list";
 import { BlogPagination } from "@/components/blog-pagination";
 import { BlogSearchResults } from "@/components/blog-search-results";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { PageBuilder } from "@/components/pagebuilder";
 import { useBlogSearch } from "@/hooks/use-blog-search";
 import type { Blog } from "@/types";
 import type { PaginationMetadata } from "@/utils";
@@ -19,27 +18,24 @@ type BlogPageContentProps = {
   indexPageData: NonNullable<QueryBlogIndexPageDataResult>;
   blogs: Blog[];
   paginationMetadata: PaginationMetadata;
+  // Resolved server-side so this client island doesn't read `useSearchParams`.
+  activeCategory: string;
+  // Server-rendered page builder passed as children, kept out of this bundle.
+  children?: ReactNode;
 };
 
 export function BlogPageContent({
   indexPageData,
   blogs,
   paginationMetadata,
+  activeCategory,
+  children,
 }: BlogPageContentProps) {
-  const {
-    title,
-    description,
-    pageBuilder = [],
-    _id,
-    _type,
-    displayFeaturedBlogs,
-  } = indexPageData;
+  const { title, description, displayFeaturedBlogs } = indexPageData;
 
   const { searchQuery, setSearchQuery, results, isSearching, hasQuery, error } =
     useBlogSearch();
 
-  const searchParams = useSearchParams();
-  const activeCategory = searchParams.get("category") ?? "";
   const hasCategory = activeCategory.length > 0;
 
   const shouldDisplayFeaturedBlogs =
@@ -76,7 +72,7 @@ export function BlogPageContent({
                 placeholder="Search…"
                 value={searchQuery}
               />
-              <BlogCategoryFilter />
+              <BlogCategoryFilter activeCategory={activeCategory} />
             </div>
           </aside>
 
@@ -108,11 +104,7 @@ export function BlogPageContent({
         </div>
       </div>
 
-      {pageBuilder && pageBuilder.length > 0 && (
-        <div className="pb-16">
-          <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
-        </div>
-      )}
+      {children}
     </main>
   );
 }
