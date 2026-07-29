@@ -6,17 +6,23 @@ import {
   useCopyToClipboard,
 } from "@workspace/sanity-blocks/internal/use-copy";
 import { cn } from "@workspace/tailwind-config/utils";
-import { Check, X } from "lucide-react";
+import { Check, Loader2, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useCallback } from "react";
 
 const LABELS: Record<CopyStatus, string> = {
   idle: "Copy as markdown",
+  loading: "Copying…",
   copied: "Copied",
   error: "Copy failed",
 };
 
-const STATUS_ICONS = { idle: CopyIcon, copied: Check, error: X };
+const STATUS_ICONS = {
+  idle: CopyIcon,
+  loading: Loader2,
+  copied: Check,
+  error: X,
+};
 
 /** Every page is also served as Markdown at its `.md` path. */
 function markdownPath(pathname: string): string {
@@ -52,7 +58,9 @@ export function CopyMarkdownButton({
         aria-hidden="true"
         className="grid size-4.5 flex-none place-items-center"
       >
-        <StatusIcon className="size-4.5" />
+        <StatusIcon
+          className={cn("size-4.5", status === "loading" && "animate-spin")}
+        />
       </span>
       <span className="grid text-left">
         <span aria-hidden="true" className="col-start-1 row-start-1 invisible">

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export const COPY_RESET_MS = 1500;
 
-export type CopyStatus = "idle" | "copied" | "error";
+export type CopyStatus = "idle" | "loading" | "copied" | "error";
 
 export function useCopyToClipboard(
   getText: () => string | Promise<string>,
@@ -23,6 +23,11 @@ export function useCopyToClipboard(
   );
 
   const copy = useCallback(async () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setStatus("loading");
+
     let next: CopyStatus = "error";
     try {
       await navigator.clipboard.writeText(await getText());
