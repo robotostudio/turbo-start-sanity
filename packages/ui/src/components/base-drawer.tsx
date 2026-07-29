@@ -38,7 +38,7 @@ function DrawerBackdrop({
   return (
     <DrawerPrimitive.Backdrop
       className={cn(
-        "fixed inset-0 z-50 min-h-dvh bg-background/80 backdrop-blur-xs",
+        "fixed inset-0 z-50 min-h-dvh bg-background/95",
         "opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-300 ease-out",
         "supports-[-webkit-touch-callout:none]:absolute",
         "data-ending-style:opacity-0 data-starting-style:opacity-0",

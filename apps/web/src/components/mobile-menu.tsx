@@ -102,7 +102,7 @@ export function MobileMenu({
                 <DrawerTitle className="sr-only">
                   {siteTitle || "Menu"}
                 </DrawerTitle>
-                <div className="flex items-center [&_img]:h-6 [&_img]:w-auto [&_img]:rounded-none">
+                <div className="flex items-center [&_img]:h-5 [&_img]:w-auto [&_img]:rounded-none">
                   <Logo
                     alt={siteTitle ?? "Turbo Start Sanity"}
                     image={logos?.logo}
