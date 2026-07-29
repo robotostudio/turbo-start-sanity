@@ -42,7 +42,7 @@ async function fetchGithubStars(repo: string): Promise<number> {
     stargazers_count?: number;
   };
   if (typeof stargazers_count !== "number") {
-    throw new Error("GitHub stars response missing stargazers_count");
+    throw new TypeError("GitHub stars response missing stargazers_count");
   }
   return stargazers_count;
 }

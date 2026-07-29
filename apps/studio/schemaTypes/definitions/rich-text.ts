@@ -12,6 +12,7 @@ export const richText = defineType({
   of: definePortableTextField(portableTextMemberTypes).of,
 });
 
-export const memberTypes = portableTextMemberTypes;
-
-export const customRichText = definePortableTextField;
+export {
+  definePortableTextField as customRichText,
+  portableTextMemberTypes as memberTypes,
+} from "@workspace/sanity-blocks/internal/sanity-rich-text";
