@@ -9,7 +9,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@workspace/ui/components/navigation-menu";
-import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 
 import type { ColumnLink, NavigationData } from "@/types";
@@ -57,22 +56,20 @@ export function NavbarSkeleton() {
   );
 }
 
-type NavbarBlurVariant = "solid" | "progressive";
-
-// Progressive (gradient) blur variant: blur ramps up toward the top edge where
-// page content scrolls under the bar. Layered masked backdrop-blur bands
-// approximate a variable-radius blur; the theme-colored scrim underneath keeps
-// the nav readable on any background — light, dark, or a colorful block.
+// Progressive (gradient) blur: blur ramps up toward the top edge where page
+// content scrolls under the bar. Layered masked backdrop-blur bands approximate
+// a variable-radius blur; the theme scrim keeps the nav readable on any
+// background and stops content/footer bleeding through.
 function ProgressiveBlur() {
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 overflow-hidden"
     >
-      <div className="absolute inset-0 backdrop-blur-[1px] [mask-image:linear-gradient(to_top,transparent_0%,black_35%)]" />
-      <div className="absolute inset-0 backdrop-blur-[3px] [mask-image:linear-gradient(to_top,transparent_25%,black_65%)]" />
-      <div className="absolute inset-0 backdrop-blur-[8px] [mask-image:linear-gradient(to_top,transparent_55%,black_90%)]" />
-      <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/40 to-transparent" />
+      <div className="absolute inset-0 backdrop-blur-[5px]" />
+      <div className="absolute inset-0 backdrop-blur-[10px] [mask-image:linear-gradient(to_top,transparent_25%,black_65%)]" />
+      <div className="absolute inset-0 backdrop-blur-[20px] [mask-image:linear-gradient(to_top,transparent_55%,black_90%)]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background via-background/75 to-background/55" />
     </div>
   );
 }
@@ -81,25 +78,19 @@ export function Navbar({
   navbarData,
   settingsData,
   stars,
-  variant = "solid",
-}: Readonly<
-  NavigationData & { stars?: number | null; variant?: NavbarBlurVariant }
->) {
+}: Readonly<NavigationData & { stars?: number | null }>) {
   const { columns, buttons, gitHubUrl } = navbarData || {};
   const { siteTitle, logos } = settingsData || {};
 
+  // The header's `before` pseudo extends a solid slab above the bar (at the
+  // navbar's z-index, over the z-0 footer) so the fixed sticky-reveal footer
+  // can't peek through during the top overscroll bounce.
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-40 w-full",
-        variant === "solid" &&
-          "bg-background/20 backdrop-blur-sm dark:bg-background/40"
-      )}
-    >
-      {variant === "progressive" ? <ProgressiveBlur /> : null}
+    <header className="sticky top-0 z-40 w-full before:absolute before:inset-x-0 before:bottom-full before:h-screen before:bg-background before:content-['']">
+      <ProgressiveBlur />
       <div className="container relative">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex h-10 flex-1 items-center pl-3 lg:pl-0">
+          <div className="flex h-10 flex-1 items-center">
             <Logo
               alt={siteTitle ?? "Turbo Start Sanity"}
               className="h-5 w-auto object-left"

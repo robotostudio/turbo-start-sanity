@@ -55,7 +55,11 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
 
   return (
     <div
-      className={pinned ? "fixed inset-x-0 bottom-0 z-0" : "relative z-10"}
+      className={
+        pinned
+          ? "fixed inset-x-0 bottom-0 z-0 [transform:translateZ(0)]"
+          : "relative z-10"
+      }
       ref={ref}
     >
       {children}
