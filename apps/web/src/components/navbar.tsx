@@ -17,7 +17,7 @@ import { Logo } from "./logo";
 import { MobileMenu } from "./mobile-menu";
 
 const TRIGGER_CLASS =
-  "h-auto rounded-full bg-transparent px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-zinc-100 focus:text-foreground focus-visible:bg-zinc-100 focus-visible:outline-none! data-popup-open:bg-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800 dark:data-popup-open:bg-zinc-800";
+  "h-auto rounded-full bg-transparent px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-zinc-100 focus:text-foreground focus-visible:bg-zinc-200 focus-visible:outline-none! data-popup-open:bg-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800 dark:data-popup-open:bg-zinc-800";
 
 const NAV_BUTTON_CLASS =
   "h-9 px-4 font-mono font-normal text-sm uppercase tracking-wide";
@@ -56,8 +56,6 @@ export function NavbarSkeleton() {
   );
 }
 
-// Blur bands, heaviest at the top. Overlapping soft masks fade each band to
-// nothing, so the blur dissolves into the page with no hard edge.
 const BLUR_LAYERS = [
   {
     radius: 32,
@@ -88,13 +86,11 @@ const BLUR_LAYERS = [
 const SATURATE_MASK =
   "linear-gradient(to bottom, black 0%, black 50%, transparent 95%)";
 
-// Progressive blur: masked blur bands + saturate glow + fading scrim. Inline
-// styles carry the -webkit- prefixes.
 function ProgressiveBlur() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-x-0 top-0 h-[140%]"
+      className="pointer-events-none absolute inset-x-0 top-0 h-[130%]"
     >
       <div
         className="absolute inset-0 [-webkit-backdrop-filter:saturate(1.5)] [backdrop-filter:saturate(1.5)]"
@@ -112,7 +108,7 @@ function ProgressiveBlur() {
           }}
         />
       ))}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/15 via-55% to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-30% via-background/25 to-transparent dark:from-background/30 dark:via-background/15" />
     </div>
   );
 }
@@ -125,9 +121,6 @@ export function Navbar({
   const { columns, buttons, gitHubUrl } = navbarData || {};
   const { siteTitle, logos } = settingsData || {};
 
-  // The header's `before` pseudo extends a solid slab above the bar (at the
-  // navbar's z-index, over the z-0 footer) so the fixed sticky-reveal footer
-  // can't peek through during the top overscroll bounce.
   return (
     <header className="sticky top-0 z-40 w-full before:absolute before:inset-x-0 before:bottom-full before:h-screen before:bg-background before:content-['']">
       <ProgressiveBlur />
@@ -188,7 +181,7 @@ export function Navbar({
                   return (
                     <NavigationMenuItem key={column._key}>
                       <NavigationMenuLink
-                        className="flex h-auto items-center rounded-full px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-zinc-100 focus-visible:bg-zinc-100 focus-visible:outline-none! dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800"
+                        className="flex h-auto items-center rounded-full px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-zinc-100 focus-visible:bg-zinc-200 focus-visible:outline-none! dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800"
                         render={<Link href={column.href} />}
                       >
                         {column.name}
