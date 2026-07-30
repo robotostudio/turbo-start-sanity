@@ -1,5 +1,6 @@
 "use client";
 
+import { cn } from "@workspace/tailwind-config/utils";
 import {
   type ReactNode,
   useEffect,
@@ -24,6 +25,13 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
   // Default to pinned so SSR and first paint agree (no relative→fixed hydration
   // flip / CLS). The effect only flips to in-flow when the footer is too tall.
   const [pinned, setPinned] = useState(true);
+  // At the top the footer is fully covered, yet still painted — and a rubber-band
+  // translates the content and sticky navbar away while a fixed element stays
+  // put, flashing accent green under the translucent navbar. Not painting it is
+  // the only reliable fix: `overscroll-behavior: none` kills the bounce and macOS
+  // Safari ignores it, and a cover can't help since the gap opens over the
+  // footer's own box.
+  const [coveredAtTop, setCoveredAtTop] = useState(false);
 
   useIsomorphicLayoutEffect(() => {
     const el = ref.current;
@@ -53,13 +61,42 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!pinned) {
+      setCoveredAtTop(false);
+      return;
+    }
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const root = document.documentElement;
+      // A page with nothing to scroll shows the footer at rest — never hide it.
+      const scrollable = root.scrollHeight - window.innerHeight > 2;
+      setCoveredAtTop(scrollable && window.scrollY <= 0);
+    };
+    const schedule = () => {
+      if (!frame) {
+        frame = requestAnimationFrame(update);
+      }
+    };
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [pinned]);
+
   return (
     <div
-      className={
+      className={cn(
         pinned
           ? "fixed inset-x-0 bottom-0 z-0 [transform:translateZ(0)]"
-          : "relative z-10"
-      }
+          : "relative z-10",
+        coveredAtTop && "opacity-0"
+      )}
       ref={ref}
     >
       {children}
