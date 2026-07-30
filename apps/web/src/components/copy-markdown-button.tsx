@@ -48,7 +48,7 @@ export function CopyMarkdownButton({
     <button
       aria-label={LABELS[status]}
       className={cn(
-        "-mr-2 focus-ring inline-flex min-h-10 items-center gap-2 px-2 text-muted-foreground text-sm leading-5 tracking-[0.017em] transition-colors duration-150 ease-out hover:text-foreground motion-reduce:transition-none",
+        "-mr-2 focus-ring inline-flex min-h-10 items-center gap-2 px-2 font-light font-mono text-muted-foreground text-sm leading-5 tracking-[0.24px] transition-colors duration-150 ease-out hover:text-foreground motion-reduce:transition-none",
         className
       )}
       onClick={copy}
