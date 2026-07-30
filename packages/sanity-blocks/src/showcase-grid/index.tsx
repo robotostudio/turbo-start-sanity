@@ -405,7 +405,7 @@ export function ShowcaseGrid({
         ) : null}
 
         {cards.length > 0 ? (
-          <div className="mx-auto w-full max-w-[90rem] sm:px-2">
+          <div className="container">
             <div className="grid gap-y-12 sm:grid-cols-2 sm:gap-x-8">
               {cards.map((item) => (
                 <ShowcaseCard item={item} key={item.id} />
