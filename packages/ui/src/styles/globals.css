@@ -234,6 +234,54 @@
   }
 }
 
+/* Registered so it can animate — an unregistered custom property would swap
+   discretely instead of sweeping. */
+@property --mark-wipe {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+
+/* No `to` — fully printed is the element's own state, so anything that ignores
+   the animation shows the whole mark rather than a blank band. */
+@keyframes mark-print {
+  from {
+    --mark-wipe: 0%;
+  }
+}
+
+/* Prints the footer mark in as the page bottoms out: a hard mask edge steps
+ * across it in lattice-column chunks, like a dot-matrix head laying it down.
+ * `steps()` is the whole effect — a smooth sweep reads as a wipe instead.
+ *
+ * Driven by document scroll rather than the band's own `view()` progress: the
+ * footer is pinned (fixed) while the page scrolls over it, so it never enters
+ * the viewport and its view progress would sit at 100% forever.
+ *
+ * `animation-duration: auto` is what makes the degradations safe. Browsers
+ * without scroll-driven timelines drop it, fall back to `0s`, and land on the
+ * printed state; a page too short to scroll leaves the timeline inactive, which
+ * drops the animation entirely — also printed. */
+@utility mark-print {
+  --mark-wipe: 100%;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    #000 var(--mark-wipe),
+    transparent var(--mark-wipe)
+  );
+  mask-image: linear-gradient(
+    90deg,
+    #000 var(--mark-wipe),
+    transparent var(--mark-wipe)
+  );
+  animation-name: mark-print;
+  animation-duration: auto;
+  animation-timing-function: steps(48);
+  animation-fill-mode: backwards;
+  animation-timeline: scroll(root block);
+  animation-range: calc(100% - 320px) calc(100% - 60px);
+}
+
 /* Underline that wipes in from the left on hover/focus (and while a Base-UI
    popup trigger is open). currentColor adapts it to any surface. */
 @layer utilities {

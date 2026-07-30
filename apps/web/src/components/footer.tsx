@@ -179,7 +179,11 @@ function FooterMark() {
       aria-hidden="true"
       className="aspect-[1440/320] w-full overflow-hidden text-accent-green-foreground"
     >
-      <svg aria-hidden="true" className="w-full" viewBox="0 0 1440 516">
+      <svg
+        aria-hidden="true"
+        className="mark-print w-full motion-reduce:animate-none"
+        viewBox="0 0 1440 516"
+      >
         <defs>
           <pattern
             height="6"
