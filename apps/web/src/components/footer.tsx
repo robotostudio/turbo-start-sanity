@@ -11,12 +11,6 @@ import type {
   QueryFooterDataResult,
   QueryGlobalSeoSettingsResult,
 } from "@workspace/sanity/types";
-import { normalizedLogoHeight } from "@workspace/sanity-blocks/internal/logo-height";
-import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
-import { cn } from "@workspace/tailwind-config/utils";
-import Link from "next/link";
-import { Fragment } from "react";
-
 import {
   FacebookIcon,
   InstagramBrandIcon,
@@ -25,6 +19,12 @@ import {
   XBrandIcon,
   YoutubeIcon,
 } from "@workspace/sanity-blocks/internal/icons";
+import { normalizedLogoHeight } from "@workspace/sanity-blocks/internal/logo-height";
+import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
+import { cn } from "@workspace/tailwind-config/utils";
+import Link from "next/link";
+import { Fragment } from "react";
+
 import { FooterThemeToggle } from "./footer-theme-toggle";
 import { Logo } from "./logo";
 
@@ -163,6 +163,39 @@ function FooterTopBar() {
   );
 }
 
+const MARK_CELLS =
+  "M0 0h498v102h-498zM666 0h258v6h-258zM1092 0h264v6h-264zM660 6h264v6h-264zM1086 6h270v12h-270zM654 12h270v6h-270zM648 18h276v6h-276zM1080 18h276v6h-276zM642 24h282v12h-282zM1074 24h282v6h-282zM1068 30h288v6h-288zM636 36h288v6h-288zM1062 36h294v12h-294zM630 42h294v6h-294zM624 48h300v6h-300zM1056 48h300v6h-300zM618 54h306v12h-306zM1050 54h306v6h-306zM1044 60h312v6h-312zM612 66h312v6h-312zM1038 66h318v6h-318zM606 72h318v6h-318zM1032 72h324v12h-324zM600 78h324v6h-324zM594 84h330v6h-330zM1026 84h330v6h-330zM588 90h336v12h-336zM1020 90h336v6h-336zM1014 96h342v6h-342zM924 102h6v6h-6zM1356 102h84v90h-84zM294 108h6v6h-6zM498 108h18v6h-18zM924 108h18v6h-18zM288 114h12v6h-12zM498 114h30v6h-30zM924 114h30v6h-30zM282 120h18v6h-18zM498 120h42v6h-42zM924 120h48v6h-48zM276 126h24v6h-24zM498 126h60v6h-60zM924 126h60v6h-60zM270 132h30v6h-30zM498 132h72v6h-72zM924 132h72v6h-72zM264 138h36v6h-36zM498 138h84v6h-84zM924 138h90v6h-90zM258 144h42v6h-42zM498 144h96v6h-96zM924 144h102v6h-102zM252 150h48v6h-48zM498 150h114v6h-114zM924 150h114v6h-114zM246 156h54v6h-54zM498 156h126v6h-126zM924 156h132v6h-132zM240 162h60v6h-60zM498 162h138v6h-138zM924 162h144v6h-144zM234 168h66v6h-66zM498 168h156v6h-156zM924 168h156v6h-156zM228 174h72v6h-72zM498 174h168v6h-168zM924 174h174v6h-174zM222 180h78v6h-78zM498 180h180v6h-180zM924 180h186v6h-186zM216 186h84v6h-84zM498 186h198v6h-198zM924 186h198v6h-198zM210 192h90v6h-90zM498 192h210v6h-210zM924 192h216v6h-216zM204 198h96v6h-96zM498 198h222v6h-222zM924 198h228v6h-228zM198 204h102v312h-102zM498 204h240v6h-240zM924 204h240v6h-240zM510 210h240v6h-240zM936 210h246v6h-246zM522 216h240v6h-240zM954 216h240v6h-240zM540 222h240v6h-240zM966 222h240v6h-240zM552 228h240v6h-240zM984 228h234v6h-234zM570 234h234v6h-234zM996 234h240v6h-240zM582 240h240v6h-240zM1014 240h234v6h-234zM600 246h234v6h-234zM1032 246h228v6h-228zM612 252h234v6h-234zM1044 252h234v6h-234zM630 258h234v6h-234zM1062 258h228v6h-228zM648 264h228v6h-228zM1074 264h228v6h-228zM660 270h228v6h-228zM1092 270h228v6h-228zM678 276h222v6h-222zM1104 276h228v6h-228zM690 282h228v6h-228zM1122 282h222v6h-222zM708 288h222v6h-222zM1134 288h228v6h-228zM720 294h222v6h-222zM1152 294h222v6h-222zM738 300h222v6h-222zM1164 300h222v6h-222zM750 306h222v6h-222zM1182 306h222v6h-222zM768 312h216v6h-216zM1194 312h222v6h-222zM780 318h222v6h-222zM1212 318h216v6h-216zM498 324h84v90h-84zM798 324h210v6h-210zM1224 324h216v6h-216zM810 330h198v6h-198zM1242 330h198v6h-198zM828 336h180v6h-180zM1254 336h186v6h-186zM840 342h168v6h-168zM1272 342h168v6h-168zM858 348h150v6h-150zM1284 348h156v6h-156zM870 354h138v6h-138zM1302 354h138v6h-138zM888 360h120v6h-120zM1314 360h126v6h-126zM900 366h108v6h-108zM1332 366h108v6h-108zM918 372h90v6h-90zM1344 372h96v6h-96zM930 378h78v6h-78zM1362 378h78v6h-78zM948 384h60v6h-60zM1374 384h66v6h-66zM960 390h48v6h-48zM1392 390h48v6h-48zM978 396h30v6h-30zM1404 396h36v6h-36zM990 402h18v6h-18zM1422 402h18v6h-18zM1434 408h6v6h-6zM582 414h336v12h-336zM1008 414h342v6h-342zM1008 420h336v6h-336zM582 426h330v6h-330zM1008 426h330v6h-330zM582 432h324v6h-324zM1008 432h324v12h-324zM582 438h318v6h-318zM582 444h312v6h-312zM1008 444h318v6h-318zM582 450h306v12h-306zM1008 450h312v6h-312zM1008 456h306v6h-306zM582 462h300v6h-300zM1008 462h300v12h-300zM582 468h294v6h-294zM582 474h288v6h-288zM1008 474h294v6h-294zM582 480h282v12h-282zM1008 480h288v6h-288zM1008 486h282v6h-282zM582 492h276v6h-276zM1008 492h276v6h-276zM582 498h270v6h-270zM1008 498h270v12h-270zM582 504h264v6h-264zM582 510h258v6h-258zM1008 510h264v6h-264z";
+
+/** Decorative slash motif closing the footer.
+ *
+ * The geometry is the design's artwork quantised to the 6px dot grid: every
+ * kept cell is a whole pitch wide, so shape edges land on cell boundaries and
+ * the pattern's dot — centred in each cell — is never sliced by an edge. That's
+ * why the diagonals read as steps rather than clean lines. The band's shorter
+ * aspect crops the lower half of the motif off. */
+function FooterMark() {
+  return (
+    <div
+      aria-hidden="true"
+      className="aspect-[1440/320] w-full overflow-hidden text-accent-green-foreground"
+    >
+      <svg aria-hidden="true" className="w-full" viewBox="0 0 1440 516">
+        <defs>
+          <pattern
+            height="6"
+            id="footer-mark-dots"
+            patternUnits="userSpaceOnUse"
+            width="6"
+          >
+            <circle cx="3" cy="3" fill="currentColor" r="0.7" />
+          </pattern>
+        </defs>
+        <path d={MARK_CELLS} fill="url(#footer-mark-dots)" />
+      </svg>
+    </div>
+  );
+}
+
 const FOOTER_BAR = "bg-accent-green-foreground/10";
 
 function FooterSocialDotSkeleton() {
@@ -212,7 +245,7 @@ export function FooterSkeleton() {
             <FooterLinkColumnSkeleton />
           </div>
         </div>
-        <div className="container relative z-10 mt-12 pt-8 pb-6">
+        <div className="container relative z-10 mt-12 pt-8 pb-8">
           <div className="flex flex-col items-start justify-between gap-6 text-start lg:flex-row lg:items-center lg:gap-4">
             <div className={cn("h-5 w-64", FOOTER_BAR)} />
             <div className="flex flex-col items-start gap-4 lg:flex-row lg:items-center">
@@ -226,6 +259,7 @@ export function FooterSkeleton() {
             </div>
           </div>
         </div>
+        <FooterMark />
       </footer>
     </>
   );
@@ -300,7 +334,7 @@ function Footer({ data, settingsData }: FooterProps) {
             </div>
           )}
         </div>
-        <div className="container relative z-10 mt-12 pt-8 pb-6">
+        <div className="container relative z-10 my-12 pt-8 pb-8">
           <div className="flex flex-col items-start justify-between gap-6 text-start lg:flex-row lg:items-center lg:gap-4">
             <p className="text-accent-green-foreground/80 text-sm tracking-[0.24px]">
               {copyright ?? `© ${year} ${siteTitle}. All rights reserved.`}
@@ -361,6 +395,7 @@ function Footer({ data, settingsData }: FooterProps) {
             </div>
           </div>
         </div>
+        <FooterMark />
       </footer>
     </>
   );
