@@ -239,36 +239,64 @@
    travel is in user units, not a percentage: percentage translations on SVG
    elements depend on `transform-box` support, 48 units always scales with the
    viewBox. */
-@keyframes mark-shutter {
+@keyframes mark-frame {
   from {
-    transform: translateY(48px);
-    fill-opacity: 0;
+    opacity: 0;
+    transform: translate3d(0, 120px, 0);
+  }
+  20% {
+    opacity: 1;
   }
 }
 
-/* Drops the footer mark's column slices into place left to right as the page
- * bottoms out.
+/* Draws the footer mark in six frames as the page bottoms out — T's bar, its
+ * stem, then each S in an upper and a lower stroke — like the mark being written.
  *
  * Driven by document scroll rather than the band's own `view()` progress: the
  * footer is pinned (fixed) while the page scrolls over it, so it never enters
  * the viewport and its view progress would sit at 100% forever. Scroll
  * timelines also ignore `animation-delay`, so the stagger is an offset
- * `animation-range` per slice — `--shutter-index` carries the slice number and
- * the range maths lives here instead of in twelve near-identical classes.
+ * `animation-range` per frame — `--frame-index` carries the stroke's position
+ * and the range maths lives here instead of in six near-identical classes.
+ * Nothing starts until the band is fully open. The reveal exposes the footer
+ * bottom-up, so the panel arrives before the mark does: `--footer-height` (the
+ * distance `StickyFooter` measures) minus the band's own 320px is the moment the
+ * whole panel is in view, and the build runs from there. Earlier starts meant a
+ * stroke was mid-rise while its place was still below the fold.
+ *
+ * Each stroke rises 120px, far enough to read as arriving from below but short
+ * enough to stay inside the open panel — at a band-height of travel the first
+ * stroke showed up before the panel had opened. Windows are 100px, 78px apart:
+ * a stroke is well on its way before the next starts, so it reads as one build
+ * rather than six pops.
+ *
+ * Three things keep it smooth. `opacity` rather than `fill-opacity`, because
+ * only the former composites — `fill-opacity` repaints the dot pattern across
+ * every path each frame. `translate3d` and `will-change` so each letter is
+ * promoted before it moves instead of hitching on its first frame. And the fade
+ * finishes at 20% while the slide keeps going, so a stroke is never translucent
+ * for long: half-lit dots over the accent green read as muddy.
  *
  * `animation-duration: auto` is what makes the degradations safe. Browsers
  * without scroll-driven timelines drop it, fall back to `0s`, and land on the
  * settled state; a page too short to scroll leaves the timeline inactive, which
  * drops the animation entirely — also settled. */
-@utility mark-shutter {
-  --shutter-index: 0;
-  animation-name: mark-shutter;
+@utility mark-frame {
+  --frame-index: 0;
+  will-change: transform, opacity;
+  animation-name: mark-frame;
   animation-duration: auto;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   animation-fill-mode: backwards;
   animation-timeline: scroll(root block);
-  animation-range: calc(100% - 340px + var(--shutter-index) * 14px)
-    calc(100% - 200px + var(--shutter-index) * 14px);
+  animation-range: calc(
+      100% -
+      var(--footer-height, 800px) +
+      320px +
+      var(--frame-index) *
+      78px
+    )
+    calc(100% - var(--footer-height, 800px) + 420px + var(--frame-index) * 78px);
 }
 
 /* Underline that wipes in from the left on hover/focus (and while a Base-UI
