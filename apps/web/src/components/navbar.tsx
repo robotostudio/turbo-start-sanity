@@ -49,7 +49,7 @@ export function NavbarSkeleton() {
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
-            <div className="size-10 rounded-full bg-muted/50" />
+            <div className="size-8 bg-muted/50" />
           </div>
         </div>
       </div>
