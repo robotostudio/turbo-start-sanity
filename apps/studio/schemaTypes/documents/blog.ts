@@ -3,7 +3,7 @@ import {
   orderRankOrdering,
 } from "@sanity/orderable-document-list";
 import { BLOG_CATEGORY_OPTIONS } from "@workspace/sanity-blocks/internal/blog-categories";
-import { FileTextIcon } from "lucide-react";
+import { FileText } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
 import { documentSlugField, imageWithAltField } from "@/schemaTypes/common";
@@ -13,13 +13,13 @@ import { seoFields } from "@/utils/seo-fields";
 
 export const blog = defineType({
   name: "blog",
-  title: "Blog",
   type: "document",
-  icon: FileTextIcon,
-  groups: GROUPS,
-  orderings: [orderRankOrdering],
+  title: "Blog",
   description:
     "A blog post that will be published on the website. Add a title, description, author, and content to create a new article for readers.",
+  icon: FileText,
+  groups: GROUPS,
+  orderings: [orderRankOrdering],
   fields: [
     orderRankField({ type: "blog" }),
     defineField({
@@ -31,12 +31,12 @@ export const blog = defineType({
       validation: (Rule) => Rule.required().error("A blog title is required"),
     }),
     defineField({
-      title: "Description",
       name: "description",
       type: "text",
-      rows: 3,
+      title: "Description",
       description:
         "A short summary of what your blog post is about (appears in search results)",
+      rows: 3,
       group: GROUP.MAIN_CONTENT,
       validation: (rule) => [
         rule
@@ -86,10 +86,10 @@ export const blog = defineType({
     defineField({
       name: "publishedAt",
       type: "date",
-      initialValue: () => new Date().toISOString().split("T")[0],
       title: "Published At",
       description:
         "The date when your blog post will appear to have been published",
+      initialValue: () => new Date().toISOString().split("T")[0],
       group: GROUP.MAIN_CONTENT,
     }),
     defineField({

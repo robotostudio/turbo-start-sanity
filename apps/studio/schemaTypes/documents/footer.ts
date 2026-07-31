@@ -6,6 +6,8 @@ import { imageWithAltField } from "@/schemaTypes/common";
 const footerCreditItem = defineArrayMember({
   name: "footerCredit",
   type: "object",
+  title: "Footer Credit",
+  description: "A short 'made with' style credit shown in the footer bar",
   icon: BadgeCheck,
   fields: [
     defineField({
@@ -34,9 +36,11 @@ const footerCreditItem = defineArrayMember({
   },
 });
 
-const footerColumnLink = defineField({
+const footerColumnLink = defineArrayMember({
   name: "footerColumnLink",
   type: "object",
+  title: "Footer Link",
+  description: "A single link inside a footer column",
   icon: Link,
   fields: [
     defineField({
@@ -48,6 +52,8 @@ const footerColumnLink = defineField({
     defineField({
       name: "url",
       type: "customUrl",
+      title: "Link URL",
+      description: "The URL that this link will navigate to when clicked",
     }),
   ],
   preview: {
@@ -73,9 +79,11 @@ const footerColumnLink = defineField({
   },
 });
 
-const footerColumn = defineField({
+const footerColumn = defineArrayMember({
   name: "footerColumn",
   type: "object",
+  title: "Footer Column",
+  description: "A group of footer links shown under a shared heading",
   icon: LayoutPanelLeft,
   fields: [
     defineField({
@@ -111,21 +119,22 @@ export const footer = defineType({
   type: "document",
   title: "Footer",
   description: "Footer content for your website",
+  icon: PanelBottom,
   fields: [
     defineField({
       name: "label",
       type: "string",
-      initialValue: "Footer",
       title: "Label",
       description: "Label used to identify footer in the CMS",
+      initialValue: "Footer",
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "subtitle",
       type: "text",
-      rows: 2,
       title: "Subtitle",
       description: "Subtitle that sits beneath the logo in the footer",
+      rows: 2,
     }),
     defineField({
       name: "columns",
@@ -137,13 +146,13 @@ export const footer = defineType({
     defineField({
       name: "copyright",
       type: "string",
-      title: "Copyright text",
+      title: "Copyright Text",
       description: "Copyright line shown on the right of the bottom bar",
     }),
     defineField({
       name: "credits",
       type: "array",
-      title: "Footer credits",
+      title: "Footer Credits",
       description:
         "Credits shown on the right of the footer bar. Each has a label and a logo (e.g. 'Powered by Sanity', 'Hosted on Vercel')",
       of: [footerCreditItem],

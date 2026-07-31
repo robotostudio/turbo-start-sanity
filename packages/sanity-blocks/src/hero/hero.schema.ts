@@ -17,21 +17,21 @@ const videoVariantFields = () => [
   defineField({
     name: "webm",
     type: "file",
-    title: "Video for computers",
+    title: "Video For Computers",
     description: "The .webm file. Most people see this one.",
     options: { accept: "video/webm" },
   }),
   defineField({
     name: "hevc",
     type: "file",
-    title: "Video for Apple devices",
+    title: "Video For Apple Devices",
     description: "The .mp4 file. Macs, iPhones and iPads need this one.",
     options: { accept: "video/mp4" },
   }),
   defineField({
     name: "mobileWebm",
     type: "file",
-    title: "Video for phones",
+    title: "Video For Phones",
     description:
       "A smaller .webm, so phones do not have to download the big file.",
     options: { accept: "video/webm" },
@@ -56,7 +56,7 @@ export const heroVideoField = defineField({
     defineField({
       name: "light",
       type: "object",
-      title: "Light mode",
+      title: "Light Mode",
       description: "The files shown when the site is in light mode.",
       options: { collapsible: true, collapsed: false },
       fields: videoVariantFields(),
@@ -64,7 +64,7 @@ export const heroVideoField = defineField({
     defineField({
       name: "dark",
       type: "object",
-      title: "Dark mode",
+      title: "Dark Mode",
       description:
         "Optional. Leave empty and the light mode files are used here too.",
       options: { collapsible: true, collapsed: false },
@@ -75,9 +75,9 @@ export const heroVideoField = defineField({
 
 export const heroSchema = defineType({
   name: "hero",
+  type: "object",
   title: "Hero",
   icon: Star,
-  type: "object",
   fields: [
     defineField({
       name: "badge",
@@ -95,6 +95,8 @@ export const heroSchema = defineType({
     }),
     definePortableTextField(["block"], {
       name: "richText",
+      description:
+        "The supporting paragraph shown beneath the title, introducing the page in a sentence or two",
     }),
     heroVideoField,
     buttonsField,

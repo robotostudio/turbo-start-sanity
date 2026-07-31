@@ -7,13 +7,13 @@ const logoCloudItem = logoLinkItem("logoCloudItem");
 export const logoCloudSchema = defineType({
   name: "logoCloud",
   type: "object",
-  icon: ImagesIcon,
   title: "Logo Cloud",
+  icon: ImagesIcon,
   fields: [
     defineField({
       name: "logos",
-      title: "Logos",
       type: "array",
+      title: "Logos",
       description: "Add the partner or brand logos to display in the row",
       of: [logoCloudItem],
     }),

@@ -1,7 +1,7 @@
 import { Logger } from "@workspace/logger";
 import {
-  type DynamicFetchOptions,
   DRAFT_MODE_ENABLED,
+  type DynamicFetchOptions,
   getDynamicFetchOptions,
   resolvePageFetchOptions,
   sanityFetch,

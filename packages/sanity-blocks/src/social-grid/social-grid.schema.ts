@@ -20,8 +20,8 @@ const socialGridItem = defineArrayMember({
   fields: [
     defineField({
       name: "platform",
-      title: "Platform",
       type: "string",
+      title: "Platform",
       description:
         "Choose which social platform this card links to. It decides the logo shown in the centre of the card",
       options: {
@@ -32,8 +32,8 @@ const socialGridItem = defineArrayMember({
     }),
     defineField({
       name: "label",
-      title: "Label",
       type: "string",
+      title: "Label",
       description:
         'The name shown at the bottom of the card, for example "Reddit" or "X [Twitter]"',
       validation: (Rule) => Rule.required(),
@@ -46,8 +46,8 @@ const socialGridItem = defineArrayMember({
     }),
     defineField({
       name: "url",
-      title: "Link URL",
       type: "customUrl",
+      title: "Link URL",
       description:
         "Where visitors go when they click this card, for example your community's profile page",
     }),
@@ -67,37 +67,37 @@ const socialGridItem = defineArrayMember({
 export const socialGridSchema = defineType({
   name: "socialGrid",
   type: "object",
-  icon: UsersIcon,
   title: "Social Grid",
   description:
     "A community section with a heading and a row of large cards linking to your social platforms",
+  icon: UsersIcon,
   fields: [
     defineField({
       name: "eyebrow",
-      title: "Eyebrow",
       type: "string",
+      title: "Eyebrow",
       description:
         'Short label shown in a pill above the title, for example "Socials"',
     }),
     defineField({
       name: "title",
-      title: "Title",
       type: "string",
+      title: "Title",
       description:
         'The main heading for this section, for example "Join our community"',
     }),
     defineField({
       name: "subtitle",
-      title: "Subtitle",
       type: "text",
-      rows: 2,
+      title: "Subtitle",
       description:
         "A short supporting sentence shown beneath the title to add context",
+      rows: 2,
     }),
     defineField({
       name: "socials",
-      title: "Social Cards",
       type: "array",
+      title: "Social Cards",
       description: "Add the social platform cards to display in the row",
       of: [socialGridItem],
     }),

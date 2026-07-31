@@ -23,7 +23,6 @@ export const handler = documentEventHandler(async ({ context, event }) => {
     logger.info("Slug did not change");
     return;
   }
-  // check if redirect already exists
   const existingRedirect = await client.fetch(
     `*[_type == "redirect" && source.current == $beforeSlug][0]`,
     { beforeSlug }
@@ -32,13 +31,13 @@ export const handler = documentEventHandler(async ({ context, event }) => {
     logger.info(`Redirect already exists for source ${beforeSlug}`);
     return;
   }
-  // check for loops
+  // A reverse redirect would bounce the two slugs forever.
   const loopRedirect = await client.fetch(
     `*[_type == "redirect" && source.current == $slug && destination.current == $beforeSlug][0]`,
     { slug, beforeSlug }
   );
   if (loopRedirect) {
-    logger.warning("Redirect loop detected");
+    logger.warn("Redirect loop detected");
     return;
   }
   const redirect = {

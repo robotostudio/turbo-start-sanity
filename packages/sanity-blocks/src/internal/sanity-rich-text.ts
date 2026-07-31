@@ -50,6 +50,8 @@ const richTextMembers = [
             defineField({
               name: "customLink",
               type: "customUrl",
+              description:
+                "Where the highlighted text takes visitors — pick a page on this site or paste a web address",
             }),
           ],
         },
@@ -63,8 +65,8 @@ const richTextMembers = [
   }),
   defineArrayMember({
     name: PORTABLE_TEXT_MEMBER_NAMES.image,
-    title: "Image",
     type: "image",
+    title: "Image",
     icon: ImageIcon,
     options: {
       hotspot: true,
@@ -72,38 +74,38 @@ const richTextMembers = [
     fields: [
       defineField({
         name: "alt",
-        title: "Alternative text",
         type: "string",
+        title: "Alternative Text",
         description: "Describe the image for screen readers and search engines",
       }),
       defineField({
         name: "caption",
-        title: "Caption Text",
         type: "string",
+        title: "Caption Text",
         description: "Optional caption shown beneath the image.",
       }),
     ],
   }),
   defineArrayMember({
     name: PORTABLE_TEXT_MEMBER_NAMES.code,
-    title: "Code Block",
     type: "object",
-    icon: CodeBlockIcon,
+    title: "Code Block",
     description:
       "A multi-line code snippet with preserved indentation. Use this for code examples instead of the inline Code style.",
+    icon: CodeBlockIcon,
     fields: [
       defineField({
         name: "code",
-        title: "Code",
         type: "text",
-        rows: 8,
+        title: "Code",
         description: "The code snippet. Indentation and line breaks are kept.",
+        rows: 8,
         validation: (rule) => rule.required(),
       }),
       defineField({
         name: "language",
-        title: "Language",
         type: "string",
+        title: "Language",
         description: "Optional language label shown in the code block header.",
         options: {
           list: CODE_LANGUAGES,
@@ -111,8 +113,8 @@ const richTextMembers = [
       }),
       defineField({
         name: "filename",
-        title: "Filename",
         type: "string",
+        title: "Filename",
         description: "Optional filename shown in the code block header.",
       }),
     ],
@@ -172,9 +174,9 @@ export const definePortableTextField = (
   return defineField({
     ...options,
     name,
+    type: "array",
     description,
     hidden,
-    type: "array",
     of: selectedMembers,
   });
 };

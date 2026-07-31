@@ -1,49 +1,49 @@
-import { CogIcon } from "lucide-react";
+import { Cog } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
 import { imageWithAltField } from "@/schemaTypes/common";
 
 const socialLinks = defineField({
   name: "socialLinks",
+  type: "object",
   title: "Social Media Links",
   description: "Add links to your social media profiles",
-  type: "object",
   fields: [
     defineField({
       name: "linkedin",
+      type: "string",
       title: "LinkedIn URL",
       description: "Full URL to your LinkedIn profile/company page",
-      type: "string",
     }),
     defineField({
       name: "facebook",
+      type: "string",
       title: "Facebook URL",
       description: "Full URL to your Facebook profile/page",
-      type: "string",
     }),
     defineField({
       name: "twitter",
+      type: "string",
       title: "Twitter/X URL",
       description: "Full URL to your Twitter/X profile",
-      type: "string",
     }),
     defineField({
       name: "instagram",
+      type: "string",
       title: "Instagram URL",
       description: "Full URL to your Instagram profile",
-      type: "string",
     }),
     defineField({
       name: "youtube",
+      type: "string",
       title: "YouTube URL",
       description: "Full URL to your YouTube channel",
-      type: "string",
     }),
     defineField({
       name: "reddit",
+      type: "string",
       title: "Reddit URL",
       description: "Full URL to your Reddit profile/subreddit",
-      type: "string",
     }),
   ],
 });
@@ -53,14 +53,14 @@ export const settings = defineType({
   type: "document",
   title: "Settings",
   description: "Global settings and configuration for your website",
-  icon: CogIcon,
+  icon: Cog,
   fields: [
     defineField({
       name: "label",
       type: "string",
-      initialValue: "Settings",
       title: "Label",
       description: "Label used to identify settings in the CMS",
+      initialValue: "Settings",
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -87,14 +87,14 @@ export const settings = defineType({
       fields: [
         imageWithAltField({
           name: "logo",
-          title: "Logo (light mode)",
+          title: "Logo (Light Mode)",
           description:
             "The site logo shown on light backgrounds, such as the navbar in light mode. Its alt text is reused for the other logo variants.",
         }),
         defineField({
           name: "logoDark",
           type: "image",
-          title: "Logo (dark mode)",
+          title: "Logo (Dark Mode)",
           description:
             "Optional logo variant for dark backgrounds, such as the navbar in dark mode. Reuses the light logo's alt text; if left empty, the light logo is used everywhere.",
           options: { hotspot: true },
@@ -102,7 +102,7 @@ export const settings = defineType({
         defineField({
           name: "footerLogo",
           type: "image",
-          title: "Footer logo",
+          title: "Footer Logo",
           description:
             "Optional logo for the footer's colored background, where the main logo may not have enough contrast. Reuses the main logo's alt text; if left empty, the main logo is used.",
           options: { hotspot: true },
@@ -112,7 +112,7 @@ export const settings = defineType({
     defineField({
       name: "ogImage",
       type: "image",
-      title: "Default social share image",
+      title: "Default Social Share Image",
       description:
         "The fallback image shown when a page is shared on social media (Open Graph / Twitter). Used whenever a page has no SEO image of its own. Recommended size 1200×630.",
       options: { hotspot: true },
@@ -132,7 +132,7 @@ export const settings = defineType({
     },
     prepare: ({ title }) => ({
       title: title || "Untitled Settings",
-      media: CogIcon,
+      media: Cog,
     }),
   },
 });

@@ -56,10 +56,8 @@ export async function handleErrors<T>(
   }
 }
 
-// Number of blog cards rendered in the grid list on every page. On page 1 the
-// full-width featured card sits above these, so page 1 consumes one extra
-// document (1 featured + BLOG_LIST_PAGE_SIZE list = 10 docs). Every later page
-// shows BLOG_LIST_PAGE_SIZE (9) list docs only.
+// Blog cards in the grid list on every page — the featured card on page 1 sits
+// above these and is counted separately by the helpers below.
 const BLOG_LIST_PAGE_SIZE = 9;
 
 /**

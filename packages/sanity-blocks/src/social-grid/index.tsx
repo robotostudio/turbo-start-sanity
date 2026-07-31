@@ -99,19 +99,19 @@ function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
         <span className="relative flex size-[100px] items-center justify-center bg-background text-foreground transition-colors duration-200 group-hover:bg-black group-hover:text-white">
           <span
             aria-hidden="true"
-            className="-top-[12px] -left-[12px] absolute size-2 border-accent-green-foreground border-r border-b opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+            className="-top-3 -left-3 absolute size-2 border-accent-green-foreground border-r border-b opacity-0 transition-opacity duration-200 group-hover:opacity-100"
           />
           <span
             aria-hidden="true"
-            className="-top-[12px] -right-[12px] absolute size-2 border-accent-green-foreground border-b border-l opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+            className="-top-3 -right-3 absolute size-2 border-accent-green-foreground border-b border-l opacity-0 transition-opacity duration-200 group-hover:opacity-100"
           />
           <span
             aria-hidden="true"
-            className="-bottom-[12px] -left-[12px] absolute size-2 border-accent-green-foreground border-t border-r opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+            className="-bottom-3 -left-3 absolute size-2 border-accent-green-foreground border-t border-r opacity-0 transition-opacity duration-200 group-hover:opacity-100"
           />
           <span
             aria-hidden="true"
-            className="-right-[12px] -bottom-[12px] absolute size-2 border-accent-green-foreground border-t border-l opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+            className="-right-3 -bottom-3 absolute size-2 border-accent-green-foreground border-t border-l opacity-0 transition-opacity duration-200 group-hover:opacity-100"
           />
           {media}
         </span>

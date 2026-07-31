@@ -1,8 +1,8 @@
 import "@workspace/ui/globals.css";
 
 import {
-  type DynamicFetchOptions,
   DRAFT_MODE_ENABLED,
+  type DynamicFetchOptions,
   getDynamicFetchOptions,
   SanityLive,
 } from "@workspace/sanity/live";

@@ -7,8 +7,8 @@ const buttonVariants = ["default", "secondary", "outline", "link"];
 
 export const button = defineType({
   name: "button",
-  title: "Button",
   type: "object",
+  title: "Button",
   icon: Command,
   fields: [
     defineField({
@@ -23,15 +23,15 @@ export const button = defineType({
     }),
     defineField({
       name: "text",
-      title: "Button Text",
       type: "string",
+      title: "Button Text",
       description:
         "The text that appears on the button, like 'Learn More' or 'Get Started'",
     }),
     defineField({
       name: "url",
-      title: "Url",
       type: "customUrl",
+      title: "URL",
       description:
         "Where the button links to - can be an internal page or external website",
     }),

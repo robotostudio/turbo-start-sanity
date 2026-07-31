@@ -16,10 +16,10 @@ export {
 
 export const pageBuilderField = defineField({
   name: "pageBuilder",
-  group: GROUP.MAIN_CONTENT,
   type: "pageBuilder",
   description:
     "Build your page by adding different sections like text, images, and other content blocks",
+  group: GROUP.MAIN_CONTENT,
 });
 
 export const documentSlugField = (

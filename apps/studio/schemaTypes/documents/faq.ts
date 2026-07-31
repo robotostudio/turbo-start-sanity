@@ -14,8 +14,8 @@ export const faq = defineType({
   fields: [
     defineField({
       name: "title",
-      title: "Question",
       type: "string",
+      title: "Question",
       description:
         "Write the question exactly as someone might ask it. For example: 'How do I reset my password?'",
       validation: (Rule) => Rule.required(),

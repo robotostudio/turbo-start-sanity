@@ -32,9 +32,10 @@ async function validateRedirectLoop(
 
 export const redirect = defineType({
   name: "redirect",
-  title: "Redirect",
   type: "document",
+  title: "Redirect",
   description: "Redirect for next.config.js",
+  icon: TrendingUpDown,
   fields: [
     defineField({
       name: "status",

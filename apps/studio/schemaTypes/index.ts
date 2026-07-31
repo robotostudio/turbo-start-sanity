@@ -5,10 +5,9 @@ import { documents, singletons } from "@/schemaTypes/documents/index";
 
 export const schemaTypes = [...documents, ...definitions, ...blockSchemas];
 
-const schemaNames = [...documents].map((doc) => doc.name);
+const schemaNames = documents.map(({ name }) => name);
 export type SchemaType = (typeof schemaNames)[number];
 
-const singletonType = singletons.map(({ name }) => name);
-export type SingletonType = (typeof singletonType)[number];
-
-export default schemaTypes;
+/** Singleton names — one document each, so they can't be created ad hoc. */
+export const singletonTypes = singletons.map(({ name }) => name);
+export type SingletonType = (typeof singletonTypes)[number];

@@ -12,15 +12,15 @@ export { definePortableTextField } from "./sanity-rich-text";
 export const buttonsField = defineField({
   name: "buttons",
   type: "array",
-  of: [{ type: "button" }],
   description:
     "Add one or more clickable buttons that visitors can use to navigate your website",
+  of: [defineArrayMember({ type: "button" })],
 });
 
 export const iconField = defineField({
   name: "icon",
-  title: "Icon",
   type: "lucide-icon",
+  title: "Icon",
   description:
     "Choose a small picture symbol to represent this item, like a home icon or shopping cart",
 });
@@ -85,8 +85,8 @@ export const logoLinkItem = (name: string) =>
       }),
       defineField({
         name: "url",
-        title: "Link URL",
         type: "customUrl",
+        title: "Link URL",
         description:
           "Optional link opened when a visitor clicks this logo, for example the brand's website",
       }),

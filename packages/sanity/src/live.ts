@@ -1,4 +1,5 @@
 import { env } from "@workspace/env/server";
+import { cacheTag } from "next/cache";
 import { cookies, draftMode } from "next/headers";
 import type { QueryParams } from "next-sanity";
 import {
@@ -9,11 +10,8 @@ import {
 
 import { client } from "./client";
 
-/**
- * Use defineLive to enable automatic revalidation and refreshing of your fetched content
- * Learn more: https://github.com/sanity-io/next-sanity?tab=readme-ov-file#1-configure-definelive
- */
-export const { sanityFetch, SanityLive } = defineLive({
+/** Learn more: https://github.com/sanity-io/next-sanity?tab=readme-ov-file#1-configure-definelive */
+const { sanityFetch: liveFetch, SanityLive } = defineLive({
   client,
   // Required for showing draft content when the Sanity Presentation Tool is used, or to enable the Vercel Toolbar Edit Mode
   serverToken: env.SANITY_API_READ_TOKEN,
@@ -22,10 +20,25 @@ export const { sanityFetch, SanityLive } = defineLive({
   strict: true,
 });
 
-export type DynamicFetchOptions = {
+export { SanityLive };
+
+/** `sanityFetch` with the query's sync tags registered on the surrounding
+ * `'use cache'` entry. next-sanity only tags the underlying `fetch`, and under
+ * `cacheComponents` that never reaches the cache entry — so `updateTag()` from
+ * `<SanityLive>` had nothing to invalidate and Presentation served stale HTML.
+ * Done here, not per boundary, so a new cached read can't forget. */
+export const sanityFetch: typeof liveFetch = async (options) => {
+  const result = await liveFetch(options);
+  if (result.tags.length > 0) {
+    cacheTag(...result.tags);
+  }
+  return result;
+};
+
+export interface DynamicFetchOptions {
   perspective: LivePerspective;
   stega: boolean;
-};
+}
 
 const PUBLISHED_FETCH_OPTIONS: DynamicFetchOptions = {
   perspective: "published",

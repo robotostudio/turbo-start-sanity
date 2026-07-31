@@ -1,14 +1,14 @@
 import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 import {
   BookMarked,
-  CogIcon,
+  Cog,
   File,
   FileText,
-  HomeIcon,
+  House,
   type LucideIcon,
   MessageCircle,
   PanelBottom,
-  PanelBottomIcon,
+  PanelTop,
   Settings2,
   TrendingUpDown,
   User,
@@ -103,7 +103,7 @@ export const structure = (
   S.list()
     .title("Content")
     .items([
-      createSingleTon({ S, type: "homePage", icon: HomeIcon }),
+      createSingleTon({ S, type: "homePage", icon: House }),
       S.divider(),
       createSlugBasedStructure(S, "page"),
       createIndexListWithOrderableItems({
@@ -137,19 +137,19 @@ export const structure = (
                 S,
                 type: "navbar",
                 title: "Navigation",
-                icon: PanelBottom,
+                icon: PanelTop,
               }),
               createSingleTon({
                 S,
                 type: "footer",
                 title: "Footer",
-                icon: PanelBottomIcon,
+                icon: PanelBottom,
               }),
               createSingleTon({
                 S,
                 type: "settings",
                 title: "Global Settings",
-                icon: CogIcon,
+                icon: Cog,
               }),
             ])
         ),

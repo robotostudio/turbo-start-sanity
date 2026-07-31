@@ -67,30 +67,30 @@ const showcaseItem = defineArrayMember({
 export const showcaseGridSchema = defineType({
   name: "showcaseGrid",
   type: "object",
-  icon: ImagesIcon,
   title: "Showcase Grid",
   description:
     "A section that shows off real websites built with the template. Add the sites as items below — the one marked 'Featured' is shown in the large card at the top.",
+  icon: ImagesIcon,
   fields: [
     defineField({
       name: "title",
-      title: "Title",
       type: "string",
+      title: "Title",
       description:
         "The large heading at the top of the section (for example: 'Sites built with this starter').",
     }),
     defineField({
       name: "description",
-      title: "Description",
       type: "text",
-      rows: 3,
+      title: "Description",
       description:
         "The short paragraph under the title that sets up what the showcase is about.",
+      rows: 3,
     }),
     defineField({
       name: "items",
-      title: "Showcase Items",
       type: "array",
+      title: "Showcase Items",
       description:
         "The sites shown in the grid. Drag to reorder — visitors see them in this order. Mark one as Featured for the large banner; add a URL to make a card link out to its live site.",
       of: [showcaseItem],

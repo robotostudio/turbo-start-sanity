@@ -28,8 +28,8 @@ export const faqAccordionSchema = defineType({
     }),
     defineField({
       name: "link",
-      title: "Link",
       type: "object",
+      title: "Link",
       description: "Optional link for additional content or actions",
       fields: [
         defineField({
@@ -60,8 +60,8 @@ export const faqAccordionSchema = defineType({
         "Groups of questions shown as a switchable list. The first category is shown by default; visitors click a category to reveal its questions.",
       of: [
         defineArrayMember({
-          type: "object",
           name: "faqCategory",
+          type: "object",
           title: "Category",
           fields: [
             defineField({
@@ -117,6 +117,3 @@ export const faqAccordionSchema = defineType({
     }),
   },
 });
-
-// Backward-compatible alias for existing consumers.
-export const faqAccordion = faqAccordionSchema;

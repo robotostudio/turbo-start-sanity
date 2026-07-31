@@ -10,9 +10,9 @@ export const homePage = defineType({
   name: "homePage",
   type: "document",
   title: "Home Page",
-  icon: HomeIcon,
   description:
     "This is where you create the main page visitors see when they first come to your website. Think of it like the front door to your online home - you can add a welcoming title, a short description, and build the page with different sections like pictures, text, and buttons.",
+  icon: HomeIcon,
   groups: GROUPS,
   fields: [
     defineField({
@@ -24,8 +24,8 @@ export const homePage = defineType({
     }),
     defineField({
       name: "description",
-      title: "Description",
       type: "text",
+      title: "Description",
       description:
         "A short summary that tells visitors what your website is about. This text also helps your page show up in Google searches.",
       rows: 3,

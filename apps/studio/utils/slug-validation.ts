@@ -9,7 +9,7 @@ type SlugValidationResult = {
   warnings: string[];
 };
 
-export type SlugValidationOptions = {
+export interface SlugValidationOptions {
   /** Human-readable doc type name for error messages */
   documentType?: string;
   /** Require leading slash */
@@ -24,7 +24,7 @@ export type SlugValidationOptions = {
   forbiddenPatterns?: RegExp[];
   /** Custom validators returning error strings */
   customValidators?: Array<(slug: string) => string[]>;
-};
+}
 
 const SEGMENT_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MIN_LEN = 3;

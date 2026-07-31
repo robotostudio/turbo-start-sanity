@@ -11,10 +11,10 @@ import {
 } from "sanity";
 import { useRouter } from "sanity/router";
 
-interface PresentationUrlAction {
+type PresentationUrlAction = {
   documentId: string;
   documentType: string;
-}
+};
 
 function getDocumentSlug(
   draft?: SanityDocument<{ slug?: SlugValue }> | null,

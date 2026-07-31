@@ -1,7 +1,7 @@
-export type BlogCategoryOption = {
+export interface BlogCategoryOption {
   title: string;
   value: string;
-};
+}
 
 // Canonical blog category taxonomy shared by the Studio `category` field and
 // the frontend filter. Add or rename here and both sides update.

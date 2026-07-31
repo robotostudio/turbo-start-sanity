@@ -6,9 +6,9 @@ type RichTextBlock = { _type: string; children?: RichTextChild[] };
 type FaqInput = { title?: string | null; richText?: RichTextBlock[] | null };
 type FaqCategoryInput = { faqs?: FaqInput[] | null };
 
-export type FaqAccordionInput = {
+export interface FaqAccordionInput {
   categories?: FaqCategoryInput[] | null;
-};
+}
 
 function extractPlainText(richText: RichTextBlock[]): string {
   return richText
