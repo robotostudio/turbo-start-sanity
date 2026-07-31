@@ -52,6 +52,7 @@
     "./internal/block-eyebrow": "./src/internal/block-eyebrow.tsx",
     "./internal/block-header": "./src/internal/block-header.tsx",
     "./internal/blog-categories": "./src/internal/blog-categories.ts",
+    "./internal/heading-slug": "./src/internal/heading-slug.ts",
     "./internal/icons": "./src/internal/icons.tsx",
     "./internal/logo-height": "./src/internal/logo-height.ts",
     "./internal/lucide-icon-preview": "./src/internal/lucide-icon-preview.tsx",

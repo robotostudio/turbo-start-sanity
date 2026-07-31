@@ -15,15 +15,12 @@
     "@workspace/tailwind-config": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "lucide-react": "catalog:",
-    "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "tw-animate-css": "catalog:",
-    "zod": "catalog:"
+    "tw-animate-css": "catalog:"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.20",
-    "@turbo/gen": "^2.8.17",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

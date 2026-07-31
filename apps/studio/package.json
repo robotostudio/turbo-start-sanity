@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "main": "package.json",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "dev": "sanity dev",
     "start": "sanity start",
@@ -48,7 +48,6 @@
   "devDependencies": {
     "@sanity/blueprints": "^0.20.1",
     "@types/react": "catalog:",
-    "@types/styled-components": "^5.1.36",
     "typescript": "catalog:",
     "vite": "^8.0.16"
   }

@@ -1,7 +1,14 @@
 {
   "name": "@workspace/tailwind-config",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
+  "scripts": {
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check-types": "tsc --noEmit"
+  },
   "dependencies": {
     "@tailwindcss/postcss": "catalog:",
     "clsx": "^2.1.1",
@@ -14,7 +21,7 @@
     "typescript": "catalog:"
   },
   "exports": {
-    "./utils": "./utils.ts",
+    "./utils": "./src/utils.ts",
     "./postcss": "./postcss.config.mjs"
   }
 }

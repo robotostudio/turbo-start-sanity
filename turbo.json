@@ -33,6 +33,9 @@
     "type": {
       "cache": false
     },
+    "test": {
+      "dependsOn": ["transit"]
+    },
     "dev": {
       "cache": false,
       "persistent": true

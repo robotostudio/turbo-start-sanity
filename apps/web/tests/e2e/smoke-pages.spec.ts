@@ -1,4 +1,4 @@
-import { test, expect } from "./fixtures";
+import { expect, test } from "./fixtures";
 
 test.describe("Smoke: static routes", { tag: "@smoke" }, () => {
   test("home page loads", async ({ page }) => {
@@ -47,7 +47,7 @@ test.describe("Smoke: dynamic slug pages", { tag: "@smoke" }, () => {
       }
 
       const hasContent = await page.evaluate(
-        () => document.body.innerText.trim().length > 0,
+        () => document.body.innerText.trim().length > 0
       );
       if (!hasContent) {
         failures.push({ slug, reason: "page has no visible content" });
@@ -55,9 +55,7 @@ test.describe("Smoke: dynamic slug pages", { tag: "@smoke" }, () => {
     }
 
     if (failures.length > 0) {
-      const report = failures
-        .map((f) => `  ${f.slug}: ${f.reason}`)
-        .join("\n");
+      const report = failures.map((f) => `  ${f.slug}: ${f.reason}`).join("\n");
       throw new Error(`${failures.length} page(s) failed:\n${report}`);
     }
   });

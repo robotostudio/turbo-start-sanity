@@ -16,8 +16,7 @@
     "@workspace/env": "workspace:*",
     "@workspace/sanity-blocks": "workspace:*",
     "next-sanity": "13.1.0",
-    "react-is": "catalog:",
-    "sanity-image": "^1.1.0"
+    "react-is": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
@@ -30,7 +29,6 @@
     "./client": "./src/client.ts",
     "./query": "./src/query.ts",
     "./live": "./src/live.ts",
-    "./image": "./src/image.ts",
     "./types": "./src/sanity.types.ts"
   }
 }
