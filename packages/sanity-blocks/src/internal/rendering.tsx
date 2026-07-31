@@ -39,13 +39,6 @@ export interface PortableTextBlock {
 
 export type PortableTextValue = PortableTextBlock[] | null | undefined;
 
-export interface SanityImageValue {
-  alt?: string | null;
-  asset?: {
-    _ref?: string | null;
-  } | null;
-}
-
 export const getHref = (url?: CustomUrlValue | null) => {
   const isSafeHref = (href: string) => {
     if (href.startsWith("/") || href.startsWith("#")) return true;

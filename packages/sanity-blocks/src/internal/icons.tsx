@@ -1,4 +1,8 @@
-export function CopyIcon({ className }: Readonly<{ className?: string }>) {
+export interface IconProps {
+  className?: string;
+}
+
+export function CopyIcon({ className }: Readonly<IconProps>) {
   return (
     <svg
       aria-hidden="true"
@@ -15,8 +19,6 @@ export function CopyIcon({ className }: Readonly<{ className?: string }>) {
     </svg>
   );
 }
-
-export type IconProps = { className?: string };
 
 export function XIcon({ className }: Readonly<IconProps>) {
   return (

@@ -9,10 +9,10 @@ export type PaginationProps = {
   basePath?: string;
 };
 
-interface BlogPaginationProps extends PaginationProps {
+type BlogPaginationProps = PaginationProps & {
   className?: string;
   category?: string;
-}
+};
 
 type PaginationItem = number | "ellipsis-start" | "ellipsis-end";
 
@@ -85,7 +85,7 @@ export function BlogPagination({
     >
       {hasPreviousPage ? (
         <Link
-          aria-label={`Go to page ${currentPage - 1}`}
+          aria-label={`Previous page, page ${currentPage - 1}`}
           className={cn(
             navLabelBase,
             "focus-ring rounded-none text-zinc-400 hover:text-foreground"
@@ -135,7 +135,7 @@ export function BlogPagination({
 
       {hasNextPage ? (
         <Link
-          aria-label={`Go to page ${currentPage + 1}`}
+          aria-label={`Next page, page ${currentPage + 1}`}
           className={cn(
             navLabelBase,
             "focus-ring rounded-none text-zinc-400 hover:text-foreground"

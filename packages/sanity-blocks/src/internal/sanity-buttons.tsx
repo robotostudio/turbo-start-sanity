@@ -63,13 +63,19 @@ function SanityButton({
       size={size ?? "default"}
       variant={variant ?? "default"}
     >
+      {/* No `aria-label`/`title`: the button text is already the accessible
+          name, and an override ("Navigate to …") only pads it and breaks the
+          match voice-control users need between what they see and what they
+          say. New-tab links say so, in text only assistive tech reads. */}
       <Link
-        aria-label={`Navigate to ${text}`}
         href={href}
+        rel={openInNewTab ? "noopener noreferrer" : undefined}
         target={openInNewTab ? "_blank" : "_self"}
-        title={`Click to visit ${text}`}
       >
         {text}
+        {openInNewTab ? (
+          <span className="sr-only"> (opens in a new tab)</span>
+        ) : null}
       </Link>
     </Button>
   );

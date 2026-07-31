@@ -1,4 +1,5 @@
 import { GithubIcon } from "@workspace/sanity-blocks/internal/icons";
+import { cn } from "@workspace/tailwind-config/utils";
 
 function formatStars(stars: number): string {
   if (stars < 1000) {
@@ -22,18 +23,20 @@ export function GithubStars({
   }
 
   return (
+    // The visible content is an icon plus a bare count, so the name has to say
+    // what the link actually does — and that it leaves the tab.
     <a
-      aria-label={`GitHub stars: ${stars}`}
-      className={
-        "focus-ring inline-flex h-8 items-center gap-2 rounded-full px-2 font-mono font-normal text-foreground text-sm uppercase tracking-wide" +
-        (className ? ` ${className}` : "")
-      }
+      aria-label={`GitHub repository, ${formatStars(stars)} stars (opens in a new tab)`}
+      className={cn(
+        "focus-ring inline-flex h-8 items-center gap-2 rounded-full px-2 font-mono font-normal text-foreground text-sm uppercase tracking-wide",
+        className
+      )}
       href={gitHubUrl}
       rel="noopener noreferrer"
       target="_blank"
     >
       <GithubIcon className="size-[18px] shrink-0" />
-      <span className="text-foreground tabular-nums">{formatStars(stars)}</span>
+      <span className="tabular-nums">{formatStars(stars)}</span>
     </a>
   );
 }

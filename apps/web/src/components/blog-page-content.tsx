@@ -7,12 +7,12 @@ import { BlogHeader, FeaturedBlogCard } from "@/components/blog-card";
 import { BlogCategoryFilter } from "@/components/blog-category-filter";
 import { BlogList } from "@/components/blog-list";
 import { BlogPagination } from "@/components/blog-pagination";
+import { SearchInput } from "@/components/blog-search";
 import { BlogSearchResults } from "@/components/blog-search-results";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { useBlogSearch } from "@/hooks/use-blog-search";
 import type { Blog } from "@/types";
 import type { PaginationMetadata } from "@/utils";
-import { SearchInput } from "./blog-search";
 
 type BlogPageContentProps = {
   indexPageData: NonNullable<QueryBlogIndexPageDataResult>;
@@ -48,6 +48,24 @@ export function BlogPageContent({
 
   const remainingBlogs = shouldDisplayFeaturedBlogs ? blogs.slice(1) : blogs;
 
+  // Typing swaps the whole result column with no announcement. This lives
+  // outside the swapped subtree deliberately: a live region has to already be
+  // in the DOM when its text changes, and `BlogSearchResults` unmounts.
+  const searchStatus = (() => {
+    if (!hasQuery) {
+      return "";
+    }
+    if (isSearching) {
+      return "Searching…";
+    }
+    if (error) {
+      return "Search failed";
+    }
+    return results.length === 0
+      ? `No articles found for ${searchQuery}`
+      : `${results.length} article${results.length === 1 ? "" : "s"} found for ${searchQuery}`;
+  })();
+
   return (
     <main className="bg-background">
       <Breadcrumbs crumbs={[{ label: "Home", href: "/" }, { label: "Blog" }]} />
@@ -77,6 +95,9 @@ export function BlogPageContent({
           </aside>
 
           <div className="text-foreground">
+            <p className="sr-only" role="status">
+              {searchStatus}
+            </p>
             {hasQuery ? (
               <BlogSearchResults
                 error={error}

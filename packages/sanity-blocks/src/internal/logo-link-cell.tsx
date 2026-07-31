@@ -1,3 +1,4 @@
+import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 
@@ -54,8 +55,10 @@ export function LogoLinkCell({
   // link. Alt-less logos still render, just unlinked.
   if (href && image.alt?.trim()) {
     return (
+      // Inset ring: the Logo Cloud clips its marquee with `overflow-hidden`, so
+      // an outset ring on a cell near either edge would be cut in half.
       <Link
-        className={cellClassName}
+        className={cn("focus-ring-inset", cellClassName)}
         href={href}
         rel={openInNewTab ? "noopener noreferrer" : undefined}
         target={openInNewTab ? "_blank" : undefined}
