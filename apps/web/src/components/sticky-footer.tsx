@@ -28,9 +28,6 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
   // Default to pinned so SSR and first paint agree (no relative→fixed hydration
   // flip / CLS). The effect only flips to in-flow when the footer is too tall.
   const [pinned, setPinned] = useState(true);
-  // A top rubber-band moves the content but not this fixed box, flashing green
-  // under the navbar. Only fix: don't paint it — a cover sits in the same gap.
-  const [coveredAtTop, setCoveredAtTop] = useState(false);
 
   useIsomorphicLayoutEffect(() => {
     const el = ref.current;
@@ -59,34 +56,6 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
       root.style.removeProperty("--footer-height");
     };
   }, []);
-
-  useEffect(() => {
-    if (!pinned) {
-      setCoveredAtTop(false);
-      return;
-    }
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      const root = document.documentElement;
-      // A page with nothing to scroll shows the footer at rest — never hide it.
-      const scrollable = root.scrollHeight - window.innerHeight > 2;
-      setCoveredAtTop(scrollable && window.scrollY <= 0);
-    };
-    const schedule = () => {
-      if (!frame) {
-        frame = requestAnimationFrame(update);
-      }
-    };
-    update();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-  }, [pinned]);
 
   // Real-time playback when the mark is crossed too fast to scrub, handed back
   // on the way up. Pinned only — in flow the range uses the CSS fallback.
@@ -133,9 +102,8 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
     <div
       className={cn(
         pinned
-          ? "fixed inset-x-0 bottom-0 z-0 [transform:translateZ(0)]"
-          : "relative z-10",
-        coveredAtTop && "opacity-0"
+          ? "footer-pinned fixed inset-x-0 bottom-0 z-0 transform-[translateZ(0)]"
+          : "relative z-10"
       )}
       ref={ref}
     >

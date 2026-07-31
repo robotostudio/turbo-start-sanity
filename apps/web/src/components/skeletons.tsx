@@ -15,8 +15,8 @@ export function BlogCardSkeleton() {
       </div>
       <div className="flex flex-col gap-3">
         <div className="grid gap-1.5">
-          <Skeleton className="h-[26px] w-full" />
-          <Skeleton className="h-[26px] w-2/3" />
+          <Skeleton className="h-6.5 w-full" />
+          <Skeleton className="h-6.5 w-2/3" />
         </div>
         <div className="grid gap-2">
           <Skeleton className="h-6 w-full" />
@@ -82,7 +82,7 @@ function TextBlockSkeleton({
   return (
     <div className="grid gap-2.5">
       {rows.map((row) => (
-        <Skeleton className={`h-5 ${row.width}`} key={row.id} />
+        <Skeleton className={cn("h-5", row.width)} key={row.id} />
       ))}
     </div>
   );

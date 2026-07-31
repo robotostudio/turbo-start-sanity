@@ -25,8 +25,8 @@ import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 import { type CSSProperties, Fragment } from "react";
 
-import { FooterThemeToggle } from "./footer-theme-toggle";
-import { Logo } from "./logo";
+import { FooterThemeToggle } from "@/components/footer-theme-toggle";
+import { Logo } from "@/components/logo";
 
 type SocialLinksProps = {
   data: NonNullable<QueryGlobalSeoSettingsResult>["socialLinks"];
@@ -58,7 +58,7 @@ export async function CachedFooter({
   return <Footer data={response.data} settingsData={settingsResponse.data} />;
 }
 
-function SocialLinks({ data }: SocialLinksProps) {
+function SocialLinks({ data }: Readonly<SocialLinksProps>) {
   if (!data) {
     return null;
   }
@@ -286,7 +286,7 @@ export function FooterSkeleton() {
   );
 }
 
-function Footer({ data, settingsData }: FooterProps) {
+function Footer({ data, settingsData }: Readonly<FooterProps>) {
   const { subtitle, columns, copyright, credits } = data;
   const { siteTitle, socialLinks, logos } = settingsData;
   const logo = logos?.logo;

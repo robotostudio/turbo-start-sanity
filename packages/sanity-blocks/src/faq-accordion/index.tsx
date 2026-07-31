@@ -4,6 +4,7 @@ import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import { useDisclosureAnimation } from "@workspace/sanity-blocks/internal/use-disclosure-animation";
+import { cn } from "@workspace/tailwind-config/utils";
 import { ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
 import { type MouseEvent as ReactMouseEvent, useRef, useState } from "react";
@@ -40,8 +41,12 @@ export interface FaqAccordionProps {
 
 const DISCLOSURE_BASE_CLASS =
   "hover-surface group border border-border bg-background px-4 has-[summary:focus-visible]:[outline:2px_dotted_var(--foreground)] has-[summary:focus-visible]:[outline-offset:-2px]";
+// `transition-none` because `duration-300` is here for `animate-in`, but the
+// utility also sets `transition-duration`, and CSS defaults `transition-property`
+// to `all` — so the entrance duration was silently fading the hover background
+// too, while the code chip inside switched instantly.
 const DISCLOSURE_ANIMATION_CLASS =
-  "fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-300 ease-out";
+  "fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-300 ease-out transition-none motion-reduce:animate-none";
 
 function FaqDisclosure({
   animationDelay,
@@ -66,7 +71,7 @@ function FaqDisclosure({
 
   return (
     <details
-      className={`${DISCLOSURE_BASE_CLASS} ${DISCLOSURE_ANIMATION_CLASS}`}
+      className={cn(DISCLOSURE_BASE_CLASS, DISCLOSURE_ANIMATION_CLASS)}
       open={initialOpen}
       ref={detailsRef}
       style={{ animationDelay }}
@@ -80,9 +85,10 @@ function FaqDisclosure({
           {faq.title}
         </h3>
         <Plus
-          className={`pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none dark:text-accent-green ${
-            isOpen ? "rotate-45" : ""
-          }`}
+          className={cn(
+            "pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none dark:text-accent-green",
+            isOpen && "rotate-45"
+          )}
         />
       </summary>
       {faq.richText?.length ? (
@@ -150,20 +156,22 @@ function CategoryTabs({
                 type="button"
               >
                 <span
-                  className={`shrink-0 px-1 py-px font-light font-mono text-sm uppercase leading-5 tracking-[0.28px] ${
+                  className={cn(
+                    "shrink-0 px-1 py-px font-light font-mono text-sm uppercase leading-5 tracking-[0.28px]",
                     isActive
                       ? "bg-accent-green text-accent-green-foreground"
                       : "text-muted-foreground group-hover:bg-foreground group-hover:text-background"
-                  }`}
+                  )}
                 >
                   {number}
                 </span>
                 <span
-                  className={`font-light font-mono text-sm uppercase leading-5 tracking-[0.28px] ${
+                  className={cn(
+                    "font-light font-mono text-sm uppercase leading-5 tracking-[0.28px]",
                     isActive
                       ? "text-zinc-900 dark:text-zinc-100"
                       : "text-muted-foreground group-hover:text-foreground"
-                  }`}
+                  )}
                 >
                   {category.title}
                 </span>
@@ -261,18 +269,16 @@ export function FaqAccordion({
   const accordionKey = `faq-${_key}-${activeCategory?._key ?? boundedIndex}`;
 
   return (
-    <section
-      className="bg-background pt-20 pb-0.5 sm:pt-28 lg:pt-[136px]"
-      id="faq"
-    >
+    <section className="bg-background pt-20 pb-0.5 sm:pt-28 lg:pt-34" id="faq">
       <div className="container">
         <FaqHeader eyebrow={eyebrow} subtitle={subtitle} title={title} />
 
         <div className="mt-12 flex flex-col gap-6 lg:mt-16">
           <div
-            className={`grid items-stretch gap-10 lg:gap-16 ${
-              hasCategories ? "lg:grid-cols-[minmax(0,12rem)_1fr]" : ""
-            }`}
+            className={cn(
+              "grid items-stretch gap-10 lg:gap-16",
+              hasCategories && "lg:grid-cols-[minmax(0,12rem)_1fr]"
+            )}
           >
             {hasCategories && (
               <CategoryTabs

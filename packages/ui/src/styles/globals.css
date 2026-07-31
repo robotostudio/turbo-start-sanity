@@ -26,6 +26,8 @@
   --accent-foreground: var(--foreground);
   --accent-green: oklch(0.935 0.226 122);
   --accent-green-foreground: var(--foreground);
+  --success: oklch(0.48 0.16 122);
+  --danger: oklch(0.55 0.21 27);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: var(--destructive);
   --border: oklch(0.92 0.004 286.32);
@@ -52,9 +54,33 @@
   /* Overscroll gutter surface, shown on the top rubber-band by the navbar. */
   --overscroll-top: var(--background);
 
-  /* Scrollbar thumb. Ink on the light ground, where the accent shouts; the
-     accent on the dark one, where ink would disappear. */
-  --scrollbar-thumb: var(--foreground);
+  /* Damped spring sampled to a `linear()` curve — ~1% overshoot, so it settles
+     rather than bounces. A cubic-bezier can't overshoot at all. */
+  --ease-spring: linear(
+    0,
+    0.0668,
+    0.2132,
+    0.3826,
+    0.5435,
+    0.6806,
+    0.7891,
+    0.87,
+    0.9269,
+    0.9648,
+    0.9884,
+    1.0019,
+    1.0085,
+    1.0109,
+    1.0108,
+    1.0095,
+    1.0076,
+    1.0058,
+    1.0041,
+    1.0028,
+    1.0018,
+    1.001,
+    1
+  );
 
   /* Space the leading hero's copy takes. The pinned banner is `100svh` minus
      this, so the copy sits on the fold. Mobile reserves more (taller wrapped
@@ -94,6 +120,10 @@
   --accent: var(--card);
   --accent-foreground: var(--foreground);
   --accent-green-foreground: oklch(0.21 0.006 285.885);
+  /* Lifted for the dark ground — success can just be the accent, danger has to
+     climb well above the fill-tuned `--destructive` (L 0.396) to read at all. */
+  --success: var(--accent-green);
+  --danger: oklch(0.72 0.19 27);
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
   --border: var(--muted);
@@ -113,7 +143,6 @@
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
   --dot-alpha: 80%;
-  --scrollbar-thumb: var(--accent-green);
 
   /* Lifted off pure black so the bounce doesn't read as a hard block. */
   --overscroll-top: color-mix(
@@ -145,6 +174,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-green: var(--accent-green);
   --color-accent-green-foreground: var(--accent-green-foreground);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
@@ -180,9 +211,8 @@
   margin-inline: calc(var(--container-px, 0.5rem) * -1);
 }
 
-/* Card hover tint — kept here so every card shares one definition. */
 @utility hover-surface {
-  @apply transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-900;
+  @apply hover:bg-zinc-100 dark:hover:bg-zinc-800;
 }
 
 @utility body-text {
@@ -251,6 +281,29 @@
   }
 }
 
+/* The pinned footer's top edge lands inside the navbar's row, and the navbar
+   paints only a blur — the page's `z-10` box starts below it, so nothing opaque
+   is behind. A top rubber-band moves that box down while a fixed element stays
+   put, uncovering the accent band. Driven from the scroll timeline to stay on
+   the compositor: React state committed a frame late and the flash got through.
+   Both degradations land visible rather than hidden. */
+@keyframes footer-uncover {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@utility footer-pinned {
+  animation-name: footer-uncover;
+  animation-duration: auto;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root block);
+  animation-range: 0 1px;
+}
+
 /* Document scroll, not `view()`: the footer is fixed and never enters the
  * viewport. `--frame-index` offsets each range; delay is ignored here. */
 @utility mark-frame {
@@ -259,7 +312,7 @@
   animation-name: mark-frame;
   /* Drops to 0s without scroll timelines — lands on the settled state. */
   animation-duration: auto;
-  animation-timing-function: ease-out;
+  animation-timing-function: var(--ease-spring);
   animation-fill-mode: backwards;
   animation-timeline: scroll(root block);
   animation-range: calc(
@@ -267,17 +320,17 @@
       var(--footer-height, 800px) +
       320px +
       var(--frame-index) *
-      60px
+      44px
     )
-    calc(100% - var(--footer-height, 800px) + 510px + var(--frame-index) * 60px);
+    calc(100% - var(--footer-height, 800px) + 490px + var(--frame-index) * 44px);
 }
 
 /* Too fast to scrub: `StickyFooter` stamps this and the strokes run on real
  * time instead. Unlayered so it beats the utility however Tailwind sorts it. */
 [data-mark-play="fast"] .mark-frame {
-  animation-duration: 190ms;
-  animation-delay: calc(var(--frame-index) * 26ms);
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-duration: 170ms;
+  animation-delay: calc(var(--frame-index) * 22ms);
+  animation-timing-function: var(--ease-spring);
   animation-fill-mode: both;
   animation-timeline: auto;
   animation-range: normal;
@@ -348,29 +401,12 @@
   body {
     @apply bg-background text-foreground;
   }
-  /* Colours the top rubber-band by the navbar; the sticky footer owns the
-     bottom. Why the pinned footer stops painting there: see `StickyFooter`. */
+  /* Colour the overscroll gutters — mainly the top rubber-band by the navbar.
+     The sticky footer owns the bottom, so there's no accent split here. For why
+     the pinned footer stops painting at the top, see `StickyFooter`. */
   html {
     background: var(--overscroll-top);
     overscroll-behavior-x: none;
-  }
-  /* Chromium ignores `::-webkit-scrollbar` on scrollers that also set
-     `scrollbar-width`/`-color`, so the two paths must stay exclusive. */
-  @supports not selector(::-webkit-scrollbar) {
-    html {
-      scrollbar-color: var(--scrollbar-thumb) transparent;
-      scrollbar-width: thin;
-    }
-  }
-  ::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb);
   }
   ::selection {
     background-color: var(--accent-green);
@@ -382,6 +418,14 @@
   [class~="bg-accent-green"]::selection {
     background-color: var(--accent-green-foreground);
     color: var(--accent-green);
+  }
+  /* ...and back again inside a dark chip on that green (the status pill), where
+     the inverted rule would otherwise paint dark-on-dark. Listed after, so the
+     nested case wins on order at equal specificity. */
+  [class~="bg-accent-green-foreground"] ::selection,
+  [class~="bg-accent-green-foreground"]::selection {
+    background-color: var(--accent-green);
+    color: var(--accent-green-foreground);
   }
   /* Global keyboard focus indicator; components opt out with `outline-none`. */
   :focus-visible {
@@ -448,7 +492,7 @@
   color: color-mix(in oklab, var(--muted-foreground) 60%, transparent);
   user-select: none;
   border-right: 1px solid var(--border);
-  background-color: color-mix(in oklab, var(--muted) 40%, transparent);
+  background-color: var(--muted);
 }
 
 .rich-code-gutter span {

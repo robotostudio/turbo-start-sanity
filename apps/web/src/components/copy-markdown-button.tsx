@@ -2,6 +2,7 @@
 
 import { CopyIcon } from "@workspace/sanity-blocks/internal/icons";
 import {
+  COPY_STATUS_CLASS,
   type CopyStatus,
   useCopyToClipboard,
 } from "@workspace/sanity-blocks/internal/use-copy";
@@ -46,9 +47,10 @@ export function CopyMarkdownButton({
 
   return (
     <button
-      aria-label={LABELS[status]}
+      aria-label={LABELS.idle}
       className={cn(
         "-mr-2 focus-ring inline-flex min-h-10 items-center gap-2 px-2 uppercase font-light font-mono text-muted-foreground text-sm leading-5 tracking-[0.24px] transition-colors duration-150 ease-out hover:text-foreground motion-reduce:transition-none",
+        COPY_STATUS_CLASS[status],
         className
       )}
       onClick={copy}
@@ -66,7 +68,10 @@ export function CopyMarkdownButton({
         <span aria-hidden="true" className="col-start-1 row-start-1 invisible">
           {LABELS.idle}
         </span>
-        <span className="col-start-1 row-start-1 truncate">
+        {/* The label is the only thing that reports the outcome, and it swaps
+            in place. As a live region the change is spoken; without it a
+            screen-reader user gets no confirmation the copy landed. */}
+        <span className="col-start-1 row-start-1 truncate" role="status">
           {LABELS[status]}
         </span>
       </span>

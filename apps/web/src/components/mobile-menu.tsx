@@ -23,11 +23,12 @@ import { Button } from "@workspace/ui/components/button";
 import { useMediaQuery } from "@workspace/ui/hooks/use-media-query";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+import { MenuLink } from "@/components/elements/menu-link";
+import { Logo } from "@/components/logo";
 import type { ColumnLink, NavigationData } from "@/types";
-import { MenuLink } from "./elements/menu-link";
-import { Logo } from "./logo";
 
 const TABLET_QUERY = "(min-width: 768px) and (max-width: 1024px)";
 
@@ -48,6 +49,7 @@ export function MobileMenu({
   settingsData,
 }: Readonly<NavigationData>) {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
   const isTablet = useMediaQuery(TABLET_QUERY);
   const liveSide = isTablet ? "right" : "bottom";
   // Freeze the anchor at open-time and keep it for the whole session, so crossing
@@ -135,7 +137,10 @@ export function MobileMenu({
                       }
                       return (
                         <Link
-                          className="focus-ring-inset -mx-3 flex items-center rounded-none px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                          aria-current={
+                            column.href === pathname ? "page" : undefined
+                          }
+                          className="focus-ring-inset -mx-3 flex items-center rounded-none px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:bg-zinc-200 dark:hover:bg-zinc-800"
                           href={column.href}
                           key={column._key}
                           onClick={closeMenu}
@@ -152,7 +157,7 @@ export function MobileMenu({
                           key={column._key}
                           value={column._key}
                         >
-                          <AccordionTrigger className="focus-ring-inset -mx-3 rounded-none px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:bg-zinc-100 hover:no-underline dark:hover:bg-zinc-800">
+                          <AccordionTrigger className="focus-ring-inset -mx-3 rounded-none px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:no-underline">
                             {column.title}
                           </AccordionTrigger>
                           <AccordionContent>

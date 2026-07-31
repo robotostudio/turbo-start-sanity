@@ -17,7 +17,7 @@ const buttonVariants = cva(
         secondary:
           "bg-accent-green text-accent-green-foreground duration-150 ease-out hover:bg-primary hover:text-primary-foreground",
         ghost:
-          "hover:bg-zinc-50 hover:text-accent-foreground dark:hover:bg-zinc-800",
+          "hover:bg-zinc-50 hover:text-accent-foreground dark:hover:bg-zinc-950",
         link: "link-underline text-primary after:-bottom-0.5! after:transition-none!",
       },
       size: {
@@ -51,6 +51,9 @@ function Button({
       suppressHydrationWarning
       className={cn(buttonVariants({ variant, size, className }))}
       data-slot="button"
+      // Lets callers style a specific variant without matching on a class the
+      // variant merely happens to emit.
+      data-variant={variant ?? "default"}
       {...props}
     />
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
+import { cn } from "@workspace/tailwind-config/utils";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -10,18 +11,41 @@ import {
   NavigationMenuTrigger,
 } from "@workspace/ui/components/navigation-menu";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
+import { GithubStars } from "@/components/github-stars";
+import { Logo } from "@/components/logo";
+import { MobileMenu } from "@/components/mobile-menu";
 import type { ColumnLink, NavigationData } from "@/types";
-import { GithubStars } from "./github-stars";
-import { Logo } from "./logo";
-import { MobileMenu } from "./mobile-menu";
 
-const TRIGGER_CLASS =
-  "h-auto rounded-full bg-transparent px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none data-[nav-on=dark]:not-hover:text-white data-[nav-on=light]:not-hover:text-zinc-900 hover:bg-zinc-100 focus:text-foreground focus-visible:bg-zinc-200 focus-visible:outline-none! data-popup-open:bg-zinc-100 dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800 dark:data-popup-open:bg-zinc-800";
+// Shared by the dropdown triggers and the plain links so the two never drift,
+// and focus mirrors hover so keyboard and pointer land alike. Over a marked
+// section the wash goes translucent: a flat zinc swatch only holds contrast on
+// the one background it was picked for.
+//
+// The wash alone can't carry focus — zinc-200 on white is ~1.2:1, well under
+// the 3:1 a focus indicator needs — so keyboard focus also draws the site's
+// dotted ring. `currentColor`, not `--foreground`, because the text colour
+// already inverts over a marked section and the ring has to follow it.
+const NAV_LINK_CLASS =
+  "h-auto rounded-full bg-transparent px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-zinc-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-200 focus-visible:[outline:2px_dotted_currentColor]! focus-visible:outline-offset-2! dark:focus-visible:bg-zinc-800 data-[nav-on=dark]:text-white data-[nav-on=dark]:hover:bg-white/15 data-[nav-on=dark]:focus-visible:bg-white/15 data-[nav-on=light]:text-zinc-900 data-[nav-on=light]:hover:bg-zinc-900/10 data-[nav-on=light]:focus-visible:bg-zinc-900/10";
 
-const NAV_BUTTON_CLASS =
-  "h-9 px-4 font-mono font-normal text-sm uppercase tracking-wide";
+const TRIGGER_CLASS = cn(
+  NAV_LINK_CLASS,
+  "data-popup-open:bg-zinc-100 dark:data-popup-open:bg-zinc-800 data-[nav-on=dark]:data-popup-open:bg-white/15 data-[nav-on=light]:data-popup-open:bg-zinc-900/10"
+);
+
+// The outline pill draws itself in theme ink, which lands white-on-bright over
+// a section whose ground is fixed regardless of theme. Filled variants carry
+// their own ground and need nothing.
+const NAV_OUTLINE_ADAPTIVE =
+  "group-data-[nav-on=dark]:data-[variant=outline]:border-white group-data-[nav-on=dark]:data-[variant=outline]:text-white group-data-[nav-on=light]:data-[variant=outline]:border-zinc-900 group-data-[nav-on=light]:data-[variant=outline]:text-zinc-900";
+
+const NAV_BUTTON_CLASS = cn(
+  "h-9 px-4 font-mono font-normal text-sm uppercase tracking-wide",
+  NAV_OUTLINE_ADAPTIVE
+);
 
 function NavItemSkeleton() {
   return <div className="h-5 w-20 bg-muted/50" />;
@@ -109,14 +133,50 @@ function ProgressiveBlur() {
           }}
         />
       ))}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-30% via-background/25 to-transparent dark:from-background/30 dark:via-background/15" />
+      {/* Dark carries a heavier scrim than light. `--background` is pure black
+          there, so an identical alpha reads as far less cover, and bright
+          imagery scrolling under the bar smears through the blur. */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-30% via-background/25 to-transparent dark:from-background/70 dark:via-background/45" />
     </div>
   );
 }
 
+type MarkedSection = { rect: DOMRect; value: string };
+
+// Contrast of the last marked section covering both the bar and this item's
+// centre. Last wins, so a section stacked over another takes precedence.
+function contrastUnder(
+  itemRect: DOMRect,
+  marked: MarkedSection[],
+  barBottom: number
+) {
+  const itemX = itemRect.left + itemRect.width / 2;
+  let value = "";
+  for (const { rect, value: markedValue } of marked) {
+    const covered = Math.min(rect.bottom, barBottom) - Math.max(rect.top, 0);
+    if (covered >= barBottom * 0.6 && rect.left < itemX && rect.right > itemX) {
+      value = markedValue;
+    }
+  }
+  return value;
+}
+
+// Stamps the section's contrast on a link, or clears it when no section covers
+// it. Compared first so an unchanged value never touches the DOM.
+function applyContrast(el: HTMLElement, value: string) {
+  if ((el.dataset.navOn ?? "") === value) {
+    return;
+  }
+  if (value) {
+    el.dataset.navOn = value;
+  } else {
+    el.removeAttribute("data-nav-on");
+  }
+}
+
 // Section-aware contrast: sections that read dark or bright regardless of
 // theme carry data-nav-contrast="dark|light". While one covers most of the
-// bar, its value is stamped on the header so the links can invert instantly.
+// bar, its value is stamped on each link so they can invert instantly.
 function useNavContrast(headerRef: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
     const header = headerRef.current;
@@ -126,44 +186,30 @@ function useNavContrast(headerRef: React.RefObject<HTMLElement | null>) {
     let frame = 0;
     // Cached and refreshed only when the DOM actually changes (route
     // transitions, streamed content) — scrolling never re-queries.
-    let markedEls: Element[] = [];
-    let adaptiveEls: Element[] = [];
+    let markedEls: HTMLElement[] = [];
+    let adaptiveEls: HTMLElement[] = [];
     const refresh = () => {
-      markedEls = [...document.querySelectorAll("[data-nav-contrast]")];
-      adaptiveEls = [...header.querySelectorAll("[data-nav-adaptive]")];
+      markedEls = [
+        ...document.querySelectorAll<HTMLElement>("[data-nav-contrast]"),
+      ];
+      adaptiveEls = [
+        ...header.querySelectorAll<HTMLElement>("[data-nav-adaptive]"),
+      ];
     };
+    const measure = (el: HTMLElement): MarkedSection => ({
+      rect: el.getBoundingClientRect(),
+      value: el.dataset.navContrast ?? "",
+    });
     const update = () => {
       frame = 0;
       if (markedEls.length === 0 && adaptiveEls.length === 0) {
         return;
       }
       const barBottom = header.getBoundingClientRect().bottom;
-      const marked = markedEls.map((el) => ({
-        rect: el.getBoundingClientRect(),
-        value: el.getAttribute("data-nav-contrast") ?? "",
-      }));
-      for (const item of adaptiveEls) {
-        const itemRect = item.getBoundingClientRect();
-        const itemX = itemRect.left + itemRect.width / 2;
-        let value = "";
-        for (const { rect, value: markedValue } of marked) {
-          const covered =
-            Math.min(rect.bottom, barBottom) - Math.max(rect.top, 0);
-          if (
-            covered >= barBottom * 0.6 &&
-            rect.left < itemX &&
-            rect.right > itemX
-          ) {
-            value = markedValue;
-          }
-        }
-        if ((item.getAttribute("data-nav-on") ?? "") !== value) {
-          if (value) {
-            item.setAttribute("data-nav-on", value);
-          } else {
-            item.removeAttribute("data-nav-on");
-          }
-        }
+      const marked = markedEls.map(measure);
+      for (const el of adaptiveEls) {
+        const rect = el.getBoundingClientRect();
+        applyContrast(el, contrastUnder(rect, marked, barBottom));
       }
     };
     const schedule = () => {
@@ -200,6 +246,12 @@ export function Navbar({
   const { siteTitle, logos } = settingsData || {};
   const headerRef = useRef<HTMLElement>(null);
   useNavContrast(headerRef);
+  // Nothing in the bar marks where you are: the active item is styled no
+  // differently from the rest, so `aria-current` is the only signal a screen
+  // reader can get. Purely semantic — it paints nothing.
+  const pathname = usePathname();
+  const currentPage = (href?: string | null) =>
+    href && href === pathname ? ("page" as const) : undefined;
 
   return (
     <header
@@ -240,7 +292,8 @@ export function Navbar({
                           {column.links?.map((link: ColumnLink) => (
                             <li key={link._key}>
                               <NavigationMenuLink
-                                className="group flex flex-col gap-0.5 rounded-none px-3 py-2.5 transition-colors focus-ring-inset hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                aria-current={currentPage(link.href)}
+                                className="group flex flex-col gap-0.5 rounded-none px-3 py-2.5 focus-ring-inset hover:bg-zinc-200 dark:hover:bg-zinc-800"
                                 closeOnClick
                                 render={<Link href={link.href ?? "#"} />}
                               >
@@ -267,8 +320,9 @@ export function Navbar({
                   return (
                     <NavigationMenuItem key={column._key}>
                       <NavigationMenuLink
+                        aria-current={currentPage(column.href)}
                         data-nav-adaptive=""
-                        className="flex h-auto items-center rounded-full px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none data-[nav-on=dark]:not-hover:text-white data-[nav-on=light]:not-hover:text-zinc-900 hover:bg-zinc-100 focus-visible:bg-zinc-200 focus-visible:outline-none! dark:hover:bg-zinc-800 dark:focus-visible:bg-zinc-800"
+                        className={cn("flex items-center", NAV_LINK_CLASS)}
                         render={<Link href={column.href} />}
                       >
                         {column.name}
@@ -281,7 +335,13 @@ export function Navbar({
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="hidden flex-1 items-center justify-end gap-2 lg:flex">
+          {/* One adaptive node for the whole cluster: the stars and both CTAs
+              sit together, so they always share a section — and it's one rect
+              to measure per scroll frame instead of three. */}
+          <div
+            className="group hidden flex-1 items-center justify-end gap-2 lg:flex"
+            data-nav-adaptive=""
+          >
             <GithubStars gitHubUrl={gitHubUrl} stars={stars} />
             <SanityButtons
               buttonClassName={NAV_BUTTON_CLASS}

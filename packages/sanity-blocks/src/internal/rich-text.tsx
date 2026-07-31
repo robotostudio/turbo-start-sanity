@@ -6,21 +6,32 @@ import {
   type PortableTextBlock,
   type PortableTextReactComponents,
 } from "next-sanity";
-import slugify from "slugify";
 
 import { CodeBlock } from "./code-block";
+import { headingChildrenToSlug as parseChildrenToSlug } from "./heading-slug";
 import { SanityImage } from "./sanity-image";
 
 const logger = new Logger("RichText");
 
-function parseChildrenToSlug(children: PortableTextBlock["children"]): string {
-  if (!children) return "";
-  const text = children.map((child) => child.text ?? "").join("");
-  return slugify(text.trim(), { lower: true, remove: /[^a-zA-Z0-9 ]/g });
-}
-
 const components: Partial<PortableTextReactComponents> = {
   block: {
+    // The Studio only offers H2–H6, but the schema doesn't police what's
+    // already stored — seeded, imported or migrated blocks can still carry
+    // `style: "h1"`, and @portabletext/react's default would render a real
+    // `<h1>` right next to the page's own. Demote it to the H2 renderer so the
+    // outline stays single-rooted and no level is skipped. Same slug, so
+    // existing anchors keep resolving.
+    h1: ({ children, value }) => {
+      const slug = parseChildrenToSlug(value.children);
+      return (
+        <h2
+          className="mt-12 mb-8 scroll-m-20 font-medium text-4xl leading-[48px] tracking-[-0.24px] first:mt-0"
+          id={slug}
+        >
+          {children}
+        </h2>
+      );
+    },
     h2: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
@@ -73,7 +84,7 @@ const components: Partial<PortableTextReactComponents> = {
   },
   marks: {
     code: ({ children }) => (
-      <code className="rounded-none border border-border bg-zinc-200 px-1.5 py-0.5 font-mono text-[0.85em] text-foreground before:content-none after:content-none lg:whitespace-nowrap dark:bg-zinc-800">
+      <code className="rounded-none border border-border bg-zinc-200 px-1.5 py-0.5 font-mono text-[0.85em] text-foreground before:content-none after:content-none lg:whitespace-nowrap dark:bg-zinc-800 dark:group-hover:bg-zinc-600">
         {children}
       </code>
     ),
@@ -86,14 +97,20 @@ const components: Partial<PortableTextReactComponents> = {
         );
       }
       return (
+        // The anchor text is the accessible name. An `aria-label` here would
+        // replace it with a raw URL, which is what a screen reader would then
+        // read out in place of the words the author wrote.
         <Link
-          aria-label={`Link to ${value?.href}`}
           className="underline decoration-dotted underline-offset-2"
           href={value.href}
           prefetch={false}
+          rel={value.openInNewTab ? "noopener noreferrer" : undefined}
           target={value.openInNewTab ? "_blank" : "_self"}
         >
           {children}
+          {value.openInNewTab ? (
+            <span className="sr-only"> (opens in a new tab)</span>
+          ) : null}
         </Link>
       );
     },

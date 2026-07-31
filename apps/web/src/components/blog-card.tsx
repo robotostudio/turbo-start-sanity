@@ -141,7 +141,7 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
           <BlogAuthor author={authors} />
         </div>
       </div>
-      <div className="relative order-first min-h-[240px] overflow-hidden border-border border-b lg:order-last lg:min-h-full lg:border-b-0 lg:border-s">
+      <div className="relative order-first min-h-60 overflow-hidden border-border border-b lg:order-last lg:min-h-full lg:border-b-0 lg:border-s">
         <BlogImage image={image} title={title} />
       </div>
     </article>
@@ -159,7 +159,7 @@ export function BlogCard({ blog }: BlogCardProps) {
     <article className="hover-surface group focus-ring-within relative flex flex-col gap-4 border border-border p-6">
       <BlogMeta category={category} publishedAt={publishedAt} />
       <div className="flex flex-col gap-3">
-        <h3 className="font-normal text-2xl text-zinc-900 leading-[34px] dark:text-zinc-50">
+        <h3 className="font-normal text-2xl text-zinc-900 leading-8.5 dark:text-zinc-50">
           <Link className="outline-none" href={slug ?? "#"}>
             <span className="absolute inset-0 z-10" />
             {title}

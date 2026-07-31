@@ -3,16 +3,22 @@
 import { cn } from "@workspace/tailwind-config/utils";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 const THEMES = [
   { value: "light", label: "Light", Icon: Sun },
   { value: "system", label: "System", Icon: Monitor },
   { value: "dark", label: "Dark", Icon: Moon },
 ] as const;
-
-const useIsomorphicLayoutEffect =
-  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 export function FooterThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -26,7 +32,7 @@ export function FooterThemeToggle() {
     THEMES.findIndex(({ value }) => value === theme)
   );
 
-  const positionPill = (index: number) => {
+  const positionPill = useCallback((index: number) => {
     const el = buttonRefs.current[index];
     const container = containerRef.current;
     const pill = pillRef.current;
@@ -35,23 +41,14 @@ export function FooterThemeToggle() {
     }
     pill.style.left = `${el.offsetLeft}px`;
     pill.style.right = `${container.clientWidth - (el.offsetLeft + el.offsetWidth)}px`;
-  };
+  }, []);
 
+  // Before paint, so the pill is already under the active button on the frame
+  // it fades in on — and on every later theme change, so it never lags.
   useIsomorphicLayoutEffect(() => {
     setMounted(true);
-    positionPill(
-      Math.max(
-        0,
-        THEMES.findIndex(({ value }) => value === theme)
-      )
-    );
-  }, [positionPill]);
-
-  useEffect(() => {
-    if (mounted) {
-      positionPill(activeIndex);
-    }
-  }, [activeIndex, mounted, positionPill]);
+    positionPill(activeIndex);
+  }, [activeIndex, positionPill]);
 
   return (
     <div
@@ -62,7 +59,12 @@ export function FooterThemeToggle() {
         aria-hidden="true"
         className={cn(
           "-translate-y-1/2 absolute top-1/2 h-8 rounded-full bg-accent-green-foreground",
-          mounted ? "opacity-100" : "opacity-0"
+          // `left`/`right` rather than a transform: the pill resizes to each
+          // segment's width, and only the inset pair carries both at once.
+          // Skipped on the mount frame, or it flies in from the left edge.
+          mounted
+            ? "opacity-100 transition-[left,right] duration-300 ease-[var(--ease-spring)] motion-reduce:transition-none"
+            : "opacity-0"
         )}
         ref={pillRef}
       />
