@@ -52,6 +52,10 @@
   /* Overscroll gutter surface, shown on the top rubber-band by the navbar. */
   --overscroll-top: var(--background);
 
+  /* Scrollbar thumb. Ink on the light ground, where the accent shouts; the
+     accent on the dark one, where ink would disappear. */
+  --scrollbar-thumb: var(--foreground);
+
   /* Space the leading hero's copy takes. The pinned banner is `100svh` minus
      this, so the copy sits on the fold. Mobile reserves more (taller wrapped
      title + full-width button); retune if the title grows past two lines. */
@@ -109,6 +113,7 @@
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
   --dot-alpha: 80%;
+  --scrollbar-thumb: var(--accent-green);
 
   /* Lifted off pure black so the bounce doesn't read as a hard block. */
   --overscroll-top: color-mix(
@@ -353,7 +358,7 @@
      `scrollbar-width`/`-color`, so the two paths must stay exclusive. */
   @supports not selector(::-webkit-scrollbar) {
     html {
-      scrollbar-color: var(--accent-green) transparent;
+      scrollbar-color: var(--scrollbar-thumb) transparent;
       scrollbar-width: thin;
     }
   }
@@ -365,7 +370,7 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--accent-green);
+    background: var(--scrollbar-thumb);
   }
   ::selection {
     background-color: var(--accent-green);
