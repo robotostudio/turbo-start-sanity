@@ -16,7 +16,7 @@ type SiteConfig = {
   ogImage?: string | null;
 };
 
-interface PageSeoData extends Metadata {
+type PageSeoData = Metadata & {
   title?: string;
   description?: string;
   ogTitle?: Maybe<string>;
@@ -26,7 +26,7 @@ interface PageSeoData extends Metadata {
   keywords?: string[];
   seoNoIndex?: boolean;
   pageType?: Extract<Metadata["openGraph"], { type: string }>["type"];
-}
+};
 
 const FALLBACK_SITE_CONFIG: SiteConfig = {
   title: "Turbo Start Sanity",
@@ -88,6 +88,7 @@ type SeoSourceDocument = {
   ogTitle?: string | null;
   ogDescription?: string | null;
   ogImage?: string | null;
+  seoNoIndex?: boolean | null;
   _id?: string | null;
   _type?: string | null;
 };
@@ -107,6 +108,7 @@ export function seoFromDocument(
     ogTitle: doc?.ogTitle,
     ogDescription: doc?.ogDescription,
     ogImage: doc?.ogImage,
+    seoNoIndex: doc?.seoNoIndex ?? false,
     slug,
     pageType,
   });

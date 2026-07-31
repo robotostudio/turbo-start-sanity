@@ -274,12 +274,15 @@ export const queryNavbarData = defineQuery(`
   }
 `);
 
+// `seoNoIndex` is excluded here as well as in the page metadata — advertising a
+// URL in the sitemap while its own robots tag says noindex is a contradiction
+// search engines report as an error.
 export const querySitemapData = defineQuery(`{
-  "slugPages": *[_type == "page" && defined(slug.current)]{
+  "slugPages": *[_type == "page" && defined(slug.current) && seoNoIndex != true]{
     "slug": slug.current,
     "lastModified": _updatedAt
   },
-  "blogPages": *[_type == "blog" && defined(slug.current)]{
+  "blogPages": *[_type == "blog" && defined(slug.current) && seoNoIndex != true]{
     "slug": slug.current,
     "lastModified": _updatedAt
   }

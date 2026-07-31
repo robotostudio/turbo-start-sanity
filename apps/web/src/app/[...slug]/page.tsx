@@ -1,7 +1,7 @@
 import { Logger } from "@workspace/logger";
 import {
-  type DynamicFetchOptions,
   DRAFT_MODE_ENABLED,
+  type DynamicFetchOptions,
   getDynamicFetchOptions,
   resolvePageFetchOptions,
   sanityFetch,
@@ -13,7 +13,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { Breadcrumbs } from "@/components/breadcrumbs";
+import {
+  ancestorCrumbs,
+  Breadcrumbs,
+  BreadcrumbsJsonLd,
+} from "@/components/breadcrumbs";
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
 import { HeroFallback } from "@/components/skeletons";
@@ -85,7 +89,7 @@ export default async function SlugPage({
   if (!pageData) {
     notFound();
   }
-  return <SlugPageContent pageData={pageData} />;
+  return <SlugPageContent pageData={pageData} slug={slug} />;
 }
 
 // Cached published fetch; a miss lets the caller return a real 404.
@@ -116,7 +120,7 @@ async function SlugPageInner({
   if (!pageData) {
     notFound();
   }
-  return <SlugPageContent pageData={pageData} />;
+  return <SlugPageContent pageData={pageData} slug={slug} />;
 }
 
 async function getDraftSlugPage({
@@ -135,7 +139,10 @@ async function getDraftSlugPage({
   return pageData;
 }
 
-function SlugPageContent({ pageData }: Readonly<{ pageData: SlugPageData }>) {
+function SlugPageContent({
+  pageData,
+  slug,
+}: Readonly<{ pageData: SlugPageData; slug: string[] }>) {
   const { title, pageBuilder, _id, _type } = pageData ?? {};
 
   if (!Array.isArray(pageBuilder) || pageBuilder.length === 0) {
@@ -150,14 +157,19 @@ function SlugPageContent({ pageData }: Readonly<{ pageData: SlugPageData }>) {
   }
 
   const hasLeadingHero = pageBuilder[0]?._type === "hero";
+  // Every ancestor segment, so /a/b/c reads Home / A / B / C rather than the
+  // flat Home / C the old hardcoded pair produced.
+  const crumbs = [...ancestorCrumbs(slug), { label: title }];
 
   return (
     <>
       <PageBuilderJsonLd pageBuilder={pageBuilder} />
-      {hasLeadingHero ? null : (
-        <Breadcrumbs
-          crumbs={[{ label: "Home", href: "/" }, { label: title }]}
-        />
+      {/* A leading hero is pulled under the navbar, so the visible bar would
+          collide with it — but the trail still belongs in the structured data. */}
+      {hasLeadingHero ? (
+        <BreadcrumbsJsonLd crumbs={crumbs} />
+      ) : (
+        <Breadcrumbs crumbs={crumbs} />
       )}
       <main className={hasLeadingHero ? "-mt-16" : undefined}>
         <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
