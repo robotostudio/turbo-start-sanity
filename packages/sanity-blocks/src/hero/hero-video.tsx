@@ -109,10 +109,16 @@ export function HeroVideo({
       aria-hidden="true"
       autoPlay
       className={cn(
-        "size-full object-cover object-[50%_45%] transition-opacity duration-700 ease-out",
+        "pointer-events-none size-full object-cover object-[50%_45%] transition-opacity duration-700 ease-out",
         ready ? "opacity-100" : "opacity-0",
         className
       )}
+      // Decorative background. `pointer-events-none` is what actually keeps it
+      // inert: without it a right-click offers Chrome's "Show controls", which
+      // sticks per-site and paints a full transport bar over the hero. The two
+      // attributes below drop picture-in-picture and casting from that menu.
+      disablePictureInPicture
+      disableRemotePlayback
       key={sources.webm ?? sources.hevc}
       loop
       muted
