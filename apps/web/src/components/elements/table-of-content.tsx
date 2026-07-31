@@ -1,4 +1,9 @@
 "use client";
+
+import {
+  headingChildrenToSlug,
+  headingTextToSlug,
+} from "@workspace/sanity-blocks/internal/heading-slug";
 import {
   CopyIcon,
   InstagramIcon,
@@ -6,7 +11,10 @@ import {
   RedditIcon,
   XIcon,
 } from "@workspace/sanity-blocks/internal/icons";
-import { useCopyToClipboard } from "@workspace/sanity-blocks/internal/use-copy";
+import {
+  COPY_STATUS_CLASS,
+  useCopyToClipboard,
+} from "@workspace/sanity-blocks/internal/use-copy";
 import {
   DISCLOSURE_ANIMATION_MS,
   useDisclosureAnimation,
@@ -20,7 +28,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import slugify from "slugify";
 
 import type { SanityRichTextBlock, SanityRichTextProps } from "@/types";
 
@@ -62,12 +69,7 @@ type TableOfContentState = {
 
 type HeadingStyle = "h2" | "h3" | "h4" | "h5" | "h6";
 
-type SanityTextChild = {
-  readonly marks?: readonly string[];
-  readonly text?: string;
-  readonly _type: "span";
-  readonly _key: string;
-};
+type SanityTextChild = NonNullable<SanityRichTextBlock["children"]>[number];
 
 type HeadingBlock = Extract<SanityRichTextBlock, { _type: "block" }> & {
   style: HeadingStyle;
@@ -90,11 +92,13 @@ const HEADING_LEVELS: Record<HeadingStyle, number> = {
   h6: 6,
 } as const;
 
-const SLUGIFY_OPTIONS = {
-  lower: true,
-  strict: true,
-  remove: /[*+~.()'"!:@]/g,
-} as const;
+// The y-offset a heading must pass to count as current. Matches the headings'
+// own scroll-margin-top (`prose-headings:scroll-m-24`), so a heading reached by
+// clicking the TOC is active the moment it lands rather than one item behind.
+const READING_LINE = 96;
+// `scrollIntoView` is sub-pixel while the scroll offset is rounded, so exact
+// comparison misses by a fraction and credits the heading above.
+const READING_LINE_SLACK = 2;
 
 const DEFAULT_MAX_DEPTH = 6;
 const MIN_HEADINGS_TO_SHOW = 1;
@@ -144,21 +148,6 @@ function isHeadingBlock(block: unknown): block is HeadingBlock {
   );
 }
 
-function createSlug(text: string): string {
-  if (!text?.trim()) {
-    return "";
-  }
-
-  try {
-    return slugify(text.trim(), SLUGIFY_OPTIONS);
-  } catch (_error) {
-    return text
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^\w-]/g, "");
-  }
-}
-
 function extractTextFromChildren(children: readonly SanityTextChild[]): string {
   try {
     return children
@@ -172,7 +161,7 @@ function extractTextFromChildren(children: readonly SanityTextChild[]): string {
 }
 
 function generateUniqueId(text: string, index: number, _key?: string): string {
-  const baseId = _key || createSlug(text) || `heading-${index}`;
+  const baseId = _key || headingTextToSlug(text) || `heading-${index}`;
   return `toc-${baseId}`;
 }
 
@@ -200,7 +189,7 @@ function createProcessedHeading(
     }
 
     const level = HEADING_LEVELS[block.style];
-    const href = `#${createSlug(text)}`;
+    const href = `#${headingChildrenToSlug(block.children)}`;
     const id = generateUniqueId(text, index, block._key);
 
     return {
@@ -379,40 +368,66 @@ function useActiveHeading(slugKey: string): string | null {
     if (slugs.length === 0) {
       return;
     }
-
-    setActiveSlug((prev) => prev ?? slugs[0] ?? null);
-
     const elements = slugs
       .map((slug) => document.getElementById(slug))
       .filter((element): element is HTMLElement => element !== null);
-
     if (elements.length === 0) {
       return;
     }
 
-    const visible = new Set<string>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            visible.add(entry.target.id);
-          } else {
-            visible.delete(entry.target.id);
-          }
-        }
-        const firstVisible = slugs.find((slug) => visible.has(slug));
-        if (firstVisible) {
-          setActiveSlug(firstVisible);
-        }
-      },
-      { rootMargin: "0px 0px -70% 0px", threshold: 0 }
-    );
+    // Measured once and refreshed only when layout moves, so scrolling is pure
+    // arithmetic over the cache and never forces a layout read.
+    let tops: number[] = [];
+    const measure = () => {
+      tops = elements.map(
+        (element) => element.getBoundingClientRect().top + window.scrollY
+      );
+    };
 
-    for (const element of elements) {
-      observer.observe(element);
-    }
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const line = window.scrollY + READING_LINE;
+      let index = -1;
+      for (const [i, top] of tops.entries()) {
+        if (top <= line + READING_LINE_SLACK) {
+          index = i;
+        }
+      }
+      // The last heading can't always reach the line — there isn't necessarily
+      // a viewport of content beneath it.
+      const atBottom =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 2;
+      if (atBottom) {
+        index = tops.length - 1;
+      }
+      setActiveSlug(index === -1 ? null : (slugs[index] ?? null));
+    };
+    const schedule = () => {
+      if (!frame) {
+        frame = requestAnimationFrame(update);
+      }
+    };
+    const remeasure = () => {
+      measure();
+      schedule();
+    };
 
-    return () => observer.disconnect();
+    measure();
+    update();
+    // Fonts finishing, images settling and the mobile disclosure opening all
+    // move headings after mount; a stale cache would highlight the wrong item.
+    const observer = new ResizeObserver(remeasure);
+    observer.observe(document.body);
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", remeasure);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", remeasure);
+    };
   }, [slugKey]);
 
   return activeSlug;
@@ -618,7 +633,10 @@ function ShareOptions({ title }: Readonly<{ title?: string }>) {
         );
       })}
       <button
-        className="focus-ring-inset flex flex-col items-center justify-center gap-1 rounded-none px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground"
+        className={cn(
+          "focus-ring-inset flex flex-col items-center justify-center gap-1 rounded-none px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground",
+          COPY_STATUS_CLASS[copyStatus]
+        )}
         onClick={copy}
         type="button"
       >
