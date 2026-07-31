@@ -343,12 +343,29 @@
   body {
     @apply bg-background text-foreground;
   }
-  /* Colour the overscroll gutters — mainly the top rubber-band by the navbar.
-     The sticky footer owns the bottom, so there's no accent split here. For why
-     the pinned footer stops painting at the top, see `StickyFooter`. */
+  /* Colours the top rubber-band by the navbar; the sticky footer owns the
+     bottom. Why the pinned footer stops painting there: see `StickyFooter`. */
   html {
     background: var(--overscroll-top);
     overscroll-behavior-x: none;
+  }
+  /* Chromium ignores `::-webkit-scrollbar` on scrollers that also set
+     `scrollbar-width`/`-color`, so the two paths must stay exclusive. */
+  @supports not selector(::-webkit-scrollbar) {
+    html {
+      scrollbar-color: var(--accent-green) transparent;
+      scrollbar-width: thin;
+    }
+  }
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--accent-green);
   }
   ::selection {
     background-color: var(--accent-green);
