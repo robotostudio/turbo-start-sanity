@@ -71,9 +71,9 @@ export function CopyMarkdownButton({
         {/* The label is the only thing that reports the outcome, and it swaps
             in place. As a live region the change is spoken; without it a
             screen-reader user gets no confirmation the copy landed. */}
-        <span className="col-start-1 row-start-1 truncate" role="status">
+        <output className="col-start-1 row-start-1 truncate">
           {LABELS[status]}
-        </span>
+        </output>
       </span>
     </button>
   );

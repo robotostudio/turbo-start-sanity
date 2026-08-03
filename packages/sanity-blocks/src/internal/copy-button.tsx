@@ -30,9 +30,7 @@ export function CopyButton({ code }: Readonly<{ code: string }>) {
           <CopyIcon className="size-4" />
         )}
       </span>
-      <span className="sr-only" role="status">
-        {copied ? "Copied to clipboard" : ""}
-      </span>
+      <output className="sr-only">{copied ? "Copied to clipboard" : ""}</output>
     </button>
   );
 }

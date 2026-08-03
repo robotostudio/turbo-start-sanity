@@ -61,9 +61,11 @@ export function BlogPageContent({
     if (error) {
       return "Search failed";
     }
-    return results.length === 0
-      ? `No articles found for ${searchQuery}`
-      : `${results.length} article${results.length === 1 ? "" : "s"} found for ${searchQuery}`;
+    if (results.length === 0) {
+      return `No articles found for ${searchQuery}`;
+    }
+    const plural = results.length === 1 ? "" : "s";
+    return `${results.length} article${plural} found for ${searchQuery}`;
   })();
 
   return (
@@ -95,9 +97,7 @@ export function BlogPageContent({
           </aside>
 
           <div className="text-foreground">
-            <p className="sr-only" role="status">
-              {searchStatus}
-            </p>
+            <output className="sr-only">{searchStatus}</output>
             {hasQuery ? (
               <BlogSearchResults
                 error={error}
