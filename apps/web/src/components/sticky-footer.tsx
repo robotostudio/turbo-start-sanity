@@ -76,7 +76,7 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
         root.scrollHeight - window.innerHeight - el.offsetHeight + MARK_START;
       const speed = Math.abs(y - lastY) / Math.max(at - lastAt, 1);
       if (y < lastY) {
-        root.removeAttribute("data-mark-play");
+        delete root.dataset.markPlay;
       } else if (lastY < start && y >= start && speed > FAST_SCROLL) {
         // Only on the tick that crosses the first stroke, while nothing is
         // drawn: swapping mid-build would rewind a stroke already in place.
@@ -94,7 +94,7 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", schedule);
-      root.removeAttribute("data-mark-play");
+      delete root.dataset.markPlay;
     };
   }, [pinned]);
 

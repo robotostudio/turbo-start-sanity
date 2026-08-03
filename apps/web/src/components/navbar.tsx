@@ -170,7 +170,7 @@ function applyContrast(el: HTMLElement, value: string) {
   if (value) {
     el.dataset.navOn = value;
   } else {
-    el.removeAttribute("data-nav-on");
+    delete el.dataset.navOn;
   }
 }
 
