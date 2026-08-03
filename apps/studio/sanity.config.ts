@@ -20,11 +20,11 @@ const title = process.env.SANITY_STUDIO_TITLE;
 
 // Singletons plus plugin-owned types are never created from the global "new
 // document" menu — they're reached through the structure or their plugin.
-const hiddenTemplateIds = [
+const hiddenTemplateIds = new Set([
   ...singletonTypes,
   "assist.instruction.context",
   "media.tag",
-];
+]);
 
 export default defineConfig({
   name: "default",
@@ -62,7 +62,7 @@ export default defineConfig({
       const { type } = creationContext;
       if (type === "global") {
         return prev.filter(
-          (template) => !hiddenTemplateIds.includes(template?.templateId)
+          (template) => !hiddenTemplateIds.has(template?.templateId)
         );
       }
       return prev;
