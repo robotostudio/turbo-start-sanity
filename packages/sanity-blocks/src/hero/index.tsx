@@ -87,9 +87,7 @@ function HeroPosters({
         eager={eager}
         poster={light}
       />
-      {split && (
-        <HeroPoster className="hidden dark:block" eager={eager} poster={dark} />
-      )}
+      {split && <HeroPoster className="hidden dark:block" poster={dark} />}
     </>
   );
 }
