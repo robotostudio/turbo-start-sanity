@@ -4,6 +4,7 @@ import { PathnameFieldComponent } from "@/components/slug-field-component";
 import { GROUP } from "@/utils/constant";
 import {
   createSlugErrorValidator,
+  createSlugUniqueValidator,
   createSlugWarningValidator,
   getDocumentTypeConfig,
 } from "@/utils/slug-validation";
@@ -49,6 +50,7 @@ export const documentSlugField = (
       const config = getDocumentTypeConfig(documentType);
       return [
         Rule.custom(createSlugErrorValidator(config)),
+        Rule.custom(createSlugUniqueValidator()),
         Rule.custom(createSlugWarningValidator(config)).warning(),
       ];
     },

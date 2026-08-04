@@ -2,7 +2,10 @@
  * Slug validation — single source of truth for all URL path validation.
  */
 
+import type { ValidationContext } from "sanity";
 import slugify from "slugify";
+
+import { API_VERSION } from "@/utils/constant";
 
 type SlugValidationResult = {
   errors: string[];
@@ -226,6 +229,33 @@ export function createSlugErrorValidator(
   return (slug) => {
     const { errors } = validateSlug(slug?.current, options);
     return errors.length > 0 ? errors.join("; ") : true;
+  };
+}
+
+/**
+ * Reject a slug already taken by another document. The document's own draft and
+ * published ids are excluded so re-saving an unchanged document doesn't flag
+ * itself.
+ */
+export function createSlugUniqueValidator(): (
+  slug: { current?: string } | undefined,
+  context: ValidationContext
+) => Promise<string | true> {
+  return async (slug, context) => {
+    const current = slug?.current;
+    if (!(current && context.getClient)) {
+      return true;
+    }
+    const id = (context.document?._id ?? "").replace(/^drafts\./, "");
+    const taken = await context
+      .getClient({ apiVersion: API_VERSION })
+      .fetch<number>(
+        `count(*[!(_id in [$draft, $published]) && slug.current == $slug])`,
+        { draft: `drafts.${id}`, published: id, slug: current }
+      );
+    return taken > 0
+      ? `“${current}” is already used by another document. URLs must be unique.`
+      : true;
   };
 }
 
