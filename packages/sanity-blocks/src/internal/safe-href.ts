@@ -1,11 +1,11 @@
-const ALLOWED_PROTOCOLS = ["http:", "https:", "mailto:", "tel:"];
+const ALLOWED_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
 
 export function isSafeHref(href: string): boolean {
   if (href.startsWith("/") || href.startsWith("#")) {
     return true;
   }
   try {
-    return ALLOWED_PROTOCOLS.includes(new URL(href).protocol);
+    return ALLOWED_PROTOCOLS.has(new URL(href).protocol);
   } catch {
     return false;
   }

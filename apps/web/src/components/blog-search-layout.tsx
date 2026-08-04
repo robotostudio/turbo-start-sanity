@@ -17,7 +17,7 @@ export function BlogSearchLayout({
   categoryFilter,
   featured,
   list,
-}: BlogSearchLayoutProps) {
+}: Readonly<BlogSearchLayoutProps>) {
   const { searchQuery, setSearchQuery, results, isSearching, hasQuery, error } =
     useBlogSearch();
 
