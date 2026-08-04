@@ -7,7 +7,7 @@ import { BlogList } from "@/components/blog-list";
 import { BlogGridSkeleton } from "@/components/skeletons";
 import type { Blog } from "@/types";
 
-type BlogSearchResultsProps = {
+type BlogSearchResultsProps = Readonly<{
   className?: string;
   results: Blog[];
   isSearching: boolean;
@@ -15,19 +15,19 @@ type BlogSearchResultsProps = {
   searchQuery: string;
   error?: Error | null;
   onClear?: () => void;
-};
+}>;
 
-function Term({ children }: { children: string }) {
+function Term({ children }: Readonly<{ children: string }>) {
   return <span className="text-foreground">“{children}”</span>;
 }
 
 function SearchResultsHeader({
   query,
   count,
-}: {
+}: Readonly<{
   query: string;
   count: number;
-}) {
+}>) {
   return (
     <div className="grid gap-1">
       <h2 className="text-balance font-normal text-2xl tracking-tight">
@@ -44,7 +44,7 @@ function SearchResultsHeader({
 
 const STATE_TITLE = "font-medium text-foreground text-lg";
 
-function StateFrame({ children }: { children: ReactNode }) {
+function StateFrame({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <div className="grid h-full place-content-center justify-items-center gap-8 py-16 text-center">
       {children}
@@ -58,10 +58,10 @@ const ACTION_CLASS =
 function EmptySearchState({
   query,
   onClear,
-}: {
+}: Readonly<{
   query: string;
   onClear?: () => void;
-}) {
+}>) {
   return (
     <>
       <div className="grid gap-6">
@@ -80,7 +80,7 @@ function EmptySearchState({
   );
 }
 
-function ErrorState({ query }: { query: string }) {
+function ErrorState({ query }: Readonly<{ query: string }>) {
   return (
     <div className="grid gap-6">
       <SearchResultsHeader count={0} query={query} />
