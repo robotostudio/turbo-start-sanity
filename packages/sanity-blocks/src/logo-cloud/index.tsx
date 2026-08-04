@@ -1,8 +1,7 @@
 "use client";
 
 import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
-import { Pause, Play } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 import { normalizedLogoHeight } from "../internal/logo-height";
 import { LogoLinkCell } from "../internal/logo-link-cell";
@@ -45,7 +44,6 @@ const CYCLE_CLASS = "flex shrink-0 items-center gap-12 pr-12";
 
 export function LogoCloud({ logos }: Readonly<LogoCloudProps>) {
   const trackRef = useRef<HTMLDivElement>(null);
-  const [isPaused, setIsPaused] = useState(false);
 
   if (!(Array.isArray(logos) && logos.length > 0)) {
     return null;
@@ -64,7 +62,7 @@ export function LogoCloud({ logos }: Readonly<LogoCloudProps>) {
   return (
     <section
       aria-label="Logo cloud"
-      className="relative overflow-hidden bg-accent-green py-6"
+      className="overflow-hidden bg-accent-green py-6"
       id="logo-cloud"
       onMouseEnter={() => setPlaybackRate(HOVER_PLAYBACK_RATE)}
       onMouseLeave={() => setPlaybackRate(1)}
@@ -72,10 +70,7 @@ export function LogoCloud({ logos }: Readonly<LogoCloudProps>) {
       <div
         className="flex w-max animate-marquee items-center focus-within:[animation-play-state:paused] motion-reduce:animate-none"
         ref={trackRef}
-        style={{
-          animationDuration: `${repeats * 35}s`,
-          animationPlayState: isPaused ? "paused" : undefined,
-        }}
+        style={{ animationDuration: `${repeats * 35}s` }}
       >
         <div className={CYCLE_CLASS}>
           {logos.map((logo) => (
@@ -100,19 +95,6 @@ export function LogoCloud({ logos }: Readonly<LogoCloudProps>) {
           ))}
         </div>
       </div>
-      <button
-        aria-label={isPaused ? "Play logo animation" : "Pause logo animation"}
-        aria-pressed={isPaused}
-        className="absolute top-2 right-2 z-10 grid size-8 place-items-center bg-background/80 text-foreground focus-ring-inset hover:bg-background motion-reduce:hidden"
-        onClick={() => setIsPaused((paused) => !paused)}
-        type="button"
-      >
-        {isPaused ? (
-          <Play aria-hidden="true" className="size-4" />
-        ) : (
-          <Pause aria-hidden="true" className="size-4" />
-        )}
-      </button>
     </section>
   );
 }
