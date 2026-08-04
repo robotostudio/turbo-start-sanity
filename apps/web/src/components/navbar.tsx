@@ -133,9 +133,6 @@ function ProgressiveBlur() {
           }}
         />
       ))}
-      {/* Dark carries a heavier scrim than light. `--background` is pure black
-          there, so an identical alpha reads as far less cover, and bright
-          imagery scrolling under the bar smears through the blur. */}
       <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-30% via-background/25 to-transparent dark:from-background/70 dark:via-background/45" />
     </div>
   );
@@ -200,8 +197,13 @@ function useNavContrast(headerRef: React.RefObject<HTMLElement | null>) {
       rect: el.getBoundingClientRect(),
       value: el.dataset.navContrast ?? "",
     });
+    let needsRefresh = false;
     const update = () => {
       frame = 0;
+      if (needsRefresh) {
+        needsRefresh = false;
+        refresh();
+      }
       if (markedEls.length === 0 && adaptiveEls.length === 0) {
         return;
       }
@@ -217,10 +219,8 @@ function useNavContrast(headerRef: React.RefObject<HTMLElement | null>) {
         frame = requestAnimationFrame(update);
       }
     };
-    // Route changes swap page content without remounting the navbar and
-    // without a scroll event — the observer keeps colors fresh there too.
     const observer = new MutationObserver(() => {
-      refresh();
+      needsRefresh = true;
       schedule();
     });
     observer.observe(document.body, { childList: true, subtree: true });
@@ -335,9 +335,6 @@ export function Navbar({
             </NavigationMenuList>
           </NavigationMenu>
 
-          {/* One adaptive node for the whole cluster: the stars and both CTAs
-              sit together, so they always share a section — and it's one rect
-              to measure per scroll frame instead of three. */}
           <div
             className="group hidden flex-1 items-center justify-end gap-2 lg:flex"
             data-nav-adaptive=""
