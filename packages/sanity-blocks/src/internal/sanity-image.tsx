@@ -89,6 +89,22 @@ export function getImageDimensions(
   return { width, height, aspectRatio: width / height };
 }
 
+const HOTSPOT_KEYS = ["x", "y"] as const;
+const CROP_KEYS = ["top", "bottom", "left", "right"] as const;
+
+// A half-filled hotspot/crop reaches `sanity-image` as NaN and yields a broken
+// transform, so anything not fully numeric is dropped.
+function isFiniteAll(
+  value: unknown,
+  keys: readonly string[]
+): value is Record<string, number> {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const record = value as Record<string, unknown>;
+  return keys.every((key) => Number.isFinite(record[key]));
+}
+
 export function SanityImage({ image, ...props }: SanityImageProps) {
   const id = resolveAssetId(image);
   if (!(id && image)) {
@@ -121,8 +137,8 @@ export function SanityImage({ image, ...props }: SanityImageProps) {
     id,
     alt: props.alt ?? image.alt ?? "",
     ...(image.preview && { preview: image.preview }),
-    ...(image.hotspot && { hotspot: image.hotspot }),
-    ...(image.crop && { crop: image.crop }),
+    ...(isFiniteAll(image.hotspot, HOTSPOT_KEYS) && { hotspot: image.hotspot }),
+    ...(isFiniteAll(image.crop, CROP_KEYS) && { crop: image.crop }),
   };
 
   return <ImageWrapper {...props} {...processedData} />;
