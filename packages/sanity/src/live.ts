@@ -50,7 +50,14 @@ const DRAFTS_FETCH_OPTIONS: DynamicFetchOptions = {
   stega: false,
 };
 
-export const DRAFT_MODE_ENABLED = process.env.NODE_ENV === "development";
+const IS_LOCAL_DEV = process.env.NODE_ENV === "development";
+const IS_VERCEL_PREVIEW = process.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
+
+/**
+ * Where draft content may be rendered at all. Production is always excluded, so
+ * it keeps reading published data and prerendering static.
+ */
+export const DRAFT_MODE_ENABLED = IS_LOCAL_DEV || IS_VERCEL_PREVIEW;
 
 /** Resolves perspective/stega outside any `'use cache'` boundary (reads draftMode/cookies). */
 export async function getDynamicFetchOptions(): Promise<DynamicFetchOptions> {
@@ -59,9 +66,13 @@ export async function getDynamicFetchOptions(): Promise<DynamicFetchOptions> {
   }
   const { isEnabled: isDraftMode } = await draftMode();
   if (!isDraftMode) {
-    // Dev without a Presentation session still shows drafts, so draft-only
-    // pages are visible while developing. Stega stays off here.
-    return DRAFTS_FETCH_OPTIONS;
+    // Local dev without a Presentation session still shows drafts, so
+    // draft-only pages are visible while developing. Stega stays off here.
+    // Preview deployments must NOT take this path: the URL is reachable by
+    // anyone Deployment Protection lets through, and serving drafts without a
+    // session would publish unreleased content to them. There, a validated
+    // draft-mode cookie from /api/presentation-draft is required.
+    return IS_LOCAL_DEV ? DRAFTS_FETCH_OPTIONS : PUBLISHED_FETCH_OPTIONS;
   }
 
   const jar = await cookies();
