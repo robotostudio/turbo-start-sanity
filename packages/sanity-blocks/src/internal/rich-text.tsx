@@ -138,6 +138,7 @@ const components: Partial<PortableTextReactComponents> = {
             className="h-auto w-full"
             height={900}
             image={value}
+            sizes="(min-width: 1024px) 900px, calc(100vw - 40px)"
             width={1600}
           />
           {value?.caption && (

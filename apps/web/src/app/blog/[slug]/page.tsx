@@ -191,9 +191,10 @@ function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
                     <SanityImage
                       alt={author.name}
                       className="size-6 rounded-full object-cover"
-                      height={48}
+                      height={24}
                       image={author.image}
-                      width={48}
+                      sizes="24px"
+                      width={24}
                     />
                   </span>
                 )}

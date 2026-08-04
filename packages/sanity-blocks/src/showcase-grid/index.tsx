@@ -232,7 +232,7 @@ function FeaturedBanner({
         loading="lazy"
         name={featured.name}
         screenshot={featured.screenshot}
-        sizes="(min-width: 1024px) 66vw, 100vw"
+        sizes="(min-width: 1024px) calc(100vw - 376px), 100vw"
       />
     </div>
   );
@@ -332,7 +332,7 @@ function ShowcaseCard({ item }: Readonly<{ item: CardView }>) {
           loading="lazy"
           name={item.name}
           screenshot={item.screenshot}
-          sizes="(min-width: 640px) 50vw, 100vw"
+          sizes="(min-width: 1440px) 652px, (min-width: 640px) calc((100vw - 72px) / 2 - 32px), calc(100vw - 72px)"
         />
       </div>
       <CardCaption clickable={clickable} item={item} />

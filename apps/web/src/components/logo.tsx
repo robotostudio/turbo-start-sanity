@@ -50,6 +50,7 @@ export function Logo({
             height={32}
             image={{ ...image, alt: alt ?? image.alt }}
             loading={loading}
+            sizes="210px"
             width={210}
           />
           <SanityImage
@@ -57,6 +58,7 @@ export function Logo({
             height={32}
             image={{ ...imageDark, alt: alt ?? imageDark.alt }}
             loading={loading}
+            sizes="210px"
             width={210}
           />
         </>
@@ -66,6 +68,7 @@ export function Logo({
           height={32}
           image={{ ...image, alt: alt ?? image.alt }}
           loading={loading}
+          sizes="210px"
           width={210}
         />
       )}
