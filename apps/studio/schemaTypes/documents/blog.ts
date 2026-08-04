@@ -93,6 +93,15 @@ export const blog = defineType({
       group: GROUP.MAIN_CONTENT,
     }),
     defineField({
+      name: "featured",
+      type: "boolean",
+      title: "Feature this post",
+      description:
+        "Show this post in a large highlighted card at the top of the blog listing page, marked “Featured”.",
+      initialValue: false,
+      group: GROUP.MAIN_CONTENT,
+    }),
+    defineField({
       name: "category",
       type: "string",
       title: "Category",

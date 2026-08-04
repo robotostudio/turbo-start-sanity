@@ -8,6 +8,7 @@ import {
   queryBlogIndexPageBlogs,
   queryBlogIndexPageBlogsCount,
   queryBlogIndexPageData,
+  queryBlogIndexPageFeaturedBlogs,
 } from "@workspace/sanity/query";
 import type { QueryBlogIndexPageDataResult } from "@workspace/sanity/types";
 import type { Metadata } from "next";
@@ -77,17 +78,36 @@ async function fetchBlogIndexPageData({
   return res.data;
 }
 
+async function fetchBlogIndexPageFeaturedBlogs({
+  perspective,
+  stega,
+}: DynamicFetchOptions) {
+  "use cache";
+  const res = await sanityFetch({
+    query: queryBlogIndexPageFeaturedBlogs,
+    perspective,
+    stega,
+  });
+  return res.data;
+}
+
 async function fetchBlogIndexPageBlogs({
   start,
   end,
   category,
+  excludeFeatured,
   perspective,
   stega,
-}: { start: number; end: number; category: string } & DynamicFetchOptions) {
+}: {
+  start: number;
+  end: number;
+  category: string;
+  excludeFeatured: boolean;
+} & DynamicFetchOptions) {
   "use cache";
   const res = await sanityFetch({
     query: queryBlogIndexPageBlogs,
-    params: { start, end, category },
+    params: { start, end, category, excludeFeatured },
     perspective,
     stega,
   });
@@ -96,13 +116,14 @@ async function fetchBlogIndexPageBlogs({
 
 async function fetchBlogIndexPageBlogsCount({
   category,
+  excludeFeatured,
   perspective,
   stega,
-}: { category: string } & DynamicFetchOptions) {
+}: { category: string; excludeFeatured: boolean } & DynamicFetchOptions) {
   "use cache";
   const res = await sanityFetch({
     query: queryBlogIndexPageBlogsCount,
-    params: { category },
+    params: { category, excludeFeatured },
     perspective,
     stega,
   });
@@ -172,21 +193,33 @@ async function BlogIndexView({
   perspective,
   stega,
 }: { currentPage: number; activeCategory: string } & DynamicFetchOptions) {
-  const [[indexPageData, errIndexPageData], [totalCount, errTotalCount]] =
-    await Promise.all([
-      handleErrors(fetchBlogIndexPageData({ perspective, stega })),
-      handleErrors(
-        fetchBlogIndexPageBlogsCount({
-          category: activeCategory,
-          perspective,
-          stega,
-        })
-      ),
-    ]);
+  const [indexPageData, errIndexPageData] = await handleErrors(
+    fetchBlogIndexPageData({ perspective, stega })
+  );
 
   if (errIndexPageData || !indexPageData) {
     notFound();
   }
+
+  // Drives the strip, the list exclusion and the count together — split them
+  // and a promoted post is counted twice or paginated into a gap.
+  const hasFeatured = !activeCategory;
+
+  const [[totalCount, errTotalCount], [featuredBlogs]] = await Promise.all([
+    handleErrors(
+      fetchBlogIndexPageBlogsCount({
+        category: activeCategory,
+        excludeFeatured: hasFeatured,
+        perspective,
+        stega,
+      })
+    ),
+    handleErrors(
+      hasFeatured
+        ? fetchBlogIndexPageFeaturedBlogs({ perspective, stega })
+        : Promise.resolve([])
+    ),
+  ]);
 
   if (errTotalCount || totalCount === null || totalCount === undefined) {
     return (
@@ -197,25 +230,20 @@ async function BlogIndexView({
     );
   }
 
-  const hasFeatured =
-    Boolean(indexPageData.displayFeaturedBlogs) && !activeCategory;
-
   const paginationMetadata = calculateBlogPaginationMetadata(
     totalCount,
-    currentPage,
-    hasFeatured
+    currentPage
   );
 
-  const { start: blogStart, end: blogEnd } = getBlogPaginationRange(
-    currentPage,
-    hasFeatured
-  );
+  const { start: blogStart, end: blogEnd } =
+    getBlogPaginationRange(currentPage);
 
   const [blogs, errBlogs] = await handleErrors(
     fetchBlogIndexPageBlogs({
       start: blogStart,
       end: blogEnd,
       category: activeCategory,
+      excludeFeatured: hasFeatured,
       perspective,
       stega,
     })
@@ -236,6 +264,7 @@ async function BlogIndexView({
       <BlogPageContent
         activeCategory={activeCategory}
         blogs={blogs}
+        featuredBlogs={featuredBlogs ?? []}
         indexPageData={indexPageData}
         paginationMetadata={paginationMetadata}
       >

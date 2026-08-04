@@ -17,6 +17,8 @@ import type { PaginationMetadata } from "@/utils";
 type BlogPageContentProps = {
   indexPageData: NonNullable<QueryBlogIndexPageDataResult>;
   blogs: Blog[];
+  // Already excluded from `blogs` by the query, so the two never overlap.
+  featuredBlogs: Blog[];
   paginationMetadata: PaginationMetadata;
   // Resolved server-side so this client island doesn't read `useSearchParams`.
   activeCategory: string;
@@ -27,26 +29,20 @@ type BlogPageContentProps = {
 export function BlogPageContent({
   indexPageData,
   blogs,
+  featuredBlogs,
   paginationMetadata,
   activeCategory,
   children,
 }: BlogPageContentProps) {
-  const { title, description, displayFeaturedBlogs } = indexPageData;
+  const { title, description } = indexPageData;
 
   const { searchQuery, setSearchQuery, results, isSearching, hasQuery, error } =
     useBlogSearch();
 
-  const hasCategory = activeCategory.length > 0;
-
-  const shouldDisplayFeaturedBlogs =
-    Boolean(displayFeaturedBlogs) &&
-    paginationMetadata.currentPage === 1 &&
-    !hasQuery &&
-    !hasCategory;
-
-  const featuredBlogs = shouldDisplayFeaturedBlogs ? blogs.slice(0, 1) : [];
-
-  const remainingBlogs = shouldDisplayFeaturedBlogs ? blogs.slice(1) : blogs;
+  // The category filter is resolved server-side; page and search are client
+  // state, so they are the only conditions left to check here.
+  const visibleFeaturedBlogs =
+    paginationMetadata.currentPage === 1 && !hasQuery ? featuredBlogs : [];
 
   // Typing swaps the whole result column with no announcement. This lives
   // outside the swapped subtree deliberately: a live region has to already be
@@ -74,9 +70,9 @@ export function BlogPageContent({
       <div className="container mt-8 mb-16 md:my-16">
         <BlogHeader description={description} title={title} />
 
-        {featuredBlogs.length > 0 && (
+        {visibleFeaturedBlogs.length > 0 && (
           <section aria-label="Featured posts" className="mt-10 grid gap-8">
-            {featuredBlogs.map((blog) => (
+            {visibleFeaturedBlogs.map((blog) => (
               <FeaturedBlogCard blog={blog} key={blog._id} />
             ))}
           </section>
@@ -108,7 +104,7 @@ export function BlogPageContent({
               />
             ) : (
               <>
-                <BlogList blogs={remainingBlogs} />
+                <BlogList blogs={blogs} />
                 {paginationMetadata?.totalPages > 1 && (
                   <BlogPagination
                     category={activeCategory}

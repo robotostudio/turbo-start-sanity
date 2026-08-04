@@ -32,40 +32,6 @@ export const blogIndex = defineType({
     documentSlugField("blogIndex", {
       group: GROUP.MAIN_CONTENT,
     }),
-    defineField({
-      name: "displayFeaturedBlogs",
-      type: "string",
-      title: "Display Featured Blogs",
-      description:
-        "When enabled, this will take the top blogs from the ordered blog list and display them as featured at the top of the page",
-      options: {
-        list: [
-          { title: "Yes", value: "yes" },
-          { title: "No", value: "no" },
-        ],
-        layout: "radio",
-      },
-      initialValue: "yes",
-      group: GROUP.MAIN_CONTENT,
-    }),
-    defineField({
-      name: "featuredBlogsCount",
-      type: "string",
-      title: "Number Of Featured Blogs",
-      description: "Select the number of blogs to display as featured.",
-      options: {
-        list: [
-          { title: "1", value: "1" },
-          { title: "2", value: "2" },
-          { title: "3", value: "3" },
-        ],
-        layout: "radio",
-        direction: "horizontal",
-      },
-      initialValue: "1",
-      hidden: ({ parent }) => parent?.displayFeaturedBlogs !== "yes",
-      group: GROUP.MAIN_CONTENT,
-    }),
     pageBuilderField,
     ...seoFields.filter(
       (field) => !["seoNoIndex", "seoHideFromLists"].includes(field.name)

@@ -60,23 +60,12 @@ export async function handleErrors<T>(
 // above these and is counted separately by the helpers below.
 const BLOG_LIST_PAGE_SIZE = 9;
 
-/**
- * GROQ slice window `[start, end)` into the full ordered blog list for a given
- * page. When `hasFeatured` is true the featured card occupies document 0 on
- * page 1, so page 1 fetches BLOG_LIST_PAGE_SIZE + 1 documents and every later
- * page is offset by that single featured document.
- */
-export function getBlogPaginationRange(
-  page: number,
-  hasFeatured: boolean
-): { start: number; end: number } {
-  const featuredOffset = hasFeatured ? 1 : 0;
-
-  if (page <= 1) {
-    return { start: 0, end: featuredOffset + BLOG_LIST_PAGE_SIZE };
-  }
-
-  const start = featuredOffset + (page - 1) * BLOG_LIST_PAGE_SIZE;
+/** GROQ slice window `[start, end)` into the ordered blog list for a page. */
+export function getBlogPaginationRange(page: number): {
+  start: number;
+  end: number;
+} {
+  const start = Math.max(page - 1, 0) * BLOG_LIST_PAGE_SIZE;
   return { start, end: start + BLOG_LIST_PAGE_SIZE };
 }
 
@@ -90,18 +79,15 @@ export type PaginationMetadata = {
 };
 
 /**
- * Derive pagination metadata for the blog index. The featured card (when
- * present) is one of the total documents but is not a list item, so the page
- * count is based on the remaining list documents at BLOG_LIST_PAGE_SIZE each.
+ * Derive pagination metadata for the blog index. `totalItems` counts list
+ * documents only — the count query applies the same featured exclusion the list
+ * query does, so featured posts never inflate the page count.
  */
 export function calculateBlogPaginationMetadata(
   totalItems: number,
-  currentPage: number,
-  hasFeatured: boolean
+  currentPage: number
 ): PaginationMetadata {
-  const featuredOffset = hasFeatured ? 1 : 0;
-  const listItems = Math.max(totalItems - featuredOffset, 0);
-  const totalPages = Math.max(1, Math.ceil(listItems / BLOG_LIST_PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(totalItems / BLOG_LIST_PAGE_SIZE));
   const hasNextPage = currentPage < totalPages;
   const hasPreviousPage = currentPage > 1;
 

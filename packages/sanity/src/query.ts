@@ -165,8 +165,6 @@ export const queryBlogIndexPageData = defineQuery(`
     _type,
     title,
     description,
-    "displayFeaturedBlogs" : displayFeaturedBlogs == "yes",
-    "featuredBlogsCount" : featuredBlogsCount,
     ogTitle,
     "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${pageBuilderFragment},
@@ -174,8 +172,14 @@ export const queryBlogIndexPageData = defineQuery(`
   }
 `);
 
+export const queryBlogIndexPageFeaturedBlogs = defineQuery(`
+  *[_type == "blog" && featured == true && (seoHideFromLists != true)] | order(orderRank asc){
+    ${blogCardFragment}
+  }
+`);
+
 export const queryBlogIndexPageBlogs = defineQuery(`
-  *[_type == "blog" && (seoHideFromLists != true) && ($category == "" || category == $category)] | order(orderRank asc) [$start...$end]{
+  *[_type == "blog" && (seoHideFromLists != true) && ($category == "" || category == $category) && (!$excludeFeatured || featured != true)] | order(orderRank asc) [$start...$end]{
     ${blogCardFragment}
   }
 `);
@@ -187,7 +191,7 @@ export const queryAllBlogDataForSearch = defineQuery(`
 `);
 
 export const queryBlogIndexPageBlogsCount = defineQuery(`
-  count(*[_type == "blog" && (seoHideFromLists != true) && ($category == "" || category == $category)])
+  count(*[_type == "blog" && (seoHideFromLists != true) && ($category == "" || category == $category) && (!$excludeFeatured || featured != true)])
 `);
 export const queryBlogSlugPageData = defineQuery(`
   *[_type == "blog" && slug.current == $slug][0]{

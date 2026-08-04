@@ -4855,44 +4855,6 @@
         },
         "optional": true
       },
-      "displayFeaturedBlogs": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "yes"
-            },
-            {
-              "type": "string",
-              "value": "no"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "featuredBlogsCount": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "1"
-            },
-            {
-              "type": "string",
-              "value": "2"
-            },
-            {
-              "type": "string",
-              "value": "3"
-            }
-          ]
-        },
-        "optional": true
-      },
       "pageBuilder": {
         "type": "objectAttribute",
         "value": {
@@ -5665,6 +5627,13 @@
         "type": "objectAttribute",
         "value": {
           "type": "string"
+        },
+        "optional": true
+      },
+      "featured": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
         },
         "optional": true
       },
