@@ -335,7 +335,7 @@ function Footer({ data, settingsData }: Readonly<FooterProps>) {
                           key={`${link?._key}-${columnIndex}-column-${column?._key}`}
                         >
                           <Link
-                            className="link-underline after:-bottom-0.5! rounded-sm outline-none after:transition-none!"
+                            className="link-underline after:-bottom-0.5! rounded-sm focus-ring after:transition-none! outline-accent-green-foreground!"
                             href={link.href ?? "#"}
                             rel={
                               link.openInNewTab

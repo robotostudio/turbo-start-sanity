@@ -36,6 +36,7 @@ type TableOfContentProps = {
   className?: string;
   maxDepth?: number;
   shareTitle?: string;
+  shareUrl?: string;
 };
 
 type ProcessedHeading = {
@@ -570,8 +571,11 @@ const SHARE_TARGETS: readonly ShareTarget[] = [
   },
 ] as const;
 
-function ShareOptions({ title }: Readonly<{ title?: string }>) {
-  const [url, setUrl] = useState("");
+function ShareOptions({
+  title,
+  shareUrl,
+}: Readonly<{ title?: string; shareUrl?: string }>) {
+  const [url, setUrl] = useState(shareUrl ?? "");
 
   useEffect(() => {
     setUrl(window.location.href);
@@ -585,10 +589,10 @@ function ShareOptions({ title }: Readonly<{ title?: string }>) {
   const encodedTitle = encodeURIComponent(title ?? "");
 
   const handleWebShare = async (fallbackUrl: string) => {
-    const shareUrl = url || window.location.href;
+    const resolvedUrl = url || window.location.href;
     if (typeof navigator.share === "function") {
       try {
-        await navigator.share({ title: title || undefined, url: shareUrl });
+        await navigator.share({ title: title || undefined, url: resolvedUrl });
         return;
       } catch {
         // Cancelled or the share failed — fall through to the fallback link.
@@ -633,6 +637,7 @@ function ShareOptions({ title }: Readonly<{ title?: string }>) {
         );
       })}
       <button
+        aria-label="Copy link to clipboard"
         className={cn(
           "focus-ring-inset flex flex-col items-center justify-center gap-1 rounded-none px-3 py-1.5 text-muted-foreground transition-colors hover:text-foreground",
           COPY_STATUS_CLASS[copyStatus]
@@ -647,9 +652,6 @@ function ShareOptions({ title }: Readonly<{ title?: string }>) {
             <CopyIcon className="size-4.5" />
           )}
         </span>
-        {/* Stack both labels in one grid cell so the button always reserves the
-            wider "Copied" width — the hidden label holds the space, so toggling
-            copied↔not never shifts the justify-between row. */}
         <span className="grid text-xs tracking-[0.02em]">
           <span
             className={cn(
@@ -668,6 +670,10 @@ function ShareOptions({ title }: Readonly<{ title?: string }>) {
             Copy
           </span>
         </span>
+        <output className="sr-only">
+          {copyStatus === "copied" ? "Link copied to clipboard" : ""}
+          {copyStatus === "error" ? "Could not copy link" : ""}
+        </output>
       </button>
     </div>
   );
@@ -678,6 +684,7 @@ export const TableOfContent: FC<TableOfContentProps> = ({
   className,
   maxDepth = DEFAULT_MAX_DEPTH,
   shareTitle,
+  shareUrl,
 }) => {
   const { shouldShow, headings, error } = useTableOfContentState(
     richText,
@@ -723,7 +730,7 @@ export const TableOfContent: FC<TableOfContentProps> = ({
           </ul>
         </nav>
 
-        <ShareOptions title={shareTitle} />
+        <ShareOptions shareUrl={shareUrl} title={shareTitle} />
       </aside>
     </div>
   );
@@ -734,6 +741,7 @@ export const MobileTableOfContent: FC<TableOfContentProps> = ({
   className,
   maxDepth = DEFAULT_MAX_DEPTH,
   shareTitle,
+  shareUrl,
 }) => {
   const { shouldShow, headings, error } = useTableOfContentState(
     richText,
@@ -794,7 +802,7 @@ export const MobileTableOfContent: FC<TableOfContentProps> = ({
               ))}
             </ul>
           </nav>
-          <ShareOptions title={shareTitle} />
+          <ShareOptions shareUrl={shareUrl} title={shareTitle} />
         </div>
       </div>
     </details>
