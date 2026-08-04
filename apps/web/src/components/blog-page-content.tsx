@@ -1,6 +1,7 @@
 "use client";
 
 import type { QueryBlogIndexPageDataResult } from "@workspace/sanity/types";
+import { cn } from "@workspace/tailwind-config/utils";
 import type { ReactNode } from "react";
 
 import { BlogHeader, FeaturedBlogCard } from "@/components/blog-card";
@@ -38,6 +39,9 @@ export function BlogPageContent({
 
   const { searchQuery, setSearchQuery, results, isSearching, hasQuery, error } =
     useBlogSearch();
+
+  const isDeadEnd =
+    hasQuery && !isSearching && (Boolean(error) || results.length === 0);
 
   // The category filter is resolved server-side; page and search are client
   // state, so they are the only conditions left to check here.
@@ -92,13 +96,19 @@ export function BlogPageContent({
             </div>
           </aside>
 
-          <div className="text-foreground">
+          <div
+            className={cn(
+              "grid text-foreground",
+              isDeadEnd ? "lg:h-0 lg:min-h-full" : "content-start"
+            )}
+          >
             <output className="sr-only">{searchStatus}</output>
             {hasQuery ? (
               <BlogSearchResults
                 error={error}
                 hasQuery={hasQuery}
                 isSearching={isSearching}
+                onClear={() => setSearchQuery("")}
                 results={results}
                 searchQuery={searchQuery}
               />
