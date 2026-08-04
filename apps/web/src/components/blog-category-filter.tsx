@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 

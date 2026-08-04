@@ -26,7 +26,7 @@ import {
 import { ArticleJsonLd } from "@/components/json-ld";
 import { BlogFallback } from "@/components/skeletons";
 import { seoFromDocument } from "@/lib/seo";
-import { formatDate, PLACEHOLDER_SLUG } from "@/utils";
+import { formatDate, getBaseUrl, PLACEHOLDER_SLUG } from "@/utils";
 
 const logger = new Logger("BlogSlug");
 
@@ -151,6 +151,7 @@ function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
   const author = data?.authors;
   const publishedDate = formatDate(publishedAt);
   const updatedDate = formatDate(_updatedAt);
+  const shareUrl = data?.slug ? `${getBaseUrl()}${data.slug}` : undefined;
 
   return (
     <main className="bg-background">
@@ -212,6 +213,7 @@ function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
               className="mb-12"
               richText={richText ?? []}
               shareTitle={title}
+              shareUrl={shareUrl}
             />
             <RichText
               className="prose-lg prose-p:my-0 prose-p:leading-7 prose-p:tracking-[0.013em] prose-li:leading-7 [&>p+p]:mt-8 [&_blockquote]:border-none [&_blockquote]:bg-grid-dots [&_blockquote]:p-4 [&_blockquote]:font-normal [&_blockquote]:not-italic [&_blockquote]:text-zinc-800 dark:[&_blockquote]:text-zinc-50 [&_blockquote_p]:my-0 [&_blockquote_p]:bg-background [&_blockquote_p]:p-8 [&_blockquote_p]:text-lg [&_blockquote_p]:text-muted-foreground [&_blockquote_p]:leading-7 [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none [&_blockquote_strong]:font-normal [&_blockquote_strong]:text-foreground"
@@ -221,7 +223,11 @@ function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
 
           <div className="hidden lg:block">
             <div className="sticky top-24">
-              <TableOfContent richText={richText ?? []} shareTitle={title} />
+              <TableOfContent
+                richText={richText ?? []}
+                shareTitle={title}
+                shareUrl={shareUrl}
+              />
             </div>
           </div>
         </div>

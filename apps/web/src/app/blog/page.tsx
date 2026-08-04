@@ -147,23 +147,38 @@ type BlogPageProps = Readonly<{
 }>;
 
 export default function BlogIndexPage({ searchParams }: BlogPageProps) {
-  // The fallback is the real default view (page 1, unfiltered, published), not a
-  // skeleton. Under PPR it prerenders as the static shell, so /blog shows content
-  // instantly; the dynamic island below streams in and only changes anything when
-  // a `category`/`page` filter is actually present.
   return (
-    <Suspense
-      fallback={
-        <BlogIndexView
-          activeCategory=""
-          currentPage={1}
-          perspective="published"
-          stega={false}
-        />
-      }
-    >
+    <Suspense fallback={<BlogIndexShell />}>
       <DynamicBlogIndex searchParams={searchParams} />
     </Suspense>
+  );
+}
+
+async function BlogIndexShell() {
+  const [indexPageData] = await handleErrors(
+    fetchBlogIndexPageData({ perspective: "published", stega: false })
+  );
+
+  if (!indexPageData) {
+    return null;
+  }
+
+  return (
+    <BlogPageContent
+      activeCategory=""
+      blogs={[]}
+      featuredBlogs={[]}
+      indexPageData={indexPageData}
+      paginationMetadata={{
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: 0,
+        itemsPerPage: 9,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      }}
+      pending
+    />
   );
 }
 
