@@ -47,7 +47,7 @@ export const customUrl = defineType({
             }
             const isValid = isValidUrl(value);
             if (!isValid) {
-              return "Invalid URL";
+              return "Enter a http, https, mailto or tel address, or a relative path like /about";
             }
           }
           return true;

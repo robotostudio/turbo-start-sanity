@@ -59,6 +59,7 @@
     "./internal/page-builder-to-markdown": "./src/internal/page-builder-to-markdown.ts",
     "./internal/portable-text-to-markdown": "./src/internal/portable-text-to-markdown.ts",
     "./internal/rendering": "./src/internal/rendering.tsx",
+    "./internal/safe-href": "./src/internal/safe-href.ts",
     "./internal/rich-text": "./src/internal/rich-text.tsx",
     "./internal/sanity-buttons": "./src/internal/sanity-buttons.tsx",
     "./internal/sanity-image": "./src/internal/sanity-image.tsx",

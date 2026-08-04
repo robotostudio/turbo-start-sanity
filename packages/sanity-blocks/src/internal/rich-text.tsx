@@ -9,6 +9,7 @@ import {
 
 import { CodeBlock } from "./code-block";
 import { headingChildrenToSlug as parseChildrenToSlug } from "./heading-slug";
+import { sanitizeHref } from "./safe-href";
 import { SanityImage } from "./sanity-image";
 
 const logger = new Logger("RichText");
@@ -89,7 +90,8 @@ const components: Partial<PortableTextReactComponents> = {
       </code>
     ),
     customLink: ({ children, value }) => {
-      if (!value.href || value.href === "#") {
+      const safeHref = sanitizeHref(value.href);
+      if (!safeHref || safeHref === "#") {
         return (
           <span className="underline decoration-dotted underline-offset-2">
             Link Broken
@@ -102,7 +104,7 @@ const components: Partial<PortableTextReactComponents> = {
         // read out in place of the words the author wrote.
         <Link
           className="underline decoration-dotted underline-offset-2"
-          href={value.href}
+          href={safeHref}
           prefetch={false}
           rel={value.openInNewTab ? "noopener noreferrer" : undefined}
           target={value.openInNewTab ? "_blank" : "_self"}

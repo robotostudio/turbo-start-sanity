@@ -1,6 +1,8 @@
 import { TriangleAlert } from "lucide-react";
 import { createElement, type ReactNode } from "react";
 
+import { isSafeHref } from "./safe-href";
+
 export interface SlugValue {
   current?: string | null;
 }
@@ -40,16 +42,6 @@ export interface PortableTextBlock {
 export type PortableTextValue = PortableTextBlock[] | null | undefined;
 
 export const getHref = (url?: CustomUrlValue | null) => {
-  const isSafeHref = (href: string) => {
-    if (href.startsWith("/") || href.startsWith("#")) return true;
-    try {
-      const parsed = new URL(href);
-      return ["http:", "https:", "mailto:", "tel:"].includes(parsed.protocol);
-    } catch {
-      return false;
-    }
-  };
-
   if (!url) {
     return undefined;
   }

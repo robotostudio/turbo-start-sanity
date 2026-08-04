@@ -6,6 +6,7 @@ import {
 import { cn } from "@workspace/tailwind-config/utils";
 
 import { normalizedLogoHeight } from "../internal/logo-height";
+import { sanitizeHref } from "../internal/safe-href";
 
 export interface ShowcaseGridItem {
   _key: string;
@@ -54,7 +55,7 @@ function cmsToView(item: ShowcaseGridItem): CardView {
   return {
     id: item._key,
     name,
-    url: item.url ?? null,
+    url: sanitizeHref(item.url) ?? null,
     category: item.category?.trim() || null,
     screenshot,
     logo: hasValidAssetId(item.attributionLogo) ? item.attributionLogo : null,

@@ -3,6 +3,8 @@ import { Button } from "@workspace/ui/components/button";
 import Link from "next/link";
 import type { ComponentProps } from "react";
 
+import { sanitizeHref } from "./safe-href";
+
 export interface ButtonProps {
   _key?: string | null;
   text?: string | null;
@@ -52,7 +54,8 @@ function SanityButton({
   className,
   size,
 }: Readonly<SanityButtonRenderProps>) {
-  if (!href) {
+  const safeHref = sanitizeHref(href);
+  if (!safeHref) {
     return <Button>Link Broken</Button>;
   }
 
@@ -63,12 +66,8 @@ function SanityButton({
       size={size ?? "default"}
       variant={variant ?? "default"}
     >
-      {/* No `aria-label`/`title`: the button text is already the accessible
-          name, and an override ("Navigate to …") only pads it and breaks the
-          match voice-control users need between what they see and what they
-          say. New-tab links say so, in text only assistive tech reads. */}
       <Link
-        href={href}
+        href={safeHref}
         rel={openInNewTab ? "noopener noreferrer" : undefined}
         target={openInNewTab ? "_blank" : "_self"}
       >

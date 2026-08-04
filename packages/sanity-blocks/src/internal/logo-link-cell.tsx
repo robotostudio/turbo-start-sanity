@@ -2,6 +2,7 @@ import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 
+import { sanitizeHref } from "./safe-href";
 import type { SanityImageData } from "./sanity-image";
 import { resolveAssetId, SanityImage } from "./sanity-image";
 
@@ -53,13 +54,14 @@ export function LogoLinkCell({
   // Only wrap in a link when the logo has alt text — the SanityImage's alt is
   // the anchor's accessible name, so linking an alt-less image yields an unnamed
   // link. Alt-less logos still render, just unlinked.
-  if (href && image.alt?.trim()) {
+  const safeHref = sanitizeHref(href);
+  if (safeHref && image.alt?.trim()) {
     return (
       // Inset ring: the Logo Cloud clips its marquee with `overflow-hidden`, so
       // an outset ring on a cell near either edge would be cut in half.
       <Link
         className={cn("focus-ring-inset", cellClassName)}
-        href={href}
+        href={safeHref}
         rel={openInNewTab ? "noopener noreferrer" : undefined}
         target={openInNewTab ? "_blank" : undefined}
       >

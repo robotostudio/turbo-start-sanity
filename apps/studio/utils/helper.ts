@@ -3,10 +3,11 @@ import { isPortableTextTextBlock, type StringOptions } from "sanity";
 const isRelativeUrl = (url: string) =>
   url.startsWith("/") || url.startsWith("#") || url.startsWith("?");
 
+const ALLOWED_PROTOCOLS = ["http:", "https:", "mailto:", "tel:"];
+
 export const isValidUrl = (url: string) => {
   try {
-    new URL(url);
-    return true;
+    return ALLOWED_PROTOCOLS.includes(new URL(url).protocol);
   } catch (_e) {
     return isRelativeUrl(url);
   }
