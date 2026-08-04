@@ -11,11 +11,7 @@ export const client = createClient({
   perspective: "published",
   stega: {
     studioUrl: env.NEXT_PUBLIC_SANITY_STUDIO_URL,
-    // Matches DRAFT_MODE_ENABLED in live.ts. Every sanityFetch passes an
-    // explicit `stega` that overrides this anyway.
-    enabled:
-      env.NODE_ENV === "development" ||
-      env.NEXT_PUBLIC_VERCEL_ENV === "preview",
+    enabled: env.NODE_ENV === "development",
   },
 });
 
