@@ -10,21 +10,32 @@ function ScrollToTopInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isPopNavigation = useRef(false);
+  const hasMounted = useRef(false);
+
+  // Key on pathname + query so a query-only popstate still re-runs the effect
+  // to clear the flag; a pathname-only key would strand the next navigation.
+  const routeKey = `${pathname}?${searchParams.toString()}`;
+  const lastRouteKey = useRef(routeKey);
 
   useEffect(() => {
     const markPop = () => {
+      const popped = `${window.location.pathname}?${window.location.search.slice(1)}`;
+      if (popped === lastRouteKey.current) {
+        return;
+      }
       isPopNavigation.current = true;
     };
     window.addEventListener("popstate", markPop);
     return () => window.removeEventListener("popstate", markPop);
   }, []);
 
-  // Key on pathname + query so a query-only popstate still re-runs the effect
-  // to clear the flag; a pathname-only key would strand the next navigation.
-  const routeKey = `${pathname}?${searchParams.toString()}`;
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: routeKey is a route-change trigger, not read inside the effect body.
   useEffect(() => {
+    lastRouteKey.current = routeKey;
+
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
     // Back/forward: let the browser restore the saved scroll position.
     if (isPopNavigation.current) {
       isPopNavigation.current = false;

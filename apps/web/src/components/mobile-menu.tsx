@@ -24,7 +24,7 @@ import { useMediaQuery } from "@workspace/ui/hooks/use-media-query";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { MenuLink } from "@/components/elements/menu-link";
 import { Logo } from "@/components/logo";
@@ -67,6 +67,11 @@ export function MobileMenu({
   function closeMenu() {
     setIsOpen(false);
   }
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: pathname is the route-change trigger, not a value the effect body reads.
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
 
   const { columns, buttons } = navbarData || {};
   const { siteTitle, logos } = settingsData || {};
