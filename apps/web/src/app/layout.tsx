@@ -101,7 +101,6 @@ async function DynamicNavbar() {
 }
 
 async function CachedNavbar({ perspective, stega }: DynamicFetchOptions) {
-  "use cache";
   const { navbarData, settingsData } = await getNavigationData({
     perspective,
     stega,
