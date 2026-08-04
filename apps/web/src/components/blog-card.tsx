@@ -26,8 +26,11 @@ function BlogImage({ image, title, className }: Readonly<BlogImageProps>) {
         "absolute inset-0 size-full rounded-none object-cover",
         className
       )}
+      fetchPriority="high"
       height={600}
       image={image}
+      loading="eager"
+      sizes="(min-width: 1440px) 700px, (min-width: 1024px) calc((100vw - 40px) / 2), calc(100vw - 40px)"
       width={800}
     />
   );
