@@ -65,7 +65,7 @@ export default async function RootLayout({
             <CachedNavbar perspective="published" stega={false} />
           )}
           <div
-            className="relative z-10 bg-background"
+            className="-mt-16 relative z-10 min-h-dvh bg-background pt-16"
             style={{ marginBottom: "var(--footer-height)" }}
           >
             {children}
