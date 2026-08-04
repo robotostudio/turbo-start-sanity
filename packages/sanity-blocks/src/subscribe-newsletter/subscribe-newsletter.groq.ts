@@ -2,7 +2,9 @@ import { imageFields, markDefsFragment } from "../internal/groq-fragments";
 
 export const subscribeNewsletterGroqProjection = /* groq */ `
   _type == "subscribeNewsletter" => {
-    ...,
+    _type,
+    _key,
+    title,
     "subTitle": subTitle[]{
       ...,
       ${markDefsFragment}
