@@ -7,7 +7,7 @@ import { useDisclosureAnimation } from "@workspace/sanity-blocks/internal/use-di
 import { cn } from "@workspace/tailwind-config/utils";
 import { ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
-import { type MouseEvent as ReactMouseEvent, useRef, useState } from "react";
+import { type MouseEvent as ReactMouseEvent, useState } from "react";
 
 export interface FaqItem {
   _key?: string | null;
@@ -60,9 +60,7 @@ function FaqDisclosure({
   onToggle: () => void;
 }>) {
   const { detailsRef, contentRef } = useDisclosureAnimation(isOpen);
-  // The `open` attribute is set once (SSR/no-JS state); afterwards the hook
-  // owns `details.open` so the close animation can finish before it flips.
-  const initialOpen = useRef(isOpen).current;
+  const [initialOpen] = useState(isOpen);
 
   const handleSummaryClick = (event: ReactMouseEvent<HTMLElement>) => {
     event.preventDefault();
