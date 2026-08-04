@@ -18,8 +18,8 @@ CMS.
   singleton schemas
 - `packages/sanity-blocks`: shared page-builder block schemas, GROQ fragments,
   React renderers, Markdown serializers, and tests
-- `packages/sanity`: shared Sanity client, live query helpers, image helpers,
-  and GROQ queries
+- `packages/sanity`: shared Sanity client, live query helpers, GROQ queries,
+  the `urlFor` image URL helper, and the generated Sanity types
 - `packages/ui`, `packages/tailwind-config`, `packages/env`,
   `packages/logger`, `packages/typescript-config`: shared workspace packages for
   UI, styling, env validation, logging, and TypeScript config
@@ -73,7 +73,9 @@ pnpm install
 
 ### 2. Create a Sanity project
 
-Skip this if you used `npm create sanity@latest` above.
+If you used `npm create sanity@latest` above, the project already exists — skip
+to step 3 below. Steps 3–5 are still required either way: the scaffold does not
+create API tokens or CORS origins, and the web app will not boot without them.
 
 1. Go to [sanity.io/manage](https://www.sanity.io/manage) and create a project.
 2. Note the **Project ID** and the **dataset** name (`production` by default).
@@ -113,7 +115,7 @@ a required value is missing:
 | `SANITY_STUDIO_DATASET` | yes | Same dataset as the web app |
 | `SANITY_STUDIO_TITLE` | no | Studio display name |
 | `SANITY_STUDIO_API_VERSION` | no | Defaults to `2025-05-08` |
-| `SANITY_STUDIO_PRESENTATION_URL` | prod only | The deployed web URL. Local development always uses `http://localhost:3000`; the Studio throws if this is unset in production |
+| `SANITY_STUDIO_PRESENTATION_URL` | non-dev | The deployed web URL. Only `NODE_ENV=development` gets the `http://localhost:3000` default; anything else (production, `test`, unset) throws when this is missing |
 | `SANITY_STUDIO_APP_ID` | no | Empty until your first `sanity deploy` returns one — see [Deploying](#sanity-studio) |
 | `NEXT_PUBLIC_SITE_URL` | no | Used by the `invalidate-tags` Sanity Function, not by the Studio UI |
 | `SANITY_REVALIDATE_SECRET` | no | Same — must match the web app's value for cache invalidation to work |
@@ -169,7 +171,7 @@ pnpm format:check     # Check formatting without writing
 pnpm check-types      # TypeScript checks across the workspace
 pnpm type             # Run Sanity type generation tasks
 
-pnpm turbo run test   # Vitest unit tests (packages/sanity-blocks)
+pnpm test             # Vitest unit tests (packages/sanity-blocks)
 pnpm test:e2e         # Playwright smoke tests against a running or deployed site
 ```
 

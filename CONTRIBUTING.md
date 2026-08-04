@@ -19,6 +19,14 @@ pnpm dev
 
 Node `>=22.12` and the pinned pnpm version from `packageManager` are required.
 
+## How to submit a change
+
+1. Fork the repository and clone your fork.
+2. Create a branch: `git checkout -b feature/short-description`.
+3. Make your changes and commit them.
+4. Push the branch to your fork: `git push origin feature/short-description`.
+5. Open a pull request against `main` and fill in the template.
+
 ## Before you open a pull request
 
 Run the same checks CI runs:
@@ -27,7 +35,7 @@ Run the same checks CI runs:
 pnpm lint
 pnpm format:check   # or `pnpm format` to fix
 pnpm check-types
-pnpm turbo run test
+pnpm test
 ```
 
 If you touched a Sanity schema, also run `pnpm type` and commit the regenerated

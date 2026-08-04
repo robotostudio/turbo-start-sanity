@@ -36,12 +36,13 @@ pnpm type             # Generates types — works from root (turbo) or apps/stud
 cd apps/studio && pnpm extract   # Schema extract only (studio-scoped)
 
 # Tests
-pnpm turbo run test   # Vitest unit tests (currently only @workspace/sanity-blocks)
+pnpm test             # Vitest unit tests (currently only @workspace/sanity-blocks)
 pnpm test:e2e         # Playwright smoke tests (apps/web, needs a running/deployed site)
 ```
 
-Note: there is no root `test` script — unit tests run through `pnpm turbo run test`
-or `pnpm --filter @workspace/sanity-blocks test`.
+Note: `pnpm test` at the root is `turbo run test`, which today only reaches
+`@workspace/sanity-blocks` — the one package with a `test` script. Run a single
+package's suite with `pnpm --filter @workspace/sanity-blocks test`.
 
 ## Monorepo Structure
 
@@ -114,7 +115,7 @@ Caveat: `SANITY_API_WRITE_TOKEN` is currently required by `packages/env/src/serv
 **`apps/studio`** (plain `process.env`, loaded via `dotenv`/Vite — not `@workspace/env`):
 
 - Required: `SANITY_STUDIO_PROJECT_ID`, `SANITY_STUDIO_DATASET`
-- Optional: `SANITY_STUDIO_TITLE`, `SANITY_STUDIO_API_VERSION` (defaults to `2025-05-08` in `apps/studio/utils/constant.ts`), `SANITY_STUDIO_APP_ID` (written back after the first `sanity deploy`), `SANITY_STUDIO_PRESENTATION_URL` (required in production only — `utils/helper.ts` throws when `NODE_ENV=production` and it is unset)
+- Optional: `SANITY_STUDIO_TITLE`, `SANITY_STUDIO_API_VERSION` (defaults to `2025-05-08` in `apps/studio/utils/constant.ts`), `SANITY_STUDIO_APP_ID` (written back after the first `sanity deploy`), `SANITY_STUDIO_PRESENTATION_URL` (required whenever `NODE_ENV` is not `development` — `utils/helper.ts` returns `http://localhost:3000` in development and throws otherwise, so an unset or `test` `NODE_ENV` throws too)
 - `NEXT_PUBLIC_SITE_URL` and `SANITY_REVALIDATE_SECRET` are read only by the deployed Sanity Function `apps/studio/functions/invalidate-tags`, not by the Studio itself
 
 Web env vars are Zod-validated at startup via `@workspace/env` (`@workspace/env/client` and `@workspace/env/server`).
