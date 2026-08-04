@@ -92,7 +92,7 @@ export const showcaseGridSchema = defineType({
       type: "array",
       title: "Showcase Items",
       description:
-        "The sites shown in the grid. Drag to reorder — visitors see them in this order. Mark one as Featured for the large banner; add a URL to make a card link out to its live site.",
+        "The sites shown in the grid. Drag to reorder — visitors see them in this order. Mark one as Featured to give it the large banner; if you don't mark any, the first item gets the banner automatically. Add a URL to make a card link out to its live site.",
       of: [showcaseItem],
     }),
   ],
