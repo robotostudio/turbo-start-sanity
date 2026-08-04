@@ -56,12 +56,10 @@ export function CodeBlock({
             <span key={index + 1}>{index + 1}</span>
           ))}
         </div>
-        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: a horizontally
-            scrolling box has to be reachable by keyboard or arrow keys can
-            never pan a long line into view (WCAG 2.1.1). No role: the rule's
-            concern is unlabelled widgets, and a labelled `region` here would
-            put every snippet on the page into the landmark list. */}
-        <pre className="rich-code-pre overflow-x-auto font-mono" tabIndex={0}>
+        {/* No tabIndex: browsers make an overflowing scroll container
+            keyboard-focusable on their own, so arrow keys can still pan a long
+            line into view (WCAG 2.1.1). */}
+        <pre className="rich-code-pre overflow-x-auto font-mono">
           <code>{code}</code>
         </pre>
       </div>
