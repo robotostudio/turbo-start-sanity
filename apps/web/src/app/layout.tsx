@@ -55,18 +55,17 @@ export default async function RootLayout({
       >
         <Providers>
           <ScrollToTop />
-          {showDrafts ? (
-            <Suspense fallback={<NavbarSkeleton />}>
-              <DynamicNavbar />
-            </Suspense>
-          ) : (
-            <CachedNavbar perspective="published" stega={false} />
-          )}
-          <div
-            className="-mt-16 relative z-10 min-h-dvh bg-background pt-16"
-            style={{ marginBottom: "var(--footer-height)" }}
-          >
-            {children}
+          <div style={{ marginBottom: "var(--footer-height)" }}>
+            {showDrafts ? (
+              <Suspense fallback={<NavbarSkeleton />}>
+                <DynamicNavbar />
+              </Suspense>
+            ) : (
+              <CachedNavbar perspective="published" stega={false} />
+            )}
+            <div className="-mt-16 relative z-10 min-h-dvh bg-background pt-16">
+              {children}
+            </div>
           </div>
           <StickyFooter>
             {showDrafts ? (
