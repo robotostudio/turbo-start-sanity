@@ -25,7 +25,6 @@ export interface MarkdownCard {
   _key?: string | null;
   title?: string | null;
   description?: string | null;
-  href?: string | null;
   // Feature-card icon — intentionally dropped from Markdown (a test guards this).
   icon?: string | null;
   image?: MarkdownImage | null;
@@ -45,11 +44,55 @@ export interface MarkdownLink {
   href?: string | null;
 }
 
+export interface MarkdownLogo {
+  _key?: string | null;
+  href?: string | null;
+  image?: MarkdownImage | null;
+}
+
+export interface MarkdownSocial {
+  _key?: string | null;
+  platform?: string | null;
+  label?: string | null;
+  href?: string | null;
+}
+
+export interface MarkdownShowcaseItem {
+  _key?: string | null;
+  siteName?: string | null;
+  url?: string | null;
+  category?: string | null;
+}
+
+export interface MarkdownFaqCategory {
+  _key?: string | null;
+  title?: string | null;
+  faqs?: MarkdownFaq[] | null;
+}
+
+export interface MarkdownTestimonial {
+  eyebrow?: string | null;
+  quote?: PortableTextValue;
+  authorName?: string | null;
+  authorRole?: string | null;
+}
+
+export interface MarkdownVideoVariant {
+  poster?: MarkdownImage | null;
+}
+
+export interface MarkdownVideo {
+  light?: MarkdownVideoVariant | null;
+  dark?: MarkdownVideoVariant | null;
+}
+
 export interface MarkdownBlock {
   _type?: string;
   _key?: string;
   title?: string | null;
   eyebrow?: string | null;
+  description?: string | null;
+  items?: MarkdownShowcaseItem[] | null;
   badge?: string | null;
   subtitle?: string | null;
   richText?: PortableTextValue;
@@ -57,9 +100,12 @@ export interface MarkdownBlock {
   helperText?: PortableTextValue;
   buttons?: MarkdownButton[] | null;
   cards?: MarkdownCard[] | null;
-  faqs?: MarkdownFaq[] | null;
+  categories?: MarkdownFaqCategory[] | null;
   link?: MarkdownLink | null;
-  image?: MarkdownImage | null;
+  logos?: MarkdownLogo[] | null;
+  socials?: MarkdownSocial[] | null;
+  video?: MarkdownVideo | null;
+  testimonial?: MarkdownTestimonial | null;
 }
 
 /** Joins defined, non-empty sections with a blank line between them. */
@@ -130,17 +176,4 @@ export function mdLink(
   return href && href !== "#"
     ? `[${escapeMarkdown(label)}](${formatUrl(absolutizeUrl(href, options.baseUrl))})`
     : escapeMarkdown(label);
-}
-
-export function cardHeading(
-  title: string,
-  href: string | null | undefined,
-  options: MarkdownOptions = {}
-): string {
-  if (title) {
-    return `### ${mdLink(title, href, options)}`;
-  }
-  return href && href !== "#"
-    ? `### ${formatUrl(absolutizeUrl(href, options.baseUrl))}`
-    : "";
 }

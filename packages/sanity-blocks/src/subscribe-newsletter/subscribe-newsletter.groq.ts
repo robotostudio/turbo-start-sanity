@@ -1,8 +1,10 @@
-import { markDefsFragment } from "../internal/groq-fragments";
+import { imageFields, markDefsFragment } from "../internal/groq-fragments";
 
 export const subscribeNewsletterGroqProjection = /* groq */ `
   _type == "subscribeNewsletter" => {
-    ...,
+    _type,
+    _key,
+    title,
     "subTitle": subTitle[]{
       ...,
       ${markDefsFragment}
@@ -10,6 +12,18 @@ export const subscribeNewsletterGroqProjection = /* groq */ `
     "helperText": helperText[]{
       ...,
       ${markDefsFragment}
+    },
+    "testimonial": testimonial{
+      eyebrow,
+      authorName,
+      authorRole,
+      "quote": quote[]{
+        ...,
+        ${markDefsFragment}
+      },
+      "authorImage": authorImage{
+        ${imageFields}
+      }
     }
   }
 `;

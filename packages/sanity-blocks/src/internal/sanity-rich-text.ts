@@ -1,4 +1,4 @@
-import { ImageIcon, LinkIcon } from "@sanity/icons";
+import { CodeBlockIcon, ImageIcon, LinkIcon } from "@sanity/icons";
 import {
   type ConditionalProperty,
   defineArrayMember,
@@ -9,7 +9,18 @@ import {
 const PORTABLE_TEXT_MEMBER_NAMES = {
   block: "block",
   image: "image",
+  code: "code",
 } as const;
+
+const CODE_LANGUAGES = [
+  { title: "TypeScript", value: "ts" },
+  { title: "TSX", value: "tsx" },
+  { title: "JavaScript", value: "js" },
+  { title: "GROQ", value: "groq" },
+  { title: "Bash", value: "bash" },
+  { title: "JSON", value: "json" },
+  { title: "CSS", value: "css" },
+];
 
 const richTextMembers = [
   defineArrayMember({
@@ -39,6 +50,8 @@ const richTextMembers = [
             defineField({
               name: "customLink",
               type: "customUrl",
+              description:
+                "Where the highlighted text takes visitors — pick a page on this site or paste a web address",
             }),
           ],
         },
@@ -52,19 +65,73 @@ const richTextMembers = [
   }),
   defineArrayMember({
     name: PORTABLE_TEXT_MEMBER_NAMES.image,
-    title: "Image",
     type: "image",
+    title: "Image",
     icon: ImageIcon,
     options: {
       hotspot: true,
     },
     fields: [
       defineField({
-        name: "caption",
-        title: "Caption Text",
+        name: "alt",
         type: "string",
+        title: "Alternative Text",
+        description: "Describe the image for screen readers and search engines",
+      }),
+      defineField({
+        name: "caption",
+        type: "string",
+        title: "Caption Text",
+        description: "Optional caption shown beneath the image.",
       }),
     ],
+  }),
+  defineArrayMember({
+    name: PORTABLE_TEXT_MEMBER_NAMES.code,
+    type: "object",
+    title: "Code Block",
+    description:
+      "A multi-line code snippet with preserved indentation. Use this for code examples instead of the inline Code style.",
+    icon: CodeBlockIcon,
+    fields: [
+      defineField({
+        name: "code",
+        type: "text",
+        title: "Code",
+        description: "The code snippet. Indentation and line breaks are kept.",
+        rows: 8,
+        validation: (rule) => rule.required(),
+      }),
+      defineField({
+        name: "language",
+        type: "string",
+        title: "Language",
+        description: "Optional language label shown in the code block header.",
+        options: {
+          list: CODE_LANGUAGES,
+        },
+      }),
+      defineField({
+        name: "filename",
+        type: "string",
+        title: "Filename",
+        description: "Optional filename shown in the code block header.",
+      }),
+    ],
+    preview: {
+      select: {
+        filename: "filename",
+        language: "language",
+        code: "code",
+      },
+      prepare({ filename, language, code }) {
+        const firstLine = (code ?? "").split("\n")[0]?.trim();
+        return {
+          title: filename || firstLine || "Code Block",
+          subtitle: language ?? "Code",
+        };
+      },
+    },
   }),
 ];
 
@@ -107,9 +174,9 @@ export const definePortableTextField = (
   return defineField({
     ...options,
     name,
+    type: "array",
     description,
     hidden,
-    type: "array",
     of: selectedMembers,
   });
 };

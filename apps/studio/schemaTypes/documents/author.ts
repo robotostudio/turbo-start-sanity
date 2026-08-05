@@ -5,8 +5,8 @@ import { imageWithAltField } from "@/schemaTypes/common";
 
 export const author = defineType({
   name: "author",
-  title: "Author",
   type: "document",
+  title: "Author",
   icon: UserIcon,
   fields: [
     defineField({

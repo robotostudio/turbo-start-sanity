@@ -2,8 +2,9 @@
   "name": "@workspace/typescript-config",
   "version": "0.0.0",
   "private": true,
-  "license": "PROPRIETARY",
-  "publishConfig": {
-    "access": "public"
+  "scripts": {
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "format:check": "biome format ."
   }
 }

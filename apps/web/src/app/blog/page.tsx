@@ -8,21 +8,62 @@ import {
   queryBlogIndexPageBlogs,
   queryBlogIndexPageBlogsCount,
   queryBlogIndexPageData,
+  queryBlogIndexPageFeaturedBlogs,
 } from "@workspace/sanity/query";
+import type { QueryBlogIndexPageDataResult } from "@workspace/sanity/types";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 import { BlogHeader } from "@/components/blog-card";
 import { BlogPageContent } from "@/components/blog-page-content";
+import { Breadcrumbs, type Crumb } from "@/components/breadcrumbs";
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
-import { getSEOMetadata } from "@/lib/seo";
+import { seoFromDocument } from "@/lib/seo";
 import {
-  calculatePaginationMetadata,
-  getBlogPaginationStartEnd,
+  calculateBlogPaginationMetadata,
+  getBlogPaginationRange,
   handleErrors,
 } from "@/utils";
+
+const BLOG_CRUMBS: readonly Crumb[] = [
+  { label: "Home", href: "/" },
+  { label: "Blog" },
+];
+
+function BlogIndexError({
+  indexPageData,
+  message,
+}: Readonly<{
+  indexPageData: NonNullable<QueryBlogIndexPageDataResult>;
+  message: string;
+}>) {
+  return (
+    <main className="bg-background">
+      <Breadcrumbs crumbs={BLOG_CRUMBS} />
+      <div className="container my-16">
+        <BlogHeader
+          description={indexPageData.description}
+          title={indexPageData.title}
+        />
+        <div className="py-12 text-center">
+          <p className="text-muted-foreground">{message}</p>
+        </div>
+        {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
+          <>
+            <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
+            <PageBuilder
+              id={indexPageData._id}
+              pageBuilder={indexPageData.pageBuilder}
+              type={indexPageData._type}
+            />
+          </>
+        )}
+      </div>
+    </main>
+  );
+}
 
 async function fetchBlogIndexPageData({
   perspective,
@@ -37,16 +78,36 @@ async function fetchBlogIndexPageData({
   return res.data;
 }
 
+async function fetchBlogIndexPageFeaturedBlogs({
+  perspective,
+  stega,
+}: DynamicFetchOptions) {
+  "use cache";
+  const res = await sanityFetch({
+    query: queryBlogIndexPageFeaturedBlogs,
+    perspective,
+    stega,
+  });
+  return res.data;
+}
+
 async function fetchBlogIndexPageBlogs({
   start,
   end,
+  category,
+  excludeFeatured,
   perspective,
   stega,
-}: { start: number; end: number } & DynamicFetchOptions) {
+}: {
+  start: number;
+  end: number;
+  category: string;
+  excludeFeatured: boolean;
+} & DynamicFetchOptions) {
   "use cache";
   const res = await sanityFetch({
     query: queryBlogIndexPageBlogs,
-    params: { start, end },
+    params: { start, end, category, excludeFeatured },
     perspective,
     stega,
   });
@@ -54,12 +115,15 @@ async function fetchBlogIndexPageBlogs({
 }
 
 async function fetchBlogIndexPageBlogsCount({
+  category,
+  excludeFeatured,
   perspective,
   stega,
-}: DynamicFetchOptions) {
+}: { category: string; excludeFeatured: boolean } & DynamicFetchOptions) {
   "use cache";
   const res = await sanityFetch({
     query: queryBlogIndexPageBlogsCount,
+    params: { category, excludeFeatured },
     perspective,
     stega,
   });
@@ -72,90 +136,129 @@ export async function generateMetadata(): Promise<Metadata> {
     query: queryBlogIndexPageData,
     perspective,
   });
-  return getSEOMetadata({
-    title: result?.title ?? result?.seoTitle,
-    description: result?.description ?? result?.seoDescription,
-    slug: "/blog",
-    contentId: result?._id,
-    contentType: result?._type,
-  });
+  return seoFromDocument(result, { slug: "/blog" });
 }
 
 type BlogPageProps = Readonly<{
   searchParams: Promise<{
     page?: string;
+    category?: string;
   }>;
 }>;
 
 export default function BlogIndexPage({ searchParams }: BlogPageProps) {
   return (
-    <Suspense fallback={<BlogIndexFallback />}>
+    <Suspense fallback={<BlogIndexShell />}>
       <DynamicBlogIndex searchParams={searchParams} />
     </Suspense>
   );
 }
 
+async function BlogIndexShell() {
+  const [indexPageData] = await handleErrors(
+    fetchBlogIndexPageData({ perspective: "published", stega: false })
+  );
+
+  if (!indexPageData) {
+    return null;
+  }
+
+  return (
+    <BlogPageContent
+      activeCategory=""
+      blogs={[]}
+      featuredBlogs={[]}
+      indexPageData={indexPageData}
+      paginationMetadata={{
+        currentPage: 1,
+        totalPages: 1,
+        totalItems: 0,
+        itemsPerPage: 9,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      }}
+      pending
+    />
+  );
+}
+
 async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
-  const [{ page }, { perspective, stega }] = await Promise.all([
+  const [{ page, category }, { perspective, stega }] = await Promise.all([
     searchParams,
     getDynamicFetchOptions(),
   ]);
-  const currentPage = page ? Number(page) : 1;
+  const parsedPage = Number(page);
+  const currentPage =
+    Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const activeCategory = category ?? "";
 
-  // Fetch page data and total count in parallel
-  const [[indexPageData, errIndexPageData], [totalCount, errTotalCount]] =
-    await Promise.all([
-      handleErrors(fetchBlogIndexPageData({ perspective, stega })),
-      handleErrors(fetchBlogIndexPageBlogsCount({ perspective, stega })),
-    ]);
+  return (
+    <BlogIndexView
+      activeCategory={activeCategory}
+      currentPage={currentPage}
+      perspective={perspective}
+      stega={stega}
+    />
+  );
+}
+
+async function BlogIndexView({
+  currentPage,
+  activeCategory,
+  perspective,
+  stega,
+}: { currentPage: number; activeCategory: string } & DynamicFetchOptions) {
+  const [indexPageData, errIndexPageData] = await handleErrors(
+    fetchBlogIndexPageData({ perspective, stega })
+  );
 
   if (errIndexPageData || !indexPageData) {
     notFound();
   }
 
+  // Drives the strip, the list exclusion and the count together — split them
+  // and a promoted post is counted twice or paginated into a gap.
+  const hasFeatured = !activeCategory;
+
+  const [[totalCount, errTotalCount], [featuredBlogs]] = await Promise.all([
+    handleErrors(
+      fetchBlogIndexPageBlogsCount({
+        category: activeCategory,
+        excludeFeatured: hasFeatured,
+        perspective,
+        stega,
+      })
+    ),
+    handleErrors(
+      hasFeatured
+        ? fetchBlogIndexPageFeaturedBlogs({ perspective, stega })
+        : Promise.resolve([])
+    ),
+  ]);
+
   if (errTotalCount || totalCount === null || totalCount === undefined) {
     return (
-      <main className="container my-16">
-        <BlogHeader
-          description={indexPageData.description}
-          title={indexPageData.title}
-        />
-        <div className="py-12 text-center">
-          <p className="text-muted-foreground">
-            Unable to load blog posts at the moment.
-          </p>
-        </div>
-        {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
-          <>
-            <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
-            <PageBuilder
-              id={indexPageData._id}
-              pageBuilder={indexPageData.pageBuilder}
-              type={indexPageData._type}
-            />
-          </>
-        )}
-      </main>
+      <BlogIndexError
+        indexPageData={indexPageData}
+        message="Unable to load blog posts at the moment."
+      />
     );
   }
 
-  const featuredBlogsCount = indexPageData.displayFeaturedBlogs
-    ? Number(indexPageData.featuredBlogsCount) || 0
-    : 0;
-
-  const paginationMetadata = calculatePaginationMetadata(
+  const paginationMetadata = calculateBlogPaginationMetadata(
     totalCount,
     currentPage
   );
 
-  const { start, end } = getBlogPaginationStartEnd(currentPage);
-  const blogStart = currentPage === 1 ? 0 : start + featuredBlogsCount;
-  const blogEnd = end + featuredBlogsCount;
+  const { start: blogStart, end: blogEnd } =
+    getBlogPaginationRange(currentPage);
 
   const [blogs, errBlogs] = await handleErrors(
     fetchBlogIndexPageBlogs({
       start: blogStart,
       end: blogEnd,
+      category: activeCategory,
+      excludeFeatured: hasFeatured,
       perspective,
       stega,
     })
@@ -163,27 +266,10 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
 
   if (errBlogs || !blogs) {
     return (
-      <main className="container my-16">
-        <BlogHeader
-          description={indexPageData.description}
-          title={indexPageData.title}
-        />
-        <div className="py-12 text-center">
-          <p className="text-muted-foreground">
-            No blog posts available at the moment.
-          </p>
-        </div>
-        {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
-          <>
-            <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
-            <PageBuilder
-              id={indexPageData._id}
-              pageBuilder={indexPageData.pageBuilder}
-              type={indexPageData._type}
-            />
-          </>
-        )}
-      </main>
+      <BlogIndexError
+        indexPageData={indexPageData}
+        message="No blog posts available at the moment."
+      />
     );
   }
 
@@ -191,14 +277,22 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
     <>
       <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
       <BlogPageContent
+        activeCategory={activeCategory}
         blogs={blogs}
+        featuredBlogs={featuredBlogs ?? []}
         indexPageData={indexPageData}
         paginationMetadata={paginationMetadata}
-      />
+      >
+        {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 ? (
+          <div className="pb-16">
+            <PageBuilder
+              id={indexPageData._id}
+              pageBuilder={indexPageData.pageBuilder}
+              type={indexPageData._type}
+            />
+          </div>
+        ) : null}
+      </BlogPageContent>
     </>
   );
-}
-
-function BlogIndexFallback() {
-  return <main className="container my-16 min-h-[50vh]" />;
 }

@@ -4,6 +4,7 @@ import { PathnameFieldComponent } from "@/components/slug-field-component";
 import { GROUP } from "@/utils/constant";
 import {
   createSlugErrorValidator,
+  createSlugUniqueValidator,
   createSlugWarningValidator,
   getDocumentTypeConfig,
 } from "@/utils/slug-validation";
@@ -14,19 +15,12 @@ export {
   imageWithAltField,
 } from "@workspace/sanity-blocks/internal/schema-fields";
 
-export const richTextField = defineField({
-  name: "richText",
-  type: "richText",
-  description:
-    "A text editor that lets you add formatting like bold text, links, and bullet points",
-});
-
 export const pageBuilderField = defineField({
   name: "pageBuilder",
-  group: GROUP.MAIN_CONTENT,
   type: "pageBuilder",
   description:
     "Build your page by adding different sections like text, images, and other content blocks",
+  group: GROUP.MAIN_CONTENT,
 });
 
 export const documentSlugField = (
@@ -56,6 +50,7 @@ export const documentSlugField = (
       const config = getDocumentTypeConfig(documentType);
       return [
         Rule.custom(createSlugErrorValidator(config)),
+        Rule.custom(createSlugUniqueValidator()),
         Rule.custom(createSlugWarningValidator(config)).warning(),
       ];
     },

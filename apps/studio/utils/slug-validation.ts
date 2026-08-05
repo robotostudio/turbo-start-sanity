@@ -2,16 +2,17 @@
  * Slug validation — single source of truth for all URL path validation.
  */
 
+import type { ValidationContext } from "sanity";
 import slugify from "slugify";
 
-// --- Types ---
+import { API_VERSION } from "@/utils/constant";
 
-export type SlugValidationResult = {
+type SlugValidationResult = {
   errors: string[];
   warnings: string[];
 };
 
-export type SlugValidationOptions = {
+export interface SlugValidationOptions {
   /** Human-readable doc type name for error messages */
   documentType?: string;
   /** Require leading slash */
@@ -26,15 +27,13 @@ export type SlugValidationOptions = {
   forbiddenPatterns?: RegExp[];
   /** Custom validators returning error strings */
   customValidators?: Array<(slug: string) => string[]>;
-};
-
-// --- Constants ---
+}
 
 const SEGMENT_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const MIN_LEN = 3;
 const MAX_LEN = 60;
 
-export const SLUG_ERROR_MESSAGES = {
+const SLUG_ERROR_MESSAGES = {
   REQUIRED: "Slug must have a value",
   INVALID_CHARACTERS:
     "Only lowercase letters, numbers, and hyphens are allowed.",
@@ -47,12 +46,10 @@ export const SLUG_ERROR_MESSAGES = {
   TRAILING_SLASH: "URL path must not end with a forward slash (/)",
 } as const;
 
-export const SLUG_WARNING_MESSAGES = {
+const SLUG_WARNING_MESSAGES = {
   TOO_SHORT: `Slug must be at least ${MIN_LEN} characters long.`,
   TOO_LONG: `Slug can't be longer than ${MAX_LEN} characters.`,
 } as const;
-
-// --- Document type configs ---
 
 const CONFIGS: Record<string, SlugValidationOptions> = {
   blog: {
@@ -100,8 +97,6 @@ const CONFIGS: Record<string, SlugValidationOptions> = {
     ],
   },
 };
-
-// --- Core validation ---
 
 /** Validate a single path segment (no slashes). */
 function validateSegment(seg: string): SlugValidationResult {
@@ -192,7 +187,7 @@ function validateDocTypeRules(
 }
 
 /** Main validation — flat pipeline, no branching. */
-export function validateSlug(
+function validateSlug(
   slug: string | undefined | null,
   options: SlugValidationOptions = {}
 ): SlugValidationResult {
@@ -216,8 +211,6 @@ export function validateSlug(
   return { errors: [...new Set(errors)], warnings: [...new Set(warnings)] };
 }
 
-// --- Public API for schema & components ---
-
 /** Get validation config for a document type. */
 export function getDocumentTypeConfig(docType: string): SlugValidationOptions {
   return CONFIGS[docType]
@@ -239,6 +232,33 @@ export function createSlugErrorValidator(
   };
 }
 
+/**
+ * Reject a slug already taken by another document. The document's own draft and
+ * published ids are excluded so re-saving an unchanged document doesn't flag
+ * itself.
+ */
+export function createSlugUniqueValidator(): (
+  slug: { current?: string } | undefined,
+  context: ValidationContext
+) => Promise<string | true> {
+  return async (slug, context) => {
+    const current = slug?.current;
+    if (!(current && context.getClient)) {
+      return true;
+    }
+    const id = (context.document?._id ?? "").replace(/^drafts\./, "");
+    const taken = await context
+      .getClient({ apiVersion: API_VERSION })
+      .fetch<number>(
+        `count(*[!(_id in [$draft, $published]) && slug.current == $slug])`,
+        { draft: `drafts.${id}`, published: id, slug: current }
+      );
+    return taken > 0
+      ? `“${current}” is already used by another document. URLs must be unique.`
+      : true;
+  };
+}
+
 /** Create a Sanity schema warning validator from options. */
 export function createSlugWarningValidator(
   options: SlugValidationOptions
@@ -250,7 +270,7 @@ export function createSlugWarningValidator(
 }
 
 /** Clean a raw string into a valid slug segment. */
-export function cleanSlug(slug: string): string {
+function cleanSlug(slug: string): string {
   if (!slug) return "";
   return slugify(slug, { lower: true, strict: true });
 }

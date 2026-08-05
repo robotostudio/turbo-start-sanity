@@ -1,9 +1,9 @@
 import {
-  type MarkdownBlock,
-  type MarkdownOptions,
   eyebrowToMarkdown,
   headingToMarkdown,
   joinSections,
+  type MarkdownBlock,
+  type MarkdownOptions,
 } from "../internal/markdown";
 import { portableTextToMarkdown } from "../internal/portable-text-to-markdown";
 

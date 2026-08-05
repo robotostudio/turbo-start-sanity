@@ -1,12 +1,13 @@
 import { isPortableTextTextBlock, type StringOptions } from "sanity";
 
-export const isRelativeUrl = (url: string) =>
+const isRelativeUrl = (url: string) =>
   url.startsWith("/") || url.startsWith("#") || url.startsWith("?");
+
+const ALLOWED_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"]);
 
 export const isValidUrl = (url: string) => {
   try {
-    new URL(url);
-    return true;
+    return ALLOWED_PROTOCOLS.has(new URL(url).protocol);
   } catch (_e) {
     return isRelativeUrl(url);
   }
@@ -63,103 +64,6 @@ export const parseRichTextToString = (
   }
   return text.join(" ");
 };
-
-export function splitArray<T>(array: T[], numChunks: number): T[][] {
-  const result: T[][] = Array.from({ length: numChunks }, () => []);
-  for (let i = 0; i < array.length; i++) {
-    result[i % numChunks].push(array[i]);
-  }
-  return result;
-}
-
-export type RetryOptions = {
-  maxRetries?: number;
-  initialDelay?: number;
-  maxDelay?: number;
-  onRetry?: (error: Error, attempt: number) => void;
-};
-
-export async function retryPromise<T>(
-  promiseFn: Promise<T>,
-  options: RetryOptions = {}
-): Promise<T> {
-  const {
-    maxRetries = 3,
-    initialDelay = 1000,
-    maxDelay = 30_000,
-    onRetry,
-  } = options;
-
-  let attempt = 0;
-  let lastError: Error | null = null;
-
-  while (attempt < maxRetries) {
-    try {
-      // Attempt the async operation
-      return await promiseFn;
-    } catch (e) {
-      const error = e instanceof Error ? e : new Error("Unknown error");
-      lastError = error;
-      attempt++;
-
-      if (onRetry) {
-        onRetry(error, attempt);
-      }
-
-      if (attempt >= maxRetries) {
-        throw error;
-      }
-
-      const backoff = Math.min(initialDelay * 2 ** (attempt - 1), maxDelay);
-      await new Promise((r) => setTimeout(r, backoff));
-    }
-  }
-
-  throw lastError ?? new Error("Promise retry failed");
-}
-
-/**
- * Converts a URL pathname to a human-readable title
- */
-export function pathnameToTitle(pathname: string): string {
-  if (pathname === "/") {
-    return "Home";
-  }
-  const lastSegment = pathname.split("/").filter(Boolean).pop() || "";
-  return lastSegment
-    .charAt(0)
-    .toUpperCase()
-    .concat(lastSegment.slice(1).replaceAll("-", " "));
-}
-
-export const getTemplateName = (template: string) => `${template}-with-slug`;
-
-export function createPageTemplate() {
-  const pages = [
-    {
-      title: "Page",
-      type: "page",
-    },
-    {
-      title: "Blog",
-      type: "blog",
-    },
-  ];
-  return pages.map((page) => ({
-    schemaType: page.type,
-    id: getTemplateName(page.type),
-    title: `${page.title} with slug`,
-    value: (props: { slug?: string }) => ({
-      ...(props.slug ? { slug: { current: props.slug, _type: "slug" } } : {}),
-    }),
-    parameters: [
-      {
-        name: "slug",
-        type: "string",
-      },
-    ],
-  }));
-}
 
 /**
  * Determines the presentation URL based on the current environment.

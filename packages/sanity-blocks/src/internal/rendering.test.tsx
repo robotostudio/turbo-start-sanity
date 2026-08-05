@@ -6,8 +6,8 @@ import {
   renderOptionalHeading,
   renderPortableText,
 } from "@workspace/sanity-blocks/internal/rendering";
-import { DynamicIcon } from "lucide-react/dynamic";
 import { TriangleAlert } from "lucide-react";
+import { DynamicIcon } from "lucide-react/dynamic";
 import { renderToStaticMarkup } from "react-dom/server";
 
 test("getHref handles empty, internal, and external URLs", () => {
@@ -99,38 +99,36 @@ test("portable text helpers flatten and render images, headings, and empty block
   ).toBe("Caption copy Alt copy Hello world");
 
   const html = renderToStaticMarkup(
-    <>
-      {renderPortableText([
-        {
-          _type: "image",
-          alt: "Inline image alt",
-        },
-        {
-          _type: "image",
-        },
-        {
-          _type: "block",
-          style: "h2",
-          children: [{ _type: "span", text: "Heading copy" }],
-        },
-        {
-          _type: "block",
-          children: [{ _type: "span", text: "Body copy" }],
-        },
-        {
-          _type: "block",
-          children: [{ _type: "span", text: "   " }],
-        },
-        {
-          _type: "block",
-          children: [{ _type: "span" }],
-        },
-        {
-          _type: "block",
-          children: null,
-        },
-      ])}
-    </>
+    renderPortableText([
+      {
+        _type: "image",
+        alt: "Inline image alt",
+      },
+      {
+        _type: "image",
+      },
+      {
+        _type: "block",
+        style: "h2",
+        children: [{ _type: "span", text: "Heading copy" }],
+      },
+      {
+        _type: "block",
+        children: [{ _type: "span", text: "Body copy" }],
+      },
+      {
+        _type: "block",
+        children: [{ _type: "span", text: "   " }],
+      },
+      {
+        _type: "block",
+        children: [{ _type: "span" }],
+      },
+      {
+        _type: "block",
+        children: null,
+      },
+    ])
   );
 
   expect(html).toBe(
@@ -139,32 +137,30 @@ test("portable text helpers flatten and render images, headings, and empty block
 });
 
 test("renderButtons handles empty, linked, and fallback button states", () => {
-  expect(renderToStaticMarkup(<>{renderButtons()}</>)).toBe("");
+  expect(renderToStaticMarkup(renderButtons())).toBe("");
 
   const html = renderToStaticMarkup(
-    <>
-      {renderButtons([
-        {
-          text: "Read more",
-          url: {
-            type: "internal",
-            internal: {
-              slug: {
-                current: "/features",
-              },
+    renderButtons([
+      {
+        text: "Read more",
+        url: {
+          type: "internal",
+          internal: {
+            slug: {
+              current: "/features",
             },
-            openInNewTab: true,
           },
+          openInNewTab: true,
         },
-        {
-          url: {
-            type: "external",
-            external: "https://example.com/docs",
-          },
+      },
+      {
+        url: {
+          type: "external",
+          external: "https://example.com/docs",
         },
-        {},
-      ])}
-    </>
+      },
+      {},
+    ])
   );
 
   expect(html).toContain('href="/features"');
@@ -176,9 +172,7 @@ test("renderButtons handles empty, linked, and fallback button states", () => {
 });
 
 test("renderOptionalHeading and IconBadge cover fallback output", () => {
-  expect(
-    renderToStaticMarkup(<>{renderOptionalHeading(undefined, "p")}</>)
-  ).toBe("");
+  expect(renderToStaticMarkup(renderOptionalHeading(undefined, "p"))).toBe("");
 
   const html = renderToStaticMarkup(
     <>

@@ -26,7 +26,7 @@ export const imageFragment = /* groq */ `
   }
 `;
 
-export const customLinkFragment = /* groq */ `
+const customLinkFragment = /* groq */ `
   ...customLink{
     openInNewTab,
     "href": select(

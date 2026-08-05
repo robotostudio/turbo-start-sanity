@@ -1,8 +1,7 @@
 "use client";
 
-import { env } from "@workspace/env/client";
 import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
-import { SanityIcon } from "@workspace/sanity-blocks/internal/sanity-icon";
+import { cn } from "@workspace/tailwind-config/utils";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,88 +11,263 @@ import {
   NavigationMenuTrigger,
 } from "@workspace/ui/components/navigation-menu";
 import Link from "next/link";
-import useSWR from "swr";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 
+import { GithubStars } from "@/components/github-stars";
+import { Logo } from "@/components/logo";
+import { MobileMenu } from "@/components/mobile-menu";
 import type { ColumnLink, NavigationData } from "@/types";
-import { Logo } from "./logo";
-import { MobileMenu } from "./mobile-menu";
-import { ModeToggle } from "./mode-toggle";
 
-const fetcher = async (url: string): Promise<NavigationData> => {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error("Failed to fetch navigation data");
-  }
-  return response.json();
-};
+// Shared by the dropdown triggers and the plain links so the two never drift,
+// and focus mirrors hover so keyboard and pointer land alike. Over a marked
+// section the wash goes translucent: a flat zinc swatch only holds contrast on
+// the one background it was picked for.
+//
+// The wash alone can't carry focus — zinc-200 on white is ~1.2:1, well under
+// the 3:1 a focus indicator needs — so keyboard focus also draws the site's
+// dotted ring. `currentColor`, not `--foreground`, because the text colour
+// already inverts over a marked section and the ring has to follow it.
+const NAV_LINK_CLASS =
+  "h-auto rounded-full bg-transparent px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-zinc-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-200 focus-visible:[outline:2px_dotted_currentColor]! focus-visible:outline-offset-2! dark:focus-visible:bg-zinc-800 data-[nav-on=dark]:text-white data-[nav-on=dark]:hover:bg-white/15 data-[nav-on=dark]:focus-visible:bg-white/15 data-[nav-on=light]:text-zinc-900 data-[nav-on=light]:hover:bg-zinc-900/10 data-[nav-on=light]:focus-visible:bg-zinc-900/10";
 
-const TRIGGER_CLASS =
-  "h-auto bg-transparent px-3 py-2 text-muted-foreground hover:bg-transparent hover:text-foreground focus:bg-transparent focus:text-muted-foreground data-popup-open:bg-transparent data-popup-open:text-foreground";
+const TRIGGER_CLASS = cn(
+  NAV_LINK_CLASS,
+  "data-popup-open:bg-zinc-100 dark:data-popup-open:bg-zinc-800 data-[nav-on=dark]:data-popup-open:bg-white/15 data-[nav-on=light]:data-popup-open:bg-zinc-900/10"
+);
+
+// The outline pill draws itself in theme ink, which lands white-on-bright over
+// a section whose ground is fixed regardless of theme. Filled variants carry
+// their own ground and need nothing.
+const NAV_OUTLINE_ADAPTIVE =
+  "group-data-[nav-on=dark]:data-[variant=outline]:border-white group-data-[nav-on=dark]:data-[variant=outline]:text-white group-data-[nav-on=light]:data-[variant=outline]:border-zinc-900 group-data-[nav-on=light]:data-[variant=outline]:text-zinc-900";
+
+const NAV_BUTTON_CLASS = cn(
+  "h-9 px-4 font-mono font-normal text-sm uppercase tracking-wide",
+  NAV_OUTLINE_ADAPTIVE
+);
+
+function NavItemSkeleton() {
+  return <div className="h-5 w-20 bg-muted/50" />;
+}
 
 export function NavbarSkeleton() {
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 w-full animate-pulse bg-background/60 backdrop-blur-lg dark:bg-background/60">
       <div className="container">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex h-10 w-40 items-center">
-            <div className="h-10 w-40 animate-pulse rounded bg-muted/50" />
+          <div className="flex h-10 flex-1 items-center">
+            <div className="h-5 w-14 bg-muted/50" />
           </div>
 
-          <div className="h-10 w-10 animate-pulse rounded bg-muted/50 lg:hidden" />
+          <div className="hidden items-center gap-8 lg:flex">
+            <NavItemSkeleton />
+            <NavItemSkeleton />
+            <NavItemSkeleton />
+            <NavItemSkeleton />
+          </div>
+
+          <div className="hidden flex-1 items-center justify-end gap-2 lg:flex">
+            <div className="h-9 w-28 rounded-full bg-muted/50" />
+            <div className="h-9 w-28 rounded-full bg-muted/50" />
+          </div>
+
+          <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
+            <div className="size-8 bg-muted/50" />
+          </div>
         </div>
       </div>
     </header>
   );
 }
 
-export function Navbar({
-  navbarData: initialNavbarData,
-  settingsData: initialSettingsData,
-}: Readonly<NavigationData>) {
-  const { data, error, isLoading } = useSWR<NavigationData>(
-    "/api/navigation",
-    fetcher,
-    {
-      fallbackData: {
-        navbarData: initialNavbarData,
-        settingsData: initialSettingsData,
-      },
-      revalidateOnFocus: false,
-      revalidateOnMount: false,
-      revalidateOnReconnect: true,
-      refreshInterval: 30_000,
-      errorRetryCount: 3,
-      errorRetryInterval: 5000,
-    }
+const BLUR_LAYERS = [
+  {
+    radius: 32,
+    mask: "linear-gradient(to bottom, black 0%, black 20%, transparent 32%)",
+  },
+  {
+    radius: 16,
+    mask: "linear-gradient(to bottom, transparent 8%, black 20%, black 32%, transparent 46%)",
+  },
+  {
+    radius: 8,
+    mask: "linear-gradient(to bottom, transparent 20%, black 32%, black 46%, transparent 60%)",
+  },
+  {
+    radius: 4,
+    mask: "linear-gradient(to bottom, transparent 32%, black 46%, black 60%, transparent 72%)",
+  },
+  {
+    radius: 2,
+    mask: "linear-gradient(to bottom, transparent 46%, black 60%, black 72%, transparent 84%)",
+  },
+  {
+    radius: 1,
+    mask: "linear-gradient(to bottom, transparent 60%, black 72%, black 84%, transparent 96%)",
+  },
+];
+
+const SATURATE_MASK =
+  "linear-gradient(to bottom, black 0%, black 50%, transparent 95%)";
+
+function ProgressiveBlur() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-x-0 top-0 h-[130%]"
+    >
+      <div
+        className="absolute inset-0 [-webkit-backdrop-filter:saturate(1.5)] [backdrop-filter:saturate(1.5)]"
+        style={{ WebkitMaskImage: SATURATE_MASK, maskImage: SATURATE_MASK }}
+      />
+      {BLUR_LAYERS.map(({ radius, mask }) => (
+        <div
+          className="absolute inset-0"
+          key={radius}
+          style={{
+            WebkitMaskImage: mask,
+            maskImage: mask,
+            WebkitBackdropFilter: `blur(${radius}px)`,
+            backdropFilter: `blur(${radius}px)`,
+          }}
+        />
+      ))}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-30% via-background/25 to-transparent dark:from-background/70 dark:via-background/45" />
+    </div>
   );
+}
 
-  const navigationData = data || {
-    navbarData: initialNavbarData,
-    settingsData: initialSettingsData,
-  };
-  const { navbarData, settingsData } = navigationData;
-  const { columns, buttons } = navbarData || {};
-  const { logo, siteTitle } = settingsData || {};
+type MarkedSection = { rect: DOMRect; value: string };
 
-  // Show skeleton only on initial mount when no fallback data is available
-  if (isLoading && !data && !(initialNavbarData && initialSettingsData)) {
-    return <NavbarSkeleton />;
+// Contrast of the last marked section covering both the bar and this item's
+// centre. Last wins, so a section stacked over another takes precedence.
+function contrastUnder(
+  itemRect: DOMRect,
+  marked: MarkedSection[],
+  barBottom: number
+) {
+  const itemX = itemRect.left + itemRect.width / 2;
+  let value = "";
+  for (const { rect, value: markedValue } of marked) {
+    const covered = Math.min(rect.bottom, barBottom) - Math.max(rect.top, 0);
+    if (covered >= barBottom * 0.6 && rect.left < itemX && rect.right > itemX) {
+      value = markedValue;
+    }
   }
+  return value;
+}
+
+// Stamps the section's contrast on a link, or clears it when no section covers
+// it. Compared first so an unchanged value never touches the DOM.
+function applyContrast(el: HTMLElement, value: string) {
+  if ((el.dataset.navOn ?? "") === value) {
+    return;
+  }
+  if (value) {
+    el.dataset.navOn = value;
+  } else {
+    delete el.dataset.navOn;
+  }
+}
+
+// Section-aware contrast: sections that read dark or bright regardless of
+// theme carry data-nav-contrast="dark|light". While one covers most of the
+// bar, its value is stamped on each link so they can invert instantly.
+function useNavContrast(headerRef: React.RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) {
+      return;
+    }
+    let frame = 0;
+    // Cached and refreshed only when the DOM actually changes (route
+    // transitions, streamed content) — scrolling never re-queries.
+    let markedEls: HTMLElement[] = [];
+    let adaptiveEls: HTMLElement[] = [];
+    const refresh = () => {
+      markedEls = [
+        ...document.querySelectorAll<HTMLElement>("[data-nav-contrast]"),
+      ];
+      adaptiveEls = [
+        ...header.querySelectorAll<HTMLElement>("[data-nav-adaptive]"),
+      ];
+    };
+    const measure = (el: HTMLElement): MarkedSection => ({
+      rect: el.getBoundingClientRect(),
+      value: el.dataset.navContrast ?? "",
+    });
+    let needsRefresh = false;
+    const update = () => {
+      frame = 0;
+      if (needsRefresh) {
+        needsRefresh = false;
+        refresh();
+      }
+      if (markedEls.length === 0 && adaptiveEls.length === 0) {
+        return;
+      }
+      const barBottom = header.getBoundingClientRect().bottom;
+      const marked = markedEls.map(measure);
+      for (const el of adaptiveEls) {
+        const rect = el.getBoundingClientRect();
+        applyContrast(el, contrastUnder(rect, marked, barBottom));
+      }
+    };
+    const schedule = () => {
+      if (!frame) {
+        frame = requestAnimationFrame(update);
+      }
+    };
+    const observer = new MutationObserver(() => {
+      needsRefresh = true;
+      schedule();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    refresh();
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [headerRef]);
+}
+
+export function Navbar({
+  navbarData,
+  settingsData,
+  stars,
+}: Readonly<NavigationData & { stars?: number | null }>) {
+  const { columns, buttons, gitHubUrl } = navbarData || {};
+  const { siteTitle, logos } = settingsData || {};
+  const headerRef = useRef<HTMLElement>(null);
+  useNavContrast(headerRef);
+  // Nothing in the bar marks where you are: the active item is styled no
+  // differently from the rest, so `aria-current` is the only signal a screen
+  // reader can get. Purely semantic — it paints nothing.
+  const pathname = usePathname();
+  const currentPage = (href?: string | null) =>
+    href && href === pathname ? ("page" as const) : undefined;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
-      <div className="container">
+    <header
+      className="sticky top-0 z-40 w-full before:absolute before:inset-x-0 before:bottom-full before:h-screen before:bg-background before:content-['']"
+      ref={headerRef}
+    >
+      <ProgressiveBlur />
+      <div className="container relative">
         <div className="flex h-16 items-center justify-between">
-          <div className="flex h-10 w-40 items-center">
-            {logo && (
-              <Logo
-                alt={siteTitle || ""}
-                height={40}
-                image={logo}
-                priority
-                width={120}
-              />
-            )}
+          <div className="flex h-10 flex-1 items-center">
+            <Logo
+              alt={siteTitle ?? "Turbo Start Sanity"}
+              className="h-5 w-auto object-left"
+              image={logos?.logo}
+              imageDark={logos?.logoDark}
+            />
           </div>
 
           <NavigationMenu
@@ -102,39 +276,35 @@ export function Navbar({
             closeDelay={150}
             viewport
           >
-            <NavigationMenuList>
+            <NavigationMenuList className="gap-8">
               {columns?.map((column) => {
                 if (column.type === "column") {
                   return (
                     <NavigationMenuItem key={column._key}>
-                      <NavigationMenuTrigger className={TRIGGER_CLASS}>
+                      <NavigationMenuTrigger
+                        className={TRIGGER_CLASS}
+                        data-nav-adaptive=""
+                      >
                         {column.title}
                       </NavigationMenuTrigger>
                       <NavigationMenuContent>
-                        <ul className="grid w-[320px] gap-1 p-1">
+                        <ul className="flex w-max max-w-sm flex-col gap-1 p-2">
                           {column.links?.map((link: ColumnLink) => (
                             <li key={link._key}>
                               <NavigationMenuLink
-                                className="group flex items-start gap-3 rounded-sm p-3 transition-colors hover:bg-accent"
+                                aria-current={currentPage(link.href)}
+                                className="group flex flex-col gap-0.5 rounded-none px-3 py-2.5 focus-ring-inset hover:bg-zinc-200 dark:hover:bg-zinc-800"
                                 closeOnClick
                                 render={<Link href={link.href ?? "#"} />}
                               >
-                                {link.icon ? (
-                                  <SanityIcon
-                                    className="mt-0.5 size-4 shrink-0 text-muted-foreground"
-                                    icon={link.icon}
-                                  />
+                                <span className="font-light font-mono text-foreground text-sm uppercase tracking-normal">
+                                  {link.name}
+                                </span>
+                                {link.description ? (
+                                  <span className="line-clamp-2 text-muted-foreground text-sm">
+                                    {link.description}
+                                  </span>
                                 ) : null}
-                                <div className="grid gap-1">
-                                  <div className="font-medium leading-none group-hover:text-accent-foreground">
-                                    {link.name}
-                                  </div>
-                                  {link.description ? (
-                                    <div className="line-clamp-2 text-muted-foreground text-sm">
-                                      {link.description}
-                                    </div>
-                                  ) : null}
-                                </div>
                               </NavigationMenuLink>
                             </li>
                           ))}
@@ -150,7 +320,9 @@ export function Navbar({
                   return (
                     <NavigationMenuItem key={column._key}>
                       <NavigationMenuLink
-                        className="flex h-auto items-center rounded-md px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
+                        aria-current={currentPage(column.href)}
+                        data-nav-adaptive=""
+                        className={cn("flex items-center", NAV_LINK_CLASS)}
                         render={<Link href={column.href} />}
                       >
                         {column.name}
@@ -163,27 +335,29 @@ export function Navbar({
             </NavigationMenuList>
           </NavigationMenu>
 
-          <div className="hidden items-center gap-4 lg:flex">
-            <ModeToggle />
+          <div
+            className="group hidden flex-1 items-center justify-end gap-2 lg:flex"
+            data-nav-adaptive=""
+          >
+            <GithubStars gitHubUrl={gitHubUrl} stars={stars} />
             <SanityButtons
-              buttonClassName="rounded-lg"
+              buttonClassName={NAV_BUTTON_CLASS}
               buttons={buttons || []}
               className="flex items-center gap-2"
+              size="sm"
             />
           </div>
 
-          <div className="flex items-center gap-2 lg:hidden">
-            <ModeToggle />
+          <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
+            <GithubStars
+              className="-mr-2"
+              gitHubUrl={gitHubUrl}
+              stars={stars}
+            />
             <MobileMenu navbarData={navbarData} settingsData={settingsData} />
           </div>
         </div>
       </div>
-
-      {error && env.NODE_ENV === "development" && (
-        <div className="border-destructive/20 border-b bg-destructive/10 px-4 py-2 text-destructive text-xs">
-          Navigation data fetch error: {error.message}
-        </div>
-      )}
     </header>
   );
 }

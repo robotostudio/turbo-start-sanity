@@ -1,21 +1,19 @@
 {
   "name": "@workspace/logger",
   "version": "0.0.0",
-  "private": true,
   "type": "module",
-  "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
-    }
-  },
+  "private": true,
   "scripts": {
     "lint": "biome lint .",
     "format": "biome format --write .",
-    "format:check": "biome format ."
+    "format:check": "biome format .",
+    "check-types": "tsc --noEmit"
   },
   "devDependencies": {
     "@workspace/typescript-config": "workspace:*",
     "typescript": "catalog:"
+  },
+  "exports": {
+    ".": "./src/index.ts"
   }
 }

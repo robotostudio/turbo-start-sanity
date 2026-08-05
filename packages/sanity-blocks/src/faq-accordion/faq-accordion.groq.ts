@@ -4,12 +4,16 @@ export const faqAccordionGroqProjection = /* groq */ `
   _type == "faqAccordion" => {
     ...,
     "eyebrow": coalesce(eyebrow, null),
-    "faqs": array::compact(faqs[]->{
+    "categories": categories[]{
+      _key,
       title,
-      _id,
-      _type,
-      ${richTextFragment}
-    }),
+      "faqs": array::compact(faqs[]->{
+        title,
+        _id,
+        _type,
+        ${richTextFragment}
+      })
+    },
     link{
       ...,
       ${urlFragment}

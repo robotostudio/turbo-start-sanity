@@ -1,6 +1,4 @@
 import { env } from "@workspace/env/client";
-import type { PortableTextBlock } from "next-sanity";
-import slugify from "slugify";
 
 export const getBaseUrl = () => {
   if (env.NEXT_PUBLIC_VERCEL_ENV === "production") {
@@ -17,10 +15,30 @@ export const getBaseUrl = () => {
 export const capitalize = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
 
-export const getTitleCase = (name: string) => {
-  const titleTemp = name.replace(/([A-Z])/g, " $1");
-  return titleTemp.charAt(0).toUpperCase() + titleTemp.slice(1);
-};
+/**
+ * Placeholder slug returned from `generateStaticParams` when no real paths
+ * exist yet, so the dynamic route still prerenders a shell.
+ */
+export const PLACEHOLDER_SLUG = "__placeholder__";
+
+/**
+ * Formats an ISO date string as `Mon D, YYYY` (en-US). Returns `null` for
+ * missing or unparseable values so callers can skip rendering.
+ */
+export function formatDate(value?: string | null): string | null {
+  if (!value) {
+    return null;
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
 
 type Response<T> = [T, undefined] | [undefined, string];
 
@@ -38,37 +56,17 @@ export async function handleErrors<T>(
   }
 }
 
-const DEFAULT_SLUG_OPTIONS: { fallback?: string } = { fallback: "top-level" };
+// Blog cards in the grid list on every page — the featured card on page 1 sits
+// above these and is counted separately by the helpers below.
+const BLOG_LIST_PAGE_SIZE = 9;
 
-function convertToSlug(
-  text?: string,
-  { fallback }: { fallback?: string } = DEFAULT_SLUG_OPTIONS
-) {
-  if (!text) {
-    return fallback;
-  }
-  return slugify(text.trim(), {
-    lower: true,
-    remove: /[^a-zA-Z0-9 ]/g,
-  });
-}
-
-export function parseChildrenToSlug(children: PortableTextBlock["children"]) {
-  if (!children) {
-    return "";
-  }
-  return convertToSlug(children.map((child) => child.text).join(""));
-}
-
-const BLOG_ITEMS_PER_PAGE = 10;
-
-export function getBlogPaginationStartEnd(page: number): {
+/** GROQ slice window `[start, end)` into the ordered blog list for a page. */
+export function getBlogPaginationRange(page: number): {
   start: number;
   end: number;
 } {
-  const start = (page - 1) * BLOG_ITEMS_PER_PAGE;
-  const end = start + BLOG_ITEMS_PER_PAGE;
-  return { start, end };
+  const start = Math.max(page - 1, 0) * BLOG_LIST_PAGE_SIZE;
+  return { start, end: start + BLOG_LIST_PAGE_SIZE };
 }
 
 export type PaginationMetadata = {
@@ -80,12 +78,16 @@ export type PaginationMetadata = {
   hasPreviousPage: boolean;
 };
 
-export function calculatePaginationMetadata(
+/**
+ * Derive pagination metadata for the blog index. `totalItems` counts list
+ * documents only — the count query applies the same featured exclusion the list
+ * query does, so featured posts never inflate the page count.
+ */
+export function calculateBlogPaginationMetadata(
   totalItems: number,
-  currentPage = 1,
-  itemsPerPage = BLOG_ITEMS_PER_PAGE
+  currentPage: number
 ): PaginationMetadata {
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(totalItems / BLOG_LIST_PAGE_SIZE));
   const hasNextPage = currentPage < totalPages;
   const hasPreviousPage = currentPage > 1;
 
@@ -93,7 +95,7 @@ export function calculatePaginationMetadata(
     currentPage,
     totalPages,
     totalItems,
-    itemsPerPage,
+    itemsPerPage: BLOG_LIST_PAGE_SIZE,
     hasNextPage,
     hasPreviousPage,
   };

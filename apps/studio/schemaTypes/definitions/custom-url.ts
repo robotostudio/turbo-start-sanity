@@ -25,8 +25,8 @@ export const customUrl = defineType({
     }),
     defineField({
       name: "openInNewTab",
-      title: "Open in new tab",
       type: "boolean",
+      title: "Open In New Tab",
       description:
         "When enabled, clicking this link will open the destination in a new browser tab instead of navigating away from the current page",
       initialValue: () => false,
@@ -47,7 +47,7 @@ export const customUrl = defineType({
             }
             const isValid = isValidUrl(value);
             if (!isValid) {
-              return "Invalid URL";
+              return "Enter a http, https, mailto or tel address, or a relative path like /about";
             }
           }
           return true;

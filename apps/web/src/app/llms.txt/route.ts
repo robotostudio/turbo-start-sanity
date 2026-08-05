@@ -1,4 +1,3 @@
-import { env } from "@workspace/env/client";
 import { Logger } from "@workspace/logger";
 import { sanityFetch } from "@workspace/sanity/live";
 import {
@@ -8,9 +7,11 @@ import {
 } from "@workspace/sanity/query";
 import { absolutizeUrl } from "@workspace/sanity-blocks/internal/portable-text-to-markdown";
 
+import { getBaseUrl } from "@/utils";
+
 const logger = new Logger("LlmsTxt");
 
-const BASE_URL = env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL;
+const BASE_URL = getBaseUrl();
 
 function mdHref(slug: string): string {
   const path = slug.startsWith("/") ? slug : `/${slug}`;
@@ -89,7 +90,7 @@ export async function GET(): Promise<Response> {
   const posts =
     postsResult.status === "fulfilled" ? (postsResult.value ?? []) : [];
 
-  const siteTitle = settings?.siteTitle ?? "Site";
+  const siteTitle = settings?.siteTitle ?? "Turbo Start Sanity";
   const siteDescription = settings?.siteDescription ?? "";
 
   const pageLines = [

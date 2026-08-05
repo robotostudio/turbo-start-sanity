@@ -1,7 +1,7 @@
+import { BlockHeader } from "@workspace/sanity-blocks/internal/block-header";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import { SanityIcon } from "@workspace/sanity-blocks/internal/sanity-icon";
-import { Badge } from "@workspace/ui/components/badge";
 
 export interface FeatureCard {
   _key?: string | null;
@@ -20,18 +20,28 @@ export interface FeatureCardsIconProps {
 function FeatureCardItem({ card }: Readonly<{ card: FeatureCard }>) {
   const { icon, title, richText } = card;
   return (
-    <div className="rounded-3xl bg-accent p-8 md:min-h-75 md:p-8">
+    <div className="group flex min-w-0 transform-gpu flex-col justify-between gap-12 bg-background p-[31.2px] text-foreground transition-colors duration-200 ease-out hover:bg-accent-green hover:text-accent-green-foreground md:min-h-72 md:gap-16">
       {icon && (
-        <span className="mb-9 flex w-fit items-center justify-center rounded-full bg-background p-3 drop-shadow-xl">
-          <SanityIcon icon={icon} />
-        </span>
+        <div className="-mr-[31.2px] relative flex h-12 items-center">
+          <span
+            aria-hidden="true"
+            className="absolute inset-y-0 right-0 left-12 bg-grid-dots bg-left text-accent-green-foreground opacity-0 transition-opacity duration-200 ease-out group-hover:opacity-100"
+          />
+          <div className="relative flex size-12 items-center justify-center bg-grid-dots bg-center text-zinc-800 transition-colors duration-200 ease-out group-hover:text-accent-green-foreground dark:text-zinc-50 dark:group-hover:text-accent-green-foreground">
+            <span className="flex size-7 items-center justify-center bg-background transition-colors duration-200 ease-out group-hover:bg-accent-green">
+              <SanityIcon className="size-6" icon={icon} />
+            </span>
+          </div>
+        </div>
       )}
-      <div>
+      <div className="flex min-w-0 flex-col gap-2">
         {title ? (
-          <h3 className="mb-2 font-medium text-lg md:text-2xl">{title}</h3>
+          <h3 className="text-balance break-words font-medium text-xl leading-8">
+            {title}
+          </h3>
         ) : null}
         <RichText
-          className="text-balance font-normal text-black/90 text-sm leading-7 md:text-[16px] dark:text-neutral-300"
+          className="body-text break-words text-muted-foreground transition-colors duration-200 ease-out group-hover:text-accent-green-foreground/80"
           richText={richText}
         />
       </div>
@@ -46,21 +56,17 @@ export function FeatureCardsWithIcon({
   cards,
 }: Readonly<FeatureCardsIconProps>) {
   return (
-    <section className="my-6 md:my-16" id="features">
-      <div className="container">
-        <div className="flex w-full flex-col items-center">
-          <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">
-            {eyebrow && <Badge variant="secondary">{eyebrow}</Badge>}
-            {title ? (
-              <h2 className="font-semibold text-3xl md:text-5xl">{title}</h2>
-            ) : null}
-            <RichText
-              className="max-w-3xl text-balance text-base md:text-lg"
-              richText={richText}
-            />
-          </div>
-        </div>
-        <div className="mx-auto mt-20 grid gap-8 lg:grid-cols-3">
+    <section className="block-section" id="features">
+      <div className="mx-auto w-full max-w-6xl px-[var(--container-px,0.5rem)]">
+        <BlockHeader eyebrow={eyebrow} title={title}>
+          <RichText
+            className="body-text max-w-xl text-muted-foreground"
+            richText={richText}
+          />
+        </BlockHeader>
+      </div>
+      <div className="mt-12 bg-grid-dots p-[var(--container-px,0.5rem)] text-zinc-800 md:mt-16 lg:p-[42px] dark:text-zinc-50 [background-size:7px_7px]">
+        <div className="grid bg-background lg:grid-cols-3">
           {cards?.map((card, index) => (
             <FeatureCardItem
               card={card}

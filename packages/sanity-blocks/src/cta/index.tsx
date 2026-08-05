@@ -1,14 +1,44 @@
+import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import type { ButtonProps } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
-import { Badge } from "@workspace/ui/components/badge";
+import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
+
+import { LogoLinkCell } from "../internal/logo-link-cell";
+
+export interface CtaUsedByTeamsLogo {
+  _key: string;
+  href?: string | null;
+  image?: SanityImageData | null;
+  openInNewTab?: boolean | null;
+}
+
+export interface CtaUsedByTeams {
+  logos?: CtaUsedByTeamsLogo[] | null;
+  title?: string | null;
+}
 
 export interface CtaBlockProps {
   buttons?: ButtonProps[] | null;
   eyebrow?: string | null;
   richText?: RichTextValue;
   title?: string | null;
+  usedByTeams?: CtaUsedByTeams | null;
+}
+
+function UsedByTeamsLogo({ logo }: Readonly<{ logo: CtaUsedByTeamsLogo }>) {
+  return (
+    <LogoLinkCell
+      cellClassName="flex items-center justify-center bg-background px-2 py-4 lg:w-[165px]"
+      height={24}
+      href={logo.href}
+      image={logo.image}
+      imageClassName="h-6 w-auto max-w-full object-contain md:h-[22px] dark:invert"
+      openInNewTab={logo.openInNewTab}
+      width={156}
+    />
+  );
 }
 
 export function CTABlock({
@@ -16,34 +46,48 @@ export function CTABlock({
   title,
   eyebrow,
   buttons,
+  usedByTeams,
 }: Readonly<CtaBlockProps>) {
+  const logos = usedByTeams?.logos?.filter((logo) => logo.image?.id) ?? [];
+  const hasLogos = logos.length > 0;
+
   return (
-    <section className="my-6 md:my-16" id="cta">
+    <section className="py-20 sm:py-28 lg:py-34" id="cta">
       <div className="container">
-        <div className="rounded-3xl bg-muted px-4 py-16">
-          <div className="mx-auto max-w-3xl space-y-8 text-center">
-            {eyebrow && (
-              <Badge
-                className="bg-zinc-200 dark:text-black"
-                variant="secondary"
-              >
-                {eyebrow}
-              </Badge>
-            )}
-            <h2 className="text-balance font-semibold text-3xl md:text-5xl">
-              {title}
-            </h2>
-            <div className="text-lg text-muted-foreground">
-              <RichText className="text-balance" richText={richText} />
-            </div>
-            <div className="flex justify-center">
-              <SanityButtons
-                buttonClassName="w-full sm:w-auto"
-                buttons={buttons}
-                className="mb-8 grid w-full gap-2 sm:w-fit sm:grid-flow-col lg:justify-start"
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
+          <div className="flex max-w-[690px] flex-col items-start gap-6">
+            <BlockEyebrow eyebrow={eyebrow} />
+            <div className="flex flex-col items-start gap-4">
+              <h2 className="font-normal text-3xl text-foreground leading-tight tracking-[-0.24px] md:text-4xl lg:text-5xl">
+                {title}
+              </h2>
+              <RichText
+                className="body-text prose-p:text-base prose-p:leading-6 text-muted-foreground sm:prose-p:text-lg sm:prose-p:leading-7"
+                richText={richText}
               />
             </div>
           </div>
+          {hasLogos && (
+            <div className="bleed-x flex flex-col items-start gap-2 lg:mx-0">
+              {usedByTeams?.title && (
+                <p className="px-4 font-light font-mono text-sm text-zinc-600 uppercase leading-6 tracking-[0.24px] lg:px-0 dark:text-zinc-300">
+                  {usedByTeams.title}
+                </p>
+              )}
+              <div className="grid w-full grid-cols-3 gap-[15.6px] bg-grid-dots [background-size:5.3px_5.2px] p-[15.6px] text-zinc-800 lg:w-auto dark:text-zinc-50">
+                {logos.map((logo) => (
+                  <UsedByTeamsLogo key={logo._key} logo={logo} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="mt-20 pb-10 sm:mt-28 sm:pb-14 lg:mt-34 lg:pb-18">
+          <SanityButtons
+            buttonClassName="h-auto px-8 py-4 font-normal text-xl sm:text-2xl lg:px-24 lg:py-6 lg:text-5xl lg:leading-[60px]"
+            buttons={buttons}
+            className="flex w-full flex-wrap justify-center gap-4"
+          />
         </div>
       </div>
     </section>

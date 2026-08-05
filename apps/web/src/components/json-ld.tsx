@@ -56,7 +56,6 @@ function buildSafeImageUrl(image?: { id?: string | null }) {
     .url();
 }
 
-// Article JSON-LD Component
 type ArticleJsonLdProps = {
   article: QueryBlogSlugPageDataResult;
   settings?: QuerySettingsDataResult;
@@ -97,7 +96,7 @@ export function ArticleJsonLd({
       : [],
     publisher: {
       "@type": "Organization",
-      name: settings?.siteTitle || "Website",
+      name: settings?.siteTitle || "Turbo Start Sanity",
       logo: settings?.logo
         ? ({
             "@type": "ImageObject",
@@ -123,12 +122,11 @@ export function ArticleJsonLd({
   );
 }
 
-// Organization JSON-LD Component
 type OrganizationJsonLdProps = {
   settings: QuerySettingsDataResult;
 };
 
-export function OrganizationJsonLd({ settings }: OrganizationJsonLdProps) {
+function OrganizationJsonLd({ settings }: Readonly<OrganizationJsonLdProps>) {
   if (!settings) {
     return null;
   }
@@ -164,12 +162,11 @@ export function OrganizationJsonLd({ settings }: OrganizationJsonLdProps) {
   return <JsonLdScript data={organizationJsonLd} id="organization-json-ld" />;
 }
 
-// Website JSON-LD Component
 type WebSiteJsonLdProps = {
   settings: QuerySettingsDataResult;
 };
 
-export function WebSiteJsonLd({ settings }: WebSiteJsonLdProps) {
+function WebSiteJsonLd({ settings }: Readonly<WebSiteJsonLdProps>) {
   if (!settings) {
     return null;
   }
@@ -191,7 +188,6 @@ export function WebSiteJsonLd({ settings }: WebSiteJsonLdProps) {
   return <JsonLdScript data={websiteJsonLd} id="website-json-ld" />;
 }
 
-// Combined JSON-LD Component for pages with multiple structured data
 type CombinedJsonLdProps = {
   settings?: QuerySettingsDataResult;
   article?: QueryBlogSlugPageDataResult;

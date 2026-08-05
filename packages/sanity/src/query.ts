@@ -2,8 +2,10 @@ import { ctaGroqProjection } from "@workspace/sanity-blocks/cta/cta.groq";
 import { faqAccordionGroqProjection } from "@workspace/sanity-blocks/faq-accordion/faq-accordion.groq";
 import { featureCardsIconGroqProjection } from "@workspace/sanity-blocks/feature-cards-icon/feature-cards-icon.groq";
 import { heroGroqProjection } from "@workspace/sanity-blocks/hero/hero.groq";
-import { imageLinkCardsGroqProjection } from "@workspace/sanity-blocks/image-link-cards/image-link-cards.groq";
+import { logoCloudGroqProjection } from "@workspace/sanity-blocks/logo-cloud/logo-cloud.groq";
 import { richTextBlockGroqProjection } from "@workspace/sanity-blocks/rich-text-block/rich-text-block.groq";
+import { showcaseGridGroqProjection } from "@workspace/sanity-blocks/showcase-grid/showcase-grid.groq";
+import { socialGridGroqProjection } from "@workspace/sanity-blocks/social-grid/social-grid.groq";
 import { subscribeNewsletterGroqProjection } from "@workspace/sanity-blocks/subscribe-newsletter/subscribe-newsletter.groq";
 import { defineQuery } from "next-sanity";
 
@@ -28,7 +30,6 @@ const imageFields = /* groq */ `
     top
   }
 `;
-// Base fragments for reusable query parts
 const imageFragment = /* groq */ `
   image {
     ${imageFields}
@@ -83,6 +84,7 @@ const blogCardFragment = /* groq */ `
   description,
   "slug":slug.current,
   orderRank,
+  category,
   ${imageFragment},
   publishedAt,
   ${blogAuthorFragment}
@@ -115,16 +117,14 @@ const pageBuilderFragment = /* groq */ `
     ${faqAccordionGroqProjection},
     ${featureCardsIconGroqProjection},
     ${subscribeNewsletterGroqProjection},
-    ${imageLinkCardsGroqProjection},
+    ${logoCloudGroqProjection},
+    ${socialGridGroqProjection},
+    ${showcaseGridGroqProjection},
     ${richTextBlockGroqProjection}
   }
 `;
 
-/**
- * Query to extract a single image from a page document
- * This is used as a type reference only and not for actual data fetching
- * Helps with TypeScript inference for image objects
- */
+/** Type-reference only — never fetched; drives TS inference for image objects. */
 export const queryImageType = defineQuery(`
   *[_type == "page" && defined(image)][0]{
     ${imageFragment}
@@ -139,6 +139,8 @@ export const queryHomePageData =
     "slug": slug.current,
     title,
     description,
+    ogTitle,
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${pageBuilderFragment}
   }`);
 
@@ -146,6 +148,8 @@ export const querySlugPageData = defineQuery(`
   *[_type == "page" && defined(slug.current) && slug.current == $slug][0]{
     ...,
     "slug": slug.current,
+    ogTitle,
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${pageBuilderFragment}
   }
   `);
@@ -161,15 +165,21 @@ export const queryBlogIndexPageData = defineQuery(`
     _type,
     title,
     description,
-    "displayFeaturedBlogs" : displayFeaturedBlogs == "yes",
-    "featuredBlogsCount" : featuredBlogsCount,
+    ogTitle,
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${pageBuilderFragment},
     "slug": slug.current
   }
 `);
 
+export const queryBlogIndexPageFeaturedBlogs = defineQuery(`
+  *[_type == "blog" && featured == true && (seoHideFromLists != true)] | order(orderRank asc){
+    ${blogCardFragment}
+  }
+`);
+
 export const queryBlogIndexPageBlogs = defineQuery(`
-  *[_type == "blog" && (seoHideFromLists != true)] | order(orderRank asc) [$start...$end]{
+  *[_type == "blog" && (seoHideFromLists != true) && ($category == "" || category == $category) && (!$excludeFeatured || featured != true)] | order(orderRank asc) [$start...$end]{
     ${blogCardFragment}
   }
 `);
@@ -181,12 +191,14 @@ export const queryAllBlogDataForSearch = defineQuery(`
 `);
 
 export const queryBlogIndexPageBlogsCount = defineQuery(`
-  count(*[_type == "blog" && (seoHideFromLists != true)])
+  count(*[_type == "blog" && (seoHideFromLists != true) && ($category == "" || category == $category) && (!$excludeFeatured || featured != true)])
 `);
 export const queryBlogSlugPageData = defineQuery(`
   *[_type == "blog" && slug.current == $slug][0]{
     ...,
     "slug": slug.current,
+    ogTitle,
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${blogAuthorFragment},
     ${imageFragment},
     ${richTextFragment},
@@ -196,41 +208,6 @@ export const queryBlogSlugPageData = defineQuery(`
 
 export const queryBlogPaths = defineQuery(`
   *[_type == "blog" && defined(slug.current)].slug.current
-`);
-
-const ogFieldsFragment = /* groq */ `
-  _type,
-  "title": select(
-    defined(ogTitle) => ogTitle,
-    defined(seoTitle) => seoTitle,
-    title
-  ),
-  "seoImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
-  "siteTitle": *[_type == "settings"][0].siteTitle
-`;
-
-export const queryHomePageOGData = defineQuery(`
-  *[_type == "homePage" && _id == $id][0]{
-    ${ogFieldsFragment}
-  }
-  `);
-
-export const querySlugPageOGData = defineQuery(`
-  *[_type == "page" && _id == $id][0]{
-    ${ogFieldsFragment}
-  }
-`);
-
-export const queryBlogPageOGData = defineQuery(`
-  *[_type == "blog" && _id == $id][0]{
-    ${ogFieldsFragment}
-  }
-`);
-
-export const queryGenericPageOGData = defineQuery(`
-  *[ defined(slug.current) && _id == $id][0]{
-    ${ogFieldsFragment}
-  }
 `);
 
 export const queryFooterData = defineQuery(`
@@ -249,6 +226,15 @@ export const queryFooterData = defineQuery(`
           url.type == "external" => url.external,
           url.href
         ),
+      }
+    },
+    copyright,
+    credits[]{
+      _key,
+      label,
+      url,
+      logo {
+        ${imageFields}
       }
     }
   }
@@ -288,15 +274,19 @@ export const queryNavbarData = defineQuery(`
       }
     },
     ${buttonsFragment},
+    gitHubUrl,
   }
 `);
 
+// `seoNoIndex` is excluded here as well as in the page metadata — advertising a
+// URL in the sitemap while its own robots tag says noindex is a contradiction
+// search engines report as an error.
 export const querySitemapData = defineQuery(`{
-  "slugPages": *[_type == "page" && defined(slug.current)]{
+  "slugPages": *[_type == "page" && defined(slug.current) && seoNoIndex != true]{
     "slug": slug.current,
     "lastModified": _updatedAt
   },
-  "blogPages": *[_type == "blog" && defined(slug.current)]{
+  "blogPages": *[_type == "blog" && defined(slug.current) && seoNoIndex != true]{
     "slug": slug.current,
     "lastModified": _updatedAt
   }
@@ -306,16 +296,26 @@ export const queryGlobalSeoSettings = defineQuery(`
     _id,
     _type,
     siteTitle,
-    logo {
-      ${imageFields}
+    logos {
+      logo {
+        ${imageFields}
+      },
+      logoDark {
+        ${imageFields}
+      },
+      footerLogo {
+        ${imageFields}
+      }
     },
+    "ogImage": ogImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     siteDescription,
     socialLinks{
       linkedin,
       facebook,
       twitter,
       instagram,
-      youtube
+      youtube,
+      reddit
     }
   }
 `);
@@ -326,7 +326,7 @@ export const querySettingsData = defineQuery(`
     _type,
     siteTitle,
     siteDescription,
-    "logo": logo.asset->url + "?w=80&h=40&dpr=3&fit=max",
+    "logo": logos.logo.asset->url + "?w=80&h=40&dpr=3&fit=max",
     "socialLinks": socialLinks,
     "contactEmail": contactEmail,
   }

@@ -1,15 +1,15 @@
 import { LayoutPanelLeft, Link, PanelTop } from "lucide-react";
-import { defineField, defineType } from "sanity";
+import { defineArrayMember, defineField, defineType } from "sanity";
 
 import { lucideIconPreview } from "@/components/icon-preview";
 import { buttonsField, iconField } from "@/schemaTypes/common";
 
-const navbarLink = defineField({
+const navbarLink = defineArrayMember({
   name: "navbarLink",
   type: "object",
-  icon: Link,
   title: "Navigation Link",
   description: "Individual navigation link with name and URL",
+  icon: Link,
   fields: [
     defineField({
       name: "name",
@@ -47,12 +47,12 @@ const navbarLink = defineField({
   },
 });
 
-const navbarColumnLink = defineField({
+const navbarColumnLink = defineArrayMember({
   name: "navbarColumnLink",
   type: "object",
-  icon: LayoutPanelLeft,
   title: "Navigation Column Link",
   description: "A link within a navigation column",
+  icon: LayoutPanelLeft,
   fields: [
     iconField,
     defineField({
@@ -98,12 +98,12 @@ const navbarColumnLink = defineField({
   },
 });
 
-const navbarColumn = defineField({
+const navbarColumn = defineArrayMember({
   name: "navbarColumn",
   type: "object",
-  icon: LayoutPanelLeft,
   title: "Navigation Column",
   description: "A column of navigation links with an optional title",
+  icon: LayoutPanelLeft,
   fields: [
     defineField({
       name: "title",
@@ -116,8 +116,8 @@ const navbarColumn = defineField({
       name: "links",
       type: "array",
       title: "Column Links",
-      validation: (rule) => [rule.required(), rule.unique()],
       description: "The list of navigation links to display in this column",
+      validation: (rule) => [rule.required(), rule.unique()],
       of: [navbarColumnLink],
     }),
   ],
@@ -137,18 +137,18 @@ const navbarColumn = defineField({
 
 export const navbar = defineType({
   name: "navbar",
-  title: "Site Navigation",
   type: "document",
-  icon: PanelTop,
+  title: "Site Navigation",
   description: "Configure the main navigation structure for your site",
+  icon: PanelTop,
   fields: [
     defineField({
       name: "label",
       type: "string",
-      initialValue: "Navbar",
       title: "Navigation Label",
       description:
         "Internal label to identify this navigation configuration in the CMS",
+      initialValue: "Navbar",
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -158,6 +158,31 @@ export const navbar = defineType({
       description:
         "Build your navigation menu using columns and links. Add either a column of links or individual links.",
       of: [navbarColumn, navbarLink],
+    }),
+    defineField({
+      name: "gitHubUrl",
+      type: "url",
+      title: "GitHub Repository URL",
+      description:
+        "Public GitHub repository URL. The navbar shows this repo's live star count (e.g. https://github.com/owner/repo). Leave empty to hide the star badge.",
+      validation: (rule) =>
+        rule.uri({ scheme: ["https"] }).custom((value) => {
+          if (!value) {
+            return true;
+          }
+          try {
+            const { hostname, pathname } = new URL(value);
+            const isGitHubHost =
+              hostname === "github.com" || hostname === "www.github.com";
+            const segments = pathname.split("/").filter(Boolean);
+            if (isGitHubHost && segments.length >= 2) {
+              return true;
+            }
+          } catch {
+            return "Please enter a valid URL";
+          }
+          return "Please enter a github.com repository URL";
+        }),
     }),
     buttonsField,
   ],

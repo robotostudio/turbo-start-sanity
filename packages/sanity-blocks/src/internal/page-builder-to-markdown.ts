@@ -1,18 +1,16 @@
-/**
- * Page builder → Markdown serializer: thin dispatcher. Each block type's
- * serializer lives co-located in its block directory. To support a new block,
- * add a `case` here and create a `markdown.ts` in that block's directory.
- * Unknown types return "".
- */
+/** Thin dispatcher: each block's Markdown serializer is co-located in its block
+ * directory (add a `case` + `markdown.ts` for new blocks). Unknown types return "". */
 
 import { ctaToMarkdown } from "../cta/markdown";
 import { faqAccordionToMarkdown } from "../faq-accordion/markdown";
 import { featureCardsIconToMarkdown } from "../feature-cards-icon/markdown";
 import { heroToMarkdown } from "../hero/markdown";
-import { imageLinkCardsToMarkdown } from "../image-link-cards/markdown";
-import type { MarkdownBlock, MarkdownOptions } from "./markdown";
+import { logoCloudToMarkdown } from "../logo-cloud/markdown";
 import { richTextBlockToMarkdown } from "../rich-text-block/markdown";
+import { showcaseGridToMarkdown } from "../showcase-grid/markdown";
+import { socialGridToMarkdown } from "../social-grid/markdown";
 import { subscribeNewsletterToMarkdown } from "../subscribe-newsletter/markdown";
+import type { MarkdownBlock, MarkdownOptions } from "./markdown";
 
 export { imageToMarkdown } from "./markdown";
 export type { MarkdownBlock };
@@ -30,8 +28,12 @@ function blockToMarkdown(
       return richTextBlockToMarkdown(block, options);
     case "featureCardsIcon":
       return featureCardsIconToMarkdown(block, options);
-    case "imageLinkCards":
-      return imageLinkCardsToMarkdown(block, options);
+    case "logoCloud":
+      return logoCloudToMarkdown(block, options);
+    case "socialGrid":
+      return socialGridToMarkdown(block, options);
+    case "showcaseGrid":
+      return showcaseGridToMarkdown(block, options);
     case "faqAccordion":
       return faqAccordionToMarkdown(block, options);
     case "subscribeNewsletter":

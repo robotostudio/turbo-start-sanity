@@ -14,8 +14,8 @@ export const faq = defineType({
   fields: [
     defineField({
       name: "title",
-      title: "Question",
       type: "string",
+      title: "Question",
       description:
         "Write the question exactly as someone might ask it. For example: 'How do I reset my password?'",
       validation: (Rule) => Rule.required(),
@@ -32,7 +32,6 @@ export const faq = defineType({
       richText: "richText",
     },
     prepare: ({ title, richText }) => {
-      // Create a playful subtitle with emojis
       const subtitle = `${parseRichTextToString(richText, 20)}`;
 
       return {

@@ -1,0 +1,88 @@
+import { showcaseGridToMarkdown } from "./markdown";
+
+test("showcaseGridToMarkdown returns empty string for a fully empty block", () => {
+  expect(showcaseGridToMarkdown({}, {})).toBe("");
+});
+
+test("showcaseGridToMarkdown renders the title and description", () => {
+  const result = showcaseGridToMarkdown(
+    {
+      title: "Real sites. Real traffic.",
+      description: "Every site here started from the same template.",
+    },
+    {}
+  );
+  expect(result).toContain("## Real sites. Real traffic.");
+  expect(result).toContain("Every site here started from the same template.");
+});
+
+test("showcaseGridToMarkdown renders items as a linked list", () => {
+  const result = showcaseGridToMarkdown(
+    {
+      items: [
+        { _key: "i1", siteName: "Volvo Chile", url: "https://volvo.cl" },
+        { _key: "i2", siteName: "No Link Site" },
+      ],
+    },
+    {}
+  );
+  expect(result).toContain("- [Volvo Chile](https://volvo.cl)");
+  // An item without a URL degrades to plain text, not a link.
+  expect(result).toContain("- No Link Site");
+  expect(result).not.toContain("No Link Site](");
+});
+
+test("showcaseGridToMarkdown links the site name and skips nameless items", () => {
+  const result = showcaseGridToMarkdown(
+    {
+      items: [
+        { _key: "i1", siteName: "Roboto", url: "https://roboto.studio" },
+        { _key: "i2", url: "https://nameless.example.com" },
+      ],
+    },
+    {}
+  );
+  expect(result).toContain("- [Roboto](https://roboto.studio)");
+  expect(result).not.toContain("nameless.example.com");
+});
+
+test("showcaseGridToMarkdown appends the category after the link", () => {
+  const result = showcaseGridToMarkdown(
+    {
+      items: [
+        {
+          _key: "i1",
+          siteName: "Opera Group",
+          url: "https://opera.example.com",
+          category: "Real Estate",
+        },
+        { _key: "i2", siteName: "Plain Site" },
+      ],
+    },
+    {}
+  );
+  expect(result).toContain(
+    "- [Opera Group](https://opera.example.com) — Real Estate"
+  );
+  // An item without a category has no trailing dash.
+  expect(result).toContain("- Plain Site");
+  expect(result).not.toContain("Plain Site —");
+});
+
+test("showcaseGridToMarkdown emits no HTML or JSX tags", () => {
+  const result = showcaseGridToMarkdown(
+    {
+      title: "Real sites",
+      description: "Built with the template.",
+      items: [
+        {
+          _key: "i1",
+          siteName: "Volvo Chile",
+          url: "https://volvo.cl",
+        },
+      ],
+    },
+    {}
+  );
+  expect(result).not.toMatch(/<[A-Za-z]/);
+});

@@ -27,6 +27,7 @@
     "@workspace/ui": "workspace:*",
     "lucide-react": "catalog:",
     "next-sanity": "^12.1.1",
+    "next-themes": "catalog:",
     "sanity": "catalog:",
     "sanity-image": "^1.1.0",
     "schema-dts": "^1.1.5",
@@ -48,15 +49,24 @@
     "./*/json-ld": "./src/*/json-ld.ts",
     "./*.schema": "./src/*.schema.ts",
     "./*.groq": "./src/*.groq.ts",
+    "./internal/block-eyebrow": "./src/internal/block-eyebrow.tsx",
+    "./internal/block-header": "./src/internal/block-header.tsx",
+    "./internal/blog-categories": "./src/internal/blog-categories.ts",
+    "./internal/heading-slug": "./src/internal/heading-slug.ts",
+    "./internal/icons": "./src/internal/icons.tsx",
+    "./internal/logo-height": "./src/internal/logo-height.ts",
     "./internal/lucide-icon-preview": "./src/internal/lucide-icon-preview.tsx",
     "./internal/page-builder-to-markdown": "./src/internal/page-builder-to-markdown.ts",
     "./internal/portable-text-to-markdown": "./src/internal/portable-text-to-markdown.ts",
     "./internal/rendering": "./src/internal/rendering.tsx",
+    "./internal/safe-href": "./src/internal/safe-href.ts",
     "./internal/rich-text": "./src/internal/rich-text.tsx",
     "./internal/sanity-buttons": "./src/internal/sanity-buttons.tsx",
     "./internal/sanity-image": "./src/internal/sanity-image.tsx",
     "./internal/sanity-icon": "./src/internal/sanity-icon.tsx",
     "./internal/sanity-rich-text": "./src/internal/sanity-rich-text.ts",
-    "./internal/schema-fields": "./src/internal/schema-fields.ts"
+    "./internal/schema-fields": "./src/internal/schema-fields.ts",
+    "./internal/use-copy": "./src/internal/use-copy.ts",
+    "./internal/use-disclosure-animation": "./src/internal/use-disclosure-animation.ts"
   }
 }

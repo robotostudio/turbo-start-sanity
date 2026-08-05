@@ -1,3 +1,4 @@
+import { BookMarked } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
 import { documentSlugField, pageBuilderField } from "@/schemaTypes/common";
@@ -11,6 +12,7 @@ export const blogIndex = defineType({
   title: "Blog Listing Page",
   description:
     "This is the main page that shows all your blog posts. You can customize how your blog listing page looks, what title it has, and which blog post you want to highlight at the top.",
+  icon: BookMarked,
   groups: GROUPS,
   fields: [
     defineField({
@@ -28,40 +30,6 @@ export const blogIndex = defineType({
       group: GROUP.MAIN_CONTENT,
     }),
     documentSlugField("blogIndex", {
-      group: GROUP.MAIN_CONTENT,
-    }),
-    defineField({
-      name: "displayFeaturedBlogs",
-      title: "Display Featured Blogs",
-      description:
-        "When enabled, this will take the top blogs from the ordered blog list and display them as featured at the top of the page",
-      type: "string",
-      options: {
-        list: [
-          { title: "Yes", value: "yes" },
-          { title: "No", value: "no" },
-        ],
-        layout: "radio",
-      },
-      initialValue: "yes",
-      group: GROUP.MAIN_CONTENT,
-    }),
-    defineField({
-      name: "featuredBlogsCount",
-      title: "Number of Featured Blogs",
-      description: "Select the number of blogs to display as featured.",
-      type: "string",
-      options: {
-        list: [
-          { title: "1", value: "1" },
-          { title: "2", value: "2" },
-          { title: "3", value: "3" },
-        ],
-        layout: "radio",
-        direction: "horizontal",
-      },
-      initialValue: "1",
-      hidden: ({ parent }) => parent?.displayFeaturedBlogs !== "yes",
       group: GROUP.MAIN_CONTENT,
     }),
     pageBuilderField,

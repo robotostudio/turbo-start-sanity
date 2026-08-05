@@ -1,46 +1,27 @@
 export function Logo() {
   return (
     <svg
-      fill="none"
-      height="32"
-      viewBox="0 0 32 32"
-      width="32"
+      fill="currentColor"
+      height="18"
+      viewBox="0 0 537 192"
+      width="50"
       xmlns="http://www.w3.org/2000/svg"
     >
       <title>Turbo Start</title>
-      <rect fill="var(--card-fg-color)" height="32" rx="16" width="32" />
-      <path
-        d="M4.68629 21.159C2.98673 19.4595 2.98673 16.704 4.68629 15.0044L12.1081 7.5826L18.2627 13.7373L10.841 21.159C9.14139 22.8586 6.38585 22.8586 4.68629 21.159Z"
-        fill="url(#paint0_linear_2_18)"
-      />
-      <path
-        d="M27.3137 10.841C25.6142 9.14139 22.8586 9.14139 21.1591 10.841L13.7373 18.2627L19.8919 24.4174L27.3137 16.9956C29.0133 15.2961 29.0133 12.5405 27.3137 10.841Z"
-        fill="url(#paint1_linear_2_18)"
-      />
-      <defs>
-        <linearGradient
-          gradientUnits="userSpaceOnUse"
-          id="paint0_linear_2_18"
-          x1="14.9316"
-          x2="4.68629"
-          y1="10.9137"
-          y2="21.159"
-        >
-          <stop stopColor="var(--card-fg-color)" />
-          <stop offset="1" stopColor="var(--card-bg-color)" />
-        </linearGradient>
-        <linearGradient
-          gradientUnits="userSpaceOnUse"
-          id="paint1_linear_2_18"
-          x1="17.0684"
-          x2="27.3137"
-          y1="21.0863"
-          y2="10.841"
-        >
-          <stop stopColor="var(--card-fg-color)" />
-          <stop offset="1" stopColor="var(--card-bg-color)" />
-        </linearGradient>
-      </defs>
+      <path d="M0 38.5036H111.511H184.57V0.129551H0V38.5036Z" />
+      <path d="M73.0591 192H111.511V38.5036L73.0591 76.8777V192Z" />
+      <path d="M184.593 38.474H216.571V70.4524H184.593V38.474Z" />
+      <path d="M344.462 38.474H376.441V70.4524H344.462V38.474Z" />
+      <path d="M504.354 121.356H536.333V153.334H504.354V121.356Z" />
+      <path d="M312.632 191.87H216.571V153.334H344.485L312.632 191.87Z" />
+      <path d="M472.501 191.87H376.441V153.334H504.354L472.501 191.87Z" />
+      <path d="M376.441 153.593H344.462V121.615H376.441V153.593Z" />
+      <path d="M536.333 70.7335H504.354V38.7551H536.333V70.7335Z" />
+      <path d="M344.485 38.7488H216.571L248.487 0H344.485V38.7488Z" />
+      <path d="M504.354 38.7551L376.441 38.7488L408.357 0H504.354V38.7551Z" />
+      <path d="M184.593 38.474L376.463 121.231V153.531L184.593 77.3217V38.474Z" />
+      <path d="M344.462 38.474L536.333 121.231V153.531L344.462 77.3217V38.474Z" />
+      <path d="M184.593 153.334H216.571V121.356H184.593V153.334Z" />
     </svg>
   );
 }

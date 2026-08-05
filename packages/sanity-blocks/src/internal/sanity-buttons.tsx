@@ -1,7 +1,9 @@
-import { Button } from "@workspace/ui/components/button";
 import { cn } from "@workspace/tailwind-config/utils";
+import { Button } from "@workspace/ui/components/button";
 import Link from "next/link";
 import type { ComponentProps } from "react";
+
+import { sanitizeHref } from "./safe-href";
 
 export interface ButtonProps {
   _key?: string | null;
@@ -52,24 +54,27 @@ function SanityButton({
   className,
   size,
 }: Readonly<SanityButtonRenderProps>) {
-  if (!href) {
+  const safeHref = sanitizeHref(href);
+  if (!safeHref) {
     return <Button>Link Broken</Button>;
   }
 
   return (
     <Button
       asChild
-      className={cn("rounded-[10px]", className)}
+      className={cn("rounded-full", className)}
       size={size ?? "default"}
       variant={variant ?? "default"}
     >
       <Link
-        aria-label={`Navigate to ${text}`}
-        href={href}
+        href={safeHref}
+        rel={openInNewTab ? "noopener noreferrer" : undefined}
         target={openInNewTab ? "_blank" : "_self"}
-        title={`Click to visit ${text}`}
       >
         {text}
+        {openInNewTab ? (
+          <span className="sr-only"> (opens in a new tab)</span>
+        ) : null}
       </Link>
     </Button>
   );

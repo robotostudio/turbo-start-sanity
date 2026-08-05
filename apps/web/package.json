@@ -15,9 +15,7 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
-    "@sanity/asset-utils": "^2.3.0",
     "@sanity/client": "catalog:",
-    "@sanity/image-url": "^2.1.1",
     "@sanity/visual-editing": "^5.4.3",
     "@tanstack/react-query": "^5.90.21",
     "@workspace/env": "workspace:*",
@@ -34,12 +32,7 @@
     "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sanity-image": "^1.1.0",
-    "schema-dts": "^1.1.5",
-    "server-only": "^0.0.1",
-    "slugify": "^1.6.8",
-    "swr": "^2.4.1",
-    "zod": "catalog:"
+    "schema-dts": "^1.1.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
@@ -48,7 +41,6 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@workspace/typescript-config": "workspace:*",
-    "baseline-browser-mapping": "^2.10.8",
     "dotenv": "^17.3.1"
   }
 }

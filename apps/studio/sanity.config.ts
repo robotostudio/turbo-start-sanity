@@ -10,13 +10,21 @@ import { media } from "sanity-plugin-media";
 import { Logo } from "@/components/logo";
 import { locations } from "@/location";
 import { presentationUrl } from "@/plugins/presentation-url";
-import { schemaTypes } from "@/schemaTypes/index";
+import { schemaTypes, singletonTypes } from "@/schemaTypes/index";
 import { structure } from "@/structure";
 import { getPresentationUrl } from "@/utils/helper";
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
 const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
 const title = process.env.SANITY_STUDIO_TITLE;
+
+// Singletons plus plugin-owned types are never created from the global "new
+// document" menu — they're reached through the structure or their plugin.
+const hiddenTemplateIds = new Set([
+  ...singletonTypes,
+  "assist.instruction.context",
+  "media.tag",
+]);
 
 export default defineConfig({
   name: "default",
@@ -54,16 +62,7 @@ export default defineConfig({
       const { type } = creationContext;
       if (type === "global") {
         return prev.filter(
-          (template) =>
-            ![
-              "homePage",
-              "navbar",
-              "footer",
-              "settings",
-              "blogIndex",
-              "assist.instruction.context",
-              "media.tag",
-            ].includes(template?.templateId)
+          (template) => !hiddenTemplateIds.has(template?.templateId)
         );
       }
       return prev;

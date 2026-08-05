@@ -6,7 +6,11 @@
     "protectedEnvironments": ["production"],
     "environments": {
       "development": { "sourceOfTruth": "local" },
-      "production": { "sourceOfTruth": "remote", "allowPush": false, "pullMode": "merge" }
+      "production": {
+        "sourceOfTruth": "remote",
+        "allowPush": false,
+        "pullMode": "merge"
+      }
     }
   }
 }

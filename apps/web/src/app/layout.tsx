@@ -1,6 +1,7 @@
 import "@workspace/ui/globals.css";
 
 import {
+  DRAFT_MODE_ENABLED,
   type DynamicFetchOptions,
   getDynamicFetchOptions,
   SanityLive,
@@ -21,6 +22,9 @@ import { CombinedJsonLd } from "@/components/json-ld";
 import { Navbar, NavbarSkeleton } from "@/components/navbar";
 import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
+import { ScrollToTop } from "@/components/scroll-to-top";
+import { StickyFooter } from "@/components/sticky-footer";
+import { getGithubStars } from "@/lib/github-stars";
 import { getNavigationData } from "@/lib/navigation";
 
 const fontSans = Geist({
@@ -40,28 +44,41 @@ export default async function RootLayout({
 }>) {
   preconnect("https://cdn.sanity.io");
   prefetchDNS("https://cdn.sanity.io");
-  const { isEnabled: isDraftMode } = await draftMode();
+  // In local dev, nav/footer follow drafts too (like page content), so draft
+  // navbar/footer/settings edits are visible without a Presentation session.
+  // Production stays static published (DRAFT_MODE_ENABLED is false).
+  const showDrafts = DRAFT_MODE_ENABLED;
+  // Presentation overlay (preview bar, visual editing) needs a real session.
+  const isDraftMode = DRAFT_MODE_ENABLED && (await draftMode()).isEnabled;
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
         <Providers>
-          {isDraftMode ? (
+          <ScrollToTop />
+          {showDrafts ? (
             <Suspense fallback={<NavbarSkeleton />}>
               <DynamicNavbar />
             </Suspense>
           ) : (
             <CachedNavbar perspective="published" stega={false} />
           )}
-          {children}
-          {isDraftMode ? (
-            <Suspense fallback={<FooterSkeleton />}>
-              <DynamicFooter />
-            </Suspense>
-          ) : (
-            <CachedFooter perspective="published" stega={false} />
-          )}
+          <div
+            className="-mt-16 relative z-10 min-h-dvh bg-background pt-16"
+            style={{ marginBottom: "var(--footer-height)" }}
+          >
+            {children}
+          </div>
+          <StickyFooter>
+            {showDrafts ? (
+              <Suspense fallback={<FooterSkeleton />}>
+                <DynamicFooter />
+              </Suspense>
+            ) : (
+              <CachedFooter perspective="published" stega={false} />
+            )}
+          </StickyFooter>
           <SanityLive action={revalidateSyncTags} includeDrafts={isDraftMode} />
           <Suspense fallback={null}>
             <CombinedJsonLd includeOrganization includeWebsite />
@@ -84,10 +101,13 @@ async function DynamicNavbar() {
 }
 
 async function CachedNavbar({ perspective, stega }: DynamicFetchOptions) {
-  "use cache";
   const { navbarData, settingsData } = await getNavigationData({
     perspective,
     stega,
   });
-  return <Navbar navbarData={navbarData} settingsData={settingsData} />;
+  const stars = await getGithubStars(navbarData?.gitHubUrl);
+
+  return (
+    <Navbar navbarData={navbarData} settingsData={settingsData} stars={stars} />
+  );
 }
