@@ -274,6 +274,27 @@
   }
 }
 
+/* Slides the navbar out as the footer finishes taking over the screen. Sticky
+   cannot do this on its own while the footer is pinned: a fixed footer adds
+   only `--footer-height` of scroll past the content, so the header's container
+   comes to rest `100vh - --footer-height` below the top and never runs out.
+   Anchored to the end of the document, so it works pinned or in flow. */
+@keyframes nav-exit {
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@utility nav-exit {
+  animation-name: nav-exit;
+  /* Drops to 0s without scroll timelines — lands on the settled state. */
+  animation-duration: auto;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root block);
+  animation-range: calc(100% - 180px) calc(100% - 20px);
+}
+
 /* No `to`, so settled is the element's own state and anything ignoring the
    animation still shows the stroke. User units: SVG % needs `transform-box`. */
 @keyframes mark-frame {
