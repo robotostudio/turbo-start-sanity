@@ -5,7 +5,9 @@
 @source "../**/*.{ts,tsx}";
 @source "../../../sanity-blocks/src/**/*.{ts,tsx}";
 
-@plugin "@tailwindcss/typography";
+/* Relative path, not the bare specifier: Turbopack's postcss sandbox can't
+   resolve node_modules from a CSS file inside a workspace package. */
+@plugin "../../node_modules/@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
