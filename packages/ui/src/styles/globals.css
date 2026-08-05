@@ -286,13 +286,21 @@
 }
 
 @utility nav-exit {
-  animation-name: nav-exit;
-  /* Drops to 0s without scroll timelines — lands on the settled state. */
-  animation-duration: auto;
+  /* Ignored on a scroll timeline, which drives progress from the range below. */
+  animation-duration: 1ms;
   animation-timing-function: linear;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
   animation-range: calc(100% - 180px) calc(100% - 20px);
+
+  /* Named only where scroll timelines exist. Elsewhere `animation-timeline` is
+     dropped, so the animation would run once on the document timeline and
+     `fill-mode: both` would hold the bar off screen for good. Unlike
+     `mark-frame` below, these keyframes have a `to`, so there is no safe
+     settled state to fall back on — better to not animate at all. */
+  @supports (animation-timeline: scroll()) {
+    animation-name: nav-exit;
+  }
 }
 
 /* No `to`, so settled is the element's own state and anything ignoring the
