@@ -145,7 +145,7 @@ export function MobileMenu({
                           aria-current={
                             column.href === pathname ? "page" : undefined
                           }
-                          className="focus-ring-inset -mx-3 flex items-center rounded-none px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:bg-zinc-200 dark:hover:bg-zinc-800"
+                          className="hover-surface focus-ring-inset -mx-3 flex items-center rounded-none px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal"
                           href={column.href}
                           key={column._key}
                           onClick={closeMenu}
@@ -162,7 +162,7 @@ export function MobileMenu({
                           key={column._key}
                           value={column._key}
                         >
-                          <AccordionTrigger className="focus-ring-inset -mx-3 rounded-none px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:no-underline">
+                          <AccordionTrigger className="hover-surface focus-ring-inset -mx-3 rounded-none px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:no-underline">
                             {column.title}
                           </AccordionTrigger>
                           <AccordionContent>

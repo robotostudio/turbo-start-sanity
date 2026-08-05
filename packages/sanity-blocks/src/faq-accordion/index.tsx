@@ -40,13 +40,12 @@ export interface FaqAccordionProps {
 }
 
 const DISCLOSURE_BASE_CLASS =
-  "hover-surface group border border-border bg-background px-4 has-[summary:focus-visible]:[outline:2px_dotted_var(--foreground)] has-[summary:focus-visible]:[outline-offset:-2px]";
-// `transition-none` because `duration-300` is here for `animate-in`, but the
-// utility also sets `transition-duration`, and CSS defaults `transition-property`
-// to `all` — so the entrance duration was silently fading the hover background
-// too, while the code chip inside switched instantly.
+  "hover-surface group border border-border bg-background px-4 transition-colors duration-150 has-[summary:focus-visible]:[outline:2px_dotted_var(--foreground)] has-[summary:focus-visible]:[outline-offset:-2px] motion-reduce:transition-none";
+// `animation-duration-300`, not `duration-300`: the latter also sets
+// `transition-duration`, which stretched the hover fade above to the entrance's
+// 300ms while the code chip inside switched instantly.
 const DISCLOSURE_ANIMATION_CLASS =
-  "fade-in slide-in-from-bottom-2 animate-in fill-mode-both duration-300 ease-out transition-none motion-reduce:animate-none";
+  "fade-in slide-in-from-bottom-2 animate-in fill-mode-both animation-duration-300 ease-out motion-reduce:animate-none";
 
 function FaqDisclosure({
   animationDelay,

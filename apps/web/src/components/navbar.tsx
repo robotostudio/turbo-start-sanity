@@ -19,21 +19,15 @@ import { Logo } from "@/components/logo";
 import { MobileMenu } from "@/components/mobile-menu";
 import type { ColumnLink, NavigationData } from "@/types";
 
-// Shared by the dropdown triggers and the plain links so the two never drift,
-// and focus mirrors hover so keyboard and pointer land alike. Over a marked
-// section the wash goes translucent: a flat zinc swatch only holds contrast on
-// the one background it was picked for.
-//
-// The wash alone can't carry focus — zinc-200 on white is ~1.2:1, well under
-// the 3:1 a focus indicator needs — so keyboard focus also draws the site's
-// dotted ring. `currentColor`, not `--foreground`, because the text colour
-// already inverts over a marked section and the ring has to follow it.
+// Focus-visible mirrors the `hover-surface` wash so keyboard and pointer land
+// on the same colour. The `data-nav-on` overrides win over both, keeping the
+// translucent treatment where the bar sits on a fixed-ground section.
 const NAV_LINK_CLASS =
-  "h-auto rounded-full bg-transparent px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none hover:bg-zinc-200 dark:hover:bg-zinc-800 focus-visible:bg-zinc-200 focus-visible:[outline:2px_dotted_currentColor]! focus-visible:outline-offset-2! dark:focus-visible:bg-zinc-800 data-[nav-on=dark]:text-white data-[nav-on=dark]:hover:bg-white/15 data-[nav-on=dark]:focus-visible:bg-white/15 data-[nav-on=light]:text-zinc-900 data-[nav-on=light]:hover:bg-zinc-900/10 data-[nav-on=light]:focus-visible:bg-zinc-900/10";
+  "hover-surface h-auto rounded-full bg-transparent px-3 py-2 font-light font-mono text-foreground text-sm uppercase tracking-normal outline-none focus-visible:bg-zinc-100 focus-visible:[outline:2px_dotted_currentColor]! focus-visible:outline-offset-2! dark:focus-visible:bg-zinc-900 data-[nav-on=dark]:text-white data-[nav-on=dark]:hover:bg-white/15 data-[nav-on=dark]:focus-visible:bg-white/15 data-[nav-on=light]:text-zinc-900 data-[nav-on=light]:hover:bg-zinc-900/10 data-[nav-on=light]:focus-visible:bg-zinc-900/10";
 
 const TRIGGER_CLASS = cn(
   NAV_LINK_CLASS,
-  "data-popup-open:bg-zinc-100 dark:data-popup-open:bg-zinc-800 data-[nav-on=dark]:data-popup-open:bg-white/15 data-[nav-on=light]:data-popup-open:bg-zinc-900/10"
+  "data-popup-open:bg-zinc-100 dark:data-popup-open:bg-zinc-900 data-[nav-on=dark]:data-popup-open:bg-white/15 data-[nav-on=light]:data-popup-open:bg-zinc-900/10"
 );
 
 // The outline pill draws itself in theme ink, which lands white-on-bright over
@@ -293,7 +287,7 @@ export function Navbar({
                             <li key={link._key}>
                               <NavigationMenuLink
                                 aria-current={currentPage(link.href)}
-                                className="group flex flex-col gap-0.5 rounded-none px-3 py-2.5 focus-ring-inset hover:bg-zinc-200 dark:hover:bg-zinc-800"
+                                className="hover-surface group flex flex-col gap-0.5 rounded-none px-3 py-2.5 focus-ring-inset"
                                 closeOnClick
                                 render={<Link href={link.href ?? "#"} />}
                               >

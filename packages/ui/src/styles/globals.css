@@ -213,8 +213,11 @@
   margin-inline: calc(var(--container-px, 0.5rem) * -1);
 }
 
+/* The one hover wash, shared by nav, the FAQ accordion and blog cards. Any
+ * surface using it must rest on `--background` (white/black), or the wash and
+ * the rest state collapse into each other. */
 @utility hover-surface {
-  @apply hover:bg-zinc-100 dark:hover:bg-zinc-800;
+  @apply hover:bg-zinc-100 dark:hover:bg-zinc-900;
 }
 
 @utility body-text {
