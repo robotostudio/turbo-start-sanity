@@ -1,6 +1,6 @@
 import { Logger } from "@workspace/logger";
 import {
-  DRAFT_MODE_ENABLED,
+  DRAFTS_WITHOUT_SESSION,
   type DynamicFetchOptions,
   getDynamicFetchOptions,
   resolvePageFetchOptions,
@@ -10,6 +10,7 @@ import {
 } from "@workspace/sanity/live";
 import { querySlugPageData, querySlugPagePaths } from "@workspace/sanity/query";
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -75,15 +76,20 @@ export async function generateMetadata({
 export default async function SlugPage({
   params,
 }: Readonly<{ params: Promise<SlugParams> }>) {
-  // Dev/preview: draft-aware path so unpublished pages still render.
-  if (DRAFT_MODE_ENABLED) {
+  const { isEnabled: isDraftMode } = await draftMode();
+
+  // A Presentation session (any environment) or local dev takes the draft-aware
+  // path, so draft edits and unpublished pages render.
+  if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
     return (
       <Suspense fallback={<HeroFallback />}>
         <SlugPageInner params={params} />
       </Suspense>
     );
   }
-  // Production: static published render with a real 404, no skeleton.
+
+  // Everyone else: published render off the same cached fetch as before, and a
+  // real 404 — not a soft one streamed inside Suspense.
   const { slug } = await params;
   const pageData = await getPublishedSlugPage(slug);
   if (!pageData) {

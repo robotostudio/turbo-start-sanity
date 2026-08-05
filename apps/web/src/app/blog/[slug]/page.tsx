@@ -1,6 +1,6 @@
 import { Logger } from "@workspace/logger";
 import {
-  DRAFT_MODE_ENABLED,
+  DRAFTS_WITHOUT_SESSION,
   type DynamicFetchOptions,
   getDynamicFetchOptions,
   resolvePageFetchOptions,
@@ -15,6 +15,7 @@ import {
 } from "@workspace/sanity-blocks/internal/rich-text";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -82,15 +83,20 @@ export default async function BlogSlugPage({
 }: Readonly<{
   params: Promise<BlogParams>;
 }>) {
-  // Dev/preview: draft-aware path so unpublished posts still render.
-  if (DRAFT_MODE_ENABLED) {
+  const { isEnabled: isDraftMode } = await draftMode();
+
+  // A Presentation session (any environment) or local dev takes the draft-aware
+  // path, so draft edits and unpublished posts render.
+  if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
     return (
       <Suspense fallback={<BlogFallback />}>
         <BlogSlugInner params={params} />
       </Suspense>
     );
   }
-  // Production: static published render with a real 404, no skeleton.
+
+  // Everyone else: published render off the same cached fetch as before, and a
+  // real 404 — not a soft one streamed inside Suspense.
   const { slug } = await params;
   const data = await getPublishedBlogPage(slug);
   if (!data) {

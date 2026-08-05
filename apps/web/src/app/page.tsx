@@ -1,5 +1,5 @@
 import {
-  DRAFT_MODE_ENABLED,
+  DRAFTS_WITHOUT_SESSION,
   type DynamicFetchOptions,
   getDynamicFetchOptions,
   resolvePageFetchOptions,
@@ -8,6 +8,7 @@ import {
 } from "@workspace/sanity/live";
 import { queryHomePageData } from "@workspace/sanity/query";
 import type { Metadata } from "next";
+import { draftMode } from "next/headers";
 import { Suspense } from "react";
 
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
@@ -24,16 +25,20 @@ export async function generateMetadata(): Promise<Metadata> {
   return seoFromDocument(homePageData, { slug: "/" });
 }
 
-export default function Page() {
-  // Production static-renders published; dev/preview streams drafts below.
-  if (!DRAFT_MODE_ENABLED) {
-    return <CachedHome perspective="published" stega={false} />;
+export default async function Page() {
+  const { isEnabled: isDraftMode } = await draftMode();
+
+  // A Presentation session (any environment) or local dev streams drafts.
+  if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
+    return (
+      <Suspense fallback={<HeroFallback />}>
+        <HomeContent />
+      </Suspense>
+    );
   }
-  return (
-    <Suspense fallback={<HeroFallback />}>
-      <HomeContent />
-    </Suspense>
-  );
+
+  // Everyone else: published render off the same cache entry as before.
+  return <CachedHome perspective="published" stega={false} />;
 }
 
 async function HomeContent() {
