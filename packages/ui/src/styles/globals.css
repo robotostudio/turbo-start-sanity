@@ -213,8 +213,11 @@
   margin-inline: calc(var(--container-px, 0.5rem) * -1);
 }
 
+/* The one hover wash, shared by nav, the FAQ accordion and blog cards. Any
+ * surface using it must rest on `--background` (white/black), or the wash and
+ * the rest state collapse into each other. */
 @utility hover-surface {
-  @apply hover:bg-zinc-100 dark:hover:bg-zinc-800;
+  @apply hover:bg-zinc-100 dark:hover:bg-zinc-900;
 }
 
 @utility body-text {
@@ -268,6 +271,33 @@
   }
   to {
     transform: translateX(-50%);
+  }
+}
+
+/* Slides the navbar out as the footer finishes taking over the screen. Sticky
+   cannot do this on its own while the footer is pinned: a fixed footer adds
+   only `--footer-height` of scroll past the content, so the header's container
+   comes to rest `100vh - --footer-height` below the top and never runs out.
+   Anchored to the end of the document, so it works pinned or in flow. */
+@keyframes nav-exit {
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@utility nav-exit {
+  animation-name: nav-exit;
+  /* Ignored on a scroll timeline, which drives progress from the range below. */
+  animation-duration: 1ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root block);
+  animation-range: calc(100% - 180px) calc(100% - 20px);
+}
+
+@supports not (animation-timeline: scroll()) {
+  .nav-exit {
+    animation-name: none;
   }
 }
 
@@ -474,9 +504,19 @@
 
 /* Code blocks (rich-text). Plain, unhighlighted monospace with a line-number
    gutter — no syntax coloring, tabs preserved. */
+.rich-code {
+  /* One inset for both columns: the block padding has to match or number N and
+     line N start on different rows, and the inline inset matches the header's
+     px-3 so the badge, the numbers and the code share one 0.75rem rhythm. */
+  --rich-code-inset-block: 1rem;
+  --rich-code-inset-inline: 0.75rem;
+}
+
 .rich-code-pre {
   margin: 0;
-  padding: 1rem 1.25rem;
+  padding: var(--rich-code-inset-block) var(--rich-code-inset-inline);
+  /* Inherited from .rich-code, so the gutter and the code cannot drift apart. */
+  line-height: inherit;
   /* max-content + min-width keeps the background full-width when lines overflow. */
   width: max-content;
   min-width: 100%;
@@ -488,7 +528,11 @@
 /* Line-number gutter — a fixed column beside the horizontally-scrolling code. */
 .rich-code-gutter {
   flex: none;
-  padding: 1rem 0.75rem;
+  padding: var(--rich-code-inset-block) var(--rich-code-inset-inline);
+  /* Reserve two digits: the column is otherwise content-sized, so a 9-line and
+     a 90-line block would indent their code by different amounts. */
+  min-width: calc(2.5ch + var(--rich-code-inset-inline) * 2);
+  line-height: inherit;
   text-align: right;
   font-variant-numeric: tabular-nums;
   color: color-mix(in oklab, var(--muted-foreground) 60%, transparent);

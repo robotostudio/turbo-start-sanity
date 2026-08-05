@@ -14,7 +14,7 @@ export function MenuLink({
 
   return (
     <Link
-      className="group flex items-start gap-3 rounded-none p-3 focus-ring-inset hover:bg-zinc-200 dark:hover:bg-zinc-800"
+      className="hover-surface group flex items-start gap-3 rounded-none p-3 focus-ring-inset"
       href={href}
       onClick={onClick}
     >

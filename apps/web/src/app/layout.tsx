@@ -1,7 +1,7 @@
 import "@workspace/ui/globals.css";
 
 import {
-  DRAFT_MODE_ENABLED,
+  DRAFTS_WITHOUT_SESSION,
   type DynamicFetchOptions,
   getDynamicFetchOptions,
   SanityLive,
@@ -46,10 +46,8 @@ export default async function RootLayout({
   prefetchDNS("https://cdn.sanity.io");
   // In local dev, nav/footer follow drafts too (like page content), so draft
   // navbar/footer/settings edits are visible without a Presentation session.
-  // Production stays static published (DRAFT_MODE_ENABLED is false).
-  const showDrafts = DRAFT_MODE_ENABLED;
-  // Presentation overlay (preview bar, visual editing) needs a real session.
-  const isDraftMode = DRAFT_MODE_ENABLED && (await draftMode()).isEnabled;
+  // Production stays static published.
+  const showDrafts = DRAFTS_WITHOUT_SESSION;
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -57,18 +55,17 @@ export default async function RootLayout({
       >
         <Providers>
           <ScrollToTop />
-          {showDrafts ? (
-            <Suspense fallback={<NavbarSkeleton />}>
-              <DynamicNavbar />
-            </Suspense>
-          ) : (
-            <CachedNavbar perspective="published" stega={false} />
-          )}
-          <div
-            className="-mt-16 relative z-10 min-h-dvh bg-background pt-16"
-            style={{ marginBottom: "var(--footer-height)" }}
-          >
-            {children}
+          <div style={{ marginBottom: "var(--footer-height)" }}>
+            {showDrafts ? (
+              <Suspense fallback={<NavbarSkeleton />}>
+                <DynamicNavbar />
+              </Suspense>
+            ) : (
+              <CachedNavbar perspective="published" stega={false} />
+            )}
+            <div className="-mt-16 relative z-10 min-h-dvh bg-background pt-16">
+              {children}
+            </div>
           </div>
           <StickyFooter>
             {showDrafts ? (
@@ -79,19 +76,37 @@ export default async function RootLayout({
               <CachedFooter perspective="published" stega={false} />
             )}
           </StickyFooter>
-          <SanityLive action={revalidateSyncTags} includeDrafts={isDraftMode} />
+          {/* Reads draftMode(), so it must stay behind Suspense — otherwise the
+              whole layout opts out of prerendering for every visitor. */}
+          <Suspense fallback={null}>
+            <LivePreviewLayer />
+          </Suspense>
           <Suspense fallback={null}>
             <CombinedJsonLd includeOrganization includeWebsite />
           </Suspense>
-          {isDraftMode && (
-            <>
-              <PreviewBar />
-              <VisualEditing />
-            </>
-          )}
         </Providers>
       </body>
     </html>
+  );
+}
+
+/**
+ * Live updates plus the Presentation overlay. The overlay renders wherever a
+ * validated draft-mode session exists — production included — which is what
+ * lets the deployed Studio preview the live site.
+ */
+async function LivePreviewLayer() {
+  const { isEnabled: isDraftMode } = await draftMode();
+  return (
+    <>
+      <SanityLive action={revalidateSyncTags} includeDrafts={isDraftMode} />
+      {isDraftMode && (
+        <>
+          <PreviewBar />
+          <VisualEditing />
+        </>
+      )}
+    </>
   );
 }
 

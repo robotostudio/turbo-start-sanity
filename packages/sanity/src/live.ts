@@ -50,18 +50,30 @@ const DRAFTS_FETCH_OPTIONS: DynamicFetchOptions = {
   stega: false,
 };
 
-export const DRAFT_MODE_ENABLED = process.env.NODE_ENV === "development";
+/**
+ * Serve drafts to a request that carries no Presentation session. Local dev
+ * only: anywhere the URL is publicly reachable this would hand unpublished
+ * content to anyone who can load the page.
+ */
+export const DRAFTS_WITHOUT_SESSION = process.env.NODE_ENV === "development";
 
-/** Resolves perspective/stega outside any `'use cache'` boundary (reads draftMode/cookies). */
+/**
+ * Resolves perspective/stega outside any `'use cache'` boundary (reads
+ * draftMode/cookies).
+ *
+ * Drafts may render in any environment — including production — but only for a
+ * request holding a draft-mode session. `/api/presentation-draft` is the only
+ * way to obtain one and it validates a Sanity preview secret, so an anonymous
+ * request still resolves to published content and renders statically.
+ * Gating on the session rather than on the environment is what lets the
+ * deployed Studio's Presentation tool preview the production site.
+ */
 export async function getDynamicFetchOptions(): Promise<DynamicFetchOptions> {
-  if (!DRAFT_MODE_ENABLED) {
-    return PUBLISHED_FETCH_OPTIONS;
-  }
   const { isEnabled: isDraftMode } = await draftMode();
   if (!isDraftMode) {
-    // Dev without a Presentation session still shows drafts, so draft-only
-    // pages are visible while developing. Stega stays off here.
-    return DRAFTS_FETCH_OPTIONS;
+    return DRAFTS_WITHOUT_SESSION
+      ? DRAFTS_FETCH_OPTIONS
+      : PUBLISHED_FETCH_OPTIONS;
   }
 
   const jar = await cookies();
@@ -70,14 +82,10 @@ export async function getDynamicFetchOptions(): Promise<DynamicFetchOptions> {
 }
 
 /**
- * Perspective/stega for a page route's inner (post-Suspense) component:
- * published in production (stays static), drafts in dev. Must be called outside
- * any `'use cache'` boundary (reads draftMode).
+ * Perspective/stega for a page route's inner (post-Suspense) component. Must be
+ * called outside any `'use cache'` boundary (reads draftMode).
  */
 export async function resolvePageFetchOptions(): Promise<DynamicFetchOptions> {
-  if (!DRAFT_MODE_ENABLED) {
-    return PUBLISHED_FETCH_OPTIONS;
-  }
   return getDynamicFetchOptions();
 }
 

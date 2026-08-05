@@ -60,7 +60,7 @@ export function CodeBlock({
             keyboard-focusable on their own, so arrow keys can still pan a long
             line into view (WCAG 2.1.1). */}
         <pre className="rich-code-pre overflow-x-auto font-mono">
-          <code>{code}</code>
+          <code className="font-mono">{code}</code>
         </pre>
       </div>
     </figure>
