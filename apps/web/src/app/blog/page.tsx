@@ -130,8 +130,25 @@ async function fetchBlogIndexPageBlogsCount({
   return res.data;
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { perspective } = await getDynamicFetchOptions();
+type BlogPageProps = Readonly<{
+  searchParams: Promise<{
+    page?: string;
+    category?: string;
+  }>;
+}>;
+
+export async function generateMetadata({
+  searchParams,
+}: BlogPageProps): Promise<Metadata> {
+  const [{ page, category }, { perspective }] = await Promise.all([
+    searchParams,
+    getDynamicFetchOptions(),
+  ]);
+  await assertBlogPageInRange({
+    page,
+    category: category ?? "",
+    perspective,
+  });
   const { data: result } = await sanityFetchMetadata({
     query: queryBlogIndexPageData,
     perspective,
@@ -139,12 +156,66 @@ export async function generateMetadata(): Promise<Metadata> {
   return seoFromDocument(result, { slug: "/blog" });
 }
 
-type BlogPageProps = Readonly<{
-  searchParams: Promise<{
-    page?: string;
-    category?: string;
-  }>;
-}>;
+/**
+ * `?page=` as a 1-based page number, or `null` when the value is present but
+ * not a positive integer — a bogus URL that should 404 rather than quietly
+ * serve page 1 under a different address.
+ */
+function parseBlogPageParam(page: string | undefined): number | null {
+  if (page === undefined || page === "") {
+    return 1;
+  }
+  const parsed = Number(page);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
+/**
+ * 404s a `?page=` past the last page. Lives in `generateMetadata` because that
+ * resolves before the response status is committed; the same `notFound()`
+ * inside the page's Suspense boundary only ever streams a soft 404, since PPR
+ * has already flushed the prerendered shell with a 200.
+ *
+ * `totalPages` floors at 1, so page 1 always survives: an empty blog, and an
+ * empty category filter, are legitimate results rather than dead URLs.
+ */
+async function assertBlogPageInRange({
+  page,
+  category,
+  perspective,
+}: {
+  page: string | undefined;
+  category: string;
+  perspective: DynamicFetchOptions["perspective"];
+}) {
+  const currentPage = parseBlogPageParam(page);
+  if (currentPage === null) {
+    notFound();
+  }
+  if (currentPage === 1) {
+    return;
+  }
+
+  const [totalCount] = await handleErrors(
+    fetchBlogIndexPageBlogsCount({
+      category,
+      excludeFeatured: !category,
+      perspective,
+      stega: false,
+    })
+  );
+  // A failed count is a server problem, not a missing page — let the page
+  // render its error state instead of masking it as a 404.
+  if (totalCount === null || totalCount === undefined) {
+    return;
+  }
+  const { totalPages } = calculateBlogPaginationMetadata(
+    totalCount,
+    currentPage
+  );
+  if (currentPage > totalPages) {
+    notFound();
+  }
+}
 
 export default function BlogIndexPage({ searchParams }: BlogPageProps) {
   return (
@@ -187,18 +258,27 @@ async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
     searchParams,
     getDynamicFetchOptions(),
   ]);
-  const parsedPage = Number(page);
-  const currentPage =
-    Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const currentPage = parseBlogPageParam(page);
+  if (currentPage === null) {
+    notFound();
+  }
   const activeCategory = category ?? "";
 
+  // Keyed so a page/category change mounts a *new* boundary. Without it React
+  // keeps the previous page's posts on screen for the whole round trip — the
+  // URL flips to `?page=2` while the grid still shows page 1.
   return (
-    <BlogIndexView
-      activeCategory={activeCategory}
-      currentPage={currentPage}
-      perspective={perspective}
-      stega={stega}
-    />
+    <Suspense
+      fallback={<BlogIndexShell />}
+      key={`${activeCategory}:${currentPage}`}
+    >
+      <BlogIndexView
+        activeCategory={activeCategory}
+        currentPage={currentPage}
+        perspective={perspective}
+        stega={stega}
+      />
+    </Suspense>
   );
 }
 
@@ -249,6 +329,13 @@ async function BlogIndexView({
     totalCount,
     currentPage
   );
+
+  // Past the last page is a dead URL, not an empty list. `totalPages` floors at
+  // 1, so page 1 still renders when there is nothing to show — including an
+  // empty category filter, which is a legitimate result rather than a 404.
+  if (currentPage > paginationMetadata.totalPages) {
+    notFound();
+  }
 
   const { start: blogStart, end: blogEnd } =
     getBlogPaginationRange(currentPage);
