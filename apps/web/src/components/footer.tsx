@@ -100,13 +100,13 @@ function SocialLinks({ data }: Readonly<SocialLinksProps>) {
         <li key={`social-link-${url}-${index.toString()}`}>
           <Link
             aria-label={label}
-            className="focus-ring-inset group inline-flex cursor-pointer items-center justify-center p-1.5 hover:bg-accent-green-foreground focus-visible:outline-accent-green-foreground!"
+            className="focus-ring-inset group inline-flex cursor-pointer items-center justify-center p-1.5 focus-visible:outline-accent-green-foreground!"
             href={url ?? "#"}
             prefetch={false}
             rel="noopener noreferrer"
             target="_blank"
           >
-            <Icon className="h-[18px] w-auto fill-accent-green-foreground group-hover:fill-accent-green" />
+            <Icon className="h-[18px] w-auto fill-accent-green-foreground transition-opacity duration-200 group-hover:opacity-75" />
             <span className="sr-only">{label}</span>
           </Link>
         </li>
