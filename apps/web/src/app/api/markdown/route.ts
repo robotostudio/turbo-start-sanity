@@ -212,8 +212,10 @@ function readForwarded(
   }
 }
 
-/** Path plus the params that shaped this doc, for `Content-Location`. */
+/** The Markdown representation's own URL (`.md` suffix, `/` → `/index.md`)
+ * plus the params that shaped this doc, for `Content-Location`. */
 function representationOf(path: string, query: BlogIndexQuery): string {
+  const mdPath = path === "/" ? "/index.md" : `${path}.md`;
   const params = new URLSearchParams();
   if (query.page !== null) {
     params.set("page", query.page);
@@ -222,7 +224,7 @@ function representationOf(path: string, query: BlogIndexQuery): string {
     params.set("category", query.category);
   }
   const search = params.toString();
-  return search ? `${path}?${search}` : path;
+  return search ? `${mdPath}?${search}` : mdPath;
 }
 
 export async function GET(request: Request): Promise<Response> {

@@ -94,7 +94,7 @@ function ErrorState({ query }: Readonly<{ query: string }>) {
 
 function LoadingState() {
   return (
-    <p aria-live="polite" className="text-muted-foreground">
+    <p className="text-muted-foreground" role="status">
       Searching…
     </p>
   );

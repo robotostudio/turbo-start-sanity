@@ -39,13 +39,17 @@ export async function generateMetadata({
     perspective,
     stega: false,
   });
+  // No index document is a 404, matching the view's behavior.
+  if (!data) {
+    notFound();
+  }
 
   // 404 out-of-range pages here, not in the view: metadata resolves before the
   // status commits, while `notFound()` inside the Suspense boundary only
   // streams a soft 404 after PPR flushed a 200 shell. `totalPages` floors at
   // 1, so page 1 of an empty blog or category always survives.
   const { totalPages } = calculateBlogPaginationMetadata(
-    data?.total ?? 0,
+    data.total,
     currentPage
   );
   if (currentPage > totalPages) {
