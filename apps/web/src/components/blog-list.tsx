@@ -5,7 +5,7 @@ export type BlogListProps = {
   blogs: Blog[];
 };
 
-export function BlogList({ blogs }: BlogListProps) {
+export function BlogList({ blogs }: Readonly<BlogListProps>) {
   if (blogs.length === 0) {
     return (
       <div className="border border-border py-12 text-center">
