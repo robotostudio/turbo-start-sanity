@@ -24,31 +24,32 @@ function hasSource(variant?: HeroVideoVariant | null): boolean {
 }
 
 /**
- * Tracks whether this is a phone-sized viewport. The `media` attribute on
+ * Whether this viewport should get the smaller clip. The `media` attribute on
  * `<source>` was dropped from the spec and Chrome ignores it, so picking in JS
  * is the only portable option.
  */
-function useIsPhone(): boolean {
-  const [isPhone, setIsPhone] = useState(false);
+function useIsCompactViewport(): boolean {
+  const [isCompact, setIsCompact] = useState(false);
 
   useEffect(() => {
-    const query = window.matchMedia("(max-width: 767px)");
-    setIsPhone(query.matches);
-    const onChange = (event: MediaQueryListEvent) => setIsPhone(event.matches);
+    const query = window.matchMedia("(max-width: 1279px)");
+    setIsCompact(query.matches);
+    const onChange = (event: MediaQueryListEvent) =>
+      setIsCompact(event.matches);
     query.addEventListener("change", onChange);
     return () => query.removeEventListener("change", onChange);
   }, []);
 
-  return isPhone;
+  return isCompact;
 }
 
 /**
- * The clips for this viewport. Only the WebM has a phone-sized version;
- * anything that cannot decode it drops to the desktop HEVC, still the
- * smallest file in the set.
+ * The clips for this viewport. Only the WebM has a smaller version; anything
+ * that cannot decode it drops to the desktop HEVC, still the smallest file in
+ * the set.
  */
-function pickSources(variant: HeroVideoVariant | null, isPhone: boolean) {
-  if (isPhone) {
+function pickSources(variant: HeroVideoVariant | null, isCompact: boolean) {
+  if (isCompact) {
     return {
       hevc: variant?.hevc,
       webm: variant?.mobileWebm ?? variant?.webm,
@@ -87,7 +88,7 @@ export function HeroVideo({
 }: Readonly<{ className?: string; video?: HeroVideoData | null }>) {
   const { resolvedTheme } = useTheme();
   const prefersReducedMotion = usePrefersReducedMotion();
-  const isPhone = useIsPhone();
+  const isCompactViewport = useIsCompactViewport();
   const [mounted, setMounted] = useState(false);
   const [ready, setReady] = useState(false);
 
@@ -98,7 +99,7 @@ export function HeroVideo({
     resolvedTheme === "dark" && hasSource(video?.dark)
       ? video?.dark
       : video?.light;
-  const sources = pickSources(variant ?? null, isPhone);
+  const sources = pickSources(variant ?? null, isCompactViewport);
 
   if (!(mounted && hasSource(variant)) || prefersReducedMotion) {
     return null;
