@@ -158,7 +158,13 @@ export const querySlugPagePaths = defineQuery(`
   *[_type == "page" && defined(slug.current)].slug.current
 `);
 
-export const queryBlogIndexPageData = defineQuery(`
+/**
+ * The whole blog index page in one round trip. The list excludes featured
+ * posts only when no category is active (`$category == ""`) — the same
+ * condition that renders the strip — so a promoted post is never counted
+ * twice or paginated into a gap.
+ */
+export const queryBlogIndexPage = defineQuery(`
   *[_type == "blogIndex"][0]{
     ...,
     _id,
@@ -168,19 +174,17 @@ export const queryBlogIndexPageData = defineQuery(`
     ogTitle,
     "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${pageBuilderFragment},
-    "slug": slug.current
-  }
-`);
-
-export const queryBlogIndexPageFeaturedBlogs = defineQuery(`
-  *[_type == "blog" && featured == true && (seoHideFromLists != true)] | order(orderRank asc){
-    ${blogCardFragment}
-  }
-`);
-
-export const queryBlogIndexPageBlogs = defineQuery(`
-  *[_type == "blog" && (seoHideFromLists != true) && ($category == "" || category == $category) && (!$excludeFeatured || featured != true)] | order(orderRank asc) [$start...$end]{
-    ${blogCardFragment}
+    "slug": slug.current,
+    "featuredBlogs": select(
+      $category == "" => *[_type == "blog" && featured == true && defined(slug.current) && (seoHideFromLists != true)] | order(orderRank asc){
+        ${blogCardFragment}
+      },
+      []
+    ),
+    "blogs": *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true) && ($category == "" || category == $category) && ($category != "" || featured != true)] | order(orderRank asc) [$start...$end]{
+      ${blogCardFragment}
+    },
+    "total": count(*[_type == "blog" && defined(slug.current) && (seoHideFromLists != true) && ($category == "" || category == $category) && ($category != "" || featured != true)])
   }
 `);
 
@@ -190,9 +194,6 @@ export const queryAllBlogDataForSearch = defineQuery(`
   }
 `);
 
-export const queryBlogIndexPageBlogsCount = defineQuery(`
-  count(*[_type == "blog" && (seoHideFromLists != true) && ($category == "" || category == $category) && (!$excludeFeatured || featured != true)])
-`);
 export const queryBlogSlugPageData = defineQuery(`
   *[_type == "blog" && slug.current == $slug][0]{
     ...,
