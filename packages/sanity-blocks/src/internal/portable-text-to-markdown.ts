@@ -1,15 +1,9 @@
 /**
  * Serializes `richText` portable-text arrays to Markdown. Pure (no React), so
  * blocks degrade to semantic Markdown instead of leaking JSX like
- * `<FAQComponent/>` when content is requested as Markdown.
- *
- * Delegates to the official `@portabletext/markdown` library with custom
- * renderers wired in for:
- *   - `customLink` annotation marks (Sanity schema convention)
- *   - Sanity image blocks (`{id, alt, caption}` via `resolveImageUrl`)
- *   - Inline code spans (CommonMark-compliant backtick fencing)
- *   - Underline marks (plain text — no `<u>` HTML leakage)
- *   - Unknown block types (silenced to `""`)
+ * `<FAQComponent/>` when content is requested as Markdown. Delegates to the
+ * official `@portabletext/markdown` library with custom renderers for the
+ * Sanity-specific shapes; each is explained at its definition below.
  */
 
 import {
@@ -193,7 +187,6 @@ export function portableTextToMarkdown(
       underline: ({ children }) => children,
     },
     types: {
-      // Multi-line code block → fenced code block with an optional info string.
       code: ({ value }) => {
         const node = value as PortableTextNode;
         const code = node.code ?? "";

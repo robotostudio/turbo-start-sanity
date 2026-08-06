@@ -1,7 +1,6 @@
 /**
- * Unit tests for the shared markdown-helper utilities in ./markdown.ts.
- * These helpers are used by every per-block serializer, so correctness here
- * protects the entire pipeline.
+ * The helpers in ./markdown.ts back every per-block serializer, so correctness
+ * here protects the entire pipeline.
  */
 
 import {
@@ -14,8 +13,6 @@ import {
   type MarkdownOptions,
   mdLink,
 } from "./markdown";
-
-// ─── joinSections ────────────────────────────────────────────────────────────
 
 test("joinSections returns empty string for an empty array", () => {
   expect(joinSections([])).toBe("");
@@ -36,8 +33,6 @@ test("joinSections returns a single non-empty section unchanged", () => {
 test("joinSections skips whitespace-only entries between real sections", () => {
   expect(joinSections(["First", "   ", "Second"])).toBe("First\n\nSecond");
 });
-
-// ─── eyebrowToMarkdown ───────────────────────────────────────────────────────
 
 test("eyebrowToMarkdown returns empty for null/undefined/empty/whitespace", () => {
   expect(eyebrowToMarkdown(null)).toBe("");
@@ -69,8 +64,6 @@ test("eyebrowToMarkdown escapes angle brackets (prevents HTML injection)", () =>
 test("eyebrowToMarkdown escapes backtick and pipe", () => {
   expect(eyebrowToMarkdown("`code` | pipe")).toBe("**\\`code\\` \\| pipe**");
 });
-
-// ─── headingToMarkdown ───────────────────────────────────────────────────────
 
 test("headingToMarkdown returns empty for null/undefined/whitespace", () => {
   expect(headingToMarkdown(null, 2)).toBe("");
@@ -107,8 +100,6 @@ test("headingToMarkdown escapes angle brackets (prevents HTML injection)", () =>
     "## \\<script\\>alert(1)\\</script\\>"
   );
 });
-
-// ─── buttonsToMarkdown ───────────────────────────────────────────────────────
 
 test("buttonsToMarkdown returns empty for null and undefined", () => {
   expect(buttonsToMarkdown(null)).toBe("");
@@ -183,8 +174,6 @@ test("buttonsToMarkdown joins multiple buttons with a newline, not a blank line"
     ])
   ).toBe("- [Primary](/primary)\n- Secondary");
 });
-
-// ─── imageToMarkdown ─────────────────────────────────────────────────────────
 
 const resolveImageUrl: MarkdownOptions["resolveImageUrl"] = (img) =>
   `https://cdn.example.com/${img.id}.webp`;
@@ -288,8 +277,6 @@ test("imageToMarkdown escapes markdown chars in caption", () => {
     "![Photo](https://cdn.example.com/abc123.webp)\n\n_\\_Caption\\__"
   );
 });
-
-// ─── mdLink ──────────────────────────────────────────────────────────────────
 
 test("mdLink returns a Markdown link for a valid href", () => {
   expect(mdLink("Docs", "/docs")).toBe("[Docs](/docs)");

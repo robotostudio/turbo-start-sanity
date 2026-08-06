@@ -12,7 +12,6 @@ import { querySlugPageData, querySlugPagePaths } from "@workspace/sanity/query";
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 
 import {
   ancestorCrumbs,
@@ -21,7 +20,6 @@ import {
 } from "@/components/breadcrumbs";
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
-import { HeroFallback } from "@/components/skeletons";
 import { seoFromDocument } from "@/lib/seo";
 import { PLACEHOLDER_SLUG } from "@/utils";
 
@@ -78,18 +76,16 @@ export default async function SlugPage({
 }: Readonly<{ params: Promise<SlugParams> }>) {
   const { isEnabled: isDraftMode } = await draftMode();
 
-  // A Presentation session (any environment) or local dev takes the draft-aware
-  // path, so draft edits and unpublished pages render.
+  // Presentation sessions and local dev take the draft-aware path, so draft
+  // edits and unpublished pages render. No Suspense: draft mode disables
+  // `use cache` entirely, so a boundary would always paint its fallback;
+  // blocking keeps the previous page on screen, as editors expect.
   if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
-    return (
-      <Suspense fallback={<HeroFallback />}>
-        <SlugPageInner params={params} />
-      </Suspense>
-    );
+    return <SlugPageInner params={params} />;
   }
 
-  // Everyone else: published render off the same cached fetch as before, and a
-  // real 404 — not a soft one streamed inside Suspense.
+  // Published render, with a real 404 — not a soft one streamed inside
+  // Suspense.
   const { slug } = await params;
   const pageData = await getPublishedSlugPage(slug);
   if (!pageData) {
@@ -163,8 +159,7 @@ function SlugPageContent({
   }
 
   const hasLeadingHero = pageBuilder[0]?._type === "hero";
-  // Every ancestor segment, so /a/b/c reads Home / A / B / C rather than the
-  // flat Home / C the old hardcoded pair produced.
+  // Every ancestor segment, so /a/b/c reads Home / A / B / C.
   const crumbs = [...ancestorCrumbs(slug), { label: title }];
 
   return (

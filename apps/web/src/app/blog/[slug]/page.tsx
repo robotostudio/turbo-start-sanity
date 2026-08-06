@@ -17,7 +17,6 @@ import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import {
@@ -25,7 +24,6 @@ import {
   TableOfContent,
 } from "@/components/elements/table-of-content";
 import { ArticleJsonLd } from "@/components/json-ld";
-import { BlogFallback } from "@/components/skeletons";
 import { seoFromDocument } from "@/lib/seo";
 import { formatDate, getBaseUrl, PLACEHOLDER_SLUG } from "@/utils";
 
@@ -85,18 +83,16 @@ export default async function BlogSlugPage({
 }>) {
   const { isEnabled: isDraftMode } = await draftMode();
 
-  // A Presentation session (any environment) or local dev takes the draft-aware
-  // path, so draft edits and unpublished posts render.
+  // Presentation sessions and local dev take the draft-aware path, so draft
+  // edits and unpublished posts render. No Suspense: draft mode disables
+  // `use cache` entirely, so a boundary would always paint its fallback;
+  // blocking keeps the previous page on screen, as editors expect.
   if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
-    return (
-      <Suspense fallback={<BlogFallback />}>
-        <BlogSlugInner params={params} />
-      </Suspense>
-    );
+    return <BlogSlugInner params={params} />;
   }
 
-  // Everyone else: published render off the same cached fetch as before, and a
-  // real 404 — not a soft one streamed inside Suspense.
+  // Published render, with a real 404 — not a soft one streamed inside
+  // Suspense.
   const { slug } = await params;
   const data = await getPublishedBlogPage(slug);
   if (!data) {
