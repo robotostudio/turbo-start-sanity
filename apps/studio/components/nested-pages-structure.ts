@@ -135,7 +135,6 @@ const buildFolderStructure = (
 const compareAlpha = (a: string, b: string): number =>
   a.localeCompare(b, undefined, { sensitivity: "base" });
 
-// Sort documents by title, falling back to slug for untitled pages
 const byDocumentTitle = (a: DocumentData, b: DocumentData): number =>
   compareAlpha(a.title || a.slug, b.title || b.slug);
 

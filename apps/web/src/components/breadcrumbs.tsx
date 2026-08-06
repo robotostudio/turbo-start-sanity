@@ -122,18 +122,3 @@ export function Breadcrumbs({
     </>
   );
 }
-
-export function BreadcrumbsSkeleton() {
-  return (
-    <div className="border-b-[0.75px] border-zinc-200 bg-background dark:border-zinc-900">
-      <div className="container flex min-h-13 animate-pulse items-center gap-2.5 pt-6 pb-2">
-        <div className="flex min-w-0 flex-1 items-center gap-1.5">
-          <div className="h-5 w-14 shrink-0 bg-muted/50" />
-          <div className="h-5 w-1.5 shrink-0 bg-muted/50" />
-          <div className="h-5 w-40 min-w-0 bg-muted/50" />
-        </div>
-        <div className="h-5 w-40 shrink-0 bg-muted/50" />
-      </div>
-    </div>
-  );
-}

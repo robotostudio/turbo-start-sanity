@@ -1,6 +1,6 @@
 import type { FilterByType, Get } from "@sanity/codegen";
 import type {
-  QueryBlogIndexPageBlogsResult,
+  QueryBlogIndexPageResult,
   QueryBlogSlugPageDataResult,
   QueryGlobalSeoSettingsResult,
   QueryHomePageDataResult,
@@ -27,7 +27,7 @@ export type SanityRichTextBlock = FilterByType<
   "block"
 >;
 
-export type Blog = Get<QueryBlogIndexPageBlogsResult, number>;
+export type Blog = Get<QueryBlogIndexPageResult, "blogs", number>;
 
 export type Maybe<T> = T | null | undefined;
 

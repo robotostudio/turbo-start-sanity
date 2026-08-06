@@ -3,8 +3,11 @@ import { cacheLife, cacheTag } from "next/cache";
 const REVALIDATE_SECONDS = 3600;
 const EXPIRE_SECONDS = 86_400;
 const REQUEST_TIMEOUT_MS = 3000;
+const MEMO_TTL_MS = REVALIDATE_SECONDS * 1000;
 // Owner/repo: word chars, dots, dashes only — no slashes can escape /repos/ (SSRF guard).
 const SEGMENT = /^[\w.-]+$/;
+
+const lastKnownStars = new Map<string, { stars: number; staleAt: number }>();
 
 function parseRepo(gitHubUrl: string): string | null {
   try {
@@ -55,9 +58,20 @@ export async function getGithubStars(
     return null;
   }
 
+  const remembered = lastKnownStars.get(repo);
+  if (remembered && performance.now() < remembered.staleAt) {
+    return remembered.stars;
+  }
+
   try {
-    return await fetchGithubStars(repo);
+    const stars = await fetchGithubStars(repo);
+    lastKnownStars.set(repo, {
+      stars,
+      staleAt: performance.now() + MEMO_TTL_MS,
+    });
+    return stars;
   } catch {
-    return null;
+    // A stale count keeps the link in the bar; `null` removes it entirely.
+    return remembered?.stars ?? null;
   }
 }

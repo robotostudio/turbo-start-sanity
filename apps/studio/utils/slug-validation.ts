@@ -186,7 +186,6 @@ function validateDocTypeRules(
   return errors;
 }
 
-/** Main validation — flat pipeline, no branching. */
 function validateSlug(
   slug: string | undefined | null,
   options: SlugValidationOptions = {}
@@ -211,7 +210,6 @@ function validateSlug(
   return { errors: [...new Set(errors)], warnings: [...new Set(warnings)] };
 }
 
-/** Get validation config for a document type. */
 export function getDocumentTypeConfig(docType: string): SlugValidationOptions {
   return CONFIGS[docType]
     ? { ...CONFIGS[docType] }
@@ -222,7 +220,6 @@ export function getDocumentTypeConfig(docType: string): SlugValidationOptions {
       };
 }
 
-/** Create a Sanity schema error validator from options. */
 export function createSlugErrorValidator(
   options: SlugValidationOptions
 ): (slug: { current?: string } | undefined) => string | true {
@@ -259,7 +256,6 @@ export function createSlugUniqueValidator(): (
   };
 }
 
-/** Create a Sanity schema warning validator from options. */
 export function createSlugWarningValidator(
   options: SlugValidationOptions
 ): (slug: { current?: string } | undefined) => string | true {
@@ -269,7 +265,6 @@ export function createSlugWarningValidator(
   };
 }
 
-/** Clean a raw string into a valid slug segment. */
 function cleanSlug(slug: string): string {
   if (!slug) return "";
   return slugify(slug, { lower: true, strict: true });

@@ -9,11 +9,9 @@ import {
 import { queryHomePageData } from "@workspace/sanity/query";
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
-import { Suspense } from "react";
 
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
-import { HeroFallback } from "@/components/skeletons";
 import { seoFromDocument } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,16 +26,13 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const { isEnabled: isDraftMode } = await draftMode();
 
-  // A Presentation session (any environment) or local dev streams drafts.
+  // Presentation sessions and local dev stream drafts. No Suspense: draft mode
+  // disables `use cache` entirely, so a boundary would always paint its
+  // fallback; blocking keeps the previous page on screen, as editors expect.
   if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
-    return (
-      <Suspense fallback={<HeroFallback />}>
-        <HomeContent />
-      </Suspense>
-    );
+    return <HomeContent />;
   }
 
-  // Everyone else: published render off the same cache entry as before.
   return <CachedHome perspective="published" stega={false} />;
 }
 

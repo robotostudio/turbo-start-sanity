@@ -1,4 +1,4 @@
-import type { QueryBlogIndexPageDataResult } from "@workspace/sanity/types";
+import type { QueryBlogIndexPageResult } from "@workspace/sanity/types";
 import type { ReactNode } from "react";
 
 import { BlogHeader, FeaturedBlogCard } from "@/components/blog-card";
@@ -7,21 +7,17 @@ import { BlogList } from "@/components/blog-list";
 import { BlogPagination } from "@/components/blog-pagination";
 import { BlogSearchLayout } from "@/components/blog-search-layout";
 import { Breadcrumbs } from "@/components/breadcrumbs";
-import { BlogGridSkeleton } from "@/components/skeletons";
 import type { Blog } from "@/types";
 import type { PaginationMetadata } from "@/utils";
 
-const BLOG_SHELL_SKELETON_COUNT = 9;
-
 type BlogPageContentProps = {
-  indexPageData: NonNullable<QueryBlogIndexPageDataResult>;
+  indexPageData: NonNullable<QueryBlogIndexPageResult>;
   blogs: Blog[];
   // Already excluded from `blogs` by the query, so the two never overlap.
   featuredBlogs: Blog[];
   paginationMetadata: PaginationMetadata;
   activeCategory: string;
   children?: ReactNode;
-  pending?: boolean;
 };
 
 export function BlogPageContent({
@@ -31,14 +27,11 @@ export function BlogPageContent({
   paginationMetadata,
   activeCategory,
   children,
-  pending = false,
 }: BlogPageContentProps) {
   const { title, description } = indexPageData;
 
   const showFeatured =
-    !pending &&
-    paginationMetadata.currentPage === 1 &&
-    featuredBlogs.length > 0;
+    paginationMetadata.currentPage === 1 && featuredBlogs.length > 0;
 
   return (
     <main className="bg-background">
@@ -58,23 +51,19 @@ export function BlogPageContent({
               : null
           }
           list={
-            pending ? (
-              <BlogGridSkeleton count={BLOG_SHELL_SKELETON_COUNT} />
-            ) : (
-              <>
-                <BlogList blogs={blogs} />
-                {paginationMetadata?.totalPages > 1 && (
-                  <BlogPagination
-                    category={activeCategory}
-                    className="mt-12"
-                    currentPage={paginationMetadata.currentPage}
-                    hasNextPage={paginationMetadata.hasNextPage}
-                    hasPreviousPage={paginationMetadata.hasPreviousPage}
-                    totalPages={paginationMetadata.totalPages}
-                  />
-                )}
-              </>
-            )
+            <>
+              <BlogList blogs={blogs} />
+              {paginationMetadata.totalPages > 1 && (
+                <BlogPagination
+                  category={activeCategory}
+                  className="mt-12"
+                  currentPage={paginationMetadata.currentPage}
+                  hasNextPage={paginationMetadata.hasNextPage}
+                  hasPreviousPage={paginationMetadata.hasPreviousPage}
+                  totalPages={paginationMetadata.totalPages}
+                />
+              )}
+            </>
           }
         />
       </div>

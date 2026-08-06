@@ -41,40 +41,6 @@ const NAV_BUTTON_CLASS = cn(
   NAV_OUTLINE_ADAPTIVE
 );
 
-function NavItemSkeleton() {
-  return <div className="h-5 w-20 bg-muted/50" />;
-}
-
-export function NavbarSkeleton() {
-  return (
-    <header className="sticky top-0 z-40 w-full animate-pulse bg-background/60 backdrop-blur-lg dark:bg-background/60">
-      <div className="container">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex h-10 flex-1 items-center">
-            <div className="h-5 w-14 bg-muted/50" />
-          </div>
-
-          <div className="hidden items-center gap-8 lg:flex">
-            <NavItemSkeleton />
-            <NavItemSkeleton />
-            <NavItemSkeleton />
-            <NavItemSkeleton />
-          </div>
-
-          <div className="hidden flex-1 items-center justify-end gap-2 lg:flex">
-            <div className="h-9 w-28 rounded-full bg-muted/50" />
-            <div className="h-9 w-28 rounded-full bg-muted/50" />
-          </div>
-
-          <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
-            <div className="size-8 bg-muted/50" />
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-}
-
 const BLUR_LAYERS = [
   {
     radius: 32,

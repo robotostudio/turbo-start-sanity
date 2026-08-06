@@ -13,13 +13,9 @@ import { Suspense } from "react";
 import { preconnect, prefetchDNS } from "react-dom";
 
 import { revalidateSyncTags } from "@/app/actions/revalidate";
-import {
-  CachedFooter,
-  DynamicFooter,
-  FooterSkeleton,
-} from "@/components/footer";
+import { CachedFooter, DynamicFooter } from "@/components/footer";
 import { CombinedJsonLd } from "@/components/json-ld";
-import { Navbar, NavbarSkeleton } from "@/components/navbar";
+import { Navbar } from "@/components/navbar";
 import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
 import { ScrollToTop } from "@/components/scroll-to-top";
@@ -57,7 +53,11 @@ export default async function RootLayout({
           <ScrollToTop />
           <div style={{ marginBottom: "var(--footer-height)" }}>
             {showDrafts ? (
-              <Suspense fallback={<NavbarSkeleton />}>
+              <Suspense
+                fallback={
+                  <CachedNavbar perspective="published" stega={false} />
+                }
+              >
                 <DynamicNavbar />
               </Suspense>
             ) : (
@@ -69,7 +69,11 @@ export default async function RootLayout({
           </div>
           <StickyFooter>
             {showDrafts ? (
-              <Suspense fallback={<FooterSkeleton />}>
+              <Suspense
+                fallback={
+                  <CachedFooter perspective="published" stega={false} />
+                }
+              >
                 <DynamicFooter />
               </Suspense>
             ) : (
