@@ -7,7 +7,6 @@ const MEMO_TTL_MS = REVALIDATE_SECONDS * 1000;
 // Owner/repo: word chars, dots, dashes only — no slashes can escape /repos/ (SSRF guard).
 const SEGMENT = /^[\w.-]+$/;
 
-
 const lastKnownStars = new Map<string, { stars: number; staleAt: number }>();
 
 function parseRepo(gitHubUrl: string): string | null {
