@@ -1,17 +1,11 @@
 import { BlogCard } from "@/components/blog-card";
-import { BlogGridSkeleton } from "@/components/skeletons";
 import type { Blog } from "@/types";
 
 export type BlogListProps = {
   blogs: Blog[];
-  isLoading?: boolean;
 };
 
-export function BlogList({ blogs, isLoading = false }: BlogListProps) {
-  if (isLoading) {
-    return <BlogGridSkeleton count={6} />;
-  }
-
+export function BlogList({ blogs }: BlogListProps) {
   if (blogs.length === 0) {
     return (
       <div className="border border-border py-12 text-center">

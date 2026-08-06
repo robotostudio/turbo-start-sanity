@@ -3,10 +3,7 @@ import {
   getDynamicFetchOptions,
   sanityFetch,
 } from "@workspace/sanity/live";
-import {
-  queryFooterData,
-  queryGlobalSeoSettings,
-} from "@workspace/sanity/query";
+import { queryFooterData } from "@workspace/sanity/query";
 import type {
   QueryFooterDataResult,
   QueryGlobalSeoSettingsResult,
@@ -21,12 +18,12 @@ import {
 } from "@workspace/sanity-blocks/internal/icons";
 import { normalizedLogoHeight } from "@workspace/sanity-blocks/internal/logo-height";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
-import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 import { type CSSProperties, Fragment } from "react";
 
 import { FooterThemeToggle } from "@/components/footer-theme-toggle";
 import { Logo } from "@/components/logo";
+import { getGlobalSettings } from "@/lib/navigation";
 
 type SocialLinksProps = {
   data: NonNullable<QueryGlobalSeoSettingsResult>["socialLinks"];
@@ -47,15 +44,15 @@ export async function CachedFooter({
   stega,
 }: DynamicFetchOptions) {
   "use cache";
-  const [response, settingsResponse] = await Promise.all([
+  const [response, settingsData] = await Promise.all([
     sanityFetch({ query: queryFooterData, perspective, stega }),
-    sanityFetch({ query: queryGlobalSeoSettings, perspective, stega }),
+    getGlobalSettings({ perspective, stega }),
   ]);
 
-  if (!(response?.data && settingsResponse?.data)) {
-    return <FooterSkeleton />;
+  if (!(response?.data && settingsData)) {
+    return null;
   }
-  return <Footer data={response.data} settingsData={settingsResponse.data} />;
+  return <Footer data={response.data} settingsData={settingsData} />;
 }
 
 function SocialLinks({ data }: Readonly<SocialLinksProps>) {
@@ -214,75 +211,6 @@ function FooterMark() {
         ))}
       </svg>
     </div>
-  );
-}
-
-const FOOTER_BAR = "bg-accent-green-foreground/10";
-
-function FooterSocialDotSkeleton() {
-  return <div className={cn("size-[18px]", FOOTER_BAR)} />;
-}
-
-function FooterLinkColumnSkeleton() {
-  return (
-    <div>
-      <div className={cn("mb-2 h-5 w-20", FOOTER_BAR)} />
-      <div className="space-y-1">
-        <div className={cn("h-6 w-24", FOOTER_BAR)} />
-        <div className={cn("h-6 w-24", FOOTER_BAR)} />
-        <div className={cn("h-6 w-24", FOOTER_BAR)} />
-      </div>
-    </div>
-  );
-}
-
-export function FooterSkeleton() {
-  return (
-    <>
-      <FooterTopBar />
-      <footer className="relative animate-pulse border-t border-accent-green-foreground/10 bg-accent-green text-accent-green-foreground">
-        <div className="container flex flex-col items-start gap-10 pt-12 text-start lg:flex-row lg:items-start lg:justify-between">
-          <div className="flex w-full max-w-96 shrink flex-col items-start gap-6 lg:items-start">
-            <div className="flex w-full flex-col items-start gap-4 lg:items-start">
-              <div className={cn("h-7 w-44", FOOTER_BAR)} />
-              <div className="flex w-full flex-col">
-                <div className={cn("h-5 w-full", FOOTER_BAR)} />
-                <div className={cn("h-5 w-3/4", FOOTER_BAR)} />
-              </div>
-            </div>
-            <div className={cn("h-7 w-52 rounded-full", FOOTER_BAR)} />
-            <div className="flex items-center gap-3">
-              <FooterSocialDotSkeleton />
-              <FooterSocialDotSkeleton />
-              <FooterSocialDotSkeleton />
-              <FooterSocialDotSkeleton />
-              <FooterSocialDotSkeleton />
-            </div>
-          </div>
-          <div className="grid w-full grid-cols-2 gap-8 sm:grid-cols-4 sm:gap-14 lg:w-auto">
-            <FooterLinkColumnSkeleton />
-            <FooterLinkColumnSkeleton />
-            <FooterLinkColumnSkeleton />
-            <FooterLinkColumnSkeleton />
-          </div>
-        </div>
-        <div className="container relative z-10 mt-12 pt-8 pb-8">
-          <div className="flex flex-col items-start justify-between gap-6 text-start lg:flex-row lg:items-center lg:gap-4">
-            <div className={cn("h-5 w-64", FOOTER_BAR)} />
-            <div className="flex flex-col items-start gap-4 lg:flex-row lg:items-center">
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <div className={cn("h-[18px] w-32", FOOTER_BAR)} />
-                <div className={cn("h-[18px] w-24", FOOTER_BAR)} />
-              </div>
-              <div
-                className={cn("h-[34px] w-[104px] rounded-full", FOOTER_BAR)}
-              />
-            </div>
-          </div>
-        </div>
-        <FooterMark />
-      </footer>
-    </>
   );
 }
 

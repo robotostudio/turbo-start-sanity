@@ -4,7 +4,6 @@ import { cn } from "@workspace/tailwind-config/utils";
 import type { ReactNode } from "react";
 
 import { BlogList } from "@/components/blog-list";
-import { BlogGridSkeleton } from "@/components/skeletons";
 import type { Blog } from "@/types";
 
 type BlogSearchResultsProps = Readonly<{
@@ -95,10 +94,9 @@ function ErrorState({ query }: Readonly<{ query: string }>) {
 
 function LoadingState() {
   return (
-    <div className="grid animate-pulse gap-6">
-      <div className="h-6 w-64 bg-muted/50" />
-      <BlogGridSkeleton count={6} />
-    </div>
+    <p aria-live="polite" className="text-muted-foreground">
+      Searching…
+    </p>
   );
 }
 

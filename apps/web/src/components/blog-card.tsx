@@ -3,7 +3,6 @@ import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 
-import { BlogCardSkeleton } from "@/components/skeletons";
 import { getBlogCategoryLabel } from "@/lib/blog-categories";
 import type { Blog } from "@/types";
 import { formatDate } from "@/utils";
@@ -153,7 +152,7 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
 
 export function BlogCard({ blog }: BlogCardProps) {
   if (!blog) {
-    return <BlogCardSkeleton />;
+    return null;
   }
 
   const { title, publishedAt, slug, description, authors, category } = blog;
