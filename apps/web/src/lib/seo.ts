@@ -158,10 +158,12 @@ export async function getSEOMetadata(
       ]
     : undefined;
 
-  // Page title only — the site name repeated on every tab pushed the part that
-  // distinguishes them out of view. It still reaches crawlers via `creator`,
-  // `authors` and the Open Graph `siteName` below.
-  const fullTitle = defaultTitle;
+  // "Page / Site" tab titles; bare site title when they are one and the same
+  // (the homepage), so it never reads "Site / Site".
+  const fullTitle =
+    defaultTitle === siteConfig.title
+      ? defaultTitle
+      : `${defaultTitle} / ${siteConfig.title}`;
 
   const markdownUrl =
     slug && slug !== "/" ? `${pageUrl}.md` : `${baseUrl}/index.md`;
