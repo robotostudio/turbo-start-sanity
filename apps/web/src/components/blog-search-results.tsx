@@ -93,11 +93,7 @@ function ErrorState({ query }: Readonly<{ query: string }>) {
 }
 
 function LoadingState() {
-  return (
-    <p className="text-muted-foreground" role="status">
-      Searching…
-    </p>
-  );
+  return <output className="block text-muted-foreground">Searching…</output>;
 }
 
 export function BlogSearchResults({
