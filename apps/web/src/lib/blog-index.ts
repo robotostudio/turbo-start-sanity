@@ -3,9 +3,13 @@ import { queryBlogIndexPage } from "@workspace/sanity/query";
 
 import { getBlogPaginationRange } from "@/utils";
 
+/** Far beyond any real archive; bounds the Sanity slice a crafted `?page=`
+ * can request and the per-page cache entries it can mint. */
+const MAX_BLOG_PAGE = 1000;
+
 /**
  * `?page=` as a 1-based page number, or `null` when present but not a positive
- * integer — a bogus URL that should 404, not alias page 1.
+ * integer within bounds — a bogus URL that should 404, not alias page 1.
  */
 export function parseBlogPageParam(
   page: string | null | undefined
@@ -14,7 +18,9 @@ export function parseBlogPageParam(
     return 1;
   }
   const parsed = Number(page);
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  return Number.isInteger(parsed) && parsed > 0 && parsed <= MAX_BLOG_PAGE
+    ? parsed
+    : null;
 }
 
 /**
