@@ -85,7 +85,7 @@ const components: Partial<PortableTextReactComponents> = {
   },
   marks: {
     code: ({ children }) => (
-      <code className="rounded-none border border-border bg-zinc-200 px-1.5 py-0.5 font-mono text-[0.85em] text-foreground before:content-none after:content-none lg:whitespace-nowrap dark:bg-zinc-800 dark:group-hover:bg-zinc-600">
+      <code className="rounded-none border border-border bg-zinc-200 px-1.5 py-0.5 font-mono text-[0.85em] text-foreground before:content-none after:content-none lg:whitespace-nowrap dark:bg-zinc-800">
         {children}
       </code>
     ),
