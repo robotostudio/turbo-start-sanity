@@ -54,9 +54,7 @@ export default async function RootLayout({
           <div style={{ marginBottom: "var(--footer-height)" }}>
             {showDrafts ? (
               <Suspense
-                fallback={
-                  <CachedNavbar perspective="published" stega={false} />
-                }
+                fallback={<Navbar navbarData={null} settingsData={null} />}
               >
                 <DynamicNavbar />
               </Suspense>
@@ -69,11 +67,7 @@ export default async function RootLayout({
           </div>
           <StickyFooter>
             {showDrafts ? (
-              <Suspense
-                fallback={
-                  <CachedFooter perspective="published" stega={false} />
-                }
-              >
+              <Suspense fallback={null}>
                 <DynamicFooter />
               </Suspense>
             ) : (
