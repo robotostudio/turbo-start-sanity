@@ -293,13 +293,18 @@
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
   animation-range: calc(100% - 180px) calc(100% - 20px);
+}
 
-  /* `& { }` rather than a bare declaration: nested inside an at-rule that sits
-     inside a rule, a loose declaration is ambiguous per spec. */
-  @supports not (animation-timeline: scroll()) {
-    & {
-      animation-name: none;
-    }
+/* Without a timeline the 1ms animation finishes on the first frame and parks
+   the header at -100% forever. Spelled out per variant rather than nested in
+   the `@utility`: the variants generate their own classes, which a bare
+   `.nav-exit` rule doesn't match, and nesting inside `@utility` is opaque to
+   CSS tooling that doesn't know the at-rule. Unlayered, so it outranks the
+   utility it's overriding. */
+@supports not (animation-timeline: scroll()) {
+  .nav-exit,
+  .lg\:nav-exit {
+    animation-name: none;
   }
 }
 

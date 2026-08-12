@@ -21,6 +21,23 @@ const MARK_START = 320;
 // the scrubbed build never reads. Set above a smooth-scrolled wheel notch.
 const FAST_SCROLL = 1.2;
 
+// One frame in flight at a time — scroll fires far faster than paint, and both
+// listeners below only ever need the latest position.
+function rafThrottle(run: () => void) {
+  let frame = 0;
+  return {
+    schedule: () => {
+      if (!frame) {
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          run();
+        });
+      }
+    },
+    cancel: () => cancelAnimationFrame(frame),
+  };
+}
+
 /** Pinned behind the page content and revealed as it scrolls up, or in-flow
  * when too tall. Publishes `--footer-height` so content reserves space. */
 export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
@@ -71,7 +88,6 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
       return;
     }
     const root = document.documentElement;
-    let frame = 0;
     let showing = false;
     // The strip behind Safari's toolbar is canvas, so it takes the ROOT's
     // background — `body` alone never reaches it. But the canvas is one
@@ -86,7 +102,6 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
       root.scrollHeight - root.clientHeight - window.scrollY <
       Math.max(el.offsetHeight - root.clientHeight, 0) + 8;
     const update = () => {
-      frame = 0;
       const onFooter = ownsScreen();
       if (onFooter === showing) {
         return;
@@ -96,11 +111,7 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
       document.body.style.background = surface;
       root.style.background = surface;
     };
-    const schedule = () => {
-      if (!frame) {
-        frame = requestAnimationFrame(update);
-      }
-    };
+    const { schedule, cancel } = rafThrottle(update);
     update();
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
@@ -109,7 +120,7 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
     observer.observe(document.body);
     return () => {
       observer.disconnect();
-      cancelAnimationFrame(frame);
+      cancel();
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
       document.body.style.background = "";
@@ -127,9 +138,7 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
     const root = document.documentElement;
     let lastY = window.scrollY;
     let lastAt = performance.now();
-    let frame = 0;
     const update = () => {
-      frame = 0;
       const y = window.scrollY;
       const at = performance.now();
       const start =
@@ -145,14 +154,10 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
       lastY = y;
       lastAt = at;
     };
-    const schedule = () => {
-      if (!frame) {
-        frame = requestAnimationFrame(update);
-      }
-    };
+    const { schedule, cancel } = rafThrottle(update);
     window.addEventListener("scroll", schedule, { passive: true });
     return () => {
-      cancelAnimationFrame(frame);
+      cancel();
       window.removeEventListener("scroll", schedule);
       delete root.dataset.markPlay;
     };
