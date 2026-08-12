@@ -293,10 +293,8 @@
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
   animation-range: calc(100% - 180px) calc(100% - 20px);
-}
 
-@supports not (animation-timeline: scroll()) {
-  .nav-exit {
+  @supports not (animation-timeline: scroll()) {
     animation-name: none;
   }
 }
