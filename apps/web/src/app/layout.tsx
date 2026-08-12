@@ -51,7 +51,7 @@ export default async function RootLayout({
       >
         <Providers>
           <ScrollToTop />
-          <div style={{ marginBottom: "var(--footer-height)" }}>
+          <div id="page-shell" style={{ marginBottom: "var(--footer-height)" }}>
             {showDrafts ? (
               <Suspense
                 fallback={<Navbar navbarData={null} settingsData={null} />}

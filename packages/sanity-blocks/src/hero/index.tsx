@@ -10,6 +10,7 @@ import {
 } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
 
+import { HeroFold } from "./hero-fold";
 import type { HeroVideoData, HeroVideoVariant } from "./hero-video";
 import { HeroVideo } from "./hero-video";
 
@@ -143,6 +144,7 @@ export function HeroBlock({
 
   return (
     <>
+      <HeroFold video={video} />
       <div
         className="relative z-0 h-[calc(100svh-var(--hero-copy))] overflow-hidden bg-background lg:sticky lg:top-0"
         id="hero"
