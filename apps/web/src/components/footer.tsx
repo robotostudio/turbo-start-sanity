@@ -183,7 +183,7 @@ function FooterMark() {
   return (
     <div
       aria-hidden="true"
-      className="aspect-[1440/516] w-full overflow-hidden text-accent-green-foreground sm:aspect-[1440/320]"
+      className="aspect-[1440/516] w-full shrink-0 overflow-hidden text-accent-green-foreground max-sm:mt-auto sm:aspect-[1440/320]"
     >
       <svg
         aria-hidden="true"
@@ -224,7 +224,7 @@ function Footer({ data, settingsData }: Readonly<FooterProps>) {
   return (
     <>
       <FooterTopBar />
-      <footer className="relative border-t border-accent-green-foreground/10 bg-accent-green text-accent-green-foreground">
+      <footer className="relative border-t border-accent-green-foreground/10 bg-accent-green text-accent-green-foreground max-sm:flex max-sm:min-h-[calc(100lvh+3rem)] max-sm:flex-col">
         <div className="container flex flex-col items-start gap-10 pt-12 text-start lg:flex-row lg:items-start lg:justify-between">
           <div className="flex w-full max-w-96 shrink flex-col items-start gap-6 lg:items-start">
             <div className="flex flex-col items-start gap-4 lg:items-start">

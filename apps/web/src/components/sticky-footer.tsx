@@ -20,6 +20,7 @@ const MARK_START = 320;
 // Scroll px per ms past which the ~490px sequence crosses in under 400ms and
 // the scrubbed build never reads. Set above a smooth-scrolled wheel notch.
 const FAST_SCROLL = 1.2;
+const NOTCH_STRIP = 64;
 
 // One frame in flight at a time — scroll fires far faster than paint, and both
 // listeners below only ever need the latest position.
@@ -89,18 +90,9 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
     }
     const root = document.documentElement;
     let showing = false;
-    // The strip behind Safari's toolbar is canvas, so it takes the ROOT's
-    // background — `body` alone never reaches it. But the canvas is one
-    // surface, so the same green also lands in the strip behind the notch;
-    // `background-attachment: fixed` would separate them and iOS treats it as
-    // `scroll`. Hence the wait until the footer owns the whole screen, where
-    // green at the notch is the footer itself rather than a wash over the
-    // section above. Measured from scroll rather than the footer's rect —
-    // pinned it is `fixed`, so its box spans the viewport the whole way down
-    // while the content still covers it.
     const ownsScreen = () =>
-      root.scrollHeight - root.clientHeight - window.scrollY <
-      Math.max(el.offsetHeight - root.clientHeight, 0) + 8;
+      root.scrollHeight - root.clientHeight - window.scrollY <=
+      Math.max(el.offsetHeight - root.clientHeight - NOTCH_STRIP, 0);
     const update = () => {
       const onFooter = ownsScreen();
       if (onFooter === showing) {
