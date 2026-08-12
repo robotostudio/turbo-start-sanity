@@ -63,7 +63,7 @@ export default async function RootLayout({
             ) : (
               <CachedNavbar perspective="published" stega={false} />
             )}
-            <div className="-mt-16 relative z-10 min-h-dvh bg-background pt-16">
+            <div className="relative z-10 min-h-dvh bg-background pt-16 lg:-mt-16">
               {children}
             </div>
           </div>

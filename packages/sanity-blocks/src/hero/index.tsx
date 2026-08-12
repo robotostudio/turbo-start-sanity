@@ -144,7 +144,7 @@ export function HeroBlock({
   return (
     <>
       <div
-        className="sticky top-0 z-0 h-[calc(100svh-var(--hero-copy))] overflow-hidden bg-background"
+        className="relative z-0 h-[calc(100svh-var(--hero-copy))] overflow-hidden bg-background lg:sticky lg:top-0"
         id="hero"
       >
         {banner}
