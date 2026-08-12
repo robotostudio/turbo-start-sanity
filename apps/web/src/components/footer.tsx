@@ -285,7 +285,7 @@ function Footer({ data, settingsData }: Readonly<FooterProps>) {
             </div>
           )}
         </div>
-        <div className="container relative z-10 pt-6 pb-6 lg:pt-8 lg:pb-8">
+        <div className="container relative z-10 pt-6 pb-6 lg:my-12 lg:pt-8 lg:pb-8">
           <div className="grid grid-cols-[1fr_auto] items-center gap-x-4 text-start lg:flex lg:flex-row lg:items-center lg:justify-between lg:gap-4">
             <p className="row-start-2 text-accent-green-foreground/80 text-sm tracking-[0.24px] lg:row-auto">
               {copyright ?? `© ${year} ${siteTitle}. All rights reserved.`}
