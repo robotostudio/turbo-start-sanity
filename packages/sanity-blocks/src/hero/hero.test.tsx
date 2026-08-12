@@ -35,3 +35,16 @@ test("HeroBlock renders without image when not provided", () => {
 
   expect(html).toMatch(/No image test/);
 });
+
+// The leading hero's page-builder wrapper is `display: contents`, which
+// measures 0x0 in the visual editing overlay. The attribute has to land on the
+// banner box or the block can't be selected or drag-sorted in Presentation.
+test("leading HeroBlock puts the visual editing attribute on the banner box", () => {
+  const html = renderToStaticMarkup(
+    <HeroBlock dataSanity="drag-me" isFirst title="Pinned" />
+  );
+
+  expect(html).toMatch(
+    /<div[^>]*class="sticky[^"]*"[^>]*data-sanity="drag-me"/
+  );
+});

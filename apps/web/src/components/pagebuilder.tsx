@@ -33,7 +33,11 @@ type SanityDataAttributeConfig = {
  * against its PagebuilderType so a GROQ or schema rename breaks the build
  * instead of silently passing through `any`.
  */
-function renderBlockComponent(block: PageBuilderBlock, isFirst: boolean) {
+function renderBlockComponent(
+  block: PageBuilderBlock,
+  isFirst: boolean,
+  dataSanity?: string
+) {
   switch (block?._type) {
     case "cta":
       return <CTABlock {...(block as PagebuilderType<"cta">)} />;
@@ -41,7 +45,11 @@ function renderBlockComponent(block: PageBuilderBlock, isFirst: boolean) {
       return <FaqAccordion {...(block as PagebuilderType<"faqAccordion">)} />;
     case "hero":
       return (
-        <HeroBlock {...(block as PagebuilderType<"hero">)} isFirst={isFirst} />
+        <HeroBlock
+          {...(block as PagebuilderType<"hero">)}
+          dataSanity={dataSanity}
+          isFirst={isFirst}
+        />
       );
     case "featureCardsIcon":
       return (
@@ -143,7 +151,19 @@ function useBlockRenderer(id: string, type: string) {
     });
 
   const renderBlock = (block: PageBuilderBlock, index: number) => {
-    const content = block && renderBlockComponent(block, index === 0);
+    // The leading hero's wrapper is `display: contents` so the banner pins
+    // against this grid, and a box-less element measures 0x0 in the visual
+    // editing overlay — unselectable, undraggable. Hand the attribute to the
+    // hero instead, which puts it on the banner box.
+    const isLeadingHero = index === 0 && block?._type === "hero";
+    const dataSanity = block && createBlockDataAttribute(block._key);
+    const content =
+      block &&
+      renderBlockComponent(
+        block,
+        index === 0,
+        isLeadingHero ? dataSanity : undefined
+      );
 
     if (!content) {
       return (
@@ -155,15 +175,13 @@ function useBlockRenderer(id: string, type: string) {
       );
     }
 
-    const isLeadingHero = index === 0 && block._type === "hero";
-
     return (
       <div
         className={cn(
           "min-w-0",
           isLeadingHero ? "contents" : "relative z-10 bg-background"
         )}
-        data-sanity={createBlockDataAttribute(block._key)}
+        data-sanity={isLeadingHero ? undefined : dataSanity}
         key={`${block._type}-${block._key}`}
       >
         {content}

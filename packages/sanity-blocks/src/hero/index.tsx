@@ -18,6 +18,13 @@ export type { HeroVideoData, HeroVideoVariant } from "./hero-video";
 export interface HeroBlockProps {
   badge?: string | null;
   buttons?: ButtonProps[] | null;
+  /**
+   * Visual editing attribute for the block. Only the leading hero needs it:
+   * its page-builder wrapper is `display: contents` so the banner can pin
+   * against the grid, and a box-less element measures 0x0 in the overlay.
+   * The banner carries it instead so the block stays selectable and drag-sortable.
+   */
+  dataSanity?: string;
   isFirst?: boolean;
   richText?: RichTextValue;
   title?: string | null;
@@ -96,6 +103,7 @@ export function HeroBlock({
   title,
   buttons,
   badge,
+  dataSanity,
   richText,
   isFirst,
   video,
@@ -145,6 +153,7 @@ export function HeroBlock({
     <>
       <div
         className="sticky top-0 z-0 h-[calc(100svh-var(--hero-copy))] overflow-hidden bg-background"
+        data-sanity={dataSanity}
         id="hero"
       >
         {banner}
