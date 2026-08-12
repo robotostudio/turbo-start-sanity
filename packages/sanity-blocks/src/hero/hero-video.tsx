@@ -128,7 +128,9 @@ export function HeroVideo({
       preload="auto"
       tabIndex={-1}
     >
-      {sources.webm && <source src={sources.webm} type="video/webm" />}
+      {sources.webm && (
+        <source src={sources.webm} type='video/webm; codecs="av01.0.05M.08"' />
+      )}
       {/*
         The codec string is required, not decoration: as plain `video/mp4`
         every browser would accept this and then fail to decode it, since
