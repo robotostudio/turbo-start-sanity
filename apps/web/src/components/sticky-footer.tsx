@@ -41,7 +41,11 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
       if (height === 0) {
         return;
       }
-      const fits = height <= root.clientHeight + (pinnedRef.current ? 24 : -24);
+      // Overflowing the viewport unpins immediately — pinned, the footer is
+      // `fixed bottom-0`, so anything past the viewport is clipped off the top
+      // and unreachable. The 24px only guards the way back in, so a footer
+      // hovering on the boundary can't flip on every resize tick.
+      const fits = height <= root.clientHeight - (pinnedRef.current ? 0 : 24);
       pinnedRef.current = fits;
       if (fits) {
         root.style.setProperty("--footer-height", `${height}px`);

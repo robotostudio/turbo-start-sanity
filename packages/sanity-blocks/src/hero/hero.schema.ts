@@ -19,7 +19,7 @@ const videoVariantFields = () => [
     type: "file",
     title: "Video For Computers",
     description:
-      "The .webm file, encoded as AV1. Most people see this one. Safari is told the codec so it can skip straight to the .mp4 rather than pick a file it cannot play — so a VP9 .webm here will not play anywhere.",
+      "The .webm file, encoded as AV1. Most people see this one. The AV1 codec is declared to the browser so Safari skips it and takes the .mp4 instead — upload a VP9 .webm here and this hero may fall back to the .mp4 or just the poster image.",
     options: { accept: "video/webm" },
   }),
   defineField({
