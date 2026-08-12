@@ -183,7 +183,7 @@ function FooterMark() {
   return (
     <div
       aria-hidden="true"
-      className="aspect-[1440/320] w-full overflow-hidden text-accent-green-foreground"
+      className="aspect-[1440/516] w-full overflow-hidden text-accent-green-foreground sm:aspect-[1440/320]"
     >
       <svg
         aria-hidden="true"
@@ -246,11 +246,13 @@ function Footer({ data, settingsData }: Readonly<FooterProps>) {
                 </p>
               )}
             </div>
-            <SystemsOperationalPill />
-            {socialLinks && <SocialLinks data={socialLinks} />}
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-4 sm:contents">
+              <SystemsOperationalPill />
+              {socialLinks && <SocialLinks data={socialLinks} />}
+            </div>
           </div>
           {Array.isArray(columns) && columns?.length > 0 && (
-            <div className="grid w-full grid-cols-2 gap-8 sm:grid-cols-4 sm:gap-14 lg:w-auto">
+            <div className="grid w-full grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4 sm:gap-14 lg:w-auto">
               {columns.map((column, index) => (
                 <div key={`column-${column?._key}-${index}`}>
                   <h3 className="mb-2 font-light font-mono text-accent-green-foreground/60 text-sm uppercase tracking-[0.28px]">
@@ -283,14 +285,14 @@ function Footer({ data, settingsData }: Readonly<FooterProps>) {
             </div>
           )}
         </div>
-        <div className="container relative z-10 my-12 pt-8 pb-8">
-          <div className="flex flex-col items-start justify-between gap-6 text-start lg:flex-row lg:items-center lg:gap-4">
-            <p className="text-accent-green-foreground/80 text-sm tracking-[0.24px]">
+        <div className="container relative z-10 pt-6 pb-6 lg:pt-8 lg:pb-8">
+          <div className="grid grid-cols-[1fr_auto] items-center gap-x-4 text-start lg:flex lg:flex-row lg:items-center lg:justify-between lg:gap-4">
+            <p className="row-start-2 text-accent-green-foreground/80 text-sm tracking-[0.24px] lg:row-auto">
               {copyright ?? `© ${year} ${siteTitle}. All rights reserved.`}
             </p>
-            <div className="flex flex-col items-start gap-4 lg:flex-row lg:items-center">
+            <div className="contents lg:flex lg:flex-row lg:items-center lg:gap-4">
               {credits && credits.length > 0 && (
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-accent-green-foreground/70 text-sm tracking-[0.24px] lg:flex-nowrap">
+                <div className="col-span-2 row-start-1 flex flex-wrap items-center gap-x-4 gap-y-2 pb-10 text-accent-green-foreground/70 text-sm tracking-[0.24px] lg:col-auto lg:row-auto lg:flex-nowrap lg:pb-0">
                   {credits.map((item, index) => {
                     const logoHeight = normalizedLogoHeight(item.logo, {
                       base: 34,
@@ -320,7 +322,7 @@ function Footer({ data, settingsData }: Readonly<FooterProps>) {
                         {index > 0 && (
                           <span
                             aria-hidden="true"
-                            className="hidden h-4 w-px shrink-0 bg-accent-green-foreground/30 lg:block"
+                            className="hidden h-4 w-px shrink-0 bg-accent-green-foreground/30 sm:block"
                           />
                         )}
                         {item.url ? (
@@ -340,7 +342,9 @@ function Footer({ data, settingsData }: Readonly<FooterProps>) {
                   })}
                 </div>
               )}
-              <FooterThemeToggle />
+              <div className="col-start-2 row-start-2 justify-self-end lg:col-auto lg:row-auto">
+                <FooterThemeToggle />
+              </div>
             </div>
           </div>
         </div>
