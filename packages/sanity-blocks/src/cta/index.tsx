@@ -52,7 +52,7 @@ export function CTABlock({
   const hasLogos = logos.length > 0;
 
   return (
-    <section className="py-20 sm:py-28 lg:py-34" id="cta">
+    <section className="block-section" id="cta">
       <div className="container">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
           <div className="flex max-w-[690px] flex-col items-start gap-6 lg:min-w-0">
@@ -85,7 +85,7 @@ export function CTABlock({
             </div>
           )}
         </div>
-        <div className="mt-20 pb-10 sm:mt-28 sm:pb-14 lg:mt-34 lg:pb-18">
+        <div className="my-20 pb-20 sm:my-28 sm:pb-28 lg:my-34 lg:pb-34">
           <SanityButtons
             buttonClassName="h-auto px-8 py-4 font-normal text-xl sm:text-2xl lg:px-24 lg:py-6 lg:text-5xl lg:leading-[60px]"
             buttons={buttons}

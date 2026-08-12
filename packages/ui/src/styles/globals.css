@@ -230,7 +230,7 @@
 
 /* Top padding scale for top-anchored page-builder sections, in one place. */
 @utility block-section {
-  @apply bg-background pt-20 pb-0 sm:pt-28 lg:pt-[136px];
+  @apply bg-background py-10 sm:py-14 lg:py-[68px];
 }
 
 /* Preflight resets buttons to cursor:default — restore the pointer. */

@@ -384,7 +384,7 @@ export function ShowcaseGrid({
 
   if (featuredItems.length === 0) {
     return (
-      <section className="bg-background pt-16 pb-24" id="showcase">
+      <section className="block-section" id="showcase">
         {title ? null : <h2 className="sr-only">{label}</h2>}
         <div className="container">
           <ShowcaseHeader description={description} title={title} />
@@ -394,7 +394,7 @@ export function ShowcaseGrid({
   }
 
   return (
-    <section className="bg-background pt-16 pb-24" id="showcase">
+    <section className="block-section" id="showcase">
       {title ? null : <h2 className="sr-only">{label}</h2>}
       <div className="flex flex-col gap-16">
         <div className="container">

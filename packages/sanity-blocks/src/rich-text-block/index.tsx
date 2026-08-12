@@ -14,7 +14,7 @@ export function RichTextBlock({
   eyebrow,
 }: Readonly<RichTextBlockProps>) {
   return (
-    <section className="my-6 md:my-16">
+    <section className="block-section">
       <div className="container">
         <div className="flex flex-col items-start gap-6">
           <BlockEyebrow eyebrow={eyebrow} />
