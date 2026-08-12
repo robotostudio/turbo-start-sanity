@@ -22,7 +22,9 @@ export interface HeroBlockProps {
    * Visual editing attribute for the block. Only the leading hero needs it:
    * its page-builder wrapper is `display: contents` so the banner can pin
    * against the grid, and a box-less element measures 0x0 in the overlay.
-   * The banner carries it instead so the block stays selectable and drag-sortable.
+   * Both boxes below carry it instead — the overlay only treats an element as
+   * drag-sortable when it resolves to an array-member path, so a half without
+   * it would resolve to the page-builder array itself and refuse to drag.
    */
   dataSanity?: string;
   isFirst?: boolean;
@@ -158,7 +160,10 @@ export function HeroBlock({
       >
         {banner}
       </div>
-      <div className="relative z-10 bg-background pt-6 pb-8 md:pt-8 md:pb-12">
+      <div
+        className="relative z-10 bg-background pt-6 pb-8 md:pt-8 md:pb-12"
+        data-sanity={dataSanity}
+      >
         {copy}
       </div>
     </>
