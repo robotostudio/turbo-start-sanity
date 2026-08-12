@@ -119,7 +119,12 @@ function useOptimisticPageBuilder(
   return useOptimistic<PageBuilderBlock[], any>(
     initialBlocks,
     (currentBlocks, action) => {
-      if (action.id !== documentId || !action.document?.pageBuilder) {
+      // `action` is untyped and comes off the mutation stream, so a truthy
+      // non-array `pageBuilder` would throw out of `for...of` mid-render.
+      if (
+        action.id !== documentId ||
+        !Array.isArray(action.document?.pageBuilder)
+      ) {
         return currentBlocks;
       }
 
