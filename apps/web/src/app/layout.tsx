@@ -51,7 +51,16 @@ export default async function RootLayout({
       >
         <Providers>
           <ScrollToTop />
-          <div id="page-shell" style={{ marginBottom: "var(--footer-height)" }}>
+          {/* Scroll room above the page for the hero fold (see hero-fold.tsx);
+              empty and zero-height on pages without a leading hero. */}
+          <div id="fold-slot" />
+          {/* `relative`, so the absolutely-positioned navbar anchors to the
+              shell rather than the document origin above the fold slot. */}
+          <div
+            className="relative"
+            id="page-shell"
+            style={{ marginBottom: "var(--footer-height)" }}
+          >
             {showDrafts ? (
               <Suspense
                 fallback={<Navbar navbarData={null} settingsData={null} />}

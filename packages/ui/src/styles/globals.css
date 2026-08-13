@@ -295,6 +295,28 @@
   animation-range: calc(100% - 180px) calc(100% - 20px);
 }
 
+/* The header's screen-of-background above it exists for the document end,
+   where the header rests mid-viewport and slides out (see nav-exit). Near the
+   top it would instead black out the overscroll glow the native rubber-band
+   reveals — so it fades in only after the first viewport of scroll. */
+@keyframes nav-cover {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lg\:nav-exit::before {
+  animation-name: nav-cover;
+  animation-duration: 1ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root block);
+  animation-range: var(--fold-height, 0px) 100vh;
+}
+
 /* Without a timeline the 1ms animation finishes on the first frame and parks
    the header at -100% forever. Spelled out per variant rather than nested in
    the `@utility`: the variants generate their own classes, which a bare
@@ -303,7 +325,8 @@
    utility it's overriding. */
 @supports not (animation-timeline: scroll()) {
   .nav-exit,
-  .lg\:nav-exit {
+  .lg\:nav-exit,
+  .lg\:nav-exit::before {
     animation-name: none;
   }
 }
@@ -340,7 +363,11 @@
   animation-duration: auto;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: 0 1px;
+  /* Hidden for the whole of the hero fold's scroll room, not just the first
+     pixel: rest sits one fold down (see hero-fold.tsx), so every position
+     from the document top up to rest is "at the top" and must not uncover
+     the footer — the strip above the navbar included. */
+  animation-range: var(--fold-height, 0px) calc(var(--fold-height, 0px) + 1px);
 }
 
 /* Document scroll, not `view()`: the footer is fixed and never enters the
