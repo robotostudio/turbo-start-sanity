@@ -295,6 +295,29 @@
   animation-range: calc(100% - 180px) calc(100% - 20px);
 }
 
+/* Blurs the leading hero's banner as the page scrolls over it. The banner
+   sits pinned under the content, so scroll progress maps directly to how
+   covered it is — sharp at rest, softest once the copy has scrolled past.
+   Kept shallow: depth without smearing the video. */
+@keyframes hero-blur {
+  to {
+    filter: blur(4px);
+  }
+}
+
+@utility hero-blur {
+  animation-name: hero-blur;
+  /* Ignored on a scroll timeline, which drives progress from the range below. */
+  animation-duration: 1ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root block);
+  /* Offset by the fold's strip, whose scroll room sits above the rest
+     position — the banner must be sharp at rest, not a fold into the ramp. */
+  animation-range: var(--fold-height, 0px)
+    calc(var(--fold-height, 0px) + 100svh - var(--hero-copy, 420px));
+}
+
 /* The header's screen-of-background above it exists for the document end,
    where the header rests mid-viewport and slides out (see nav-exit). Near the
    top it would instead black out the overscroll glow the native rubber-band
@@ -318,15 +341,16 @@
 }
 
 /* Without a timeline the 1ms animation finishes on the first frame and parks
-   the header at -100% forever. Spelled out per variant rather than nested in
-   the `@utility`: the variants generate their own classes, which a bare
-   `.nav-exit` rule doesn't match, and nesting inside `@utility` is opaque to
-   CSS tooling that doesn't know the at-rule. Unlayered, so it outranks the
-   utility it's overriding. */
+   the header at -100% forever (and the hero banner at full blur). Spelled out
+   per variant rather than nested in the `@utility`: the variants generate
+   their own classes, which a bare `.nav-exit` rule doesn't match, and nesting
+   inside `@utility` is opaque to CSS tooling that doesn't know the at-rule.
+   Unlayered, so it outranks the utility it's overriding. */
 @supports not (animation-timeline: scroll()) {
   .nav-exit,
   .lg\:nav-exit,
-  .lg\:nav-exit::before {
+  .lg\:nav-exit::before,
+  .hero-blur {
     animation-name: none;
   }
 }

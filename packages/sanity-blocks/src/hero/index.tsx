@@ -149,7 +149,7 @@ export function HeroBlock({
         className="relative z-0 h-[calc(100svh-var(--hero-copy))] overflow-hidden bg-background lg:sticky lg:top-0"
         id="hero"
       >
-        {banner}
+        <div className="hero-blur absolute inset-0">{banner}</div>
       </div>
       <div className="relative z-10 bg-background pt-6 pb-8 md:pt-8 md:pb-12">
         {copy}
