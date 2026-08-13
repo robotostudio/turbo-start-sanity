@@ -33,7 +33,11 @@ type SanityDataAttributeConfig = {
  * against its PagebuilderType so a GROQ or schema rename breaks the build
  * instead of silently passing through `any`.
  */
-function renderBlockComponent(block: PageBuilderBlock, isFirst: boolean) {
+function renderBlockComponent(
+  block: PageBuilderBlock,
+  isFirst: boolean,
+  dataSanity?: string
+) {
   switch (block?._type) {
     case "cta":
       return <CTABlock {...(block as PagebuilderType<"cta">)} />;
@@ -41,7 +45,11 @@ function renderBlockComponent(block: PageBuilderBlock, isFirst: boolean) {
       return <FaqAccordion {...(block as PagebuilderType<"faqAccordion">)} />;
     case "hero":
       return (
-        <HeroBlock {...(block as PagebuilderType<"hero">)} isFirst={isFirst} />
+        <HeroBlock
+          {...(block as PagebuilderType<"hero">)}
+          dataSanity={dataSanity}
+          isFirst={isFirst}
+        />
       );
     case "featureCardsIcon":
       return (
@@ -111,10 +119,30 @@ function useOptimisticPageBuilder(
   return useOptimistic<PageBuilderBlock[], any>(
     initialBlocks,
     (currentBlocks, action) => {
-      if (action.id === documentId && action.document?.pageBuilder) {
-        return action.document.pageBuilder;
+      // `action` is untyped and comes off the mutation stream, so a truthy
+      // non-array `pageBuilder` would throw out of `for...of` mid-render.
+      if (
+        action.id !== documentId ||
+        !Array.isArray(action.document?.pageBuilder)
+      ) {
+        return currentBlocks;
       }
-      return currentBlocks;
+
+      // The action carries the raw document, not the GROQ projection the page
+      // rendered from, so only its `_key` order is usable — take that and keep
+      // the resolved blocks. Keys with no resolved block (a just-inserted one)
+      // are dropped until revalidation projects them.
+      const resolved = new Map(
+        currentBlocks.map((block) => [block._key, block])
+      );
+      const reordered: PageBuilderBlock[] = [];
+      for (const raw of action.document.pageBuilder) {
+        const block = raw?._key ? resolved.get(raw._key) : undefined;
+        if (block) {
+          reordered.push(block);
+        }
+      }
+      return reordered;
     }
   );
 }
@@ -128,7 +156,19 @@ function useBlockRenderer(id: string, type: string) {
     });
 
   const renderBlock = (block: PageBuilderBlock, index: number) => {
-    const content = block && renderBlockComponent(block, index === 0);
+    // The leading hero's wrapper is `display: contents` so the banner pins
+    // against this grid, and a box-less element measures 0x0 in the visual
+    // editing overlay — unselectable, undraggable. Hand the attribute to the
+    // hero instead, which puts it on the banner box.
+    const isLeadingHero = index === 0 && block?._type === "hero";
+    const dataSanity = block && createBlockDataAttribute(block._key);
+    const content =
+      block &&
+      renderBlockComponent(
+        block,
+        index === 0,
+        isLeadingHero ? dataSanity : undefined
+      );
 
     if (!content) {
       return (
@@ -140,15 +180,13 @@ function useBlockRenderer(id: string, type: string) {
       );
     }
 
-    const isLeadingHero = index === 0 && block._type === "hero";
-
     return (
       <div
         className={cn(
           "min-w-0",
           isLeadingHero ? "contents" : "relative z-10 bg-background"
         )}
-        data-sanity={createBlockDataAttribute(block._key)}
+        data-sanity={isLeadingHero ? undefined : dataSanity}
         key={`${block._type}-${block._key}`}
       >
         {content}
