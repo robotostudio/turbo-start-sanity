@@ -43,12 +43,8 @@ const NAV_BUTTON_CLASS = cn(
 
 const BLUR_LAYERS = [
   {
-    radius: 32,
-    mask: "linear-gradient(to bottom, black 0%, black 20%, transparent 32%)",
-  },
-  {
     radius: 16,
-    mask: "linear-gradient(to bottom, transparent 8%, black 20%, black 32%, transparent 46%)",
+    mask: "linear-gradient(to bottom, black 0%, black 32%, transparent 46%)",
   },
   {
     radius: 8,
@@ -81,6 +77,14 @@ function ProgressiveBlur() {
         className="absolute inset-0 [-webkit-backdrop-filter:saturate(1.5)] [backdrop-filter:saturate(1.5)]"
         style={{ WebkitMaskImage: SATURATE_MASK, maskImage: SATURATE_MASK }}
       />
+      <div className="nav-tint absolute inset-0 bg-gradient-to-b from-background/30 via-30% via-background/25 to-transparent dark:from-background/70 dark:via-background/45" />
+      <div
+        className="absolute inset-x-0 top-0 h-[calc(env(safe-area-inset-top,0px)*2.5)]"
+        style={{
+          background:
+            "linear-gradient(to bottom, transparent env(safe-area-inset-top, 0px), color-mix(in srgb, var(--color-background) 38%, transparent) env(safe-area-inset-top, 0px), transparent 100%)",
+        }}
+      />
       {BLUR_LAYERS.map(({ radius, mask }) => (
         <div
           className="absolute inset-0"
@@ -93,7 +97,6 @@ function ProgressiveBlur() {
           }}
         />
       ))}
-      <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-30% via-background/25 to-transparent dark:from-background/70 dark:via-background/45" />
     </div>
   );
 }
@@ -215,7 +218,7 @@ export function Navbar({
 
   return (
     <header
-      className="absolute inset-x-0 top-0 z-40 w-full lg:nav-exit lg:sticky lg:before:absolute lg:before:inset-x-0 lg:before:bottom-full lg:before:h-screen lg:before:bg-background lg:before:content-['']"
+      className="absolute inset-x-0 top-0 z-40 w-full pt-[env(safe-area-inset-top)] lg:nav-exit lg:sticky lg:before:absolute lg:before:inset-x-0 lg:before:bottom-full lg:before:h-screen lg:before:bg-background lg:before:content-['']"
       ref={headerRef}
     >
       <ProgressiveBlur />
