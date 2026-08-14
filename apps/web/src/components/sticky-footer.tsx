@@ -22,8 +22,6 @@ const MARK_START = 320;
 const FAST_SCROLL = 1.2;
 const NOTCH_STRIP = 64;
 
-// One frame in flight at a time — scroll fires far faster than paint, and both
-// listeners below only ever need the latest position.
 function rafThrottle(run: () => void) {
   let frame = 0;
   return {
@@ -59,10 +57,6 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
       if (height === 0) {
         return;
       }
-      // Overflowing the viewport unpins immediately — pinned, the footer is
-      // `fixed bottom-0`, so anything past the viewport is clipped off the top
-      // and unreachable. The 24px only guards the way back in, so a footer
-      // hovering on the boundary can't flip on every resize tick.
       const fits = height <= root.clientHeight - (pinnedRef.current ? 0 : 24);
       pinnedRef.current = fits;
       if (fits) {
@@ -115,8 +109,6 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
       cancel();
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
-      // Only what this effect painted — clearing a shared property it doesn't
-      // currently own would wipe whoever set it last.
       if (showing) {
         document.body.style.background = "";
         root.style.background = "";

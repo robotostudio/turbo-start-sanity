@@ -41,19 +41,11 @@ function ScrollToTopInner() {
       isPopNavigation.current = false;
       return;
     }
-    // Forward navigation: skip in-page hash jumps, otherwise reset to top —
-    // which sits one fold below the true top when the hero fold's scroll
-    // room is mounted (see hero-fold.tsx).
+    // Forward navigation: skip in-page hash jumps, otherwise reset to top.
     if (window.location.hash) {
       return;
     }
-    const fold =
-      Number.parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue(
-          "--fold-height"
-        )
-      ) || 0;
-    window.scrollTo(0, fold);
+    window.scrollTo(0, 0);
   }, [routeKey]);
 
   return null;
