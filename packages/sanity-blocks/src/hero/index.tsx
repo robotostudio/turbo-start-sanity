@@ -184,11 +184,11 @@ export function HeroBlock({
     <>
       <HeroFold video={video} />
       <div
-        className="hero-rest relative z-0 h-[calc(100svh-var(--hero-copy))] overflow-hidden bg-background lg:sticky lg:top-0"
+        className="relative z-0 h-[calc(100svh-var(--hero-copy))] overflow-hidden bg-background lg:sticky lg:top-0"
         data-sanity={dataSanity}
         id="hero"
       >
-        <div className="hero-blur absolute inset-0">{banner}</div>
+        {banner}
       </div>
       <div
         className="relative z-10 bg-background pt-6 pb-8 md:pt-8 md:pb-12"

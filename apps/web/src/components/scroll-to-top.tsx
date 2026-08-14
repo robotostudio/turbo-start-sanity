@@ -3,6 +3,15 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef } from "react";
 
+// Rest position: one hero fold below the document top (0 without a fold).
+function restTop() {
+  return (
+    Number.parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--hero-fold")
+    ) || 0
+  );
+}
+
 // Some link components (e.g. base-ui NavigationMenuLink) bypass the App
 // Router's scroll-to-top. Reset scroll on forward navigation, but let the
 // browser restore position on back/forward (popstate).
@@ -29,11 +38,29 @@ function ScrollToTopInner() {
     return () => window.removeEventListener("popstate", markPop);
   }, []);
 
+  // Spring back to rest once a scroll settles inside the fold's strip — the
+  // scroll-snap it replaces yanked normal downward scrolling back too.
+  useEffect(() => {
+    const settle = () => {
+      const fold = restTop();
+      if (fold > 0 && window.scrollY < fold) {
+        window.scrollTo({ top: fold, behavior: "smooth" });
+      }
+    };
+    window.addEventListener("scrollend", settle);
+    return () => window.removeEventListener("scrollend", settle);
+  }, []);
+
   useEffect(() => {
     lastRouteKey.current = routeKey;
 
     if (!hasMounted.current) {
       hasMounted.current = true;
+      // Initial load starts at 0, above the rest position; a refresh restores
+      // a non-zero scroll and is left alone.
+      if (!window.location.hash && window.scrollY === 0) {
+        window.scrollTo(0, restTop());
+      }
       return;
     }
     // Back/forward: let the browser restore the saved scroll position.
@@ -41,11 +68,11 @@ function ScrollToTopInner() {
       isPopNavigation.current = false;
       return;
     }
-    // Forward navigation: skip in-page hash jumps, otherwise reset to top.
+    // Forward navigation: skip in-page hash jumps, otherwise reset to rest.
     if (window.location.hash) {
       return;
     }
-    window.scrollTo(0, 0);
+    window.scrollTo(0, restTop());
   }, [routeKey]);
 
   return null;

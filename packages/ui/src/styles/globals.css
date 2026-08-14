@@ -206,16 +206,8 @@
   --hero-fold: 160px;
 }
 
-html:has(#hero-fold) {
-  scroll-snap-type: y proximity;
-}
-
 #fold-slot {
   height: var(--hero-fold, 0px);
-}
-
-.hero-rest {
-  scroll-snap-align: start;
 }
 
 /* Overrides Tailwind's `container`. Inset defaults to 8px via a fallback var,
@@ -311,22 +303,6 @@ html:has(#hero-fold) {
   animation-range: calc(100% - 180px) calc(100% - 20px);
 }
 
-@keyframes hero-blur {
-  to {
-    filter: blur(4px);
-  }
-}
-
-@utility hero-blur {
-  animation-name: hero-blur;
-  animation-duration: 1ms;
-  animation-timing-function: linear;
-  animation-fill-mode: both;
-  animation-timeline: scroll(root block);
-  animation-range: var(--hero-fold, 0px)
-    calc(var(--hero-fold, 0px) + 100svh - var(--hero-copy, 420px));
-}
-
 @keyframes nav-cover {
   from {
     opacity: 0;
@@ -348,8 +324,7 @@ html:has(#hero-fold) {
 @supports not (animation-timeline: scroll()) {
   .nav-exit,
   .lg\:nav-exit,
-  .lg\:nav-exit::before,
-  .hero-blur {
+  .lg\:nav-exit::before {
     animation-name: none;
   }
 }
