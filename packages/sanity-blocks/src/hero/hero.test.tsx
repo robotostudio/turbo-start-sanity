@@ -46,7 +46,7 @@ test("leading HeroBlock puts the visual editing attribute on both boxes", () => 
   );
 
   expect(html.match(/data-sanity="drag-me"/g)).toHaveLength(2);
-  expect(html).toMatch(
-    /<div[^>]*class="sticky[^"]*"[^>]*data-sanity="drag-me"/
-  );
+  // Anchored on the banner box's id, not its classes — it pins only from `lg`
+  // up, so matching a bare `sticky` misses it.
+  expect(html).toMatch(/<div[^>]*data-sanity="drag-me"[^>]*id="hero"/);
 });
