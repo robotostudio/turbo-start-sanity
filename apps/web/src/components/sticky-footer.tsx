@@ -115,8 +115,12 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
       cancel();
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
-      document.body.style.background = "";
-      root.style.background = "";
+      // Only what this effect painted — clearing a shared property it doesn't
+      // currently own would wipe whoever set it last.
+      if (showing) {
+        document.body.style.background = "";
+        root.style.background = "";
+      }
     };
   }, []);
 
