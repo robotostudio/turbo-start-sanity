@@ -85,7 +85,7 @@ export function CTABlock({
             </div>
           )}
         </div>
-        <div className="my-20 pb-20 sm:my-28 sm:pb-28 lg:my-34 lg:pb-34">
+        <div className="my-20 sm:my-28 lg:my-34">
           <SanityButtons
             buttonClassName="h-auto px-8 py-4 font-normal text-xl sm:text-2xl lg:px-24 lg:py-6 lg:text-5xl lg:leading-[60px]"
             buttons={buttons}
