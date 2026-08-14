@@ -73,7 +73,7 @@ function HeroFold({ video }: Readonly<{ video?: HeroVideoData | null }>) {
 
   const split = dark !== null && dark !== light;
   const mirror =
-    "absolute inset-x-0 bottom-16 h-[calc(100svh-var(--hero-copy))] w-full scale-y-[-1] rounded-none! object-cover object-[50%_45%] blur-[16px]";
+    "absolute inset-x-0 bottom-0 h-[calc(100svh-var(--hero-copy))] w-full scale-y-[-1] rounded-none! object-cover object-[50%_45%] blur-[16px]";
 
   return (
     <div
