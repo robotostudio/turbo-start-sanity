@@ -336,15 +336,6 @@ html:has(#hero-fold) {
   }
 }
 
-.nav-tint {
-  animation-name: nav-cover;
-  animation-duration: 1ms;
-  animation-timing-function: linear;
-  animation-fill-mode: both;
-  animation-timeline: scroll(root block);
-  animation-range: var(--hero-fold, 0px) 100vh;
-}
-
 .lg\:nav-exit::before {
   animation-name: nav-cover;
   animation-duration: 1ms;
@@ -358,8 +349,7 @@ html:has(#hero-fold) {
   .nav-exit,
   .lg\:nav-exit,
   .lg\:nav-exit::before,
-  .hero-blur,
-  .nav-tint {
+  .hero-blur {
     animation-name: none;
   }
 }

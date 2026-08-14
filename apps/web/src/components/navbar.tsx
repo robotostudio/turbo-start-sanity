@@ -77,7 +77,6 @@ function ProgressiveBlur() {
         className="absolute inset-0 [-webkit-backdrop-filter:saturate(1.5)] [backdrop-filter:saturate(1.5)]"
         style={{ WebkitMaskImage: SATURATE_MASK, maskImage: SATURATE_MASK }}
       />
-      <div className="nav-tint absolute inset-0 bg-gradient-to-b from-background/30 via-30% via-background/25 to-transparent dark:from-background/70 dark:via-background/45" />
       <div
         className="absolute inset-x-0 top-0 h-[calc(env(safe-area-inset-top,0px)*2.5)]"
         style={{
@@ -97,6 +96,7 @@ function ProgressiveBlur() {
           }}
         />
       ))}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-30% via-background/25 to-transparent dark:from-background/70 dark:via-background/45" />
     </div>
   );
 }
