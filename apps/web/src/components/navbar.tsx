@@ -42,12 +42,12 @@ const NAV_BUTTON_CLASS = cn(
 );
 
 // Anchored in px from the wrapper's bottom (`to top`), so the bar keeps this
-// exact progression at rest no matter how tall the fold strip above is — the
-// 16px layer alone runs on up to cover the whole strip.
+// progression at rest however tall the fold strip above is. Only the top
+// layer reaches into the strip, fading linearly across it.
 const BLUR_LAYERS = [
   {
-    radius: 16,
-    mask: "linear-gradient(to top, transparent 45px, black 56px)",
+    radius: 24,
+    mask: "linear-gradient(to top, transparent 45px, black 56px, black 83px, transparent calc(83px + var(--hero-fold, 0px)))",
   },
   {
     radius: 8,
