@@ -68,43 +68,129 @@ function ScrollToTopInner() {
 
   // Spring back to rest once a scroll settles inside the fold's strip — the
   // scroll-snap it replaces yanked normal downward scrolling back too.
+  // Driven per frame rather than by `scrollTo({behavior: "smooth"})`: a flick's
+  // momentum cancels the browser's smooth scroll without firing another
+  // `scrollend`, which left the page stranded mid-strip.
   useEffect(() => {
+    let frame = 0;
+    let idle = 0;
+    let painted = -1;
+    // A held finger owns the position; springing under it fights the drag.
+    let touching = false;
+
+    const stop = () => {
+      cancelAnimationFrame(frame);
+      frame = 0;
+      painted = -1;
+    };
+
+    const springTo = (target: number) => {
+      const from = window.scrollY;
+      const distance = target - from;
+      if (Math.abs(distance) < 1) {
+        return;
+      }
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        window.scrollTo(0, target);
+        return;
+      }
+      const started = performance.now();
+      const step = (now: number) => {
+        const progress = Math.min(1, (now - started) / 320);
+        // Eased out, never past the target: an overshooting curve reads as a
+        // bounce against the fold's edge.
+        painted = Math.round(from + distance * (1 - (1 - progress) ** 3));
+        window.scrollTo(0, painted);
+        frame = progress < 1 ? requestAnimationFrame(step) : 0;
+      };
+      frame = requestAnimationFrame(step);
+    };
+
     const settle = () => {
       const fold = restTop();
-      if (Date.now() < restoringUntil.current) {
+      if (frame || touching || Date.now() < restoringUntil.current) {
         return;
       }
       if (fold > 0 && window.scrollY < fold) {
-        scrollToRest(fold, true);
+        springTo(fold);
       }
     };
-    window.addEventListener("scrollend", settle);
-    return () => window.removeEventListener("scrollend", settle);
+
+    // Every path that cancels the spring re-arms it. A gesture's tail (wheel
+    // events still arriving while the page sits pinned at the strip, so no
+    // `scroll` follows) otherwise cancelled with nothing left to restart it,
+    // stranding the page mid-strip.
+    const arm = () => {
+      window.clearTimeout(idle);
+      idle = window.setTimeout(settle, 120);
+    };
+
+    const takeOver = () => {
+      stop();
+      arm();
+    };
+
+    const onScroll = () => {
+      // A scroll that isn't the frame this effect just painted is the reader's.
+      if (frame && Math.abs(window.scrollY - painted) > 2) {
+        stop();
+      }
+      arm();
+    };
+
+    const onTouchStart = () => {
+      touching = true;
+      stop();
+    };
+
+    const onTouchEnd = () => {
+      touching = false;
+      arm();
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("wheel", takeOver, { passive: true });
+    window.addEventListener("keydown", takeOver);
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    return () => {
+      stop();
+      window.clearTimeout(idle);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("wheel", takeOver);
+      window.removeEventListener("keydown", takeOver);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
+    };
   }, []);
 
   // Park below the fold on first load, pre-paint so the strip never shows and
-  // jumps. Retried because the fold arrives with the hero, which streams in
-  // behind draft mode's Suspense boundary, and because scroll restoration can
-  // land inside the strip after this runs.
+  // jumps. Retried only until the fold has a height — it arrives with the
+  // hero, which streams in behind draft mode's Suspense boundary — then stops
+  // for good, leaving the strip to the spring above. Kept running, its instant
+  // jumps every 100ms fought that animation.
   useIsomorphicLayoutEffect(() => {
     if (window.location.hash) {
       return;
     }
     const park = () => {
       const fold = restTop();
-      if (fold > 0 && window.scrollY < fold) {
+      if (fold === 0) {
+        return false;
+      }
+      if (window.scrollY < fold) {
         scrollToRest(fold, false);
       }
-      return fold;
+      return true;
     };
-    park();
+    if (park()) {
+      return;
+    }
     const deadline = Date.now() + 3000;
     const timer = window.setInterval(() => {
-      if (
-        window.scrollY > park() ||
-        Date.now() > deadline ||
-        Date.now() < restoringUntil.current
-      ) {
+      if (park() || Date.now() > deadline) {
         window.clearInterval(timer);
       }
     }, 100);
