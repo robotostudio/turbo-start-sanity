@@ -48,13 +48,21 @@ function ScrollToTopInner() {
     const markRestore = () => {
       restoringUntil.current = Date.now() + 1000;
     };
+    // Only a bfcache `pageshow` restores a position; the one every fresh load
+    // fires would silence the park retry for a second — when the streamed-in
+    // hero, and the fold it carries, is still arriving.
+    const markBfCache = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        markRestore();
+      }
+    };
     window.addEventListener("popstate", markPop);
     window.addEventListener("popstate", markRestore);
-    window.addEventListener("pageshow", markRestore);
+    window.addEventListener("pageshow", markBfCache);
     return () => {
       window.removeEventListener("popstate", markPop);
       window.removeEventListener("popstate", markRestore);
-      window.removeEventListener("pageshow", markRestore);
+      window.removeEventListener("pageshow", markBfCache);
     };
   }, []);
 
