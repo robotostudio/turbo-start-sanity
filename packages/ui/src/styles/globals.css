@@ -202,10 +202,12 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Height of the fixed strip the page slides off during the browser's elastic
-   overscroll. Not scroll room: nothing scrolls to it, and no script returns. */
 :root:has(#hero-fold) {
   --hero-fold: 160px;
+}
+
+#fold-slot {
+  height: var(--hero-fold, 0px);
 }
 
 /* Overrides Tailwind's `container`. Inset defaults to 8px via a fallback var,
@@ -317,7 +319,8 @@
   animation-timing-function: linear;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: 0 calc(100svh - var(--hero-copy, 420px));
+  animation-range: var(--hero-fold, 0px)
+    calc(var(--hero-fold, 0px) + 100svh - var(--hero-copy, 420px));
 }
 
 @keyframes nav-cover {
@@ -335,7 +338,7 @@
   animation-timing-function: linear;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: 0 100vh;
+  animation-range: var(--hero-fold, 0px) 100vh;
 }
 
 @supports not (animation-timeline: scroll()) {
@@ -379,7 +382,7 @@
   animation-duration: auto;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: 0 1px;
+  animation-range: var(--hero-fold, 0px) calc(var(--hero-fold, 0px) + 1px);
 }
 
 /* Document scroll, not `view()`: the footer is fixed and never enters the
