@@ -10,6 +10,15 @@ const useIsomorphicLayoutEffect =
 // release starts firing inside gestures, which shakes.
 const RELEASE_DELAY = 90;
 
+// How long to wait for the fold to exist. A draft-mode preview streams the
+// hero in behind Suspense with the cache off; give up too early and the slot
+// grows under a page still at 0, stranding it on the strip.
+const FOLD_WAIT = 10_000;
+
+// Kept parking this long after the fold appears, so Safari's own scroll
+// restoration — which lands after the layout effect — can't win the last word.
+const PARK_GRACE = 1000;
+
 // Rest position: one hero fold below the document top (0 without a fold).
 function restTop() {
   return (
@@ -54,14 +63,31 @@ function ScrollToTopInner() {
   }, []);
 
   // Park below the fold on first load, pre-paint so the strip never shows and
-  // jumps. Retried briefly: the fold arrives with the hero, which streams in
-  // behind draft mode's Suspense boundary.
+  // jumps.
   useIsomorphicLayoutEffect(() => {
-    if (window.location.hash || parkAtRest()) {
+    if (window.location.hash) {
       return;
     }
-    const timer = window.setInterval(parkAtRest, 100);
-    window.setTimeout(() => window.clearInterval(timer), 2000);
+    parkAtRest();
+    let firstParkAt = 0;
+    const giveUpAt = Date.now() + FOLD_WAIT;
+    const timer = window.setInterval(() => {
+      const now = Date.now();
+      const fold = restTop();
+      // Gave up, or the reader has scrolled past the strip themselves.
+      if (now > giveUpAt || window.scrollY > fold) {
+        window.clearInterval(timer);
+        return;
+      }
+      if (fold === 0) {
+        return;
+      }
+      parkAtRest();
+      firstParkAt = firstParkAt || now;
+      if (now - firstParkAt > PARK_GRACE) {
+        window.clearInterval(timer);
+      }
+    }, 100);
     return () => window.clearInterval(timer);
   }, []);
 
