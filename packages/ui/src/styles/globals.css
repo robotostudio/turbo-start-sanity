@@ -303,6 +303,26 @@
   animation-range: calc(100% - 180px) calc(100% - 20px);
 }
 
+/* Blurs the leading hero's banner as the page scrolls over it: the banner is
+   pinned under the content, so scroll progress maps to how covered it is.
+   Offset by the fold's strip so the banner rests sharp, not mid-ramp. */
+@keyframes hero-blur {
+  to {
+    filter: blur(4px);
+  }
+}
+
+@utility hero-blur {
+  animation-name: hero-blur;
+  /* Ignored on a scroll timeline, which drives progress from the range below. */
+  animation-duration: 1ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root block);
+  animation-range: var(--hero-fold, 0px)
+    calc(var(--hero-fold, 0px) + 100svh - var(--hero-copy, 420px));
+}
+
 @keyframes nav-cover {
   from {
     opacity: 0;
@@ -324,7 +344,8 @@
 @supports not (animation-timeline: scroll()) {
   .nav-exit,
   .lg\:nav-exit,
-  .lg\:nav-exit::before {
+  .lg\:nav-exit::before,
+  .hero-blur {
     animation-name: none;
   }
 }

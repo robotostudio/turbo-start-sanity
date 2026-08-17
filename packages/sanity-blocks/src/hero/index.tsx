@@ -188,7 +188,7 @@ export function HeroBlock({
         data-sanity={dataSanity}
         id="hero"
       >
-        {banner}
+        <div className="hero-blur absolute inset-0">{banner}</div>
       </div>
       <div
         className="relative z-10 bg-background pt-6 pb-8 md:pt-8 md:pb-12"
