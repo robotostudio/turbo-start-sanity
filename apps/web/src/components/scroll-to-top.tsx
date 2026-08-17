@@ -10,6 +10,12 @@ const useIsomorphicLayoutEffect =
 // release starts firing inside gestures, which shakes.
 const RELEASE_DELAY = 90;
 
+// A fling's tail keeps firing wheels long after the page has stopped, and
+// releasing into one gets the page yanked straight back. It may hold the
+// release off, but never longer than this past the last movement — sitting on
+// the strip for the length of the fling is the stall the tail used to cause.
+const MAX_HOLD = 260;
+
 // Time constant of the return: ~90% of the way back by 400ms, settled by 650.
 const RELEASE_TAU = 115;
 
@@ -109,11 +115,15 @@ function ScrollToTopInner() {
     let timer = 0;
     let frame = 0;
     let painted = -1;
+    // When the current run of waiting began. Movement clears it, so the cap
+    // below is always measured from the last time the page actually moved.
+    let armedAt = 0;
 
     const stop = () => {
       cancelAnimationFrame(frame);
       frame = 0;
       painted = -1;
+      armedAt = 0;
     };
 
     const release = () => {
@@ -127,18 +137,23 @@ function ScrollToTopInner() {
       }
       let last = performance.now();
       let ramp = 0;
+      let lastY = window.scrollY;
       painted = window.scrollY;
 
       const step = (now: number) => {
         const target = restTop();
         const y = window.scrollY;
-        // Only a downward divergence is the reader taking over. Upward means
-        // the browser's elastic spring still owns the scroll, and treating
-        // that as input is what cancelled the release mid-flight.
-        if (y > painted + TAKEOVER_PX || y >= target) {
+        // Anything moving the page but us means the gesture isn't over: a
+        // fling's momentum still running it up, or the reader scrolling down.
+        // Bail and let `arm` schedule a fresh one once it stops. Backwards is
+        // measured against where the page really was, not against what we
+        // asked for — a frame the elastic spring ate leaves `scrollY` where it
+        // was, while momentum leaves it lower.
+        if (y < lastY - 1 || y > painted + TAKEOVER_PX || y >= target) {
           stop();
           return;
         }
+        lastY = y;
         const dt = Math.min(50, now - last);
         last = now;
         // Ramp only on frames the page actually moved, so a release armed
@@ -159,35 +174,40 @@ function ScrollToTopInner() {
 
     const runRelease = () => {
       timer = 0;
+      // The wait is spent, including when `release` declines it — a stale
+      // start would make the next arm compute a wait of zero and fire inside
+      // the gesture it was meant to sit out.
+      armedAt = 0;
       release();
     };
 
-    // Movement pushes the wait back — the reader is still scrolling.
+    // Input pushes the wait back, but only until the cap runs out.
     const arm = () => {
       window.clearTimeout(timer);
-      timer = window.setTimeout(runRelease, RELEASE_DELAY);
+      armedAt = armedAt || performance.now();
+      const held = performance.now() - armedAt;
+      const wait = Math.max(0, Math.min(RELEASE_DELAY, MAX_HOLD - held));
+      timer = window.setTimeout(runRelease, wait);
     };
 
-    // A tail only ever starts the wait. Extending it on wheels that move
-    // nothing is what left the page sitting on the strip for the length of the
-    // fling; `step`'s takeover check is what makes starting early safe.
-    const armOnce = () => {
-      if (!timer) {
-        timer = window.setTimeout(runRelease, RELEASE_DELAY);
+    const onScroll = () => {
+      // Our own writes are the only scrolls that land mid-release, so they
+      // must not count as the reader still moving the page.
+      if (!frame) {
+        armedAt = 0;
       }
+      arm();
     };
 
-    // Takeover is judged in `step` against the frame it just painted; a
-    // scroll handler can't tell our own writes from the reader's.
-    window.addEventListener("scroll", arm, { passive: true });
-    // A tail keeps firing wheels after the page has stopped, with no `scroll`
-    // behind them — without this the release would never be armed at all.
-    window.addEventListener("wheel", armOnce, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    // Wheels arm too: once the page is pinned at the top a tail moves nothing,
+    // so there is no `scroll` behind it to arm from.
+    window.addEventListener("wheel", arm, { passive: true });
     return () => {
       stop();
       window.clearTimeout(timer);
-      window.removeEventListener("scroll", arm);
-      window.removeEventListener("wheel", armOnce);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("wheel", arm);
     };
   }, []);
 
