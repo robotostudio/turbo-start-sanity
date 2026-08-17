@@ -56,7 +56,6 @@ export default async function RootLayout({
       >
         <Providers>
           <ScrollToTop />
-          <div id="fold-slot" />
           <div
             className="relative"
             id="page-shell"

@@ -75,10 +75,13 @@ function HeroFold({ video }: Readonly<{ video?: HeroVideoData | null }>) {
   const mirror =
     "absolute inset-x-0 bottom-0 h-[calc(100svh-var(--hero-copy))] w-full scale-y-[-1] rounded-none! object-cover object-[50%_45%] blur-[16px]";
 
+  // Fixed, not parked above the document origin: the elastic bounce clips
+  // anything above the origin, so a strip there never paints. Fixed stays put
+  // while the page slides off it — the pinned footer's trick, inverted.
   return (
     <div
       aria-hidden="true"
-      className="-top-[var(--hero-fold)] absolute inset-x-0 z-0 h-[calc(var(--hero-fold)+4rem)] overflow-hidden bg-background"
+      className="fixed inset-x-0 top-0 z-0 h-[var(--hero-fold)] overflow-hidden bg-background"
       id="hero-fold"
     >
       <SanityImage
