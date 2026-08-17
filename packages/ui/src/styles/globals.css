@@ -206,8 +206,15 @@
   --hero-fold: 160px;
 }
 
+/* Sized by a selector match, not `height: var(--hero-fold)`: Safari updates the
+   property when `:has()` starts matching but does not re-lay-out what reads it,
+   so on iOS the slot stayed 0 tall and the park ate 160px of the banner. */
 #fold-slot {
-  height: var(--hero-fold, 0px);
+  height: 0;
+}
+
+:root:has(#hero-fold) #fold-slot {
+  height: 160px;
 }
 
 /* Overrides Tailwind's `container`. Inset defaults to 8px via a fallback var,
