@@ -45,7 +45,9 @@ function ScrollToTopInner() {
     if (window.location.hash) {
       return;
     }
-    window.scrollTo(0, 0);
+    // Explicit "instant": hero pages set `scroll-behavior: smooth`, which the
+    // two-argument form would inherit and animate.
+    window.scrollTo({ top: 0, behavior: "instant" });
   }, [routeKey]);
 
   return null;
