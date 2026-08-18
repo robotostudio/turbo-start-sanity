@@ -20,7 +20,6 @@ const MARK_START = 320;
 // Scroll px per ms past which the ~490px sequence crosses in under 400ms and
 // the scrubbed build never reads. Set above a smooth-scrolled wheel notch.
 const FAST_SCROLL = 1.2;
-const NOTCH_STRIP = 64;
 
 function rafThrottle(run: () => void) {
   let frame = 0;
@@ -74,45 +73,6 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
       observer.disconnect();
       window.removeEventListener("resize", update);
       root.style.removeProperty("--footer-height");
-    };
-  }, []);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) {
-      return;
-    }
-    const root = document.documentElement;
-    let showing = false;
-    const ownsScreen = () =>
-      root.scrollHeight - root.clientHeight - window.scrollY <=
-      Math.max(el.offsetHeight - root.clientHeight - NOTCH_STRIP, 0);
-    const update = () => {
-      const onFooter = ownsScreen();
-      if (onFooter === showing) {
-        return;
-      }
-      showing = onFooter;
-      const surface = onFooter ? "var(--accent-green)" : "";
-      document.body.style.background = surface;
-      root.style.background = surface;
-    };
-    const { schedule, cancel } = rafThrottle(update);
-    update();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-    const observer = new ResizeObserver(schedule);
-    observer.observe(el);
-    observer.observe(document.body);
-    return () => {
-      observer.disconnect();
-      cancel();
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-      if (showing) {
-        document.body.style.background = "";
-        root.style.background = "";
-      }
     };
   }, []);
 

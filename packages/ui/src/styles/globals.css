@@ -392,7 +392,17 @@
     calc(var(--hero-rest, 0px) + 100svh + 1px);
 }
 
+/* The surface iOS samples for its status-bar and toolbar strips — see the
+   `html, body` rule in @layer base. */
+@keyframes canvas-footer {
+  to {
+    background-color: var(--accent-green);
+  }
+}
+
 @supports not (animation-timeline: scroll()) {
+  html,
+  body,
   .nav-exit,
   .lg\:nav-exit,
   .lg\:nav-exit::before,
@@ -534,12 +544,25 @@
   body {
     @apply bg-background text-foreground;
   }
-  /* Colour the overscroll gutters — mainly the top rubber-band by the navbar.
-     The sticky footer owns the bottom, so there's no accent split here. For why
-     the pinned footer stops painting at the top, see `StickyFooter`. */
+  /* Colour the overscroll gutters — mainly the top rubber-band by the navbar. */
   html {
     background-color: var(--overscroll-top);
     overscroll-behavior-x: none;
+  }
+  /* iOS paints the strips behind its toolbar and status bar from the document
+     background — WebKit takes `body`'s, with the root covering the hairline at
+     the document's own edge (measured on iOS 26). Those strips only show the
+     document background at the very end of the scroll, where the footer fills
+     the screen, so flip both there: any earlier and the notch takes green
+     while the page is still dark. */
+  html,
+  body {
+    animation-name: canvas-footer;
+    animation-duration: 1ms;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(root block);
+    animation-range: calc(100% - 24px) 100%;
   }
   ::selection {
     background-color: var(--accent-green);
