@@ -202,8 +202,44 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-:root:has(#hero-fold) {
-  --hero-fold: 160px;
+/* Rest sits one fold down: iOS Safari composites the ~60px just scrolled past
+   behind the status bar, but paints an opaque strip at scrollY 0 — so the
+   parked mirror is what shows through the notch. Initial position and the
+   return spring are both scroll-snap; the snap point is a 1px marker because
+   snap-align on a tall element made Safari re-snap deep when late layout
+   (hydration, --footer-height) changed the document height. */
+#notch-slot,
+#notch-snap {
+  height: 0;
+}
+
+/* Below lg the page parks one fold down (the notch effect); from lg up the
+   fold is the fixed strip revealed by the browser's own elastic overscroll,
+   and rest stays at 0. --hero-rest is the park offset the scroll ranges key
+   off, so both breakpoints resolve their own rest position. */
+@media (width < 64rem) {
+  :root:has(#hero-fold) {
+    --hero-fold: 140px;
+    --hero-rest: 140px;
+    scroll-snap-type: y proximity;
+    scroll-behavior: smooth;
+  }
+
+  :root:has(#hero-fold) #notch-slot {
+    height: 140px;
+  }
+
+  :root:has(#hero-fold) #notch-snap {
+    height: 1px;
+    margin-bottom: -1px;
+    scroll-snap-align: start;
+  }
+}
+
+@media (width >= 64rem) {
+  :root:has(#hero-fold) {
+    --hero-fold: 160px;
+  }
 }
 
 /* Overrides Tailwind's `container`. Inset defaults to 8px via a fallback var,
@@ -315,23 +351,8 @@
   animation-timing-function: linear;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: 0 calc(100svh - var(--hero-copy, 420px));
-}
-
-@keyframes fold-hide {
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-
-#hero-fold {
-  animation-name: fold-hide;
-  animation-duration: 1ms;
-  animation-timing-function: linear;
-  animation-fill-mode: both;
-  animation-timeline: scroll(root block);
-  animation-range: 0 1px;
+  animation-range: var(--hero-rest, 0px)
+    calc(var(--hero-rest, 0px) + 100svh - var(--hero-copy, 420px));
 }
 
 @keyframes nav-cover {
@@ -349,7 +370,7 @@
   animation-timing-function: linear;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: 0 100vh;
+  animation-range: var(--hero-rest, 0px) 100vh;
 }
 
 @supports not (animation-timeline: scroll()) {
@@ -393,7 +414,7 @@
   animation-duration: auto;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: 0 1px;
+  animation-range: var(--hero-rest, 0px) calc(var(--hero-rest, 0px) + 1px);
 }
 
 /* Document scroll, not `view()`: the footer is fixed and never enters the

@@ -51,6 +51,8 @@ export default async function RootLayout({
       >
         <Providers>
           <ScrollToTop />
+          <div id="notch-slot" />
+          <div id="notch-snap" />
           <div
             className="relative"
             id="page-shell"
