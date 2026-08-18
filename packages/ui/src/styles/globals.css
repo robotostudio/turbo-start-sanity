@@ -217,7 +217,7 @@
    fold is the fixed strip revealed by the browser's own elastic overscroll,
    and rest stays at 0. --hero-rest is the park offset the scroll ranges key
    off, so both breakpoints resolve their own rest position. */
-@media (width < 64rem) {
+@media (width < 64rem) and (hover: none) and (pointer: coarse) {
   :root:has(#hero-fold) {
     --hero-fold: 140px;
     --hero-rest: 140px;
