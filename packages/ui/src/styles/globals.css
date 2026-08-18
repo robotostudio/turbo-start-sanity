@@ -206,17 +206,6 @@
   --hero-fold: 160px;
 }
 
-/* Sized by a selector match, not `height: var(--hero-fold)`: Safari updates the
-   property when `:has()` starts matching but does not re-lay-out what reads it,
-   so on iOS the slot stayed 0 tall and the park ate 160px of the banner. */
-#fold-slot {
-  height: 0;
-}
-
-:root:has(#hero-fold) #fold-slot {
-  height: 160px;
-}
-
 /* Overrides Tailwind's `container`. Inset defaults to 8px via a fallback var,
  * so [--container-px:…] can override it per instance. */
 @utility container {
@@ -326,8 +315,23 @@
   animation-timing-function: linear;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: var(--hero-fold, 0px)
-    calc(var(--hero-fold, 0px) + 100svh - var(--hero-copy, 420px));
+  animation-range: 0 calc(100svh - var(--hero-copy, 420px));
+}
+
+@keyframes fold-hide {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+#hero-fold {
+  animation-name: fold-hide;
+  animation-duration: 1ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root block);
+  animation-range: 0 1px;
 }
 
 @keyframes nav-cover {
@@ -345,7 +349,7 @@
   animation-timing-function: linear;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: var(--hero-fold, 0px) 100vh;
+  animation-range: 0 100vh;
 }
 
 @supports not (animation-timeline: scroll()) {
@@ -389,7 +393,7 @@
   animation-duration: auto;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: var(--hero-fold, 0px) calc(var(--hero-fold, 0px) + 1px);
+  animation-range: 0 1px;
 }
 
 /* Document scroll, not `view()`: the footer is fixed and never enters the

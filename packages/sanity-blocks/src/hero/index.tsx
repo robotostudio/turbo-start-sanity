@@ -78,7 +78,7 @@ function HeroFold({ video }: Readonly<{ video?: HeroVideoData | null }>) {
   return (
     <div
       aria-hidden="true"
-      className="-top-[var(--hero-fold)] absolute inset-x-0 z-0 h-[calc(var(--hero-fold)+4rem)] overflow-hidden bg-background"
+      className="fixed inset-x-0 top-0 z-0 h-[var(--hero-fold)] overflow-hidden bg-background"
       id="hero-fold"
     >
       <SanityImage

@@ -80,13 +80,6 @@ function ProgressiveBlur() {
         className="absolute inset-0 [-webkit-backdrop-filter:saturate(1.5)] [backdrop-filter:saturate(1.5)]"
         style={{ WebkitMaskImage: SATURATE_MASK, maskImage: SATURATE_MASK }}
       />
-      <div
-        className="absolute inset-x-0 top-0 h-[calc(env(safe-area-inset-top,0px)*2.5)]"
-        style={{
-          background:
-            "linear-gradient(to bottom, transparent env(safe-area-inset-top, 0px), color-mix(in srgb, var(--color-background) 38%, transparent) env(safe-area-inset-top, 0px), transparent 100%)",
-        }}
-      />
       <div className="-top-[var(--hero-fold,0px)] absolute inset-x-0 bottom-0">
         {BLUR_LAYERS.map(({ radius, mask }) => (
           <div

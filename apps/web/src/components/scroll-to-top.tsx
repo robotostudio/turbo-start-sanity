@@ -1,56 +1,7 @@
 "use client";
 
 import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useLayoutEffect, useRef } from "react";
-
-const useIsomorphicLayoutEffect =
-  typeof window === "undefined" ? useEffect : useLayoutEffect;
-
-// Wait after the page stops moving before easing back. Below ~40ms the
-// release starts firing inside gestures, which shakes.
-const RELEASE_DELAY = 90;
-
-// A fling's tail keeps firing wheels long after the page has stopped, and
-// releasing into one gets the page yanked straight back. It may hold the
-// release off, but never longer than this past the last movement — sitting on
-// the strip for the length of the fling is the stall the tail used to cause.
-const MAX_HOLD = 260;
-
-// Time constant of the return: ~90% of the way back by 400ms, settled by 650.
-const RELEASE_TAU = 115;
-
-// The rate eases in over this, so the return never starts at full speed.
-const RELEASE_RAMP = 150;
-
-// How far the page must diverge from the frame just painted to count as the
-// reader taking over, rather than a momentum tail nudging it.
-const TAKEOVER_PX = 40;
-
-// How long to wait for the fold to exist. A draft-mode preview streams the
-// hero in behind Suspense with the cache off; give up too early and the slot
-// grows under a page still at 0, stranding it on the strip.
-const FOLD_WAIT = 10_000;
-
-// Kept parking this long after the fold appears, so Safari's own scroll
-// restoration — which lands after the layout effect — can't win the last word.
-const PARK_GRACE = 1000;
-
-// Rest position: one hero fold below the document top (0 without a fold).
-function restTop() {
-  return (
-    Number.parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue("--hero-fold")
-    ) || 0
-  );
-}
-
-function parkAtRest() {
-  const fold = restTop();
-  if (fold > 0 && window.scrollY < fold) {
-    window.scrollTo(0, fold);
-  }
-  return fold > 0;
-}
+import { Suspense, useEffect, useRef } from "react";
 
 // Some link components (e.g. base-ui NavigationMenuLink) bypass the App
 // Router's scroll-to-top. Reset scroll on forward navigation, but let the
@@ -78,139 +29,6 @@ function ScrollToTopInner() {
     return () => window.removeEventListener("popstate", markPop);
   }, []);
 
-  // Park below the fold on first load, pre-paint so the strip never shows and
-  // jumps.
-  useIsomorphicLayoutEffect(() => {
-    if (window.location.hash) {
-      return;
-    }
-    parkAtRest();
-    let firstParkAt = 0;
-    const giveUpAt = Date.now() + FOLD_WAIT;
-    const timer = window.setInterval(() => {
-      const now = Date.now();
-      const fold = restTop();
-      // Gave up, or the reader has scrolled past the strip themselves.
-      if (now > giveUpAt || window.scrollY > fold) {
-        window.clearInterval(timer);
-        return;
-      }
-      if (fold === 0) {
-        return;
-      }
-      parkAtRest();
-      firstParkAt = firstParkAt || now;
-      if (now - firstParkAt > PARK_GRACE) {
-        window.clearInterval(timer);
-      }
-    }, 100);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  // Overscrolling into the fold is free; once the page stops moving there, it
-  // eases back to rest. Driven per frame rather than by `scrollTo({behavior:
-  // "smooth"})`, which a fling's momentum cancels — that left the page sitting
-  // on the strip for as long as the tail ran, then finishing in a second jump.
-  useEffect(() => {
-    let timer = 0;
-    let frame = 0;
-    let painted = -1;
-    // When the current run of waiting began. Movement clears it, so the cap
-    // below is always measured from the last time the page actually moved.
-    let armedAt = 0;
-
-    const stop = () => {
-      cancelAnimationFrame(frame);
-      frame = 0;
-      painted = -1;
-      armedAt = 0;
-    };
-
-    const release = () => {
-      const fold = restTop();
-      if (frame || fold === 0 || window.scrollY >= fold) {
-        return;
-      }
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        window.scrollTo(0, fold);
-        return;
-      }
-      let last = performance.now();
-      let ramp = 0;
-      let lastY = window.scrollY;
-      painted = window.scrollY;
-
-      const step = (now: number) => {
-        const target = restTop();
-        const y = window.scrollY;
-        // Anything moving the page but us means the gesture isn't over: a
-        // fling's momentum still running it up, or the reader scrolling down.
-        // Bail and let `arm` schedule a fresh one once it stops. Backwards is
-        // measured against where the page really was, not against what we
-        // asked for — a frame the elastic spring ate leaves `scrollY` where it
-        // was, while momentum leaves it lower.
-        if (y < lastY - 1 || y > painted + TAKEOVER_PX || y >= target) {
-          stop();
-          return;
-        }
-        lastY = y;
-        const dt = Math.min(50, now - last);
-        last = now;
-        // Ramp only on frames the page actually moved, so a release armed
-        // inside the spring waits it out at a standstill and then starts from
-        // zero speed, instead of arriving at the curve's peak velocity.
-        if (y > painted - 1) {
-          ramp = Math.min(1, ramp + dt / RELEASE_RAMP);
-        }
-        // Approach from where the page really is, never from a remembered
-        // start: a frame the spring ate then costs nothing to recover from.
-        const closed = 1 - Math.exp((-dt / RELEASE_TAU) * ramp);
-        painted = Math.min(target, y + Math.max(1, (target - y) * closed));
-        window.scrollTo(0, painted);
-        frame = target - painted < 1 ? 0 : requestAnimationFrame(step);
-      };
-      frame = requestAnimationFrame(step);
-    };
-
-    const runRelease = () => {
-      timer = 0;
-      // The wait is spent, including when `release` declines it — a stale
-      // start would make the next arm compute a wait of zero and fire inside
-      // the gesture it was meant to sit out.
-      armedAt = 0;
-      release();
-    };
-
-    // Input pushes the wait back, but only until the cap runs out.
-    const arm = () => {
-      window.clearTimeout(timer);
-      armedAt = armedAt || performance.now();
-      const held = performance.now() - armedAt;
-      const wait = Math.max(0, Math.min(RELEASE_DELAY, MAX_HOLD - held));
-      timer = window.setTimeout(runRelease, wait);
-    };
-
-    const onScroll = () => {
-      // Our own writes are the only scrolls that land mid-release, so they
-      // must not count as the reader still moving the page.
-      if (!frame) {
-        armedAt = 0;
-      }
-      arm();
-    };
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    // Wheels arm too: once the page is pinned at the top a tail moves nothing,
-    // so there is no `scroll` behind it to arm from.
-    window.addEventListener("wheel", arm, { passive: true });
-    return () => {
-      stop();
-      window.clearTimeout(timer);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("wheel", arm);
-    };
-  }, []);
-
   useEffect(() => {
     lastRouteKey.current = routeKey;
 
@@ -223,11 +41,11 @@ function ScrollToTopInner() {
       isPopNavigation.current = false;
       return;
     }
-    // Forward navigation: skip in-page hash jumps, otherwise reset to rest.
+    // Forward navigation: skip in-page hash jumps, otherwise reset to top.
     if (window.location.hash) {
       return;
     }
-    window.scrollTo(0, restTop());
+    window.scrollTo(0, 0);
   }, [routeKey]);
 
   return null;

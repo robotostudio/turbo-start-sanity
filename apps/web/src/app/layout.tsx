@@ -6,7 +6,6 @@ import {
   getDynamicFetchOptions,
   SanityLive,
 } from "@workspace/sanity/live";
-import type { Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { draftMode } from "next/headers";
 import { VisualEditing } from "next-sanity/visual-editing";
@@ -34,10 +33,6 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 });
 
-export const viewport: Viewport = {
-  viewportFit: "cover",
-};
-
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -56,7 +51,6 @@ export default async function RootLayout({
       >
         <Providers>
           <ScrollToTop />
-          <div id="fold-slot" />
           <div
             className="relative"
             id="page-shell"
