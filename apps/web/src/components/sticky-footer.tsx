@@ -154,9 +154,8 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <div
       className={cn(
-        "sm:flex sm:h-[calc(100svh-1.5rem)] sm:flex-col",
         pinned
-          ? "footer-pinned fixed inset-x-0 bottom-0 z-0 transform-[translateZ(0)] before:absolute before:inset-x-0 before:bottom-full before:h-screen before:bg-background before:content-[''] after:absolute after:inset-x-0 after:top-full after:h-svh after:bg-accent-green after:content-['']"
+          ? "footer-pinned fixed inset-x-0 bottom-0 z-0 transform-[translateZ(0)] sm:flex sm:h-[calc(100svh-1.5rem)] sm:flex-col before:absolute before:inset-x-0 before:bottom-full before:h-screen before:bg-background before:content-[''] after:absolute after:inset-x-0 after:top-full after:h-svh after:bg-accent-green after:content-['']"
           : "relative z-10"
       )}
       ref={ref}
