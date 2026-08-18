@@ -217,7 +217,7 @@ export function Navbar({
 
   return (
     <header
-      className="absolute inset-x-0 top-0 z-40 w-full pt-[env(safe-area-inset-top)] lg:nav-exit lg:sticky lg:before:absolute lg:before:inset-x-0 lg:before:bottom-full lg:before:h-screen lg:before:bg-background lg:before:content-['']"
+      className="absolute inset-x-0 top-0 z-40 w-full lg:nav-exit lg:sticky lg:before:absolute lg:before:inset-x-0 lg:before:bottom-full lg:before:h-screen lg:before:bg-background lg:before:content-['']"
       ref={headerRef}
     >
       <ProgressiveBlur />
