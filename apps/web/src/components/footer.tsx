@@ -128,7 +128,7 @@ function SystemsOperationalPill() {
 
 function FooterTopBar() {
   return (
-    <div className="w-full bg-background [background-image:radial-gradient(circle,var(--color-zinc-500)_0.8px,transparent_1.3px)] [background-position:top] [background-repeat:repeat-x] [background-size:6.7px_1.4px]">
+    <div className="w-full shrink-0 bg-background [background-image:radial-gradient(circle,var(--color-zinc-500)_0.8px,transparent_1.3px)] [background-position:top] [background-repeat:repeat-x] [background-size:6.7px_1.4px]">
       <div className="container flex items-center justify-center py-4 sm:grid sm:grid-cols-3 sm:gap-4">
         <div className="flex items-center gap-2">
           <span
@@ -183,7 +183,7 @@ function FooterMark() {
   return (
     <div
       aria-hidden="true"
-      className="aspect-[1440/516] w-full shrink-0 overflow-hidden text-accent-green-foreground max-sm:mt-auto sm:aspect-[1440/320]"
+      className="mt-auto aspect-[1440/516] w-full shrink-0 overflow-hidden text-accent-green-foreground sm:aspect-[1440/320] sm:min-h-0 sm:shrink"
     >
       <svg
         aria-hidden="true"
@@ -224,7 +224,7 @@ function Footer({ data, settingsData }: Readonly<FooterProps>) {
   return (
     <>
       <FooterTopBar />
-      <footer className="relative border-t border-accent-green-foreground/10 bg-accent-green text-accent-green-foreground max-sm:flex max-sm:min-h-[calc(100lvh+3rem)] max-sm:flex-col">
+      <footer className="relative flex flex-col border-t border-accent-green-foreground/10 bg-accent-green text-accent-green-foreground max-sm:min-h-[calc(100lvh+3rem)] sm:min-h-0 sm:flex-1">
         <div className="container flex flex-col items-start gap-10 pt-12 text-start lg:flex-row lg:items-start lg:justify-between">
           <div className="flex w-full max-w-96 shrink flex-col items-start gap-6 lg:items-start">
             <div className="flex flex-col items-start gap-4 lg:items-start">
