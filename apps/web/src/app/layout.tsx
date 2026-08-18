@@ -51,29 +51,29 @@ export default async function RootLayout({
       >
         <Providers>
           <ScrollToTop />
-          <div style={{ marginBottom: "var(--footer-height)" }}>
+          <div id="notch-slot" />
+          <div id="notch-snap" />
+          <div
+            className="relative"
+            id="page-shell"
+            style={{ marginBottom: "var(--footer-height)" }}
+          >
             {showDrafts ? (
               <Suspense
-                fallback={
-                  <CachedNavbar perspective="published" stega={false} />
-                }
+                fallback={<Navbar navbarData={null} settingsData={null} />}
               >
                 <DynamicNavbar />
               </Suspense>
             ) : (
               <CachedNavbar perspective="published" stega={false} />
             )}
-            <div className="-mt-16 relative z-10 min-h-dvh bg-background pt-16">
+            <div className="relative z-10 min-h-dvh bg-background pt-16 lg:-mt-16">
               {children}
             </div>
           </div>
           <StickyFooter>
             {showDrafts ? (
-              <Suspense
-                fallback={
-                  <CachedFooter perspective="published" stega={false} />
-                }
-              >
+              <Suspense fallback={null}>
                 <DynamicFooter />
               </Suspense>
             ) : (

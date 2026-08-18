@@ -18,7 +18,8 @@ const videoVariantFields = () => [
     name: "webm",
     type: "file",
     title: "Video For Computers",
-    description: "The .webm file. Most people see this one.",
+    description:
+      "The .webm file, encoded as AV1. Most people see this one. The AV1 codec is declared to the browser so Safari skips it and takes the .mp4 instead — upload a VP9 .webm here and this hero may fall back to the .mp4 or just the poster image.",
     options: { accept: "video/webm" },
   }),
   defineField({
@@ -33,7 +34,7 @@ const videoVariantFields = () => [
     type: "file",
     title: "Video For Phones",
     description:
-      "A smaller .webm, so phones do not have to download the big file.",
+      "A smaller .webm, so phones do not have to download the big file. AV1, like the one above.",
     options: { accept: "video/webm" },
   }),
   defineField({

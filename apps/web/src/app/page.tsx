@@ -9,6 +9,7 @@ import {
 import { queryHomePageData } from "@workspace/sanity/query";
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
+import { Suspense } from "react";
 
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
@@ -26,11 +27,12 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const { isEnabled: isDraftMode } = await draftMode();
 
-  // Presentation sessions and local dev stream drafts. No Suspense: draft mode
-  // disables `use cache` entirely, so a boundary would always paint its
-  // fallback; blocking keeps the previous page on screen, as editors expect.
   if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
-    return <HomeContent />;
+    return (
+      <Suspense fallback={null}>
+        <HomeContent />
+      </Suspense>
+    );
   }
 
   return <CachedHome perspective="published" stega={false} />;

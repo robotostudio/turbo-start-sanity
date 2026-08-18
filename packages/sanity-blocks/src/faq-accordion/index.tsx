@@ -266,7 +266,7 @@ export function FaqAccordion({
   const accordionKey = `faq-${_key}-${activeCategory?._key ?? boundedIndex}`;
 
   return (
-    <section className="bg-background pt-20 pb-0.5 sm:pt-28 lg:pt-34" id="faq">
+    <section className="block-section" id="faq">
       <div className="container">
         <FaqHeader eyebrow={eyebrow} subtitle={subtitle} title={title} />
 

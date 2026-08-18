@@ -21,6 +21,21 @@ const MARK_START = 320;
 // the scrubbed build never reads. Set above a smooth-scrolled wheel notch.
 const FAST_SCROLL = 1.2;
 
+function rafThrottle(run: () => void) {
+  let frame = 0;
+  return {
+    schedule: () => {
+      if (!frame) {
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          run();
+        });
+      }
+    },
+    cancel: () => cancelAnimationFrame(frame),
+  };
+}
+
 /** Pinned behind the page content and revealed as it scrolls up, or in-flow
  * when too tall. Publishes `--footer-height` so content reserves space. */
 export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
@@ -28,6 +43,7 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
   // Default to pinned so SSR and first paint agree (no relative→fixed hydration
   // flip / CLS). The effect only flips to in-flow when the footer is too tall.
   const [pinned, setPinned] = useState(true);
+  const pinnedRef = useRef(true);
 
   useIsomorphicLayoutEffect(() => {
     const el = ref.current;
@@ -37,14 +53,17 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
     const root = document.documentElement;
     const update = () => {
       const height = el.offsetHeight;
-      const fits = height > 0 && height <= window.innerHeight;
+      if (height === 0) {
+        return;
+      }
+      const fits = height <= root.clientHeight - (pinnedRef.current ? 0 : 24);
+      pinnedRef.current = fits;
       if (fits) {
         root.style.setProperty("--footer-height", `${height}px`);
-        setPinned(true);
       } else {
         root.style.removeProperty("--footer-height");
-        setPinned(false);
       }
+      setPinned(fits);
     };
     update();
     const observer = new ResizeObserver(update);
@@ -67,13 +86,11 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
     const root = document.documentElement;
     let lastY = window.scrollY;
     let lastAt = performance.now();
-    let frame = 0;
     const update = () => {
-      frame = 0;
       const y = window.scrollY;
       const at = performance.now();
       const start =
-        root.scrollHeight - window.innerHeight - el.offsetHeight + MARK_START;
+        root.scrollHeight - root.clientHeight - el.offsetHeight + MARK_START;
       const speed = Math.abs(y - lastY) / Math.max(at - lastAt, 1);
       if (y < lastY) {
         delete root.dataset.markPlay;
@@ -85,14 +102,10 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
       lastY = y;
       lastAt = at;
     };
-    const schedule = () => {
-      if (!frame) {
-        frame = requestAnimationFrame(update);
-      }
-    };
+    const { schedule, cancel } = rafThrottle(update);
     window.addEventListener("scroll", schedule, { passive: true });
     return () => {
-      cancelAnimationFrame(frame);
+      cancel();
       window.removeEventListener("scroll", schedule);
       delete root.dataset.markPlay;
     };
@@ -102,7 +115,7 @@ export function StickyFooter({ children }: Readonly<{ children: ReactNode }>) {
     <div
       className={cn(
         pinned
-          ? "footer-pinned fixed inset-x-0 bottom-0 z-0 transform-[translateZ(0)]"
+          ? "footer-pinned fixed inset-x-0 bottom-0 z-0 transform-[translateZ(0)] sm:flex sm:h-[calc(100svh-1.5rem)] sm:flex-col before:absolute before:inset-x-0 before:bottom-full before:h-screen before:bg-background before:content-[''] after:absolute after:inset-x-0 after:top-full after:h-svh after:bg-accent-green after:content-['']"
           : "relative z-10"
       )}
       ref={ref}

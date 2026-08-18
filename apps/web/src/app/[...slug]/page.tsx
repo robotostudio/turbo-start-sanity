@@ -12,6 +12,7 @@ import { querySlugPageData, querySlugPagePaths } from "@workspace/sanity/query";
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 import {
   ancestorCrumbs,
@@ -76,12 +77,12 @@ export default async function SlugPage({
 }: Readonly<{ params: Promise<SlugParams> }>) {
   const { isEnabled: isDraftMode } = await draftMode();
 
-  // Presentation sessions and local dev take the draft-aware path, so draft
-  // edits and unpublished pages render. No Suspense: draft mode disables
-  // `use cache` entirely, so a boundary would always paint its fallback;
-  // blocking keeps the previous page on screen, as editors expect.
   if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
-    return <SlugPageInner params={params} />;
+    return (
+      <Suspense fallback={null}>
+        <SlugPageInner params={params} />
+      </Suspense>
+    );
   }
 
   // Published render, with a real 404 — not a soft one streamed inside

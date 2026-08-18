@@ -18,14 +18,6 @@ export type { HeroVideoData, HeroVideoVariant } from "./hero-video";
 export interface HeroBlockProps {
   badge?: string | null;
   buttons?: ButtonProps[] | null;
-  /**
-   * Visual editing attribute for the block. Only the leading hero needs it:
-   * its page-builder wrapper is `display: contents` so the banner can pin
-   * against the grid, and a box-less element measures 0x0 in the overlay.
-   * Both boxes below carry it instead — the overlay only treats an element as
-   * drag-sortable when it resolves to an array-member path, so a half without
-   * it would resolve to the page-builder array itself and refuse to drag.
-   */
   dataSanity?: string;
   isFirst?: boolean;
   richText?: RichTextValue;
@@ -69,6 +61,43 @@ function HeroPoster({
       loading={eager ? "eager" : "lazy"}
       width={POSTER_WIDTH}
     />
+  );
+}
+
+function HeroFold({ video }: Readonly<{ video?: HeroVideoData | null }>) {
+  const light = posterOf(video?.light) ?? posterOf(video?.dark);
+  const dark = posterOf(video?.dark) ?? light;
+  if (!light) {
+    return null;
+  }
+
+  const split = dark !== null && dark !== light;
+  const mirror =
+    "absolute inset-x-0 bottom-0 h-[calc(100svh-var(--hero-copy))] w-full scale-y-[-1] rounded-none! object-cover object-[50%_45%] blur-[16px]";
+
+  return (
+    <div
+      aria-hidden="true"
+      className="hero-park -top-[var(--hero-fold,0px)] absolute inset-x-0 z-0 h-[calc(var(--hero-fold,0px)+4rem)] overflow-hidden bg-background lg:fixed lg:top-0 lg:h-[var(--hero-fold)]"
+      id="hero-fold"
+    >
+      <SanityImage
+        alt=""
+        className={cn(mirror, split && "dark:hidden")}
+        image={light}
+        loading="lazy"
+        width={POSTER_WIDTH}
+      />
+      {split && dark && (
+        <SanityImage
+          alt=""
+          className={cn(mirror, "hidden dark:block")}
+          image={dark}
+          loading="lazy"
+          width={POSTER_WIDTH}
+        />
+      )}
+    </div>
   );
 }
 
@@ -153,12 +182,13 @@ export function HeroBlock({
 
   return (
     <>
+      <HeroFold video={video} />
       <div
-        className="sticky top-0 z-0 h-[calc(100svh-var(--hero-copy))] overflow-hidden bg-background"
+        className="hero-park relative z-0 h-[calc(100svh-var(--hero-copy))] overflow-hidden bg-background lg:sticky lg:top-0"
         data-sanity={dataSanity}
         id="hero"
       >
-        {banner}
+        <div className="hero-blur absolute inset-0">{banner}</div>
       </div>
       <div
         className="relative z-10 bg-background pt-6 pb-8 md:pt-8 md:pb-12"
