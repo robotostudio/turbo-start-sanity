@@ -78,7 +78,7 @@ function HeroFold({ video }: Readonly<{ video?: HeroVideoData | null }>) {
   return (
     <div
       aria-hidden="true"
-      className="-top-[var(--hero-fold,0px)] absolute inset-x-0 z-0 h-[calc(var(--hero-fold,0px)+4rem)] overflow-hidden bg-background lg:fixed lg:top-0 lg:h-[var(--hero-fold)]"
+      className="hero-park -top-[var(--hero-fold,0px)] absolute inset-x-0 z-0 h-[calc(var(--hero-fold,0px)+4rem)] overflow-hidden bg-background lg:fixed lg:top-0 lg:h-[var(--hero-fold)]"
       id="hero-fold"
     >
       <SanityImage
@@ -184,7 +184,7 @@ export function HeroBlock({
     <>
       <HeroFold video={video} />
       <div
-        className="relative z-0 h-[calc(100svh-var(--hero-copy))] overflow-hidden bg-background lg:sticky lg:top-0"
+        className="hero-park relative z-0 h-[calc(100svh-var(--hero-copy))] overflow-hidden bg-background lg:sticky lg:top-0"
         data-sanity={dataSanity}
         id="hero"
       >

@@ -373,11 +373,31 @@
   animation-range: var(--hero-rest, 0px) 100vh;
 }
 
+/* The sticky banner paints at the viewport top for the whole page, so it
+   would surface again in the footer's full-screen reveal. Once the content
+   has fully covered it (~one viewport of scroll) it switches off. */
+@keyframes hero-park {
+  to {
+    visibility: hidden;
+  }
+}
+
+@utility hero-park {
+  animation-name: hero-park;
+  animation-duration: 1ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root block);
+  animation-range: calc(var(--hero-rest, 0px) + 100svh)
+    calc(var(--hero-rest, 0px) + 100svh + 1px);
+}
+
 @supports not (animation-timeline: scroll()) {
   .nav-exit,
   .lg\:nav-exit,
   .lg\:nav-exit::before,
-  .hero-blur {
+  .hero-blur,
+  .hero-park {
     animation-name: none;
   }
 }
