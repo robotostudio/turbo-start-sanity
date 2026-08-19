@@ -23,6 +23,12 @@ helpers) used across blocks. `src/sanity-blocks.ts` re-exports every schema and
 exposes the `blockSchemas` array that Studio and the page-builder array
 definition both consume.
 
+Video blocks reach for `muxVideoField()` from `src/internal/schema-fields.ts`
+and the `muxVideoFields` GROQ fragment, and read the result only through
+`src/internal/mux.ts` — that module stega-cleans every value and refuses a
+playback ID whose encode failed or whose policy is not public. See the
+[Video (Mux) section of CLAUDE.md](../../CLAUDE.md#video-mux).
+
 ## Imports
 
 ```typescript

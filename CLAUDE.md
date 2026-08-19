@@ -94,6 +94,19 @@ To add a new page builder block:
 
 Any page is also served as Markdown for LLMs/agents: append `.md` to the URL (`/about.md`, `/blog/post.md`, `/index.md`) or send `Accept: text/markdown`. `apps/web/src/proxy.ts` rewrites those requests to `apps/web/src/app/api/markdown/route.ts`, which fetches the page's Sanity data and serializes it via `pageBuilderToMarkdown` — the Markdown counterpart of `renderBlockComponent`. Because it serializes structured data (never React), components can't leak as raw `<Component/>` tags; unknown block types return `""`. See step 7 above to support a new block.
 
+### Video (Mux)
+
+Video is hosted on Mux, not stored as a Sanity file asset. `sanity-plugin-mux-input` (registered in `apps/studio/sanity.config.ts`) adds the `mux.video` field type; use the `muxVideoField()` helper from `packages/sanity-blocks/src/internal/schema-fields.ts` (it takes an optional `validation`) and the `muxVideoFields` GROQ fragment, which resolves the referenced `mux.videoAsset` down to `{ playbackId, aspectRatio, status, thumbTime, title, policy }`. One upload covers every device — Mux serves an adaptive HLS ladder — so schemas carry a single video field, not a per-format set.
+
+Helpers live in `packages/sanity-blocks/src/internal/mux.ts` and every value that reaches a URL or a CSS declaration is stega-cleaned there, because Visual Editing encodes invisible characters into strings. `muxPlaybackId` is the only way to read a playback ID, and it withholds one when Mux reports `errored` or when the playback policy is anything but `public` (signed playback needs JWTs this starter does not mint). It deliberately does **not** gate on `status === "ready"`: that field is patched by a poll running in the editor's browser tab, so it stalls at `preparing` whenever the tab closes mid-encode, and gating on it would hide a playable video indefinitely.
+
+Upload settings are left on the plugin defaults (`video_quality: "plus"`, 1080p ceiling, public playback); every upload is billed, so each project should pick its own tier in `sanity.config.ts`. Mux API credentials are **not** env vars: an editor pastes the token ID and secret into the plugin's setup screen the first time they upload, and the Studio stores them in the dataset as `secrets.mux`. That is a trade, not just a convenience — on a public dataset the secret key is readable by anyone who can query it, so give the token only Mux Video read/write, and keep the dataset private if that matters.
+
+Two render paths, deliberately different:
+
+- **Content video** — `internal/mux-video.tsx` renders a facade: the Mux still and a play button, with `@mux/mux-player-react` behind a `next/dynamic` import that only resolves once a visitor presses play. Until then neither the player chunk nor the video bytes Mux bills are spent on someone who never watches. `disableTracking` keeps Mux Data off both paths — drop it and set an `envKey` to turn analytics on. The block renders its copy even when no video resolves, matching the Markdown serializer.
+- **Hero background** — the bare `@mux/mux-video-react` element behind a `next/dynamic` import, so hls.js stays out of the shared client bundle on pages with no video. It sets `renditionOrder="desc"` and `maxResolution="1080p"` — ABR would otherwise leave a short loop parked on whatever rendition the first segment picked, and Mux ships H.264 only, so the same clip that was 1.9 MB as hand-encoded AV1 costs 3.0 MB at 1080p and 13.2 MB at 2160p. The hand-encoded webm/mp4/mobile fallback that predated Mux has been removed; a hero variant is now a Mux video, a picture, or both, and the picture falls back to the video's own still (`muxThumbnailUrl` honours the editor's `thumbTime`).
+
 ### Sanity Document Types
 
 **Singletons** (one instance each): `homePage`, `blogIndex`, `settings`, `footer`, `navbar`
