@@ -1,11 +1,11 @@
-import { ImageIcon, ImagesIcon } from "@sanity/icons";
 import { imageWithAltField } from "@workspace/sanity-blocks/internal/schema-fields";
+import { Image, Images } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
 const showcaseItem = defineArrayMember({
   name: "showcaseItem",
   type: "object",
-  icon: ImageIcon,
+  icon: Image,
   fields: [
     defineField({
       name: "siteName",
@@ -70,7 +70,7 @@ export const showcaseGridSchema = defineType({
   title: "Showcase Grid",
   description:
     "A section that shows off real websites built with the template. Add the sites as items below — the one marked 'Featured' is shown in the large card at the top.",
-  icon: ImagesIcon,
+  icon: Images,
   fields: [
     defineField({
       name: "title",
