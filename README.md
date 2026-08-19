@@ -203,6 +203,137 @@ derives every content type from that file rather than redeclaring shapes. See
 [CLAUDE.md](CLAUDE.md) for the architecture in detail, including the checklist
 for adding a new page-builder block.
 
+## Documenting your routes
+
+The Studio tells editors what fields exist, not what any document *does* or which
+URL it ends up at. [`sanity-plugin-md-notes`](https://www.npmjs.com/package/sanity-plugin-md-notes)
+fixes that: drop a `<schemaName>.help.md` next to a schema and editors get a Help
+panel inside the Studio, rendered from your markdown.
+
+Rather than ship help files that won't match your content model, paste the prompt
+below into Claude Code (or your agent of choice). It installs the plugin, works out
+what routes your site actually has by reading your schemas and querying your
+dataset, and writes the documentation against your content.
+
+```
+Document every route in this project.
+
+This repo is Turbo Start Sanity: a pnpm/Turborepo monorepo with a Vite-based Sanity
+Studio in `apps/studio` and a Next.js frontend in `apps/web`. You're going to install
+`sanity-plugin-md-notes`, which turns a `<schemaName>.help.md` file sitting next to a
+schema into a Help panel inside the Studio, and then write those files for every route
+this site has.
+
+1. Install and register the plugin
+
+Read the plugin README and follow its Vite setup, not the Turbopack/codegen one -
+this Studio runs on `sanity dev`. npmjs.com returns 403 to programmatic fetches, so
+pull the README from the registry instead:
+`curl -s https://registry.npmjs.org/sanity-plugin-md-notes | jq -r .readme`
+
+Document the four URL-owning types at minimum (`homePage`, `page`, `blogIndex`,
+`blog`) plus `redirect`. The global config types (`navbar`, `footer`, `settings`)
+and reference-only types (`author`, `faq`) are optional - say which you chose.
+
+You need three things:
+
+- `helpPlugin({ files })` in the `plugins` array of `apps/studio/sanity.config.ts`,
+  with `files` from `import.meta.glob("./schemaTypes/**/*.help.md", { eager: true,
+  query: "?raw", import: "default" })`
+- `defaultDocumentNode: withHelpDefaultDocumentNode()` on the existing
+  `structureTool(...)` call
+- `withHelp()` wrapped around each document schema you intend to document
+
+One thing will bite you. `apps/studio/tsconfig.json` sets `"types": []`, so
+`import.meta.glob` won't typecheck and the build fails with `Property 'glob' does
+not exist on type 'ImportMeta'`. Add `"vite/client"`.
+
+Leave the page-builder block schemas in `packages/sanity-blocks` alone. `apps/web`
+imports that package, and `withHelp` would pull a Studio-only dependency into the
+frontend's dependency graph. Document types only.
+
+2. Work out what the routes actually are
+
+Don't infer routes from the files in `apps/web/src/app`. Only a handful are static.
+The real inventory is the home page, every `page` document's slug, the blog index,
+and every `blog` document's slug. Work it out from the content, not the filesystem:
+
+a. List the document types in `apps/studio/schemaTypes/documents/`. Mark which own a
+   URL, which are global config consumed by the layout (navbar, footer, settings),
+   and which are only ever referenced by other documents (author, faq).
+b. For each URL-owning type, read its route file in `apps/web/src/app`, the GROQ
+   query in `packages/sanity/src/query.ts` that feeds it, and its entry in
+   `apps/studio/utils/slug-validation.ts`. Note the exact query names and paths.
+   You'll cite them.
+c. Query the dataset for the live slugs of each type, so you document real URLs
+   rather than hypothetical ones. `apps/web/src/app/llms.txt/route.ts` already does
+   this exact enumeration. Read it first. If no dataset is configured, fall back to
+   the seed data in `apps/studio/seed-data.tar.gz`.
+d. Trace everything downstream of each type: `sitemap.ts`, `llms.txt`, the `.md` twin
+   rewrite in `apps/web/src/proxy.ts`, build-time redirects in
+   `apps/web/next.config.ts`, and the Presentation mapping in
+   `apps/studio/location.ts`.
+e. Collect the rules an editor can trip over: reserved slug prefixes, required exact
+   slugs, uniqueness constraints, and anything that fires automatically on publish
+   (this template mints a `redirect` document whenever a published slug changes).
+
+Write the inventory out as a table before you start writing help files, so it can be
+checked against what you produce.
+
+3. Write the help files
+
+One `<schemaName>.help.md` per wrapped schema, in `apps/studio/schemaTypes/documents/`.
+The glob root is `schemaTypes/` - files anywhere else produce an empty map and no
+error.
+
+The filename must equal the schema's `name:` exactly, because the plugin keys its
+registry on the basename. `blog-index.ts` declares `name: "blogIndex"`, so it needs
+`blogIndex.help.md`. A mismatch fails silently: the Help icon just never appears.
+
+This knowingly breaks the kebab-case file convention in `CLAUDE.md`. Follow the
+plugin, not the convention, and add a note to `CLAUDE.md` saying why.
+
+Write for a non-technical editor. Each file:
+
+- `lastUpdated` frontmatter with today's date
+- One sentence on what the document type is for
+- The URL it produces, with a real example taken from the dataset
+- A table of the slug rules
+- What happens when you publish it: redirects, revalidation, anything automatic
+- Where it surfaces beyond its own page (navigation, sitemap, `llms.txt`, `.md` twin)
+- `> [!WARNING]` for anything destructive or irreversible, `> [!IMPORTANT]` for rules
+  that will reject a save
+
+Cross-link sibling types with in-Studio intent links. Editing an existing document is
+`[Navigation](/structure/intent/edit/id=navbar;type=navbar)`; creating a new one is
+`[Redirects](/structure/intent/create/type=redirect)`. Querystring syntax crashes the
+router. The format is semicolon-separated path segments and the `/structure/` prefix
+is required.
+
+4. Verify
+
+`S.document()` bypasses `defaultDocumentNode`, so every call site needs
+`helpView(S, { schemaType })` spread into `.views([...])` or the tab silently never
+appears. There are two files to fix, not one:
+
+- `apps/studio/structure.ts` - the singletons. Note `blogIndex` already calls
+  `.views([S.view.form()])`; extend that array rather than replacing it.
+- `apps/studio/components/nested-pages-structure.ts` - three more call sites, which
+  build every `page` document under "Pages by Path". Miss these and Pages, the
+  most-edited type, has no Help tab on that route. Reaching a Page via "All Pages"
+  goes through `S.documentTypeListItem` and does get the tab, so the bug looks fixed
+  unless you check "Pages by Path" specifically.
+
+Run `pnpm dev:studio` and open a document of each type, including a singleton and a
+Page reached via "Pages by Path". Confirm the Help inspector (book icon, top right)
+renders your markdown.
+
+Finish with `pnpm check-types`, `pnpm lint` and `pnpm format:check`.
+```
+
+Wrapping schemas in `withHelp()` reindents them, so review the resulting diff with
+`git diff -w`.
+
 ## Notable features
 
 - Page-builder architecture backed by shared block schemas and renderers
@@ -212,6 +343,7 @@ for adding a new page-builder block.
 - Redirect support managed in Sanity
 - Markdown twins for pages via `.md` URLs and `Accept: text/markdown`
 - `llms.txt` generation at `/llms.txt`
+- Copy-paste prompt for documenting your routes inside the Studio
 - GitHub Actions for CI, template validation, E2E smoke tests, and Studio deploy
 
 ## Deploying
