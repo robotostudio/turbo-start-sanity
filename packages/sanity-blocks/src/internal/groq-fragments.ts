@@ -81,3 +81,22 @@ export const urlFragment = /* groq */ `
     url.href
   )
 `;
+
+/** `mux.video` holds only a reference; everything playable is on the asset. */
+export const muxVideoFields = /* groq */ `
+  "playbackId": asset->playbackId,
+  "policy": asset->data.playback_ids[0].policy,
+  "aspectRatio": asset->data.aspect_ratio,
+  "status": asset->status,
+  "thumbTime": asset->thumbTime,
+  "title": asset->filename
+`;
+
+/** The `muxVideoEmbedField` shape: the clip, plus how the editor wants it played. */
+export const muxVideoEmbedFields = /* groq */ `
+  asset {
+    ${muxVideoFields}
+  },
+  autoPlay,
+  loop
+`;
