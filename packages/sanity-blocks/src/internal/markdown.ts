@@ -4,6 +4,7 @@
  * here to stay DRY and avoid circular dependencies with the dispatcher.
  */
 
+import { type MuxVideoData, muxPlaybackId, muxThumbnailUrl } from "./mux";
 import {
   absolutizeUrl,
   escapeMarkdown,
@@ -78,10 +79,17 @@ export interface MarkdownTestimonial {
 }
 
 export interface MarkdownVideoVariant {
+  mux?: MuxVideoData | null;
   poster?: MarkdownImage | null;
 }
 
-export interface MarkdownVideo {
+/**
+ * Every shape a `video` field takes: the hero's per-theme variants and the
+ * content embed. One optional-everything type, so serializers read the field
+ * without narrowing a union.
+ */
+export interface MarkdownVideo extends MuxVideoData {
+  asset?: MuxVideoData | null;
   light?: MarkdownVideoVariant | null;
   dark?: MarkdownVideoVariant | null;
 }
@@ -90,6 +98,7 @@ export interface MarkdownBlock {
   _type?: string;
   _key?: string;
   title?: string | null;
+  caption?: string | null;
   eyebrow?: string | null;
   description?: string | null;
   items?: MarkdownShowcaseItem[] | null;
@@ -165,6 +174,26 @@ export function imageToMarkdown(
       : img;
   }
   return escapeMarkdown(caption || alt);
+}
+
+/** Enough for a reader; a source-resolution still would be pointless here. */
+const STILL_WIDTH = 1200;
+
+/** Mux holds no still in Sanity, so its generated thumbnail is the only one. */
+export function muxVideoToMarkdown(
+  video: MuxVideoData | null | undefined,
+  alt?: string | null
+): string {
+  const url = muxThumbnailUrl(
+    muxPlaybackId(video),
+    video?.thumbTime,
+    STILL_WIDTH
+  );
+  if (!url) {
+    return "";
+  }
+  const label = (alt ?? video?.title ?? "").trim();
+  return `![${escapeMarkdown(label)}](${formatUrl(url)})`;
 }
 
 /** A Markdown link, or plain escaped text when the href is missing or `#`. */
