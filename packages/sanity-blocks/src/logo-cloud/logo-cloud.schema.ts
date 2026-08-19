@@ -1,4 +1,4 @@
-import { ImagesIcon } from "@sanity/icons";
+import { Images } from "lucide-react";
 import { logoLinkItem } from "@workspace/sanity-blocks/internal/schema-fields";
 import { defineField, defineType } from "sanity";
 
@@ -8,7 +8,7 @@ export const logoCloudSchema = defineType({
   name: "logoCloud",
   type: "object",
   title: "Logo Cloud",
-  icon: ImagesIcon,
+  icon: Images,
   fields: [
     defineField({
       name: "logos",

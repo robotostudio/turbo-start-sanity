@@ -1,4 +1,4 @@
-import { ImagesIcon } from "@sanity/icons";
+import { Images } from "lucide-react";
 import {
   defineArrayMember,
   defineField,
@@ -76,7 +76,7 @@ export const logoLinkItem = (name: string) =>
   defineArrayMember({
     name,
     type: "object",
-    icon: ImagesIcon,
+    icon: Images,
     fields: [
       imageWithAltField({
         title: "Logo",

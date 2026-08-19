@@ -1,4 +1,4 @@
-import { LinkIcon, UsersIcon } from "@sanity/icons";
+import { Link, Users } from "lucide-react";
 import { imageWithAltField } from "@workspace/sanity-blocks/internal/schema-fields";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
@@ -16,7 +16,7 @@ const SOCIAL_PLATFORMS = [
 const socialGridItem = defineArrayMember({
   name: "socialGridItem",
   type: "object",
-  icon: LinkIcon,
+  icon: Link,
   fields: [
     defineField({
       name: "platform",
@@ -70,7 +70,7 @@ export const socialGridSchema = defineType({
   title: "Social Grid",
   description:
     "A community section with a heading and a row of large cards linking to your social platforms",
-  icon: UsersIcon,
+  icon: Users,
   fields: [
     defineField({
       name: "eyebrow",
