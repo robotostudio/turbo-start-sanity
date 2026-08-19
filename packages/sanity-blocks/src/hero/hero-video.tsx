@@ -2,60 +2,27 @@
 
 import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
+import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
+import { type MuxVideoData, muxPlaybackId } from "../internal/mux";
+
+/**
+ * Loaded on demand: a static import would ship hls.js and mux-embed
+ * (~216 KB gzip) to every route through the client-side page builder, video
+ * or no video. Nothing renders before mount, so skipping SSR costs no markup.
+ */
+const MuxVideo = dynamic(() => import("@mux/mux-video-react"), { ssr: false });
+
 export interface HeroVideoVariant {
-  /** Full-resolution HEVC for Safari, which decodes AV1 only on recent chips. */
-  hevc?: string | null;
-  /** Phone-sized clips. Optional — the desktop set is used when absent. */
-  mobileWebm?: string | null;
+  mux?: MuxVideoData | null;
   poster?: SanityImageData | null;
-  webm?: string | null;
 }
 
 export interface HeroVideoData {
   light?: HeroVideoVariant | null;
   dark?: HeroVideoVariant | null;
-}
-
-function hasSource(variant?: HeroVideoVariant | null): boolean {
-  return Boolean(variant?.webm || variant?.hevc || variant?.mobileWebm);
-}
-
-/**
- * Whether this viewport should get the smaller clip. The `media` attribute on
- * `<source>` was dropped from the spec and Chrome ignores it, so picking in JS
- * is the only portable option.
- */
-function useIsCompactViewport(): boolean {
-  const [isCompact, setIsCompact] = useState(false);
-
-  useEffect(() => {
-    const query = window.matchMedia("(max-width: 1279px)");
-    setIsCompact(query.matches);
-    const onChange = (event: MediaQueryListEvent) =>
-      setIsCompact(event.matches);
-    query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
-  }, []);
-
-  return isCompact;
-}
-
-/**
- * The clips for this viewport. Only the WebM has a smaller version; anything
- * that cannot decode it drops to the desktop HEVC, still the smallest file in
- * the set.
- */
-function pickSources(variant: HeroVideoVariant | null, isCompact: boolean) {
-  if (isCompact) {
-    return {
-      hevc: variant?.hevc,
-      webm: variant?.mobileWebm ?? variant?.webm,
-    };
-  }
-  return { hevc: variant?.hevc, webm: variant?.webm };
 }
 
 /** Tracks the reduced-motion preference, including changes made after load. */
@@ -88,57 +55,58 @@ export function HeroVideo({
 }: Readonly<{ className?: string; video?: HeroVideoData | null }>) {
   const { resolvedTheme } = useTheme();
   const prefersReducedMotion = usePrefersReducedMotion();
-  const isCompactViewport = useIsCompactViewport();
   const [mounted, setMounted] = useState(false);
-  const [ready, setReady] = useState(false);
+  // The clip that decoded a frame, not a boolean: a theme toggle mounts a
+  // fresh element, so readiness expires with the ID it was earned for.
+  const [readyId, setReadyId] = useState<string | null>(null);
 
   useEffect(() => setMounted(true), []);
 
-  // Dark falls back to the light clip so a single upload still works.
-  const variant =
-    resolvedTheme === "dark" && hasSource(video?.dark)
-      ? video?.dark
-      : video?.light;
-  const sources = pickSources(variant ?? null, isCompactViewport);
+  const darkId = muxPlaybackId(video?.dark?.mux);
+  const playbackId =
+    resolvedTheme === "dark" && darkId
+      ? darkId
+      : muxPlaybackId(video?.light?.mux);
 
-  if (!(mounted && hasSource(variant)) || prefersReducedMotion) {
+  if (!(mounted && playbackId) || prefersReducedMotion) {
     return null;
   }
 
   return (
-    <video
-      aria-hidden="true"
+    <MuxVideo
+      aria-hidden
       autoPlay
       className={cn(
         "pointer-events-none size-full object-cover object-[50%_45%] transition-opacity duration-700 ease-out",
-        ready ? "opacity-100" : "opacity-0",
+        readyId === playbackId ? "opacity-100" : "opacity-0",
         className
       )}
-      // Decorative background. `pointer-events-none` is what actually keeps it
-      // inert: without it a right-click offers Chrome's "Show controls", which
-      // sticks per-site and paints a full transport bar over the hero. The two
-      // attributes below drop picture-in-picture and casting from that menu.
+      // `pointer-events-none` is what keeps this decorative: without it a
+      // right-click offers Chrome's "Show controls", which sticks per-site and
+      // paints a transport bar over the hero. These two drop picture-in-picture
+      // and casting from that menu.
       disablePictureInPicture
       disableRemotePlayback
-      key={sources.webm ?? sources.hevc}
+      // The hero autoplays, so Mux Data would beacon and set a year-long
+      // cookie on every visit, ahead of any consent gate. Drop this and set
+      // `envKey` to opt back in.
+      disableTracking
+      key={playbackId}
       loop
+      // A short loop replays from buffer, so ABR never steps up from whatever
+      // the first segment picked. Capping the ladder high-first pins it to
+      // 1080p immediately. Not higher: Mux ships H.264, so this 8.5s clip is
+      // 3.0 MB at 1080p against 13.2 MB at 2160p — the AV1 file it replaced
+      // was 1.9 MB at full 4K.
+      maxResolution="1080p"
       muted
-      onCanPlay={() => setReady(true)}
+      onCanPlay={() => setReadyId(playbackId)}
+      playbackId={playbackId}
       playsInline
       preload="auto"
+      renditionOrder="desc"
+      streamType="on-demand"
       tabIndex={-1}
-    >
-      {sources.webm && (
-        <source src={sources.webm} type='video/webm; codecs="av01.0.05M.08"' />
-      )}
-      {/*
-        The codec string is required, not decoration: as plain `video/mp4`
-        every browser would accept this and then fail to decode it, since
-        <source> selection is by type alone.
-      */}
-      {sources.hevc && (
-        <source src={sources.hevc} type='video/mp4; codecs="hvc1"' />
-      )}
-    </video>
+    />
   );
 }

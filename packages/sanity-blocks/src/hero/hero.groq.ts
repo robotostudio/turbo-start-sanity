@@ -1,17 +1,15 @@
 import {
   buttonsFragment,
   imageFields,
+  muxVideoFields,
   richTextFragment,
 } from "../internal/groq-fragments";
 
-/**
- * File assets carry no LQIP or dimensions, so only the URL is worth resolving.
- * The poster keeps the full image shape so it renders through SanityImage.
- */
+/** The poster keeps the full image shape so it renders through SanityImage. */
 const videoVariantFields = /* groq */ `
-  "webm": webm.asset->url,
-  "hevc": hevc.asset->url,
-  "mobileWebm": mobileWebm.asset->url,
+  mux {
+    ${muxVideoFields}
+  },
   poster {
     ${imageFields}
   }

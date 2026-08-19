@@ -1,48 +1,29 @@
 import {
   buttonsField,
   definePortableTextField,
+  muxVideoField,
 } from "@workspace/sanity-blocks/internal/schema-fields";
 import { Star } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
 /**
- * One theme's worth of background video.
- *
- * Three clips, because no single file suits every visitor: two formats cover
- * the range of devices, plus one phone-sized version. Each is optional and
- * falls back to the next, so a partial set still works — and the picture alone
- * is a valid setup.
+ * One theme's worth of background: a single upload, encoded for every device,
+ * so no format matrix. The picture covers the load, stands alone when there is
+ * no video, and falls back to the clip's own opening frame when skipped.
  */
 const videoVariantFields = () => [
-  defineField({
-    name: "webm",
-    type: "file",
-    title: "Video For Computers",
+  muxVideoField({
+    name: "mux",
+    title: "Video",
     description:
-      "The .webm file, encoded as AV1. Most people see this one. The AV1 codec is declared to the browser so Safari skips it and takes the .mp4 instead — upload a VP9 .webm here and this hero may fall back to the .mp4 or just the poster image.",
-    options: { accept: "video/webm" },
-  }),
-  defineField({
-    name: "hevc",
-    type: "file",
-    title: "Video For Apple Devices",
-    description: "The .mp4 file. Macs, iPhones and iPads need this one.",
-    options: { accept: "video/mp4" },
-  }),
-  defineField({
-    name: "mobileWebm",
-    type: "file",
-    title: "Video For Phones",
-    description:
-      "A smaller .webm, so phones do not have to download the big file. AV1, like the one above.",
-    options: { accept: "video/webm" },
+      "Upload one video. It is optimised for every device automatically.",
   }),
   defineField({
     name: "poster",
     type: "image",
     title: "Picture",
     description:
-      "Shown while the video loads, and on its own if you add no videos. Use the very first frame of the video, so you cannot see the moment it starts playing.",
+      "Optional. Shown while the video loads, or on its own if you add no video.",
   }),
 ];
 
@@ -50,15 +31,14 @@ export const heroVideoField = defineField({
   name: "video",
   type: "object",
   title: "Background",
-  description:
-    "Add just a picture, or add videos too. The picture appears first, then the video fades in over it.",
+  description: "Add a video. If you have no video, add a picture instead.",
   options: { collapsible: true, collapsed: true },
   fields: [
     defineField({
       name: "light",
       type: "object",
       title: "Light Mode",
-      description: "The files shown when the site is in light mode.",
+      description: "Shown in light mode.",
       options: { collapsible: true, collapsed: false },
       fields: videoVariantFields(),
     }),
@@ -66,8 +46,7 @@ export const heroVideoField = defineField({
       name: "dark",
       type: "object",
       title: "Dark Mode",
-      description:
-        "Optional. Leave empty and the light mode files are used here too.",
+      description: "Optional. Leave empty to reuse the light mode background.",
       options: { collapsible: true, collapsed: false },
       fields: videoVariantFields(),
     }),

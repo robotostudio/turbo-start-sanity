@@ -40,6 +40,12 @@ export default async function RootLayout({
 }>) {
   preconnect("https://cdn.sanity.io");
   prefetchDNS("https://cdn.sanity.io");
+  // Mux serves the manifest from stream and the poster from image, both on
+  // the critical path once a page carries a clip.
+  preconnect("https://stream.mux.com");
+  prefetchDNS("https://stream.mux.com");
+  preconnect("https://image.mux.com");
+  prefetchDNS("https://image.mux.com");
   // In local dev, nav/footer follow drafts too (like page content), so draft
   // navbar/footer/settings edits are visible without a Presentation session.
   // Production stays static published.
