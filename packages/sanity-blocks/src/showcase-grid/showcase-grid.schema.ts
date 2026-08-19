@@ -1,5 +1,5 @@
-import { Image, Images } from "lucide-react";
 import { imageWithAltField } from "@workspace/sanity-blocks/internal/schema-fields";
+import { Image, Images } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
 const showcaseItem = defineArrayMember({

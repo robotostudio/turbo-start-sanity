@@ -1,5 +1,5 @@
-import { File, Folder } from "lucide-react";
 import { friendlyWords } from "friendlier-words";
+import { File, Folder } from "lucide-react";
 import { getPublishedId } from "sanity";
 import type { ListItemBuilder, StructureBuilder } from "sanity/structure";
 
