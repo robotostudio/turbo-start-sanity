@@ -119,7 +119,7 @@ export const logoLinkItem = (name: string) =>
  * `muxVideoField` — always muted, always looping, nothing to ask.
  */
 export const muxVideoEmbedField = ({
-  description = "The video, and how it should play.",
+  description,
   group,
   name = "video",
   title = "Video",
@@ -138,8 +138,13 @@ export const muxVideoEmbedField = ({
     description,
     group,
     validation,
+    options: { collapsible: false },
     fields: [
-      muxVideoField({ name: "asset" }),
+      muxVideoField({
+        name: "asset",
+        title: "File",
+        validation: (Rule) => Rule.required(),
+      }),
       defineField({
         name: "autoPlay",
         type: "boolean",
@@ -160,7 +165,7 @@ export const muxVideoEmbedField = ({
 
 /** A bare Mux clip. The plugin encodes it for every device on upload. */
 export const muxVideoField = ({
-  description = "Upload one video. It is optimised for every device automatically.",
+  description = "Upload a file, paste a video URL, or pick one already in the project.",
   group,
   name = "video",
   title = "Video",
@@ -179,4 +184,5 @@ export const muxVideoField = ({
     description,
     group,
     validation,
+    options: { collapsible: false },
   });

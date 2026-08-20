@@ -29,11 +29,11 @@ export const videoFeatureSchema = defineType({
       description: "The supporting paragraph shown beneath the title",
     }),
     muxVideoEmbedField({
-      // A warning, not an error: the block renders its copy without a video.
-      // It only sees whether a clip was picked — a failed encode or a
-      // non-public policy lives on the asset the form cannot follow.
-      validation: (Rule) =>
-        Rule.required().warning("Add a video, or this block shows only text."),
+      // The block is the video: without one there is nothing to show but a
+      // heading, so this blocks publishing rather than warning. The renderer
+      // still copes with an absent clip — a published asset can be deleted, or
+      // its encode can fail, long after the form was satisfied.
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: "caption",
