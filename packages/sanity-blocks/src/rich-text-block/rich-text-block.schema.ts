@@ -20,10 +20,10 @@ export const richTextBlockSchema = defineType({
       title: "Title",
       description: "The large text that is the primary focus of the block",
     }),
-    definePortableTextField(["block", "image"], {
+    definePortableTextField(["block", "image", "table"], {
       name: "richText",
       description:
-        "The body content for this block. Add paragraphs, headings, lists, links and images.",
+        "The body content for this block. Add paragraphs, headings, lists, links, images and tables.",
     }),
   ],
   preview: {

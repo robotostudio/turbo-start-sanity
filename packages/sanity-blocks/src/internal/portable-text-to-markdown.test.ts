@@ -370,6 +370,73 @@ test("block-leading: inline underscores in normal paragraphs are not over-escape
   ).toBe("user_name_field");
 });
 
+const cellPara = (text: string) => [
+  {
+    _type: "block",
+    style: "normal",
+    children: [{ _type: "span", text }],
+  },
+];
+
+test("serializes a table to a GFM pipe table", () => {
+  const md = portableTextToMarkdown([
+    {
+      _type: "table",
+      headerRows: 1,
+      rows: [
+        {
+          cells: [{ value: cellPara("Name") }, { value: cellPara("Role") }],
+        },
+        {
+          cells: [{ value: cellPara("Ada") }, { value: cellPara("Engineer") }],
+        },
+      ],
+    },
+  ]);
+
+  expect(md).toBe("| Name | Role |\n| --- | --- |\n| Ada | Engineer |");
+});
+
+test("table cells escape pipes and collapse newlines to <br>", () => {
+  const md = portableTextToMarkdown([
+    {
+      _type: "table",
+      headerRows: 1,
+      rows: [
+        { cells: [{ value: cellPara("A | B") }] },
+        {
+          cells: [
+            {
+              value: [...cellPara("Line one"), ...cellPara("Line two")],
+            },
+          ],
+        },
+      ],
+    },
+  ]);
+
+  expect(md).toBe("| A \\| B |\n| --- |\n| Line one<br>Line two |");
+});
+
+test("table rows are padded to the widest row's column count", () => {
+  const md = portableTextToMarkdown([
+    {
+      _type: "table",
+      headerRows: 1,
+      rows: [
+        { cells: [{ value: cellPara("A") }, { value: cellPara("B") }] },
+        { cells: [{ value: cellPara("C") }] },
+      ],
+    },
+  ]);
+
+  expect(md).toBe("| A | B |\n| --- | --- |\n| C |  |");
+});
+
+test("empty table serializes to nothing", () => {
+  expect(portableTextToMarkdown([{ _type: "table", rows: [] }])).toBe("");
+});
+
 test("never emits raw JSX-style tags", () => {
   const md = portableTextToMarkdown([
     {
