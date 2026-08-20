@@ -62,7 +62,7 @@ export type Testimonial = {
 };
 
 export type VideoFeatureVideo = {
-  asset?: MuxVideo;
+  asset: MuxVideo;
   autoPlay?: boolean;
   loop?: boolean;
 };
@@ -1916,7 +1916,7 @@ export type QueryHomePageDataResult = {
             status: string | null;
             thumbTime: number | null;
             title: string | null;
-          } | null;
+          };
           autoPlay: boolean | null;
           loop: boolean | null;
         };
@@ -2536,7 +2536,7 @@ export type QuerySlugPageDataResult = {
             status: string | null;
             thumbTime: number | null;
             title: string | null;
-          } | null;
+          };
           autoPlay: boolean | null;
           loop: boolean | null;
         };
@@ -3154,7 +3154,7 @@ export type QueryBlogIndexPageResult = {
             status: string | null;
             thumbTime: number | null;
             title: string | null;
-          } | null;
+          };
           autoPlay: boolean | null;
           loop: boolean | null;
         };
