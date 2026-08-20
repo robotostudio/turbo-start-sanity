@@ -52,7 +52,10 @@ export function MuxVideo({
   video,
 }: Readonly<MuxVideoProps>) {
   const autoPlay = Boolean(options?.autoPlay);
-  const [playing, setPlaying] = useState(autoPlay);
+  // Derived, not seeded: Presentation keeps the instance mounted across edits,
+  // so state initialised at mount would ignore the editor's toggle.
+  const [pressed, setPressed] = useState(false);
+  const playing = autoPlay || pressed;
 
   const playbackId = muxPlaybackId(video);
   if (!playbackId) {
@@ -75,12 +78,13 @@ export function MuxVideo({
         <img
           alt=""
           className="absolute inset-0 size-full object-cover"
+          loading="lazy"
           src={poster}
         />
       )}
       {playing ? (
         <MuxPlayer
-          autoPlay={autoPlay ? "muted" : true}
+          autoPlay={autoPlay ? "muted" : "any"}
           className="absolute inset-0 size-full"
           // Mux Data would beacon and set a year-long cookie ahead of any
           // consent gate. Drop this and set `envKey` to opt back in.
@@ -99,7 +103,7 @@ export function MuxVideo({
         <button
           aria-label={videoTitle ? `Play video: ${videoTitle}` : "Play video"}
           className="group absolute inset-0 grid place-items-center"
-          onClick={() => setPlaying(true)}
+          onClick={() => setPressed(true)}
           type="button"
         >
           <span className="grid size-14 place-items-center rounded-full bg-background/80 text-foreground backdrop-blur transition group-hover:scale-105 group-hover:bg-background">

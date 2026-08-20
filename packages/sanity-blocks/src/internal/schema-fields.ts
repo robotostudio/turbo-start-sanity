@@ -4,6 +4,7 @@ import {
   defineField,
   type ImageRule,
   type ImageValue,
+  type ObjectRule,
   type Rule,
   type ValidationBuilder,
 } from "sanity";
@@ -122,11 +123,13 @@ export const muxVideoEmbedField = ({
   group,
   name = "video",
   title = "Video",
+  validation,
 }: {
   description?: string;
   group?: string;
   name?: string;
   title?: string;
+  validation?: ValidationBuilder<ObjectRule, Record<string, unknown>>;
 } = {}) =>
   defineField({
     name,
@@ -134,6 +137,7 @@ export const muxVideoEmbedField = ({
     title,
     description,
     group,
+    validation,
     fields: [
       muxVideoField({ name: "asset" }),
       defineField({

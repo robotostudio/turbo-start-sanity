@@ -28,7 +28,13 @@ export const videoFeatureSchema = defineType({
       name: "richText",
       description: "The supporting paragraph shown beneath the title",
     }),
-    muxVideoEmbedField(),
+    muxVideoEmbedField({
+      // A warning, not an error: the block renders its copy without a video.
+      // It only sees whether a clip was picked — a failed encode or a
+      // non-public policy lives on the asset the form cannot follow.
+      validation: (Rule) =>
+        Rule.required().warning("Add a video, or this block shows only text."),
+    }),
     defineField({
       name: "caption",
       type: "string",
