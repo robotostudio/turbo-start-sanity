@@ -95,9 +95,8 @@ export function HeroVideo({
       loop
       // A short loop replays from buffer, so ABR never steps up from whatever
       // the first segment picked. Capping the ladder high-first pins it to
-      // 1080p immediately. Not higher: Mux ships H.264, so this 8.5s clip is
-      // 3.0 MB at 1080p against 13.2 MB at 2160p — the AV1 file it replaced
-      // was 1.9 MB at full 4K.
+      // 1080p immediately. Not higher: Mux ships H.264, and 2160p costs
+      // several times the bytes for a background nobody is studying.
       maxResolution="1080p"
       muted
       onCanPlay={() => setReadyId(playbackId)}

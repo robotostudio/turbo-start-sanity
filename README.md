@@ -124,8 +124,10 @@ Notes:
 
 - Video is hosted on **Mux**, not stored in Sanity. There is no env var for it:
   the first time an editor uploads a video, the Studio asks for a Mux access
-  token (Mux Video read + write) and stores it in the dataset. Nothing else in
-  the template needs a Mux account until then.
+  token and stores it in the dataset. Give that token only the Mux Video
+  read and write scopes — on a public dataset it is readable by anyone who can
+  query the dataset. Nothing else in the template needs a Mux account until
+  then.
 - Local development defaults are `http://localhost:3000` for the web app and
   `http://localhost:3333` for Studio.
 - On Vercel, framework environment variables such as
@@ -189,8 +191,8 @@ The Studio currently includes these document types:
 The document definitions live in
 `apps/studio/schemaTypes/documents`, and the shared page-builder blocks live in
 `packages/sanity-blocks/src` — one directory per block, each holding its schema,
-GROQ projection, React component, Markdown serializer, and (where one has been
-captured) its insert-menu thumbnail.
+GROQ projection, React component, Markdown serializer, and its insert-menu
+thumbnail.
 
 After schema changes, regenerate types with:
 
