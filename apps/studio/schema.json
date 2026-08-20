@@ -1879,34 +1879,6 @@
                                                   {
                                                     "type": "string",
                                                     "value": "normal"
-                                                  },
-                                                  {
-                                                    "type": "string",
-                                                    "value": "h1"
-                                                  },
-                                                  {
-                                                    "type": "string",
-                                                    "value": "h2"
-                                                  },
-                                                  {
-                                                    "type": "string",
-                                                    "value": "h3"
-                                                  },
-                                                  {
-                                                    "type": "string",
-                                                    "value": "h4"
-                                                  },
-                                                  {
-                                                    "type": "string",
-                                                    "value": "h5"
-                                                  },
-                                                  {
-                                                    "type": "string",
-                                                    "value": "h6"
-                                                  },
-                                                  {
-                                                    "type": "string",
-                                                    "value": "blockquote"
                                                   }
                                                 ]
                                               },
@@ -1936,10 +1908,11 @@
                                                 "of": {
                                                   "type": "object",
                                                   "attributes": {
-                                                    "href": {
+                                                    "customLink": {
                                                       "type": "objectAttribute",
                                                       "value": {
-                                                        "type": "string"
+                                                        "type": "inline",
+                                                        "name": "customUrl"
                                                       },
                                                       "optional": true
                                                     },
@@ -1947,7 +1920,7 @@
                                                       "type": "objectAttribute",
                                                       "value": {
                                                         "type": "string",
-                                                        "value": "link"
+                                                        "value": "customLink"
                                                       }
                                                     }
                                                   },
@@ -4008,34 +3981,6 @@
                                             {
                                               "type": "string",
                                               "value": "normal"
-                                            },
-                                            {
-                                              "type": "string",
-                                              "value": "h1"
-                                            },
-                                            {
-                                              "type": "string",
-                                              "value": "h2"
-                                            },
-                                            {
-                                              "type": "string",
-                                              "value": "h3"
-                                            },
-                                            {
-                                              "type": "string",
-                                              "value": "h4"
-                                            },
-                                            {
-                                              "type": "string",
-                                              "value": "h5"
-                                            },
-                                            {
-                                              "type": "string",
-                                              "value": "h6"
-                                            },
-                                            {
-                                              "type": "string",
-                                              "value": "blockquote"
                                             }
                                           ]
                                         },
@@ -4065,10 +4010,11 @@
                                           "of": {
                                             "type": "object",
                                             "attributes": {
-                                              "href": {
+                                              "customLink": {
                                                 "type": "objectAttribute",
                                                 "value": {
-                                                  "type": "string"
+                                                  "type": "inline",
+                                                  "name": "customUrl"
                                                 },
                                                 "optional": true
                                               },
@@ -4076,7 +4022,7 @@
                                                 "type": "objectAttribute",
                                                 "value": {
                                                   "type": "string",
-                                                  "value": "link"
+                                                  "value": "customLink"
                                                 }
                                               }
                                             },

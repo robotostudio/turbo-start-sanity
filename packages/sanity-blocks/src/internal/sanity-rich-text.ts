@@ -1,5 +1,9 @@
-import { CodeBlockIcon, ImageIcon, LinkIcon } from "@sanity/icons";
-import { Table } from "lucide-react";
+import {
+  CodeBlockIcon,
+  ImageIcon,
+  LinkIcon,
+  ThLargeIcon,
+} from "@sanity/icons";
 import {
   type ConditionalProperty,
   defineArrayMember,
@@ -24,46 +28,54 @@ const CODE_LANGUAGES = [
   { title: "CSS", value: "css" },
 ];
 
+const PORTABLE_TEXT_BLOCK_STYLES = [
+  { title: "Normal", value: "normal" },
+  { title: "H2", value: "h2" },
+  { title: "H3", value: "h3" },
+  { title: "H4", value: "h4" },
+  { title: "H5", value: "h5" },
+  { title: "H6", value: "h6" },
+  { title: "Inline", value: "inline" },
+];
+
+const TABLE_CELL_BLOCK_STYLES = [{ title: "Normal", value: "normal" }];
+
+const customLinkAnnotation = {
+  name: "customLink",
+  type: "object",
+  title: "Internal/External Link",
+  icon: LinkIcon,
+  fields: [
+    defineField({
+      name: "customLink",
+      type: "customUrl",
+      description:
+        "Where the highlighted text takes visitors — pick a page on this site or paste a web address",
+    }),
+  ],
+};
+
+const PORTABLE_TEXT_MARK_DECORATORS = [
+  { title: "Strong", value: "strong" },
+  { title: "Emphasis", value: "em" },
+  { title: "Code", value: "code" },
+];
+
+const PORTABLE_TEXT_MARKS = {
+  annotations: [customLinkAnnotation],
+  decorators: PORTABLE_TEXT_MARK_DECORATORS,
+};
+
 const richTextMembers = [
   defineArrayMember({
     name: PORTABLE_TEXT_MEMBER_NAMES.block,
     type: "block",
-    styles: [
-      { title: "Normal", value: "normal" },
-      { title: "H2", value: "h2" },
-      { title: "H3", value: "h3" },
-      { title: "H4", value: "h4" },
-      { title: "H5", value: "h5" },
-      { title: "H6", value: "h6" },
-      { title: "Inline", value: "inline" },
-    ],
+    styles: PORTABLE_TEXT_BLOCK_STYLES,
     lists: [
       { title: "Numbered", value: "number" },
       { title: "Bullet", value: "bullet" },
     ],
-    marks: {
-      annotations: [
-        {
-          name: "customLink",
-          type: "object",
-          title: "Internal/External Link",
-          icon: LinkIcon,
-          fields: [
-            defineField({
-              name: "customLink",
-              type: "customUrl",
-              description:
-                "Where the highlighted text takes visitors — pick a page on this site or paste a web address",
-            }),
-          ],
-        },
-      ],
-      decorators: [
-        { title: "Strong", value: "strong" },
-        { title: "Emphasis", value: "em" },
-        { title: "Code", value: "code" },
-      ],
-    },
+    marks: PORTABLE_TEXT_MARKS,
   }),
   defineArrayMember({
     name: PORTABLE_TEXT_MEMBER_NAMES.image,
@@ -143,7 +155,7 @@ const richTextMembers = [
     // in sanity.config.ts) strips fields the schema doesn't declare — omitting
     // `headerRows` would silently break the header-row toggle, so it's
     // required here even though the editor UI manages it directly.
-    icon: Table,
+    icon: ThLargeIcon,
     fields: [
       defineField({
         name: "headerRows",
@@ -172,7 +184,13 @@ const richTextMembers = [
                       defineField({
                         name: "value",
                         type: "array",
-                        of: [defineArrayMember({ type: "block" })],
+                        of: [
+                          defineArrayMember({
+                            type: "block",
+                            styles: TABLE_CELL_BLOCK_STYLES,
+                            marks: PORTABLE_TEXT_MARKS,
+                          }),
+                        ],
                       }),
                     ],
                   }),

@@ -5,10 +5,12 @@ import {
 } from "next-sanity";
 
 export interface TableCellValue {
+  _key: string;
   value?: PortableTextBlock[] | null;
 }
 
 export interface TableRowValue {
+  _key: string;
   cells?: TableCellValue[] | null;
 }
 
@@ -50,12 +52,12 @@ function TableRow({
 }>) {
   return (
     <tr>
-      {(row.cells ?? []).map((cell, cellIndex) => (
+      {(row.cells ?? []).map((cell) => (
         <TableCell
           cell={cell}
           cellComponents={cellComponents}
           isHeader={isHeader}
-          key={cellIndex}
+          key={cell._key}
         />
       ))}
     </tr>
@@ -84,23 +86,23 @@ export function TableBlock({
       <table className="w-full border-collapse text-sm">
         {headRows.length > 0 ? (
           <thead>
-            {headRows.map((row, rowIndex) => (
+            {headRows.map((row) => (
               <TableRow
                 cellComponents={cellComponents}
                 isHeader
                 row={row}
-                key={rowIndex}
+                key={row._key}
               />
             ))}
           </thead>
         ) : null}
         <tbody>
-          {bodyRows.map((row, rowIndex) => (
+          {bodyRows.map((row) => (
             <TableRow
               cellComponents={cellComponents}
               isHeader={false}
               row={row}
-              key={rowIndex}
+              key={row._key}
             />
           ))}
         </tbody>

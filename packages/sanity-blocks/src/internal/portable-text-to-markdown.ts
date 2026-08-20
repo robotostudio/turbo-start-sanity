@@ -150,7 +150,7 @@ function fenceCodeBlock(code: string, language?: string | null): string {
 // GFM pipe-table cells are single-line, so a literal `|` would split the
 // column and an embedded newline would break the row entirely.
 function escapeTableCell(text: string): string {
-  return text.replace(/\|/g, String.raw`\|`).replace(/\n+/g, "<br>");
+  return text.replaceAll('|', String.raw`\|`).replace(/\n+/g, "<br>");
 }
 
 function renderTableRow(cells: string[]): string {
@@ -176,7 +176,7 @@ function renderTable(node: PortableTextNode, options: MarkdownOptions): string {
     return "";
   }
   const pad = (cells: string[]) =>
-    Array.from({ length: columnCount }, (_, index) => cells[index] ?? "");
+    Array.from({ length: columnCount }, (_, index) => cells.at(index) ?? "");
 
   const [headerCells = [], ...bodyCells] = rowsMarkdown;
   return [

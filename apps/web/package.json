@@ -36,13 +36,11 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
-    "@sanity/cli-core": "^2.8.1",
     "@sanity/codegen": "^7.0.3",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@workspace/typescript-config": "workspace:*",
-    "dotenv": "^17.3.1",
-    "sanity": "catalog:"
+    "dotenv": "^17.3.1"
   }
 }

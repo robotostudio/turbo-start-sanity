@@ -289,19 +289,11 @@ export type RichTextBlock = {
                 _type: "span";
                 _key: string;
               }>;
-              style?:
-                | "normal"
-                | "h1"
-                | "h2"
-                | "h3"
-                | "h4"
-                | "h5"
-                | "h6"
-                | "blockquote";
+              style?: "normal";
               listItem?: "bullet" | "number";
               markDefs?: Array<{
-                href?: string;
-                _type: "link";
+                customLink?: CustomUrl;
+                _type: "customLink";
                 _key: string;
               }>;
               level?: number;
@@ -586,19 +578,11 @@ export type RichText = Array<
               _type: "span";
               _key: string;
             }>;
-            style?:
-              | "normal"
-              | "h1"
-              | "h2"
-              | "h3"
-              | "h4"
-              | "h5"
-              | "h6"
-              | "blockquote";
+            style?: "normal";
             listItem?: "bullet" | "number";
             markDefs?: Array<{
-              href?: string;
-              _type: "link";
+              customLink?: CustomUrl;
+              _type: "customLink";
               _key: string;
             }>;
             level?: number;
@@ -1663,21 +1647,22 @@ export type QueryHomePageDataResult = {
                       _type: "span";
                       _key: string;
                     }>;
-                    style?:
-                      | "blockquote"
-                      | "h1"
-                      | "h2"
-                      | "h3"
-                      | "h4"
-                      | "h5"
-                      | "h6"
-                      | "normal";
+                    style?: "normal";
                     listItem?: "bullet" | "number";
-                    markDefs: Array<{
-                      href?: string;
-                      _type: "link";
-                      _key: string;
-                    }> | null;
+                    markDefs: Array<
+                      | {
+                          customLink?: CustomUrl;
+                          _type: "customLink";
+                          _key: string;
+                          openInNewTab: boolean | null;
+                          href: string | "#" | null;
+                        }
+                      | {
+                          customLink?: CustomUrl;
+                          _type: "customLink";
+                          _key: string;
+                        }
+                    > | null;
                     level?: number;
                     _type: "block";
                     _key: string;
@@ -2266,21 +2251,22 @@ export type QuerySlugPageDataResult = {
                       _type: "span";
                       _key: string;
                     }>;
-                    style?:
-                      | "blockquote"
-                      | "h1"
-                      | "h2"
-                      | "h3"
-                      | "h4"
-                      | "h5"
-                      | "h6"
-                      | "normal";
+                    style?: "normal";
                     listItem?: "bullet" | "number";
-                    markDefs: Array<{
-                      href?: string;
-                      _type: "link";
-                      _key: string;
-                    }> | null;
+                    markDefs: Array<
+                      | {
+                          customLink?: CustomUrl;
+                          _type: "customLink";
+                          _key: string;
+                          openInNewTab: boolean | null;
+                          href: string | "#" | null;
+                        }
+                      | {
+                          customLink?: CustomUrl;
+                          _type: "customLink";
+                          _key: string;
+                        }
+                    > | null;
                     level?: number;
                     _type: "block";
                     _key: string;
@@ -2867,21 +2853,22 @@ export type QueryBlogIndexPageResult = {
                       _type: "span";
                       _key: string;
                     }>;
-                    style?:
-                      | "blockquote"
-                      | "h1"
-                      | "h2"
-                      | "h3"
-                      | "h4"
-                      | "h5"
-                      | "h6"
-                      | "normal";
+                    style?: "normal";
                     listItem?: "bullet" | "number";
-                    markDefs: Array<{
-                      href?: string;
-                      _type: "link";
-                      _key: string;
-                    }> | null;
+                    markDefs: Array<
+                      | {
+                          customLink?: CustomUrl;
+                          _type: "customLink";
+                          _key: string;
+                          openInNewTab: boolean | null;
+                          href: string | "#" | null;
+                        }
+                      | {
+                          customLink?: CustomUrl;
+                          _type: "customLink";
+                          _key: string;
+                        }
+                    > | null;
                     level?: number;
                     _type: "block";
                     _key: string;
@@ -3101,13 +3088,7 @@ export type QueryBlogIndexPageResult = {
         slug: string | null;
         orderRank: string | null;
         category:
-          | "aeo"
-          | "changelog"
-          | "nextjs"
-          | "sanity"
-          | "seo"
-          | "skills"
-          | null;
+          "aeo" | "changelog" | "nextjs" | "sanity" | "seo" | "skills" | null;
         image: {
           id: string | null;
           preview: string | null;
@@ -3154,13 +3135,7 @@ export type QueryBlogIndexPageResult = {
     slug: string | null;
     orderRank: string | null;
     category:
-      | "aeo"
-      | "changelog"
-      | "nextjs"
-      | "sanity"
-      | "seo"
-      | "skills"
-      | null;
+      "aeo" | "changelog" | "nextjs" | "sanity" | "seo" | "skills" | null;
     image: {
       id: string | null;
       preview: string | null;
@@ -3367,21 +3342,22 @@ export type QueryBlogSlugPageDataResult = {
                 _type: "span";
                 _key: string;
               }>;
-              style?:
-                | "blockquote"
-                | "h1"
-                | "h2"
-                | "h3"
-                | "h4"
-                | "h5"
-                | "h6"
-                | "normal";
+              style?: "normal";
               listItem?: "bullet" | "number";
-              markDefs: Array<{
-                href?: string;
-                _type: "link";
-                _key: string;
-              }> | null;
+              markDefs: Array<
+                | {
+                    customLink?: CustomUrl;
+                    _type: "customLink";
+                    _key: string;
+                    openInNewTab: boolean | null;
+                    href: string | "#" | null;
+                  }
+                | {
+                    customLink?: CustomUrl;
+                    _type: "customLink";
+                    _key: string;
+                  }
+              > | null;
               level?: number;
               _type: "block";
               _key: string;
