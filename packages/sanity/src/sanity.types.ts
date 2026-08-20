@@ -184,7 +184,7 @@ export type VideoFeature = {
     _type: "block";
     _key: string;
   }>;
-  video?: VideoFeatureVideo;
+  video: VideoFeatureVideo;
   caption?: string;
 };
 
@@ -1919,7 +1919,7 @@ export type QueryHomePageDataResult = {
           } | null;
           autoPlay: boolean | null;
           loop: boolean | null;
-        } | null;
+        };
         caption?: string;
       }
   > | null;
@@ -2539,7 +2539,7 @@ export type QuerySlugPageDataResult = {
           } | null;
           autoPlay: boolean | null;
           loop: boolean | null;
-        } | null;
+        };
         caption?: string;
       }
   > | null;
@@ -3157,7 +3157,7 @@ export type QueryBlogIndexPageResult = {
           } | null;
           autoPlay: boolean | null;
           loop: boolean | null;
-        } | null;
+        };
         caption?: string;
       }
   > | null;

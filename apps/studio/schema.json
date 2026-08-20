@@ -1125,7 +1125,7 @@
             "type": "inline",
             "name": "videoFeature.video"
           },
-          "optional": true
+          "optional": false
         },
         "caption": {
           "type": "objectAttribute",
