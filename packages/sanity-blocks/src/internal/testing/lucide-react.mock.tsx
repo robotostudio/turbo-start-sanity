@@ -30,6 +30,7 @@ export const Phone = IconStub("phone");
 export const Plus = IconStub("plus");
 export const Slack = IconStub("slack");
 export const Star = IconStub("star");
+export const Table = IconStub("table");
 export const Text = IconStub("text");
 export const TriangleAlert = IconStub("triangle-alert");
 export const Users = IconStub("users");

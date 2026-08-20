@@ -54,6 +54,22 @@ export const richTextFragment = /* groq */ `
     _type == "image" => {
       ${imageFields},
       "caption": caption
+    },
+    _type == "table" => {
+      ...,
+      rows[]{
+        ...,
+        cells[]{
+          ...,
+          value[]{
+            ...,
+            _type == "block" => {
+              ...,
+              ${markDefsFragment}
+            }
+          }
+        }
+      }
     }
   }
 `;

@@ -68,6 +68,20 @@ export default defineConfig({
       return prev;
     },
   },
+  form: {
+    components: {
+      portableText: {
+        plugins: (props) =>
+          props.renderDefault({
+            ...props,
+            plugins: {
+              ...props.plugins,
+              table: { enabled: true },
+            },
+          }),
+      },
+    },
+  },
   schema: {
     types: schemaTypes,
     templates: [

@@ -1,4 +1,5 @@
 import { CodeBlockIcon, ImageIcon, LinkIcon } from "@sanity/icons";
+import { Table } from "lucide-react";
 import {
   type ConditionalProperty,
   defineArrayMember,
@@ -10,6 +11,7 @@ const PORTABLE_TEXT_MEMBER_NAMES = {
   block: "block",
   image: "image",
   code: "code",
+  table: "table",
 } as const;
 
 const CODE_LANGUAGES = [
@@ -129,6 +131,72 @@ const richTextMembers = [
         return {
           title: filename || firstLine || "Code Block",
           subtitle: language ?? "Code",
+        };
+      },
+    },
+  }),
+  defineArrayMember({
+    name: PORTABLE_TEXT_MEMBER_NAMES.table,
+    type: "object",
+    title: "Table",
+    // The Portable Text table plugin (bundled with `sanity` v6.6+, enabled
+    // in sanity.config.ts) strips fields the schema doesn't declare — omitting
+    // `headerRows` would silently break the header-row toggle, so it's
+    // required here even though the editor UI manages it directly.
+    icon: Table,
+    fields: [
+      defineField({
+        name: "headerRows",
+        type: "number",
+        title: "Header Rows",
+        description: "How many rows at the top of the table are headers.",
+      }),
+      defineField({
+        name: "rows",
+        type: "array",
+        title: "Rows",
+        of: [
+          defineArrayMember({
+            name: "row",
+            type: "object",
+            fields: [
+              defineField({
+                name: "cells",
+                type: "array",
+                title: "Cells",
+                of: [
+                  defineArrayMember({
+                    name: "cell",
+                    type: "object",
+                    fields: [
+                      defineField({
+                        name: "value",
+                        type: "array",
+                        of: [defineArrayMember({ type: "block" })],
+                      }),
+                    ],
+                  }),
+                ],
+              }),
+            ],
+          }),
+        ],
+      }),
+    ],
+    preview: {
+      select: {
+        rows: "rows",
+      },
+      prepare({ rows }) {
+        const rowCount = Array.isArray(rows) ? rows.length : 0;
+        const columnCount = Array.isArray(rows?.[0]?.cells)
+          ? rows[0].cells.length
+          : 0;
+        return {
+          title:
+            rowCount && columnCount
+              ? `${rowCount}×${columnCount} Table`
+              : "Table",
         };
       },
     },
