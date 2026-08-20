@@ -12,12 +12,7 @@ import { defineField, defineType } from "sanity";
  * no video, and falls back to the clip's own opening frame when skipped.
  */
 const videoVariantFields = () => [
-  muxVideoField({
-    name: "mux",
-    title: "Video",
-    description:
-      "Upload one video. It is optimised for every device automatically.",
-  }),
+  muxVideoField({ name: "mux", title: "Video" }),
   defineField({
     name: "poster",
     type: "image",
