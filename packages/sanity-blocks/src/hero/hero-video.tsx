@@ -10,8 +10,9 @@ import { type MuxVideoData, muxPlaybackId } from "../internal/mux";
 
 /**
  * Loaded on demand: a static import would ship hls.js and mux-embed
- * (~216 KB gzip) to every route through the client-side page builder, video
- * or no video. Nothing renders before mount, so skipping SSR costs no markup.
+ * (194 KB gzip, measured) to every route through the client-side page builder,
+ * video or no video. Nothing renders before mount, so skipping SSR costs no
+ * markup.
  */
 const MuxVideo = dynamic(() => import("@mux/mux-video-react"), { ssr: false });
 

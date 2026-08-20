@@ -119,7 +119,7 @@ export const logoLinkItem = (name: string) =>
  * `muxVideoField` — always muted, always looping, nothing to ask.
  */
 export const muxVideoEmbedField = ({
-  description,
+  description = "The video for this section, and how it plays.",
   group,
   name = "video",
   title = "Video",
