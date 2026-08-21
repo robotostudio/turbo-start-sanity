@@ -1,4 +1,7 @@
-import { mediaTypeOf } from "@workspace/sanity-blocks/hero/media-type";
+import {
+  isMuxPath,
+  mediaTypeOf,
+} from "@workspace/sanity-blocks/hero/media-type";
 
 const READY_MUX = {
   playbackId: "abc123",
@@ -35,4 +38,20 @@ test("an unplayable Mux asset infers the file path, not Mux", () => {
 test("an unrecognised mediaType falls back to inference", () => {
   expect(mediaTypeOf({ mediaType: "cloudflare", mux: READY_MUX })).toBe("mux");
   expect(mediaTypeOf({ mediaType: "", mux: null })).toBe("sanity");
+});
+
+test("the progressive-MP4 path is recognised and counts as Mux", () => {
+  expect(mediaTypeOf({ mediaType: "mux-mp4", mux: READY_MUX })).toBe("mux-mp4");
+  expect(isMuxPath(mediaTypeOf({ mediaType: "mux-mp4", mux: READY_MUX }))).toBe(
+    true
+  );
+  expect(isMuxPath("mux")).toBe(true);
+  expect(isMuxPath("sanity")).toBe(false);
+});
+
+// Nothing infers to mux-mp4: static renditions may not exist for an asset, so
+// it is only ever reached by an explicit choice.
+test("mux-mp4 is never inferred, only chosen", () => {
+  expect(mediaTypeOf({ mux: READY_MUX })).toBe("mux");
+  expect(mediaTypeOf({})).toBe("sanity");
 });

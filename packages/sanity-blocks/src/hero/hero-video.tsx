@@ -7,11 +7,11 @@ import { stegaClean } from "next-sanity";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
-import { type MuxVideoData, muxPlaybackId } from "../internal/mux";
-import { mediaTypeOf } from "./media-type";
+import { type MuxVideoData, muxMp4Url, muxPlaybackId } from "../internal/mux";
+import { isMuxPath, mediaTypeOf } from "./media-type";
 
 export type { HeroMediaType } from "./media-type";
-export { mediaTypeOf } from "./media-type";
+export { isMuxPath, mediaTypeOf } from "./media-type";
 
 /**
  * Loaded on demand: a static import would ship hls.js and mux-embed
@@ -49,7 +49,7 @@ function hasFiles(variant?: HeroVideoVariant | null): boolean {
 
 /** Whether the path this variant selected has something to play. */
 function hasSource(variant?: HeroVideoVariant | null): boolean {
-  return mediaTypeOf(variant) === "mux"
+  return isMuxPath(mediaTypeOf(variant))
     ? Boolean(muxPlaybackId(variant?.mux))
     : hasFiles(variant);
 }
@@ -59,7 +59,7 @@ function hasSource(variant?: HeroVideoVariant | null): boolean {
  * readiness has to expire with the source it was earned for.
  */
 function sourceKeyOf(variant?: HeroVideoVariant | null): string | null {
-  if (mediaTypeOf(variant) === "mux") {
+  if (isMuxPath(mediaTypeOf(variant))) {
     return muxPlaybackId(variant?.mux);
   }
   return (
@@ -165,6 +165,45 @@ function MuxBackground({ className, onReady, variant }: BackgroundProps) {
   );
 }
 
+/**
+ * Mux, delivered as one progressive MP4 instead of an adaptive ladder.
+ *
+ * The point of this path is what it does *not* load: no hls.js, no mux-embed,
+ * no master and rendition manifests. It is a bare `<video>` pointed at Mux's
+ * origin, so the browser starts fetching the moment the element mounts, the
+ * same way the Sanity path does.
+ *
+ * The trade is that the rendition is chosen here rather than by ABR, so a slow
+ * link gets no step-down — it just buffers. Resolution follows the viewport,
+ * matching what the hand-encoded set does across the same breakpoint.
+ */
+function MuxMp4Background({ className, onReady, variant }: BackgroundProps) {
+  const isCompactViewport = useIsCompactViewport();
+  const playbackId = muxPlaybackId(variant.mux);
+  const src = muxMp4Url(playbackId, isCompactViewport ? "720p" : "1080p");
+  if (!src) {
+    return null;
+  }
+
+  return (
+    <video
+      aria-hidden="true"
+      autoPlay
+      className={className}
+      disablePictureInPicture
+      disableRemotePlayback
+      key={src}
+      loop
+      muted
+      onCanPlay={onReady}
+      playsInline
+      preload="auto"
+      src={src}
+      tabIndex={-1}
+    />
+  );
+}
+
 /** Sanity: the hand-encoded set, served straight off the asset CDN. */
 function FileBackground({ className, onReady, variant }: BackgroundProps) {
   const isCompactViewport = useIsCompactViewport();
@@ -244,10 +283,14 @@ export function HeroVideo({
     className
   );
   const onReady = () => setReadyKey(sourceKey);
+  const props = { className: shared, onReady, variant };
 
-  return mediaTypeOf(variant) === "mux" ? (
-    <MuxBackground className={shared} onReady={onReady} variant={variant} />
-  ) : (
-    <FileBackground className={shared} onReady={onReady} variant={variant} />
-  );
+  switch (mediaTypeOf(variant)) {
+    case "mux":
+      return <MuxBackground {...props} />;
+    case "mux-mp4":
+      return <MuxMp4Background {...props} />;
+    default:
+      return <FileBackground {...props} />;
+  }
 }

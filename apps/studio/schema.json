@@ -457,6 +457,10 @@
               },
               {
                 "type": "string",
+                "value": "mux-mp4"
+              },
+              {
+                "type": "string",
                 "value": "sanity"
               }
             ]
@@ -694,6 +698,10 @@
               {
                 "type": "string",
                 "value": "mux"
+              },
+              {
+                "type": "string",
+                "value": "mux-mp4"
               },
               {
                 "type": "string",

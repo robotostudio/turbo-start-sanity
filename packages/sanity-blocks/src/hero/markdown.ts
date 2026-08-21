@@ -10,7 +10,7 @@ import {
   muxVideoToMarkdown,
 } from "../internal/markdown";
 import { portableTextToMarkdown } from "../internal/portable-text-to-markdown";
-import { mediaTypeOf } from "./media-type";
+import { isMuxPath, mediaTypeOf } from "./media-type";
 
 export function heroToMarkdown(
   block: MarkdownBlock,
@@ -24,7 +24,7 @@ export function heroToMarkdown(
     if (variant?.poster) {
       return imageToMarkdown(variant.poster, options);
     }
-    return mediaTypeOf(variant) === "mux"
+    return isMuxPath(mediaTypeOf(variant))
       ? muxVideoToMarkdown(variant?.mux, block.title)
       : "";
   };

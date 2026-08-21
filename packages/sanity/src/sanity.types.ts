@@ -83,7 +83,7 @@ export type SeoImage = {
 };
 
 export type Light = {
-  mediaType: "mux" | "sanity";
+  mediaType: "mux" | "mux-mp4" | "sanity";
   mux?: MuxVideo;
   webm?: Webm;
   hevc?: Hevc;
@@ -125,7 +125,7 @@ export type Poster = {
 };
 
 export type Dark = {
-  mediaType: "mux" | "sanity";
+  mediaType: "mux" | "mux-mp4" | "sanity";
   mux?: MuxVideo;
   webm?: DarkWebm;
   hevc?: DarkHevc;
@@ -1606,7 +1606,7 @@ export type QueryHomePageDataResult = {
         }> | null;
         video: {
           light: {
-            mediaType: "mux" | "sanity";
+            mediaType: "mux-mp4" | "mux" | "sanity";
             mux: {
               playbackId: string | null;
               policy: string | null;
@@ -1635,7 +1635,7 @@ export type QueryHomePageDataResult = {
             } | null;
           } | null;
           dark: {
-            mediaType: "mux" | "sanity";
+            mediaType: "mux-mp4" | "mux" | "sanity";
             mux: {
               playbackId: string | null;
               policy: string | null;
@@ -2234,7 +2234,7 @@ export type QuerySlugPageDataResult = {
         }> | null;
         video: {
           light: {
-            mediaType: "mux" | "sanity";
+            mediaType: "mux-mp4" | "mux" | "sanity";
             mux: {
               playbackId: string | null;
               policy: string | null;
@@ -2263,7 +2263,7 @@ export type QuerySlugPageDataResult = {
             } | null;
           } | null;
           dark: {
-            mediaType: "mux" | "sanity";
+            mediaType: "mux-mp4" | "mux" | "sanity";
             mux: {
               playbackId: string | null;
               policy: string | null;
@@ -2860,7 +2860,7 @@ export type QueryBlogIndexPageResult = {
         }> | null;
         video: {
           light: {
-            mediaType: "mux" | "sanity";
+            mediaType: "mux-mp4" | "mux" | "sanity";
             mux: {
               playbackId: string | null;
               policy: string | null;
@@ -2889,7 +2889,7 @@ export type QueryBlogIndexPageResult = {
             } | null;
           } | null;
           dark: {
-            mediaType: "mux" | "sanity";
+            mediaType: "mux-mp4" | "mux" | "sanity";
             mux: {
               playbackId: string | null;
               policy: string | null;

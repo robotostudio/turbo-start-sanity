@@ -6,8 +6,8 @@ import {
 import { Star } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-/** The two delivery paths a hero background can take. */
-export const HERO_MEDIA_TYPES = ["mux", "sanity"] as const;
+/** The three delivery paths a hero background can take. */
+export const HERO_MEDIA_TYPES = ["mux", "mux-mp4", "sanity"] as const;
 
 type HeroVariantValue = {
   mediaType?: string;
@@ -26,11 +26,16 @@ const hasFiles = (variant?: HeroVariantValue) =>
  * infers rather than defaults — see `mediaTypeOf` in `hero-video`. Kept in one
  * place so schema, validation and render agree on what a blank value means.
  */
-const selected = (variant?: HeroVariantValue) =>
-  variant?.mediaType === "sanity" ? "sanity" : "mux";
+const selected = (variant?: HeroVariantValue) => {
+  const type = variant?.mediaType;
+  return type === "sanity" || type === "mux-mp4" ? type : "mux";
+};
 
-const showFor = (type: "mux" | "sanity") => (context: { parent?: unknown }) =>
-  selected(context.parent as HeroVariantValue) !== type;
+/** Hides a field unless one of the listed paths is the one selected. */
+const showFor =
+  (...types: readonly string[]) =>
+  (context: { parent?: unknown }) =>
+    !types.includes(selected(context.parent as HeroVariantValue));
 
 /**
  * One theme's worth of background, delivered one of two ways.
@@ -54,7 +59,14 @@ const videoVariantFields = () => [
     options: {
       layout: "radio",
       list: [
-        { title: "Mux — one upload, encoded for every device", value: "mux" },
+        {
+          title: "Mux — one upload, adapts to the connection",
+          value: "mux",
+        },
+        {
+          title: "Mux as a single file — lighter, does not adapt",
+          value: "mux-mp4",
+        },
         { title: "Sanity — your own encoded files", value: "sanity" },
       ],
     },
@@ -63,7 +75,7 @@ const videoVariantFields = () => [
   muxVideoField({
     name: "mux",
     title: "Video",
-    hidden: showFor("mux"),
+    hidden: showFor("mux", "mux-mp4"),
   }),
   defineField({
     name: "webm",
@@ -111,7 +123,7 @@ const checkVariant = (value: unknown): true | string => {
     return true;
   }
   const type = selected(variant);
-  if (type === "mux" && !variant.mux?.asset && hasFiles(variant)) {
+  if (type !== "sanity" && !variant.mux?.asset && hasFiles(variant)) {
     return "Set to Mux, but only uploaded files are here. Upload a Mux video, or switch the source to Sanity.";
   }
   if (type === "sanity" && !hasFiles(variant) && variant.mux?.asset) {

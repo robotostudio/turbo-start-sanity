@@ -75,3 +75,25 @@ export function muxThumbnailUrl(
   const query = params.size ? `?${params}` : "";
   return `https://image.mux.com/${playbackId}/thumbnail.webp${query}`;
 }
+
+/** The static-rendition resolutions this starter asks Mux to keep on hand. */
+export type MuxMp4Resolution = "1080p" | "720p" | "480p" | "270p";
+
+/**
+ * A progressive MP4 straight off Mux's origin, no manifest and no player.
+ *
+ * These exist only for assets that had static renditions enabled — either at
+ * upload, or afterwards via `POST /video/v1/assets/{id}/static-renditions`.
+ * Mux 404s the URL otherwise, which is why `muxMp4Url` is a URL builder and
+ * not a promise that the file is there: the caller has to be willing to fall
+ * back. Enabling them costs Mux storage per rendition.
+ */
+export function muxMp4Url(
+  playbackId?: string | null,
+  resolution: MuxMp4Resolution = "1080p"
+): string | undefined {
+  if (!playbackId) {
+    return undefined;
+  }
+  return `https://stream.mux.com/${playbackId}/${resolution}.mp4`;
+}
