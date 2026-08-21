@@ -1,8 +1,9 @@
+import { createClient } from "next-sanity";
+
+import { DEFAULT_SANITY_API_VERSION } from "@workspace/env/constants";
 import type { SanityImageSource } from "@sanity/asset-utils";
 import { createImageUrlBuilder } from "@sanity/image-url";
 import { env } from "@workspace/env/client";
-import { DEFAULT_SANITY_API_VERSION } from "@workspace/env/constants";
-import { createClient } from "next-sanity";
 
 export const client = createClient({
   projectId: env.NEXT_PUBLIC_SANITY_PROJECT_ID,
