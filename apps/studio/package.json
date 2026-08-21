@@ -43,6 +43,7 @@
     "sanity-plugin-asset-source-unsplash": "^7.0.5",
     "sanity-plugin-lucide-icon-picker": "^1.0.3",
     "sanity-plugin-media": "^4.1.1",
+    "sanity-plugin-mux-input": "^5.0.10",
     "slugify": "^1.6.8",
     "styled-components": "^6.3.11"
   },

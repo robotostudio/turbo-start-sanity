@@ -25,6 +25,11 @@ seed-data.tar.gz   Sample content
 Page-builder block schemas do not live here — they come from
 `@workspace/sanity-blocks` and are merged in `schemaTypes/index.ts`.
 
+Video uses `sanity-plugin-mux-input`, which adds the `mux.video` field type and
+a "Videos" tab to the nav. Its Mux credentials are not env vars: an editor
+enters them once in the plugin's setup screen and the Studio keeps them in the
+dataset, so a public dataset exposes that secret to anyone who can query it.
+
 ## Scripts
 
 ```sh

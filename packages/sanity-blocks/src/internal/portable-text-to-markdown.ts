@@ -150,7 +150,7 @@ function fenceCodeBlock(code: string, language?: string | null): string {
 // GFM pipe-table cells are single-line, so a literal `|` would split the
 // column and an embedded newline would break the row entirely.
 function escapeTableCell(text: string): string {
-  return text.replaceAll('|', String.raw`\|`).replace(/\n+/g, "<br>");
+  return text.replaceAll("|", String.raw`\|`).replace(/\n+/g, "<br>");
 }
 
 function renderTableRow(cells: string[]): string {

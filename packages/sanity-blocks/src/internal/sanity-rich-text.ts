@@ -1,9 +1,4 @@
-import {
-  CodeBlockIcon,
-  ImageIcon,
-  LinkIcon,
-  ThLargeIcon,
-} from "@sanity/icons";
+import { CodeBlockIcon, ImageIcon, LinkIcon, ThLargeIcon } from "@sanity/icons";
 import {
   type ConditionalProperty,
   defineArrayMember,
