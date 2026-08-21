@@ -36,3 +36,4 @@ export const TriangleAlert = IconStub("triangle-alert");
 export const Users = IconStub("users");
 export const X = IconStub("x");
 export const Youtube = IconStub("youtube");
+export const Play = IconStub("play");

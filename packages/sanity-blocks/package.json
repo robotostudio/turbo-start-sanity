@@ -14,11 +14,14 @@
   },
   "peerDependencies": {
     "next": ">=16",
+    "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "sanity": "catalog:"
   },
   "dependencies": {
+    "@mux/mux-player-react": "^3.13.2",
+    "@mux/mux-video-react": "^0.31.2",
     "@portabletext/markdown": "^1.4.2",
     "@sanity/client": "catalog:",
     "@sanity/icons": "^3.7.4",

@@ -94,3 +94,22 @@ test("heroToMarkdown does not emit HTML or JSX tags", () => {
   );
   expect(result).not.toMatch(/<[A-Za-z]/);
 });
+
+test("heroToMarkdown falls back to the dark mux still when light errored", () => {
+  const result = heroToMarkdown(
+    {
+      title: "H",
+      video: {
+        light: {
+          mux: { playbackId: "broken", policy: "public", status: "errored" },
+        },
+        dark: {
+          mux: { playbackId: "works", policy: "public", status: "ready" },
+        },
+      },
+    },
+    {}
+  );
+  expect(result).toContain("https://image.mux.com/works/thumbnail.webp");
+  expect(result).not.toContain("broken");
+});

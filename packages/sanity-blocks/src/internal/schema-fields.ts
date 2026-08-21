@@ -1,9 +1,12 @@
 import { Images } from "lucide-react";
 import {
+  type ConditionalProperty,
   defineArrayMember,
   defineField,
   type ImageRule,
   type ImageValue,
+  type ObjectRule,
+  type Rule,
   type ValidationBuilder,
 } from "sanity";
 
@@ -109,4 +112,82 @@ export const logoLinkItem = (name: string) =>
         };
       },
     },
+  });
+
+/**
+ * A Mux video plus its playback choices: the shape `MuxVideo` renders, for a
+ * clip a visitor chooses to watch. Background video takes the bare
+ * `muxVideoField` — always muted, always looping, nothing to ask.
+ */
+export const muxVideoEmbedField = ({
+  description = "The video for this section, and how it plays.",
+  group,
+  name = "video",
+  title = "Video",
+  validation,
+}: {
+  description?: string;
+  group?: string;
+  name?: string;
+  title?: string;
+  validation?: ValidationBuilder<ObjectRule, Record<string, unknown>>;
+} = {}) =>
+  defineField({
+    name,
+    type: "object",
+    title,
+    description,
+    group,
+    validation,
+    options: { collapsible: false },
+    fields: [
+      muxVideoField({
+        name: "asset",
+        title: "File",
+        validation: (Rule) => Rule.required(),
+      }),
+      defineField({
+        name: "autoPlay",
+        type: "boolean",
+        title: "Play automatically",
+        description:
+          "Starts the video without sound as soon as the page loads. Leave it off and visitors see the opening frame with a play button.",
+        initialValue: false,
+      }),
+      defineField({
+        name: "loop",
+        type: "boolean",
+        title: "Repeat",
+        description: "Starts again from the beginning when it reaches the end.",
+        initialValue: false,
+      }),
+    ],
+  });
+
+/** A bare Mux clip. The plugin encodes it for every device on upload. */
+export const muxVideoField = ({
+  description = "Upload a file, paste a video URL, or pick one already in the project.",
+  group,
+  hidden,
+  name = "video",
+  title = "Video",
+  validation,
+}: {
+  description?: string;
+  group?: string;
+  /** For blocks that offer a choice of delivery — see the hero's `mediaType`. */
+  hidden?: ConditionalProperty;
+  name?: string;
+  title?: string;
+  validation?: ValidationBuilder<Rule>;
+} = {}) =>
+  defineField({
+    name,
+    type: "mux.video",
+    title,
+    description,
+    group,
+    hidden,
+    validation,
+    options: { collapsible: false },
   });
