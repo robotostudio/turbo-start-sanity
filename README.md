@@ -101,7 +101,7 @@ a required value is missing:
 | --- | --- | --- |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID` | yes | From sanity.io/manage |
 | `NEXT_PUBLIC_SANITY_DATASET` | yes | Usually `production` |
-| `NEXT_PUBLIC_SANITY_API_VERSION` | yes | Pre-filled with a valid date |
+| `NEXT_PUBLIC_SANITY_API_VERSION` | no | Defaults to today's UTC date if unset |
 | `NEXT_PUBLIC_SANITY_STUDIO_URL` | yes | `http://localhost:3333` locally |
 | `SANITY_API_READ_TOKEN` | yes | Viewer token — drafts, live preview, Visual Editing |
 | `SANITY_API_WRITE_TOKEN` | yes | Editor token. Validation requires it even though no runtime code reads it yet, so it must be set for `pnpm dev` and `pnpm build` to start |
@@ -114,7 +114,7 @@ a required value is missing:
 | `SANITY_STUDIO_PROJECT_ID` | yes | Same project ID as the web app |
 | `SANITY_STUDIO_DATASET` | yes | Same dataset as the web app |
 | `SANITY_STUDIO_TITLE` | no | Studio display name |
-| `SANITY_STUDIO_API_VERSION` | no | Defaults to `2025-05-08` |
+| `SANITY_STUDIO_API_VERSION` | no | Defaults to today's UTC date if unset |
 | `SANITY_STUDIO_PRESENTATION_URL` | non-dev | The deployed web URL. Only `NODE_ENV=development` gets the `http://localhost:3000` default; anything else (production, `test`, unset) throws when this is missing |
 | `SANITY_STUDIO_APP_ID` | no | Empty until your first `sanity deploy` returns one — see [Deploying](#sanity-studio) |
 | `NEXT_PUBLIC_SITE_URL` | no | Used by the `invalidate-tags` Sanity Function, not by the Studio UI |

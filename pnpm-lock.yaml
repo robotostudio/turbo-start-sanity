@@ -116,6 +116,9 @@ importers:
       '@sanity/vision':
         specifier: ^6.1.0
         version: 6.4.0(24531c3d73a99eff136b7c1f7b38eaa0)
+      '@workspace/env':
+        specifier: workspace:*
+        version: link:../../packages/env
       '@workspace/logger':
         specifier: workspace:*
         version: link:../../packages/logger
@@ -6654,6 +6657,7 @@ packages:
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uuidv7@0.4.4:
@@ -11066,7 +11070,7 @@ snapshots:
       '@sanity/mutate': 0.18.0(xstate@5.31.1)
       '@sanity/presentation-comlink': 2.1.0(@sanity/client@7.26.2)(@sanity/types@6.10.1(@types/react@19.2.14))
       '@sanity/preview-url-secret': 4.0.7(@sanity/client@7.26.2)
-      '@sanity/ui': 3.2.0(react-dom@19.2.4(react@19.2.4))(react-is@19.2.8)(react@19.2.4)(styled-components@6.3.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+      '@sanity/ui': 3.2.0(react-dom@19.2.4(react@19.2.4))(react-is@19.2.6)(react@19.2.4)(styled-components@6.3.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
       '@sanity/visual-editing-csm': 3.0.9(@sanity/client@7.26.2)(@sanity/types@6.10.1(@types/react@19.2.14))(typescript@5.9.2)
       '@vercel/stega': 1.1.0
       dequal: 2.0.3

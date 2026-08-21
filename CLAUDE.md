@@ -115,7 +115,7 @@ Caveat: `SANITY_API_WRITE_TOKEN` is currently required by `packages/env/src/serv
 **`apps/studio`** (plain `process.env`, loaded via `dotenv`/Vite — not `@workspace/env`):
 
 - Required: `SANITY_STUDIO_PROJECT_ID`, `SANITY_STUDIO_DATASET`
-- Optional: `SANITY_STUDIO_TITLE`, `SANITY_STUDIO_API_VERSION` (defaults to `2025-05-08` in `apps/studio/utils/constant.ts`), `SANITY_STUDIO_APP_ID` (written back after the first `sanity deploy`), `SANITY_STUDIO_PRESENTATION_URL` (required whenever `NODE_ENV` is not `development` — `utils/helper.ts` returns `http://localhost:3000` in development and throws otherwise, so an unset or `test` `NODE_ENV` throws too)
+- Optional: `SANITY_STUDIO_TITLE`, `SANITY_STUDIO_API_VERSION` (defaults to `DEFAULT_SANITY_API_VERSION` from `@workspace/env/constants` — today's UTC date — in `apps/studio/utils/constant.ts`), `SANITY_STUDIO_APP_ID` (written back after the first `sanity deploy`), `SANITY_STUDIO_PRESENTATION_URL` (required whenever `NODE_ENV` is not `development` — `utils/helper.ts` returns `http://localhost:3000` in development and throws otherwise, so an unset or `test` `NODE_ENV` throws too)
 - `NEXT_PUBLIC_SITE_URL` and `SANITY_REVALIDATE_SECRET` are read only by the deployed Sanity Function `apps/studio/functions/invalidate-tags`, not by the Studio itself
 
 Web env vars are Zod-validated at startup via `@workspace/env` (`@workspace/env/client` and `@workspace/env/server`).
