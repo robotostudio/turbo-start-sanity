@@ -67,24 +67,37 @@ function sourceKeyOf(variant?: HeroVideoVariant | null): string | null {
   );
 }
 
+/** The resolutions every path picks between. */
+export type DeliveryRung = "1080p" | "720p" | "480p";
+
+type Connection = { effectiveType?: string; saveData?: boolean };
+
 /**
- * Whether this viewport should get the smaller clip. The `media` attribute on
- * `<source>` was dropped from the spec and Chrome ignores it, so picking in JS
- * is the only portable option.
+ * The rendition for this screen and connection.
+ *
+ * Split from the globals so it is testable: `deliveryRung` reads them, this
+ * decides. `saveData` and `effectiveType` are Chromium-only, so Safari and
+ * Firefox fall through to the width, which is the answer they had before.
  */
-function useIsCompactViewport(): boolean {
-  const [isCompact, setIsCompact] = useState(false);
+export function rungFor(width: number, connection?: Connection): DeliveryRung {
+  if (
+    connection?.saveData ||
+    /(^|-)2g$/.test(connection?.effectiveType ?? "")
+  ) {
+    return "480p";
+  }
+  return width >= 1280 ? "1080p" : "720p";
+}
 
-  useEffect(() => {
-    const query = window.matchMedia("(max-width: 1279px)");
-    setIsCompact(query.matches);
-    const onChange = (event: MediaQueryListEvent) =>
-      setIsCompact(event.matches);
-    query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
-  }, []);
-
-  return isCompact;
+/**
+ * Read once, at mount. Deliberately not reactive: `key` is the source URL, so
+ * re-picking on a resize would remount the element and re-download the clip —
+ * worse than leaving an already-buffered loop alone. Safe to call during render
+ * because `HeroVideo` renders nothing until it has mounted.
+ */
+function deliveryRung(): DeliveryRung {
+  const { connection } = navigator as Navigator & { connection?: Connection };
+  return rungFor(window.innerWidth, connection);
 }
 
 /**
@@ -92,10 +105,11 @@ function useIsCompactViewport(): boolean {
  * that cannot decode it drops to the desktop HEVC, still the smallest file in
  * the set.
  */
-function pickSources(variant: HeroVideoVariant | null, isCompact: boolean) {
-  const webm = isCompact
-    ? (variant?.mobileWebm ?? variant?.webm)
-    : variant?.webm;
+function pickSources(variant: HeroVideoVariant | null, rung: DeliveryRung) {
+  // Only two encodes exist, so anything below the desktop rung takes the
+  // smaller one — including a wide screen on a metered connection.
+  const webm =
+    rung === "1080p" ? variant?.webm : (variant?.mobileWebm ?? variant?.webm);
   return {
     hevc: stegaClean(variant?.hevc) ?? undefined,
     webm: stegaClean(webm) ?? undefined,
@@ -126,10 +140,17 @@ type BackgroundProps = Readonly<{
 
 /** Mux: one upload, an adaptive ladder, and hls.js to drive it. */
 function MuxBackground({ className, onReady, variant }: BackgroundProps) {
+  const rung = deliveryRung();
   const playbackId = muxPlaybackId(variant.mux);
   if (!playbackId) {
     return null;
   }
+
+  // `maxResolution` bottoms out at 720p, so a thin link gets the ladder
+  // instead: releasing `desc` lets ABR settle on 480p or 270p itself. Pinning
+  // the top rung is right everywhere else, since a short loop replays from
+  // buffer and so never steps up on its own.
+  const thin = rung === "480p";
 
   return (
     <MuxVideo
@@ -148,17 +169,13 @@ function MuxBackground({ className, onReady, variant }: BackgroundProps) {
       disableTracking
       key={playbackId}
       loop
-      // A short loop replays from buffer, so ABR never steps up from whatever
-      // the first segment picked. Capping the ladder high-first pins it to
-      // 1080p immediately. Not higher: Mux ships H.264, and 2160p costs
-      // several times the bytes for a background nobody is studying.
-      maxResolution="1080p"
+      maxResolution={thin ? "720p" : rung}
       muted
       onCanPlay={onReady}
       playbackId={playbackId}
       playsInline
       preload="auto"
-      renditionOrder="desc"
+      renditionOrder={thin ? undefined : "desc"}
       streamType="on-demand"
       tabIndex={-1}
     />
@@ -178,9 +195,9 @@ function MuxBackground({ className, onReady, variant }: BackgroundProps) {
  * matching what the hand-encoded set does across the same breakpoint.
  */
 function MuxMp4Background({ className, onReady, variant }: BackgroundProps) {
-  const isCompactViewport = useIsCompactViewport();
+  const rung = deliveryRung();
   const playbackId = muxPlaybackId(variant.mux);
-  const src = muxMp4Url(playbackId, isCompactViewport ? "720p" : "1080p");
+  const src = muxMp4Url(playbackId, rung);
   if (!src) {
     return null;
   }
@@ -206,8 +223,8 @@ function MuxMp4Background({ className, onReady, variant }: BackgroundProps) {
 
 /** Sanity: the hand-encoded set, served straight off the asset CDN. */
 function FileBackground({ className, onReady, variant }: BackgroundProps) {
-  const isCompactViewport = useIsCompactViewport();
-  const sources = pickSources(variant, isCompactViewport);
+  const rung = deliveryRung();
+  const sources = pickSources(variant, rung);
   if (!(sources.webm || sources.hevc)) {
     return null;
   }
