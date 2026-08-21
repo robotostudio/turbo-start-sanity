@@ -3,27 +3,103 @@
 import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
 import dynamic from "next/dynamic";
+import { stegaClean } from "next-sanity";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 import { type MuxVideoData, muxPlaybackId } from "../internal/mux";
+import { mediaTypeOf } from "./media-type";
+
+export type { HeroMediaType } from "./media-type";
+export { mediaTypeOf } from "./media-type";
 
 /**
  * Loaded on demand: a static import would ship hls.js and mux-embed
  * (194 KB gzip, measured) to every route through the client-side page builder,
  * video or no video. Nothing renders before mount, so skipping SSR costs no
- * markup.
+ * markup. It also means a hero set to `sanity` never pays for the player —
+ * which is what makes the two delivery paths comparable on the same site.
  */
 const MuxVideo = dynamic(() => import("@mux/mux-video-react"), { ssr: false });
 
 export interface HeroVideoVariant {
+  /** Which path renders. Absent on anything authored before the toggle. */
+  mediaType?: string | null;
   mux?: MuxVideoData | null;
+  /** Full-resolution HEVC for Safari, which decodes AV1 only on recent chips. */
+  hevc?: string | null;
+  /** Phone-sized clips. Optional — the desktop set is used when absent. */
+  mobileWebm?: string | null;
   poster?: SanityImageData | null;
+  webm?: string | null;
 }
 
 export interface HeroVideoData {
   light?: HeroVideoVariant | null;
   dark?: HeroVideoVariant | null;
+}
+
+/** Shared by both elements, so the two paths differ only in how bytes arrive. */
+const BACKGROUND_CLASS =
+  "pointer-events-none size-full object-cover object-[50%_45%] transition-opacity duration-700 ease-out";
+
+function hasFiles(variant?: HeroVideoVariant | null): boolean {
+  return Boolean(variant?.webm || variant?.hevc || variant?.mobileWebm);
+}
+
+/** Whether the path this variant selected has something to play. */
+function hasSource(variant?: HeroVideoVariant | null): boolean {
+  return mediaTypeOf(variant) === "mux"
+    ? Boolean(muxPlaybackId(variant?.mux))
+    : hasFiles(variant);
+}
+
+/**
+ * Identifies the clip on screen. A theme toggle mounts a fresh element, so
+ * readiness has to expire with the source it was earned for.
+ */
+function sourceKeyOf(variant?: HeroVideoVariant | null): string | null {
+  if (mediaTypeOf(variant) === "mux") {
+    return muxPlaybackId(variant?.mux);
+  }
+  return (
+    stegaClean(variant?.webm ?? variant?.hevc ?? variant?.mobileWebm) ?? null
+  );
+}
+
+/**
+ * Whether this viewport should get the smaller clip. The `media` attribute on
+ * `<source>` was dropped from the spec and Chrome ignores it, so picking in JS
+ * is the only portable option.
+ */
+function useIsCompactViewport(): boolean {
+  const [isCompact, setIsCompact] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 1279px)");
+    setIsCompact(query.matches);
+    const onChange = (event: MediaQueryListEvent) =>
+      setIsCompact(event.matches);
+    query.addEventListener("change", onChange);
+    return () => query.removeEventListener("change", onChange);
+  }, []);
+
+  return isCompact;
+}
+
+/**
+ * The clips for this viewport. Only the WebM has a smaller version; anything
+ * that cannot decode it drops to the desktop HEVC, still the smallest file in
+ * the set.
+ */
+function pickSources(variant: HeroVideoVariant | null, isCompact: boolean) {
+  const webm = isCompact
+    ? (variant?.mobileWebm ?? variant?.webm)
+    : variant?.webm;
+  return {
+    hevc: stegaClean(variant?.hevc) ?? undefined,
+    webm: stegaClean(webm) ?? undefined,
+  };
 }
 
 /** Tracks the reduced-motion preference, including changes made after load. */
@@ -42,34 +118,16 @@ function usePrefersReducedMotion(): boolean {
   return prefersReduced;
 }
 
-/**
- * Background video for the hero, layered over the poster.
- *
- * Renders nothing until the clip can play, then fades in, so the poster covers
- * the load. Mounting client-side is deliberate: the theme comes from
- * `next-themes` and this site has a manual toggle, so a CSS
- * `prefers-color-scheme` source would pick the wrong variant.
- */
-export function HeroVideo({
-  className,
-  video,
-}: Readonly<{ className?: string; video?: HeroVideoData | null }>) {
-  const { resolvedTheme } = useTheme();
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const [mounted, setMounted] = useState(false);
-  // The clip that decoded a frame, not a boolean: a theme toggle mounts a
-  // fresh element, so readiness expires with the ID it was earned for.
-  const [readyId, setReadyId] = useState<string | null>(null);
+type BackgroundProps = Readonly<{
+  className?: string;
+  onReady: () => void;
+  variant: HeroVideoVariant;
+}>;
 
-  useEffect(() => setMounted(true), []);
-
-  const darkId = muxPlaybackId(video?.dark?.mux);
-  const playbackId =
-    resolvedTheme === "dark" && darkId
-      ? darkId
-      : muxPlaybackId(video?.light?.mux);
-
-  if (!(mounted && playbackId) || prefersReducedMotion) {
+/** Mux: one upload, an adaptive ladder, and hls.js to drive it. */
+function MuxBackground({ className, onReady, variant }: BackgroundProps) {
+  const playbackId = muxPlaybackId(variant.mux);
+  if (!playbackId) {
     return null;
   }
 
@@ -77,11 +135,7 @@ export function HeroVideo({
     <MuxVideo
       aria-hidden
       autoPlay
-      className={cn(
-        "pointer-events-none size-full object-cover object-[50%_45%] transition-opacity duration-700 ease-out",
-        readyId === playbackId ? "opacity-100" : "opacity-0",
-        className
-      )}
+      className={className}
       // `pointer-events-none` is what keeps this decorative: without it a
       // right-click offers Chrome's "Show controls", which sticks per-site and
       // paints a transport bar over the hero. These two drop picture-in-picture
@@ -100,7 +154,7 @@ export function HeroVideo({
       // several times the bytes for a background nobody is studying.
       maxResolution="1080p"
       muted
-      onCanPlay={() => setReadyId(playbackId)}
+      onCanPlay={onReady}
       playbackId={playbackId}
       playsInline
       preload="auto"
@@ -108,5 +162,92 @@ export function HeroVideo({
       streamType="on-demand"
       tabIndex={-1}
     />
+  );
+}
+
+/** Sanity: the hand-encoded set, served straight off the asset CDN. */
+function FileBackground({ className, onReady, variant }: BackgroundProps) {
+  const isCompactViewport = useIsCompactViewport();
+  const sources = pickSources(variant, isCompactViewport);
+  if (!(sources.webm || sources.hevc)) {
+    return null;
+  }
+
+  return (
+    <video
+      aria-hidden="true"
+      autoPlay
+      className={className}
+      disablePictureInPicture
+      disableRemotePlayback
+      key={sources.webm ?? sources.hevc}
+      loop
+      muted
+      onCanPlay={onReady}
+      playsInline
+      preload="auto"
+      tabIndex={-1}
+    >
+      {sources.webm && (
+        <source src={sources.webm} type='video/webm; codecs="av01.0.05M.08"' />
+      )}
+      {/*
+        The codec string is required, not decoration: as plain `video/mp4`
+        every browser would accept this and then fail to decode it, since
+        <source> selection is by type alone.
+      */}
+      {sources.hevc && (
+        <source src={sources.hevc} type='video/mp4; codecs="hvc1"' />
+      )}
+    </video>
+  );
+}
+
+/**
+ * Background video for the hero, layered over the poster.
+ *
+ * Renders nothing until the clip can play, then fades in, so the poster covers
+ * the load. Mounting client-side is deliberate: the theme comes from
+ * `next-themes` and this site has a manual toggle, so a CSS
+ * `prefers-color-scheme` source would pick the wrong variant.
+ *
+ * Which element renders is the variant's own `mediaType`, so one page can be
+ * served by Mux and another by the Sanity CDN with nothing else differing.
+ */
+export function HeroVideo({
+  className,
+  video,
+}: Readonly<{ className?: string; video?: HeroVideoData | null }>) {
+  const { resolvedTheme } = useTheme();
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  // The clip that decoded a frame, not a boolean: a theme toggle mounts a
+  // fresh element, so readiness expires with the source it was earned for.
+  const [readyKey, setReadyKey] = useState<string | null>(null);
+
+  useEffect(() => setMounted(true), []);
+
+  // Dark falls back to the light variant so a single upload still works.
+  const variant =
+    resolvedTheme === "dark" && hasSource(video?.dark)
+      ? video?.dark
+      : video?.light;
+  const sourceKey = sourceKeyOf(variant);
+
+  if (!(mounted && variant && hasSource(variant)) || prefersReducedMotion) {
+    return null;
+  }
+
+  const shared = cn(
+    BACKGROUND_CLASS,
+    readyKey === sourceKey ? "opacity-100" : "opacity-0",
+    className
+  );
+  const onReady = () => setReadyKey(sourceKey);
+
+  return mediaTypeOf(variant) === "mux" ? (
+    <MuxBackground className={shared} onReady={onReady} variant={variant} />
+  ) : (
+    <FileBackground className={shared} onReady={onReady} variant={variant} />
   );
 }

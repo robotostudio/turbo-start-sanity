@@ -446,11 +446,52 @@
     "value": {
       "type": "object",
       "attributes": {
+        "mediaType": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "mux"
+              },
+              {
+                "type": "string",
+                "value": "sanity"
+              }
+            ]
+          },
+          "optional": false
+        },
         "mux": {
           "type": "objectAttribute",
           "value": {
             "type": "inline",
             "name": "mux.video"
+          },
+          "optional": true
+        },
+        "webm": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "webm"
+          },
+          "optional": true
+        },
+        "hevc": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "hevc"
+          },
+          "optional": true
+        },
+        "mobileWebm": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "mobileWebm"
           },
           "optional": true
         },
@@ -461,6 +502,132 @@
             "name": "poster"
           },
           "optional": true
+        }
+      }
+    }
+  },
+  {
+    "type": "type",
+    "name": "sanity.fileAsset.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "sanity.fileAsset"
+    }
+  },
+  {
+    "type": "type",
+    "name": "webm",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "asset": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "sanity.fileAsset.reference"
+          },
+          "optional": true
+        },
+        "media": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "webm.media"
+          },
+          "optional": true
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "file"
+          }
+        }
+      }
+    }
+  },
+  {
+    "type": "type",
+    "name": "hevc",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "asset": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "sanity.fileAsset.reference"
+          },
+          "optional": true
+        },
+        "media": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "hevc.media"
+          },
+          "optional": true
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "file"
+          }
+        }
+      }
+    }
+  },
+  {
+    "type": "type",
+    "name": "mobileWebm",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "asset": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "sanity.fileAsset.reference"
+          },
+          "optional": true
+        },
+        "media": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "mobileWebm.media"
+          },
+          "optional": true
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "file"
+          }
         }
       }
     }
@@ -519,11 +686,52 @@
     "value": {
       "type": "object",
       "attributes": {
+        "mediaType": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "mux"
+              },
+              {
+                "type": "string",
+                "value": "sanity"
+              }
+            ]
+          },
+          "optional": false
+        },
         "mux": {
           "type": "objectAttribute",
           "value": {
             "type": "inline",
             "name": "mux.video"
+          },
+          "optional": true
+        },
+        "webm": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "dark.webm"
+          },
+          "optional": true
+        },
+        "hevc": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "dark.hevc"
+          },
+          "optional": true
+        },
+        "mobileWebm": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "dark.mobileWebm"
           },
           "optional": true
         },
@@ -534,6 +742,102 @@
             "name": "dark.poster"
           },
           "optional": true
+        }
+      }
+    }
+  },
+  {
+    "type": "type",
+    "name": "dark.webm",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "asset": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "sanity.fileAsset.reference"
+          },
+          "optional": true
+        },
+        "media": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "dark.webm.media"
+          },
+          "optional": true
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "file"
+          }
+        }
+      }
+    }
+  },
+  {
+    "type": "type",
+    "name": "dark.hevc",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "asset": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "sanity.fileAsset.reference"
+          },
+          "optional": true
+        },
+        "media": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "dark.hevc.media"
+          },
+          "optional": true
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "file"
+          }
+        }
+      }
+    }
+  },
+  {
+    "type": "type",
+    "name": "dark.mobileWebm",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "asset": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "sanity.fileAsset.reference"
+          },
+          "optional": true
+        },
+        "media": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "inline",
+            "name": "dark.mobileWebm.media"
+          },
+          "optional": true
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "file"
+          }
         }
       }
     }

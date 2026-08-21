@@ -6,13 +6,91 @@ import {
 import { Star } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
+/** The two delivery paths a hero background can take. */
+export const HERO_MEDIA_TYPES = ["mux", "sanity"] as const;
+
+type HeroVariantValue = {
+  mediaType?: string;
+  mux?: { asset?: unknown } | null;
+  webm?: unknown;
+  hevc?: unknown;
+  mobileWebm?: unknown;
+};
+
+/** Whether a variant carries any hand-encoded file, in any of the three slots. */
+const hasFiles = (variant?: HeroVariantValue) =>
+  Boolean(variant?.webm || variant?.hevc || variant?.mobileWebm);
+
 /**
- * One theme's worth of background: a single upload, encoded for every device,
- * so no format matrix. The picture covers the load, stands alone when there is
- * no video, and falls back to the clip's own opening frame when skipped.
+ * Absent on everything authored before this field existed, so the renderer
+ * infers rather than defaults — see `mediaTypeOf` in `hero-video`. Kept in one
+ * place so schema, validation and render agree on what a blank value means.
+ */
+const selected = (variant?: HeroVariantValue) =>
+  variant?.mediaType === "sanity" ? "sanity" : "mux";
+
+const showFor = (type: "mux" | "sanity") => (context: { parent?: unknown }) =>
+  selected(context.parent as HeroVariantValue) !== type;
+
+/**
+ * One theme's worth of background, delivered one of two ways.
+ *
+ * Mux takes a single upload and encodes it for every device. The Sanity path
+ * is the hand-encoded set it replaced — an AV1 `.webm` for most browsers, an
+ * HEVC `.mp4` for Safari, and a smaller `.webm` for phones. Both are kept so
+ * the two can be measured against each other on the same page.
+ *
+ * The picture covers the load, stands alone when there is no video, and falls
+ * back to the clip's own opening frame when skipped.
  */
 const videoVariantFields = () => [
-  muxVideoField({ name: "mux", title: "Video" }),
+  defineField({
+    name: "mediaType",
+    type: "string",
+    title: "Video Source",
+    description:
+      "Where this background is served from. Mux encodes one upload for every device. Sanity serves the files you upload below, exactly as encoded.",
+    initialValue: "mux",
+    options: {
+      layout: "radio",
+      list: [
+        { title: "Mux — one upload, encoded for every device", value: "mux" },
+        { title: "Sanity — your own encoded files", value: "sanity" },
+      ],
+    },
+    validation: (Rule) => Rule.required(),
+  }),
+  muxVideoField({
+    name: "mux",
+    title: "Video",
+    hidden: showFor("mux"),
+  }),
+  defineField({
+    name: "webm",
+    type: "file",
+    title: "Video For Computers",
+    description:
+      "The .webm file, encoded as AV1. Most people see this one. The AV1 codec is declared to the browser so Safari skips it and takes the .mp4 instead — upload a VP9 .webm here and this hero may fall back to the .mp4 or just the poster image.",
+    options: { accept: "video/webm" },
+    hidden: showFor("sanity"),
+  }),
+  defineField({
+    name: "hevc",
+    type: "file",
+    title: "Video For Apple Devices",
+    description: "The .mp4 file. Macs, iPhones and iPads need this one.",
+    options: { accept: "video/mp4" },
+    hidden: showFor("sanity"),
+  }),
+  defineField({
+    name: "mobileWebm",
+    type: "file",
+    title: "Video For Phones",
+    description:
+      "A smaller .webm, so phones do not have to download the big file. AV1, like the one above.",
+    options: { accept: "video/webm" },
+    hidden: showFor("sanity"),
+  }),
   defineField({
     name: "poster",
     type: "image",
@@ -21,6 +99,26 @@ const videoVariantFields = () => [
       "Optional. Shown while the video loads, or on its own if you add no video.",
   }),
 ];
+
+/**
+ * Flags the one mistake the toggle makes possible: content uploaded to the
+ * path that is not selected. Silent otherwise — a picture with no video at all
+ * is a valid background.
+ */
+const checkVariant = (value: unknown): true | string => {
+  const variant = value as HeroVariantValue | undefined;
+  if (!variant) {
+    return true;
+  }
+  const type = selected(variant);
+  if (type === "mux" && !variant.mux?.asset && hasFiles(variant)) {
+    return "Set to Mux, but only uploaded files are here. Upload a Mux video, or switch the source to Sanity.";
+  }
+  if (type === "sanity" && !hasFiles(variant) && variant.mux?.asset) {
+    return "Set to Sanity, but only a Mux video is here. Upload the files, or switch the source to Mux.";
+  }
+  return true;
+};
 
 export const heroVideoField = defineField({
   name: "video",
@@ -36,6 +134,7 @@ export const heroVideoField = defineField({
       description: "Shown in light mode.",
       options: { collapsible: true, collapsed: false },
       fields: videoVariantFields(),
+      validation: (Rule) => Rule.custom(checkVariant).warning(),
     }),
     defineField({
       name: "dark",
@@ -44,6 +143,7 @@ export const heroVideoField = defineField({
       description: "Optional. Leave empty to reuse the light mode background.",
       options: { collapsible: true, collapsed: false },
       fields: videoVariantFields(),
+      validation: (Rule) => Rule.custom(checkVariant).warning(),
     }),
   ],
 });

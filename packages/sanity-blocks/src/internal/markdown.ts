@@ -79,6 +79,8 @@ export interface MarkdownTestimonial {
 }
 
 export interface MarkdownVideoVariant {
+  /** Which delivery path the hero selected — see `hero/media-type`. */
+  mediaType?: string | null;
   mux?: MuxVideoData | null;
   poster?: MarkdownImage | null;
 }

@@ -1,5 +1,6 @@
 import { Images } from "lucide-react";
 import {
+  type ConditionalProperty,
   defineArrayMember,
   defineField,
   type ImageRule,
@@ -167,12 +168,15 @@ export const muxVideoEmbedField = ({
 export const muxVideoField = ({
   description = "Upload a file, paste a video URL, or pick one already in the project.",
   group,
+  hidden,
   name = "video",
   title = "Video",
   validation,
 }: {
   description?: string;
   group?: string;
+  /** For blocks that offer a choice of delivery — see the hero's `mediaType`. */
+  hidden?: ConditionalProperty;
   name?: string;
   title?: string;
   validation?: ValidationBuilder<Rule>;
@@ -183,6 +187,7 @@ export const muxVideoField = ({
     title,
     description,
     group,
+    hidden,
     validation,
     options: { collapsible: false },
   });

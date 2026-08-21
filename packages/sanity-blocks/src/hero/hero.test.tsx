@@ -88,3 +88,55 @@ test("HeroBlock renders one still per theme only when they differ", () => {
   expect(split).toContain("dark:hidden");
   expect(split).toContain("def456");
 });
+
+// The two delivery paths have to be selectable on the same site, or the
+// comparison pages measure nothing. `HeroVideo` mounts client-side, so the
+// server render carries the still only — which is exactly what must differ:
+// a hero served from Sanity must never reach image.mux.com for its poster.
+test("a sanity-delivered hero does not borrow the Mux still", () => {
+  const html = renderToStaticMarkup(
+    <HeroBlock
+      isFirst
+      title="H"
+      video={{
+        light: {
+          mediaType: "sanity",
+          mux: READY_MUX,
+          webm: "https://cdn.sanity.io/files/p/d/hero.webm",
+        },
+      }}
+    />
+  );
+
+  expect(html).not.toContain("image.mux.com");
+});
+
+test("a mux-delivered hero still falls back to the Mux still", () => {
+  const html = renderToStaticMarkup(
+    <HeroBlock
+      isFirst
+      title="H"
+      video={{ light: { mediaType: "mux", mux: READY_MUX } }}
+    />
+  );
+
+  expect(html).toContain("https://image.mux.com/abc123/thumbnail.webp");
+});
+
+// A hero authored before the toggle has no `mediaType` at all. It must keep
+// rendering from whichever path it actually carries.
+test("a hero with no mediaType keeps rendering from what it carries", () => {
+  const files = renderToStaticMarkup(
+    <HeroBlock
+      isFirst
+      title="H"
+      video={{ light: { webm: "https://cdn.sanity.io/files/p/d/hero.webm" } }}
+    />
+  );
+  expect(files).not.toContain("image.mux.com");
+
+  const mux = renderToStaticMarkup(
+    <HeroBlock isFirst title="H" video={{ light: { mux: READY_MUX } }} />
+  );
+  expect(mux).toContain("image.mux.com");
+});

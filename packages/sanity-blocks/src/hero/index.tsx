@@ -13,6 +13,7 @@ import { cn } from "@workspace/tailwind-config/utils";
 import { muxPlaybackId, muxThumbnailUrl } from "../internal/mux";
 import type { HeroVideoData, HeroVideoVariant } from "./hero-video";
 import { HeroVideo } from "./hero-video";
+import { mediaTypeOf } from "./media-type";
 
 export type { HeroVideoData, HeroVideoVariant } from "./hero-video";
 
@@ -40,6 +41,12 @@ type HeroStill = {
 function stillOf(variant?: HeroVideoVariant | null): HeroStill | null {
   if (variant?.poster?.id) {
     return { image: variant.poster, key: variant.poster.id };
+  }
+  // Only the Mux path may borrow Mux's generated still. A hero served from the
+  // Sanity CDN must not reach image.mux.com for its poster, or the two
+  // delivery paths stop being measurable against each other.
+  if (mediaTypeOf(variant) !== "mux") {
+    return null;
   }
   const url = muxThumbnailUrl(
     muxPlaybackId(variant?.mux),
