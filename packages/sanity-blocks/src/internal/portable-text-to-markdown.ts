@@ -40,6 +40,13 @@ export interface PortableTextNode {
   code?: string | null;
   language?: string | null;
   filename?: string | null;
+  // Table fields.
+  headerRows?: number | null;
+  rows?: PortableTextTableRow[] | null;
+}
+
+export interface PortableTextTableRow {
+  cells?: { value?: PortableTextNode[] | null }[] | null;
 }
 
 export interface MarkdownImage {
@@ -140,6 +147,45 @@ function fenceCodeBlock(code: string, language?: string | null): string {
   return `${fence}${info}\n${body}\n${fence}`;
 }
 
+// GFM pipe-table cells are single-line, so a literal `|` would split the
+// column and an embedded newline would break the row entirely.
+function escapeTableCell(text: string): string {
+  return text.replaceAll("|", String.raw`\|`).replace(/\n+/g, "<br>");
+}
+
+function renderTableRow(cells: string[]): string {
+  return `| ${cells.join(" | ")} |`;
+}
+
+// GFM requires a header row followed by a `---` separator row; the schema's
+// `headerRows` is a Studio display concern with no Markdown equivalent, so
+// the first row is always treated as the header here regardless of its value.
+function renderTable(node: PortableTextNode, options: MarkdownOptions): string {
+  const rows = node.rows ?? [];
+  if (rows.length === 0) {
+    return "";
+  }
+
+  const rowsMarkdown = rows.map((row) =>
+    (row.cells ?? []).map((cell) =>
+      escapeTableCell(portableTextToMarkdown(cell.value, options))
+    )
+  );
+  const columnCount = Math.max(0, ...rowsMarkdown.map((cells) => cells.length));
+  if (columnCount === 0) {
+    return "";
+  }
+  const pad = (cells: string[]) =>
+    Array.from({ length: columnCount }, (_, index) => cells.at(index) ?? "");
+
+  const [headerCells = [], ...bodyCells] = rowsMarkdown;
+  return [
+    renderTableRow(pad(headerCells)),
+    renderTableRow(Array.from({ length: columnCount }, () => "---")),
+    ...bodyCells.map((cells) => renderTableRow(pad(cells))),
+  ].join("\n");
+}
+
 /**
  * Converts a portable-text array to a Markdown string.
  *
@@ -195,6 +241,7 @@ export function portableTextToMarkdown(
         }
         return fenceCodeBlock(code, node.language);
       },
+      table: ({ value }) => renderTable(value as PortableTextNode, options),
       // Sanity images carry `{id, alt, caption}`, not `{src, alt, title}`.
       // Resolve the CDN URL via the caller-supplied resolver when available.
       image: ({ value, isInline }) => {

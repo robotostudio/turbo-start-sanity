@@ -55,7 +55,11 @@ const videoVariantFields = () => [
     title: "Video Source",
     description:
       "Where this background is served from. Mux encodes one upload for every device. Sanity serves the files you upload below, exactly as encoded.",
-    initialValue: "mux",
+    // Measured: the hand-encoded set is smaller and sharper than either Mux
+    // path on this hero — 2.02 MB at 3408x2160 against 2.92 MB at 1704x1080 —
+    // and ships no player. Mux earns its place on video blocks an editor
+    // uploads to often, not on the one clip that autoplays on every visit.
+    initialValue: "sanity",
     options: {
       layout: "radio",
       list: [

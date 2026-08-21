@@ -23,6 +23,7 @@
     "@types/react": "catalog:",
     "@workspace/typescript-config": "workspace:*",
     "next": "16.2.9",
+    "sanity": "catalog:",
     "typescript": "catalog:"
   },
   "exports": {

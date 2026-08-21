@@ -1,7 +1,6 @@
 import "@workspace/ui/globals.css";
 
 import {
-  DRAFTS_WITHOUT_SESSION,
   type DynamicFetchOptions,
   getDynamicFetchOptions,
   SanityLive,
@@ -46,10 +45,6 @@ export default async function RootLayout({
   prefetchDNS("https://stream.mux.com");
   preconnect("https://image.mux.com");
   prefetchDNS("https://image.mux.com");
-  // In local dev, nav/footer follow drafts too (like page content), so draft
-  // navbar/footer/settings edits are visible without a Presentation session.
-  // Production stays static published.
-  const showDrafts = DRAFTS_WITHOUT_SESSION;
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -64,27 +59,22 @@ export default async function RootLayout({
             id="page-shell"
             style={{ marginBottom: "var(--footer-height)" }}
           >
-            {showDrafts ? (
-              <Suspense
-                fallback={<Navbar navbarData={null} settingsData={null} />}
-              >
-                <DynamicNavbar />
-              </Suspense>
-            ) : (
-              <CachedNavbar perspective="published" stega={false} />
-            )}
+            {/* Session-gated, not environment-gated, so the deployed Studio can
+                edit the nav; the published fallback keeps real content in the
+                static shell. */}
+            <Suspense fallback={<PublishedNavbar />}>
+              <DynamicNavbar />
+            </Suspense>
             <div className="relative z-10 min-h-dvh bg-background pt-16 lg:-mt-16">
               {children}
             </div>
           </div>
           <StickyFooter>
-            {showDrafts ? (
-              <Suspense fallback={null}>
-                <DynamicFooter />
-              </Suspense>
-            ) : (
-              <CachedFooter perspective="published" stega={false} />
-            )}
+            <Suspense
+              fallback={<CachedFooter perspective="published" stega={false} />}
+            >
+              <DynamicFooter />
+            </Suspense>
           </StickyFooter>
           {/* Reads draftMode(), so it must stay behind Suspense — otherwise the
               whole layout opts out of prerendering for every visitor. */}
@@ -123,6 +113,17 @@ async function LivePreviewLayer() {
 async function DynamicNavbar() {
   const { perspective, stega } = await getDynamicFetchOptions();
   return <CachedNavbar perspective={perspective} stega={stega} />;
+}
+
+/** Static shell for the nav. A Suspense fallback renders in the parent, so it
+ * may only await cached data — `getGithubStars` memoizes at runtime, so the
+ * count arrives with DynamicNavbar instead. */
+async function PublishedNavbar() {
+  const { navbarData, settingsData } = await getNavigationData({
+    perspective: "published",
+    stega: false,
+  });
+  return <Navbar navbarData={navbarData} settingsData={settingsData} />;
 }
 
 async function CachedNavbar({ perspective, stega }: DynamicFetchOptions) {
