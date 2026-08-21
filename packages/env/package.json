@@ -1,6 +1,6 @@
 {
   "name": "@workspace/env",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "module",
   "private": true,
   "scripts": {
@@ -20,6 +20,7 @@
   },
   "exports": {
     "./client": "./src/client.ts",
+    "./constants": "./src/constants.ts",
     "./server": "./src/server.ts"
   }
 }

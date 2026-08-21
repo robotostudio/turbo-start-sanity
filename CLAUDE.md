@@ -133,8 +133,8 @@ Canonical source of truth is `apps/web/.env.example` and `apps/studio/.env.examp
 
 **`apps/web`** (validated by `@workspace/env`):
 
-- Required: `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`, `NEXT_PUBLIC_SANITY_API_VERSION`, `NEXT_PUBLIC_SANITY_STUDIO_URL`, `SANITY_API_READ_TOKEN`, `SANITY_API_WRITE_TOKEN`
-- Optional: `SANITY_REVALIDATE_SECRET` (shared secret for the `/api/revalidate-sync-tags` webhook; the route fails closed when unset)
+- Required: `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`, `NEXT_PUBLIC_SANITY_STUDIO_URL`, `SANITY_API_READ_TOKEN`, `SANITY_API_WRITE_TOKEN`
+- Optional: `NEXT_PUBLIC_SANITY_API_VERSION` (blank or unset falls back to `DEFAULT_SANITY_API_VERSION` from `@workspace/env/constants`, currently `2026-08-21`), `SANITY_REVALIDATE_SECRET` (shared secret for the `/api/revalidate-sync-tags` webhook; the route fails closed when unset)
 - `NEXT_PUBLIC_VERCEL_ENV`, `NEXT_PUBLIC_VERCEL_URL`, `NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL` are also validated but default to localhost, so they need no local value
 
 Caveat: `SANITY_API_WRITE_TOKEN` is currently required by `packages/env/src/server.ts` even though no runtime code reads it. `apps/web/next.config.ts` imports `@workspace/env/server`, so `next dev` and `next build` both fail fast if it is unset.
@@ -142,7 +142,7 @@ Caveat: `SANITY_API_WRITE_TOKEN` is currently required by `packages/env/src/serv
 **`apps/studio`** (plain `process.env`, loaded via `dotenv`/Vite — not `@workspace/env`):
 
 - Required: `SANITY_STUDIO_PROJECT_ID`, `SANITY_STUDIO_DATASET`
-- Optional: `SANITY_STUDIO_TITLE`, `SANITY_STUDIO_API_VERSION` (defaults to `2025-05-08` in `apps/studio/utils/constant.ts`), `SANITY_STUDIO_APP_ID` (written back after the first `sanity deploy`), `SANITY_STUDIO_PRESENTATION_URL` (required whenever `NODE_ENV` is not `development` — `utils/helper.ts` returns `http://localhost:3000` in development and throws otherwise, so an unset or `test` `NODE_ENV` throws too)
+- Optional: `SANITY_STUDIO_TITLE`, `SANITY_STUDIO_API_VERSION` (defaults to `DEFAULT_SANITY_API_VERSION` from `@workspace/env/constants` — currently `2026-08-21` — in `apps/studio/utils/constant.ts`), `SANITY_STUDIO_APP_ID` (written back after the first `sanity deploy`), `SANITY_STUDIO_PRESENTATION_URL` (required whenever `NODE_ENV` is not `development` — `utils/helper.ts` returns `http://localhost:3000` in development and throws otherwise, so an unset or `test` `NODE_ENV` throws too)
 - `NEXT_PUBLIC_SITE_URL` and `SANITY_REVALIDATE_SECRET` are read only by the deployed Sanity Function `apps/studio/functions/invalidate-tags`, not by the Studio itself
 
 Web env vars are Zod-validated at startup via `@workspace/env` (`@workspace/env/client` and `@workspace/env/server`).
