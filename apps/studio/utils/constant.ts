@@ -24,4 +24,4 @@ export const GROUPS: FieldGroupDefinition[] = [
 ];
 
 export const API_VERSION =
-  process.env.SANITY_STUDIO_API_VERSION ?? DEFAULT_SANITY_API_VERSION;
+  process.env.SANITY_STUDIO_API_VERSION || DEFAULT_SANITY_API_VERSION;
