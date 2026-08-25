@@ -56,3 +56,11 @@ jobs:
 
       - name: Unit Tests
         run: pnpm turbo run test
+
+      - name: Build Studio
+        # apps/web is built by Vercel on every PR; apps/studio is not, so a
+        # dependency that breaks `sanity build` would otherwise merge green.
+        # The example values are placeholders, enough for a build.
+        run: |
+          cp apps/studio/.env.example apps/studio/.env
+          pnpm --filter studio build
