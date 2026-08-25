@@ -63,4 +63,4 @@ jobs:
         # The example values are placeholders, enough for a build.
         run: |
           cp apps/studio/.env.example apps/studio/.env
-          pnpm --filter studio build
+          pnpm turbo run build --filter=studio
