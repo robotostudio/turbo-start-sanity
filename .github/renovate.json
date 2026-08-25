@@ -1,0 +1,13 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Sanity ecosystem presets, then Roboto policy LAST so it wins - preset packageRules are appended in order and the last matching rule sets each option.",
+  "extends": [
+    "github>sanity-io/renovate-config",
+    "github>sanity-io/renovate-config:automerge",
+    "local>robotostudio/.github"
+  ],
+  "ignorePresets": [
+    "github>sanity-io/renovate-config:schedule",
+    "github>sanity-io/renovate-config:lock-file-maintenance"
+  ]
+}
