@@ -20,15 +20,16 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
+          persist-credentials: false
           fetch-depth: 1
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: "pnpm"
@@ -37,7 +38,7 @@ jobs:
         run: pnpm install --frozen-lockfile --ignore-scripts
 
       - name: Cache Turbo
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .turbo
           key: turbo-${{ runner.os }}-${{ hashFiles('**/turbo.json', 'pnpm-lock.yaml') }}
@@ -55,3 +56,11 @@ jobs:
 
       - name: Unit Tests
         run: pnpm turbo run test
+
+      - name: Build Studio
+        # apps/web is built by Vercel on every PR; apps/studio is not, so a
+        # dependency that breaks `sanity build` would otherwise merge green.
+        # The example values are placeholders, enough for a build.
+        run: |
+          cp apps/studio/.env.example apps/studio/.env
+          pnpm turbo run build --filter=studio
