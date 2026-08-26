@@ -50,6 +50,6 @@
     "@sanity/blueprints": "^0.20.1",
     "@types/react": "catalog:",
     "typescript": "catalog:",
-    "vite": "^8.0.16"
+    "vite": "^8.1.5"
   }
 }
