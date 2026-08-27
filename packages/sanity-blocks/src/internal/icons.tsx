@@ -93,7 +93,7 @@ export function LinkedinBrandIcon({ className }: Readonly<IconProps>) {
     <svg
       aria-hidden="true"
       className={className}
-      fill="none"
+      fill="currentColor"
       height="18"
       viewBox="0 0 18 18"
       width="18"
@@ -109,7 +109,7 @@ export function XBrandIcon({ className }: Readonly<IconProps>) {
     <svg
       aria-hidden="true"
       className={className}
-      fill="none"
+      fill="currentColor"
       height="18"
       viewBox="0 0 20 18"
       width="20"
@@ -125,7 +125,7 @@ export function YoutubeIcon({ className }: Readonly<IconProps>) {
     <svg
       aria-hidden="true"
       className={className}
-      fill="none"
+      fill="currentColor"
       height="16"
       viewBox="0 0 20 16"
       width="20"
