@@ -42,8 +42,8 @@ packages/
 
 ## Requirements
 
-- Node.js `>=22.12`
-- pnpm `10.32.1` — pinned via `packageManager`, so the simplest setup is
+- Node.js `>=24`
+- pnpm `11.24.0` — pinned via `packageManager`, so the simplest setup is
   `corepack enable` and letting Corepack install the right version
 - A free [Sanity](https://www.sanity.io/) account
 

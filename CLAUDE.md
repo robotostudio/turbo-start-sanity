@@ -188,6 +188,6 @@ All frontend types derive from generated Sanity types. `apps/web/src/types.ts` e
 
 ### Node/Runtime
 
-- Node >= 22.12 required (`engines.node` in the root `package.json`)
-- pnpm 10.32.1, pinned via `packageManager` — enable with `corepack enable`
+- Node >= 24 required (`engines.node` in the root `package.json`)
+- pnpm 11.24.0, pinned via `packageManager` — enable with `corepack enable`
 - Turborepo handles task orchestration — `transit` task runs before lint/format/check-types
