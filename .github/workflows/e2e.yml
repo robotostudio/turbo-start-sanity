@@ -3,9 +3,6 @@ name: E2E Smoke Tests
 on:
   deployment_status:
 
-permissions:
-  contents: read
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.deployment.id }}
   cancel-in-progress: true
@@ -20,6 +17,8 @@ jobs:
   # moved past, which the newer deployment covers anyway.
   guard:
     name: Verify Deployed Commit
+    permissions:
+      contents: read
     if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -43,6 +42,8 @@ jobs:
 
   e2e:
     name: Playwright Smoke Tests
+    permissions:
+      contents: read
     needs: guard
     if: needs.guard.outputs.trusted == 'true'
     runs-on: ubuntu-latest
