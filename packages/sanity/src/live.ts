@@ -1,7 +1,7 @@
 import { env } from "@workspace/env/server";
 import { cacheTag } from "next/cache";
 import { cookies, draftMode } from "next/headers";
-import type { QueryParams } from "next-sanity";
+import type { QueryParams, StegaCleaned } from "next-sanity";
 import {
   defineLive,
   type LivePerspective,
@@ -22,17 +22,38 @@ const { sanityFetch: liveFetch, SanityLive } = defineLive({
 
 export { SanityLive };
 
+type LiveFetchOptions<Q extends string> = Parameters<typeof liveFetch<Q>>[0];
+type LiveFetchResult<Q extends string> = Awaited<
+  ReturnType<typeof liveFetch<Q>>
+>;
+
 /** `sanityFetch` with the query's sync tags registered on the surrounding
  * `'use cache'` entry. next-sanity only tags the underlying `fetch`, and under
  * `cacheComponents` that never reaches the cache entry — so `updateTag()` from
  * `<SanityLive>` had nothing to invalidate and Presentation served stale HTML.
- * Done here, not per boundary, so a new cached read can't forget. */
-export const sanityFetch: typeof liveFetch = async (options) => {
+ * Done here, not per boundary, so a new cached read can't forget.
+ *
+ * `data` is also unbranded back to the plain TypeGen shape. next-sanity 13.3
+ * brands result strings as `StegaString` unless `stega` is the literal `false`,
+ * and every call here passes a runtime boolean. Unbranding is type-level only —
+ * the strings still carry stega characters at runtime, exactly as before 13.3.
+ * The alternative is widening every block prop in `@workspace/sanity-blocks` to
+ * `StegaCleaned | StegaBranded`; do that if a literal comparison ever needs the
+ * compiler's help, and keep using `stegaClean` at the comparison itself. */
+export const sanityFetch = async <const Q extends string>(
+  options: LiveFetchOptions<Q>
+): Promise<
+  Omit<LiveFetchResult<Q>, "data"> & {
+    data: StegaCleaned<LiveFetchResult<Q>["data"]>;
+  }
+> => {
   const result = await liveFetch(options);
   if (result.tags.length > 0) {
     cacheTag(...result.tags);
   }
-  return result;
+  return result as Omit<LiveFetchResult<Q>, "data"> & {
+    data: StegaCleaned<LiveFetchResult<Q>["data"]>;
+  };
 };
 
 export interface DynamicFetchOptions {
