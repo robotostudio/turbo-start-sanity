@@ -102,7 +102,13 @@ looser is safer. Conventions: wrap in `<section>` with its own
 `<div className="container">` rail, prefer `grid` over `flex` unless two
 siblings, use `SanityImage` / `SanityButtons` / `RichText` / `BlockEyebrow`
 from `../internal/*`, and give the `<section>` the shared `block-section`
-class every existing block uses:
+class every existing block uses.
+
+The hardcoded `id` is the repo-wide convention (`id="cta"`, `id="faq"`,
+`id="showcase"`, …) and doubles as the in-page anchor. It assumes one instance
+per page: the page builder is an unconstrained array, so an editor who adds the
+same block twice gets a duplicate `id`. Keep the convention, and drop the `id`
+if the block is one an editor is likely to repeat:
 
 ```tsx
 import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
@@ -192,17 +198,17 @@ and add it to `pageBuilderFragment` alongside the existing projections.
 ### 4. Regenerate Sanity types
 
 ```bash
-pnpm --filter studio exec sanity schema extract --force
+pnpm --filter studio extract
 pnpm type
 ```
 
 Both commands are required, in that order. `pnpm type` runs
 `sanity typegen generate`, which reads the **committed**
 `apps/studio/schema.json` — it does not look at the schema source. Only
-`sanity schema extract` refreshes that file, and without `--force` it refuses
-to overwrite the existing one. Run `pnpm type` alone and the generated types
-silently keep the old schema, leaving `PagebuilderType<"<camel>">` unresolvable
-in step 5 (never paper over that with a cast — it means extract didn't run).
+`sanity schema extract` refreshes that file. Run `pnpm type` alone and the
+generated types silently keep the old schema, leaving
+`PagebuilderType<"<camel>">` unresolvable in step 5 (never paper over that with
+a cast — it means extract didn't run).
 
 Together they update `packages/sanity/src/sanity.types.ts`; the web app's
 `PagebuilderType<"<camel>">` in `apps/web/src/types.ts` picks the new block up
@@ -264,7 +270,7 @@ One hit per file. Fewer means a registration is missing.
 - [ ] Schema icon stubbed in `internal/testing/lucide-react.mock.tsx`
 - [ ] Exported + appended to `blockSchemas` in `sanity-blocks.ts`
 - [ ] Projection added to `pageBuilderFragment` in `packages/sanity/src/query.ts`
-- [ ] `sanity schema extract --force` **then** `pnpm type` — types include the block
+- [ ] `pnpm --filter studio extract` **then** `pnpm type` — types include the block
 - [ ] `case` added in `renderBlockComponent` (`apps/web/src/components/pagebuilder.tsx`)
 - [ ] `case` added in `blockToMarkdown` (`internal/page-builder-to-markdown.ts`)
 - [ ] Any new field the serializer reads added to `MarkdownBlock`
