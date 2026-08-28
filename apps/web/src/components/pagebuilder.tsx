@@ -6,9 +6,13 @@ import { CTABlock } from "@workspace/sanity-blocks/cta/index";
 import { FaqAccordion } from "@workspace/sanity-blocks/faq-accordion/index";
 import { FeatureCardsWithIcon } from "@workspace/sanity-blocks/feature-cards-icon/index";
 import { HeroBlock } from "@workspace/sanity-blocks/hero/index";
-import { ImageLinkCards } from "@workspace/sanity-blocks/image-link-cards/index";
+import { LogoCloud } from "@workspace/sanity-blocks/logo-cloud/index";
 import { RichTextBlock } from "@workspace/sanity-blocks/rich-text-block/index";
+import { ShowcaseGrid } from "@workspace/sanity-blocks/showcase-grid/index";
+import { SocialGrid } from "@workspace/sanity-blocks/social-grid/index";
 import { SubscribeNewsletter } from "@workspace/sanity-blocks/subscribe-newsletter/index";
+import { VideoFeature } from "@workspace/sanity-blocks/video-feature/index";
+import { cn } from "@workspace/tailwind-config/utils";
 import { createDataAttribute } from "next-sanity";
 
 import type { PageBuilderBlock, PagebuilderType } from "@/types";
@@ -30,14 +34,24 @@ type SanityDataAttributeConfig = {
  * against its PagebuilderType so a GROQ or schema rename breaks the build
  * instead of silently passing through `any`.
  */
-function renderBlockComponent(block: PageBuilderBlock) {
+function renderBlockComponent(
+  block: PageBuilderBlock,
+  isFirst: boolean,
+  dataSanity?: string
+) {
   switch (block?._type) {
     case "cta":
       return <CTABlock {...(block as PagebuilderType<"cta">)} />;
     case "faqAccordion":
       return <FaqAccordion {...(block as PagebuilderType<"faqAccordion">)} />;
     case "hero":
-      return <HeroBlock {...(block as PagebuilderType<"hero">)} />;
+      return (
+        <HeroBlock
+          {...(block as PagebuilderType<"hero">)}
+          dataSanity={dataSanity}
+          isFirst={isFirst}
+        />
+      );
     case "featureCardsIcon":
       return (
         <FeatureCardsWithIcon
@@ -50,20 +64,21 @@ function renderBlockComponent(block: PageBuilderBlock) {
           {...(block as PagebuilderType<"subscribeNewsletter">)}
         />
       );
-    case "imageLinkCards":
-      return (
-        <ImageLinkCards {...(block as PagebuilderType<"imageLinkCards">)} />
-      );
+    case "logoCloud":
+      return <LogoCloud {...(block as PagebuilderType<"logoCloud">)} />;
+    case "socialGrid":
+      return <SocialGrid {...(block as PagebuilderType<"socialGrid">)} />;
+    case "showcaseGrid":
+      return <ShowcaseGrid {...(block as PagebuilderType<"showcaseGrid">)} />;
     case "richTextBlock":
       return <RichTextBlock {...(block as PagebuilderType<"richTextBlock">)} />;
+    case "videoFeature":
+      return <VideoFeature {...(block as PagebuilderType<"videoFeature">)} />;
     default:
       return null;
   }
 }
 
-/**
- * Helper function to create consistent Sanity data attributes
- */
 function createSanityDataAttribute(config: SanityDataAttributeConfig): string {
   return createDataAttribute({
     id: config.id,
@@ -75,9 +90,6 @@ function createSanityDataAttribute(config: SanityDataAttributeConfig): string {
   }).toString();
 }
 
-/**
- * Error fallback component for unknown block types
- */
 function UnknownBlockError({
   blockType,
   blockKey,
@@ -102,9 +114,6 @@ function UnknownBlockError({
   );
 }
 
-/**
- * Hook to handle optimistic updates for page builder blocks
- */
 function useOptimisticPageBuilder(
   initialBlocks: PageBuilderBlock[],
   documentId: string
@@ -113,17 +122,34 @@ function useOptimisticPageBuilder(
   return useOptimistic<PageBuilderBlock[], any>(
     initialBlocks,
     (currentBlocks, action) => {
-      if (action.id === documentId && action.document?.pageBuilder) {
-        return action.document.pageBuilder;
+      // `action` is untyped and comes off the mutation stream, so a truthy
+      // non-array `pageBuilder` would throw out of `for...of` mid-render.
+      if (
+        action.id !== documentId ||
+        !Array.isArray(action.document?.pageBuilder)
+      ) {
+        return currentBlocks;
       }
-      return currentBlocks;
+
+      // The action carries the raw document, not the GROQ projection the page
+      // rendered from, so only its `_key` order is usable — take that and keep
+      // the resolved blocks. Keys with no resolved block (a just-inserted one)
+      // are dropped until revalidation projects them.
+      const resolved = new Map(
+        currentBlocks.map((block) => [block._key, block])
+      );
+      const reordered: PageBuilderBlock[] = [];
+      for (const raw of action.document.pageBuilder) {
+        const block = raw?._key ? resolved.get(raw._key) : undefined;
+        if (block) {
+          reordered.push(block);
+        }
+      }
+      return reordered;
     }
   );
 }
 
-/**
- * Custom hook for block component rendering logic
- */
 function useBlockRenderer(id: string, type: string) {
   const createBlockDataAttribute = (blockKey: string) =>
     createSanityDataAttribute({
@@ -132,8 +158,20 @@ function useBlockRenderer(id: string, type: string) {
       path: `pageBuilder[_key=="${blockKey}"]`,
     });
 
-  const renderBlock = (block: PageBuilderBlock) => {
-    const content = block && renderBlockComponent(block);
+  const renderBlock = (block: PageBuilderBlock, index: number) => {
+    // The leading hero's wrapper is `display: contents` so the banner pins
+    // against this grid, and a box-less element measures 0x0 in the visual
+    // editing overlay — unselectable, undraggable. Hand the attribute to the
+    // hero instead, which puts it on the banner box.
+    const isLeadingHero = index === 0 && block?._type === "hero";
+    const dataSanity = block && createBlockDataAttribute(block._key);
+    const content =
+      block &&
+      renderBlockComponent(
+        block,
+        index === 0,
+        isLeadingHero ? dataSanity : undefined
+      );
 
     if (!content) {
       return (
@@ -147,7 +185,11 @@ function useBlockRenderer(id: string, type: string) {
 
     return (
       <div
-        data-sanity={createBlockDataAttribute(block._key)}
+        className={cn(
+          "min-w-0",
+          isLeadingHero ? "contents" : "relative z-10 bg-background"
+        )}
+        data-sanity={isLeadingHero ? undefined : dataSanity}
         key={`${block._type}-${block._key}`}
       >
         {content}
@@ -158,9 +200,6 @@ function useBlockRenderer(id: string, type: string) {
   return { renderBlock };
 }
 
-/**
- * PageBuilder component for rendering dynamic content blocks from Sanity CMS
- */
 export function PageBuilder({
   pageBuilder: initialBlocks = [],
   id,
@@ -180,13 +219,11 @@ export function PageBuilder({
   }
 
   return (
-    // Full-bleed by design: each block owns its own `container` rail (see
-    // renderBlockComponent). A block that omits one renders edge-to-edge.
-    <main
-      className="my-16 flex flex-col gap-16"
+    <div
+      className="grid min-w-0 grid-cols-1"
       data-sanity={containerDataAttribute}
     >
       {blocks.map(renderBlock)}
-    </main>
+    </div>
   );
 }

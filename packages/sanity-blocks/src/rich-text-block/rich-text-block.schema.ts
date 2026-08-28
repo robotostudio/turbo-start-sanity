@@ -1,27 +1,29 @@
 import { definePortableTextField } from "@workspace/sanity-blocks/internal/schema-fields";
-import { TextIcon } from "lucide-react";
+import { Text } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
 export const richTextBlockSchema = defineType({
   name: "richTextBlock",
   type: "object",
-  icon: TextIcon,
+  icon: Text,
   fields: [
     defineField({
       name: "eyebrow",
-      title: "Eyebrow",
       type: "string",
+      title: "Eyebrow",
       description:
         "The smaller text that sits above the title to provide context",
     }),
     defineField({
       name: "title",
-      title: "Title",
       type: "string",
+      title: "Title",
       description: "The large text that is the primary focus of the block",
     }),
-    definePortableTextField(["block", "image"], {
+    definePortableTextField(["block", "image", "table"], {
       name: "richText",
+      description:
+        "The body content for this block. Add paragraphs, headings, lists, links, images and tables.",
     }),
   ],
   preview: {

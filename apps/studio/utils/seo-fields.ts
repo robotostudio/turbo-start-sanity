@@ -5,19 +5,19 @@ import { GROUP } from "@/utils/constant";
 export const seoFields = [
   defineField({
     name: "seoTitle",
-    title: "SEO meta title override",
+    type: "string",
+    title: "SEO Meta Title Override",
     description:
       "This will override the meta title. If left blank it will inherit the page title.",
-    type: "string",
     validation: (rule) => rule.warning("A page title is required"),
     group: GROUP.SEO,
   }),
   defineField({
     name: "seoDescription",
-    title: "SEO meta description override",
+    type: "text",
+    title: "SEO Meta Description Override",
     description:
       "This will override the meta description. If left blank it will inherit the description from the page description.",
-    type: "text",
     rows: 2,
     validation: (rule) => [
       rule.warning("A description is required"),
@@ -27,10 +27,10 @@ export const seoFields = [
   }),
   defineField({
     name: "seoImage",
-    title: "SEO image override",
+    type: "image",
+    title: "SEO Image Override",
     description:
       "This will override the main image. If left blank it will inherit the image from the main image.",
-    type: "image",
     group: GROUP.SEO,
     options: {
       hotspot: true,
@@ -38,17 +38,17 @@ export const seoFields = [
   }),
   defineField({
     name: "seoNoIndex",
-    title: "Do not index this page",
-    description: "If checked, this content won't be indexed by search engines.",
     type: "boolean",
+    title: "Do Not Index This Page",
+    description: "If checked, this content won't be indexed by search engines.",
     initialValue: () => false,
     group: GROUP.SEO,
   }),
   defineField({
     name: "seoHideFromLists",
-    title: "Hide from lists",
-    description: "If checked, this content won't appear in any list pages.",
     type: "boolean",
+    title: "Hide From Lists",
+    description: "If checked, this content won't appear in any list pages.",
     initialValue: () => false,
     group: GROUP.SEO,
   }),

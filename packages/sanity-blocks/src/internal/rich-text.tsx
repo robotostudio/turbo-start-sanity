@@ -6,25 +6,39 @@ import {
   type PortableTextBlock,
   type PortableTextReactComponents,
 } from "next-sanity";
-import slugify from "slugify";
 
+import { CodeBlock } from "./code-block";
+import { headingChildrenToSlug as parseChildrenToSlug } from "./heading-slug";
+import { sanitizeHref } from "./safe-href";
 import { SanityImage } from "./sanity-image";
+import { TableBlock } from "./table-block";
 
 const logger = new Logger("RichText");
 
-function parseChildrenToSlug(children: PortableTextBlock["children"]): string {
-  if (!children) return "";
-  const text = children.map((child) => child.text ?? "").join("");
-  return slugify(text.trim(), { lower: true, remove: /[^a-zA-Z0-9 ]/g });
-}
-
 const components: Partial<PortableTextReactComponents> = {
   block: {
+    // The Studio only offers H2–H6, but the schema doesn't police what's
+    // already stored — seeded, imported or migrated blocks can still carry
+    // `style: "h1"`, and @portabletext/react's default would render a real
+    // `<h1>` right next to the page's own. Demote it to the H2 renderer so the
+    // outline stays single-rooted and no level is skipped. Same slug, so
+    // existing anchors keep resolving.
+    h1: ({ children, value }) => {
+      const slug = parseChildrenToSlug(value.children);
+      return (
+        <h2
+          className="mt-12 mb-8 scroll-m-20 font-medium text-4xl leading-[48px] tracking-[-0.24px] first:mt-0"
+          id={slug}
+        >
+          {children}
+        </h2>
+      );
+    },
     h2: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
         <h2
-          className="scroll-m-20 border-b pb-2 font-semibold text-3xl first:mt-0"
+          className="mt-12 mb-8 scroll-m-20 font-medium text-4xl leading-[48px] tracking-[-0.24px] first:mt-0"
           id={slug}
         >
           {children}
@@ -34,7 +48,10 @@ const components: Partial<PortableTextReactComponents> = {
     h3: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h3 className="scroll-m-20 font-semibold text-2xl" id={slug}>
+        <h3
+          className="scroll-m-20 font-medium text-3xl leading-10 tracking-[-0.24px]"
+          id={slug}
+        >
           {children}
         </h3>
       );
@@ -42,7 +59,10 @@ const components: Partial<PortableTextReactComponents> = {
     h4: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h4 className="scroll-m-20 font-semibold text-xl" id={slug}>
+        <h4
+          className="scroll-m-20 font-medium text-2xl leading-8 tracking-[-0.24px]"
+          id={slug}
+        >
           {children}
         </h4>
       );
@@ -50,7 +70,7 @@ const components: Partial<PortableTextReactComponents> = {
     h5: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h5 className="scroll-m-20 font-semibold text-lg" id={slug}>
+        <h5 className="scroll-m-20 font-medium text-xl leading-7" id={slug}>
           {children}
         </h5>
       );
@@ -58,7 +78,7 @@ const components: Partial<PortableTextReactComponents> = {
     h6: ({ children, value }) => {
       const slug = parseChildrenToSlug(value.children);
       return (
-        <h6 className="scroll-m-20 font-semibold text-base" id={slug}>
+        <h6 className="scroll-m-20 font-medium text-lg leading-7" id={slug}>
           {children}
         </h6>
       );
@@ -66,12 +86,13 @@ const components: Partial<PortableTextReactComponents> = {
   },
   marks: {
     code: ({ children }) => (
-      <code className="rounded-md border border-white/10 bg-opacity-5 p-1 text-sm lg:whitespace-nowrap">
+      <code className="rounded-none border border-border bg-zinc-200 px-1.5 py-0.5 font-mono text-[0.85em] text-foreground before:content-none after:content-none lg:whitespace-nowrap dark:bg-zinc-800">
         {children}
       </code>
     ),
     customLink: ({ children, value }) => {
-      if (!value.href || value.href === "#") {
+      const safeHref = sanitizeHref(value.href);
+      if (!safeHref || safeHref === "#") {
         return (
           <span className="underline decoration-dotted underline-offset-2">
             Link Broken
@@ -79,19 +100,37 @@ const components: Partial<PortableTextReactComponents> = {
         );
       }
       return (
+        // The anchor text is the accessible name. An `aria-label` here would
+        // replace it with a raw URL, which is what a screen reader would then
+        // read out in place of the words the author wrote.
         <Link
-          aria-label={`Link to ${value?.href}`}
           className="underline decoration-dotted underline-offset-2"
-          href={value.href}
+          href={safeHref}
           prefetch={false}
+          rel={value.openInNewTab ? "noopener noreferrer" : undefined}
           target={value.openInNewTab ? "_blank" : "_self"}
         >
           {children}
+          {value.openInNewTab ? (
+            <span className="sr-only"> (opens in a new tab)</span>
+          ) : null}
         </Link>
       );
     },
   },
   types: {
+    code: ({ value }) => {
+      if (!value?.code) {
+        return null;
+      }
+      return (
+        <CodeBlock
+          code={value.code}
+          filename={value.filename}
+          language={value.language}
+        />
+      );
+    },
     image: ({ value }) => {
       if (!value?.id) {
         return null;
@@ -99,9 +138,10 @@ const components: Partial<PortableTextReactComponents> = {
       return (
         <figure className="my-4">
           <SanityImage
-            className="h-auto w-full rounded-lg"
+            className="h-auto w-full"
             height={900}
             image={value}
+            sizes="(min-width: 1024px) 900px, calc(100vw - 40px)"
             width={1600}
           />
           {value?.caption && (
@@ -112,6 +152,13 @@ const components: Partial<PortableTextReactComponents> = {
         </figure>
       );
     },
+    table: ({ value }) => (
+      <TableBlock
+        cellComponents={components}
+        headerRows={value?.headerRows}
+        rows={value?.rows}
+      />
+    ),
   },
   hardBreak: () => <br />,
 };
@@ -140,7 +187,9 @@ export function RichText<T extends RichTextValue>({
   return (
     <div
       className={cn(
-        "prose prose-zinc dark:prose-invert max-w-none prose-headings:scroll-m-24 prose-h2:border-b prose-h2:pb-2 prose-h2:font-semibold prose-h2:text-3xl prose-headings:text-opacity-90 prose-ol:text-opacity-80 prose-p:text-opacity-80 prose-ul:text-opacity-80 prose-a:decoration-dotted prose-h2:first:mt-0",
+        // `strong` is the design's highlight treatment: foreground ink at
+        // normal weight, not bold.
+        "prose prose-zinc dark:prose-invert max-w-none prose-headings:scroll-m-24 prose-a:decoration-dotted prose-strong:font-normal prose-strong:text-foreground prose-h2:first:mt-0 dark:prose-headings:text-zinc-100",
         className
       )}
     >

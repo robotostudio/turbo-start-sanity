@@ -1,3 +1,4 @@
+import { env } from "@workspace/env/client";
 import { urlFor } from "@workspace/sanity/client";
 import type {
   QueryAllBlogDataForSearchResult,
@@ -9,12 +10,16 @@ import {
   pageBuilderToMarkdown,
 } from "@workspace/sanity-blocks/internal/page-builder-to-markdown";
 import {
+  absolutizeUrl,
   escapeMarkdown,
   type MarkdownImage,
   type MarkdownOptions,
   type PortableTextValue,
   portableTextToMarkdown,
 } from "@workspace/sanity-blocks/internal/portable-text-to-markdown";
+
+// Site origin for absolutizing internal `.md`/page links (already protocol-prefixed).
+const BASE_URL = env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL;
 
 /** Resolves a Sanity image (by asset `_ref`) to a public CDN URL for Markdown. */
 export const resolveImageUrl: NonNullable<
@@ -31,7 +36,7 @@ export const resolveImageUrl: NonNullable<
   }
 };
 
-const markdownOptions: MarkdownOptions = { resolveImageUrl };
+const markdownOptions: MarkdownOptions = { resolveImageUrl, baseUrl: BASE_URL };
 
 // Field shapes are derived from the generated query result types rather than
 // hand-written, per the project's types strategy. The blog post result carries
@@ -104,7 +109,9 @@ export function blogIndexToMarkdown(
     .map((post) => {
       const title = post.title?.trim();
       const slug = post.slug?.trim();
-      return title && slug ? `- [${escapeMarkdown(title)}](${slug})` : null;
+      return title && slug
+        ? `- [${escapeMarkdown(title)}](${absolutizeUrl(slug, BASE_URL)})`
+        : null;
     })
     .filter(Boolean)
     .join("\n");

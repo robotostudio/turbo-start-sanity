@@ -1,10 +1,10 @@
 import {
-  type MarkdownBlock,
-  type MarkdownOptions,
   buttonsToMarkdown,
   eyebrowToMarkdown,
   headingToMarkdown,
   joinSections,
+  type MarkdownBlock,
+  type MarkdownOptions,
 } from "../internal/markdown";
 import { portableTextToMarkdown } from "../internal/portable-text-to-markdown";
 
@@ -16,6 +16,6 @@ export function ctaToMarkdown(
     eyebrowToMarkdown(block.eyebrow),
     headingToMarkdown(block.title, 2),
     portableTextToMarkdown(block.richText, options),
-    buttonsToMarkdown(block.buttons),
+    buttonsToMarkdown(block.buttons, options),
   ]);
 }

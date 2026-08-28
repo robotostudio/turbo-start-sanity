@@ -5,8 +5,18 @@ import {
   queryGlobalSeoSettings,
   querySlugPagePaths,
 } from "@workspace/sanity/query";
+import { absolutizeUrl } from "@workspace/sanity-blocks/internal/portable-text-to-markdown";
+
+import { getBaseUrl } from "@/utils";
 
 const logger = new Logger("LlmsTxt");
+
+const BASE_URL = getBaseUrl();
+
+function mdHref(slug: string): string {
+  const path = slug.startsWith("/") ? slug : `/${slug}`;
+  return absolutizeUrl(`${path}.md`, BASE_URL);
+}
 
 const PUBLISHED = { perspective: "published", stega: false } as const;
 
@@ -80,16 +90,16 @@ export async function GET(): Promise<Response> {
   const posts =
     postsResult.status === "fulfilled" ? (postsResult.value ?? []) : [];
 
-  const siteTitle = settings?.siteTitle ?? "Site";
+  const siteTitle = settings?.siteTitle ?? "Turbo Start Sanity";
   const siteDescription = settings?.siteDescription ?? "";
 
   const pageLines = [
-    "- [Home](/index.md)",
+    `- [Home](${mdHref("/index")})`,
     ...slugs
       .filter((s): s is string => Boolean(s))
       .map((slug) => {
         const path = slug.startsWith("/") ? slug : `/${slug}`;
-        return `- [${slugToTitle(path)}](${path}.md)`;
+        return `- [${slugToTitle(path)}](${mdHref(path)})`;
       }),
   ];
 
@@ -99,7 +109,7 @@ export async function GET(): Promise<Response> {
 
   const blogLines = sortedPosts.flatMap((post) =>
     post.slug
-      ? [`- [${post.title ?? slugToTitle(post.slug)}](${post.slug}.md)`]
+      ? [`- [${post.title ?? slugToTitle(post.slug)}](${mdHref(post.slug)})`]
       : []
   );
 

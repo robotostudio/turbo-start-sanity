@@ -1,204 +1,169 @@
-import {
-  type DynamicFetchOptions,
-  getDynamicFetchOptions,
-  sanityFetch,
-  sanityFetchMetadata,
-} from "@workspace/sanity/live";
-import {
-  queryBlogIndexPageBlogs,
-  queryBlogIndexPageBlogsCount,
-  queryBlogIndexPageData,
-} from "@workspace/sanity/query";
+import { getDynamicFetchOptions } from "@workspace/sanity/live";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { BlogHeader } from "@/components/blog-card";
 import { BlogPageContent } from "@/components/blog-page-content";
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
-import { getSEOMetadata } from "@/lib/seo";
 import {
-  calculatePaginationMetadata,
-  getBlogPaginationStartEnd,
-  handleErrors,
-} from "@/utils";
+  type BlogIndexPageData,
+  fetchBlogIndexPage,
+  parseBlogPageParam,
+} from "@/lib/blog-index";
+import { seoFromDocument } from "@/lib/seo";
+import { calculateBlogPaginationMetadata } from "@/utils";
 
-async function fetchBlogIndexPageData({
-  perspective,
-  stega,
-}: DynamicFetchOptions) {
-  "use cache";
-  const res = await sanityFetch({
-    query: queryBlogIndexPageData,
-    perspective,
-    stega,
-  });
-  return res.data;
-}
-
-async function fetchBlogIndexPageBlogs({
-  start,
-  end,
-  perspective,
-  stega,
-}: { start: number; end: number } & DynamicFetchOptions) {
-  "use cache";
-  const res = await sanityFetch({
-    query: queryBlogIndexPageBlogs,
-    params: { start, end },
-    perspective,
-    stega,
-  });
-  return res.data;
-}
-
-async function fetchBlogIndexPageBlogsCount({
-  perspective,
-  stega,
-}: DynamicFetchOptions) {
-  "use cache";
-  const res = await sanityFetch({
-    query: queryBlogIndexPageBlogsCount,
-    perspective,
-    stega,
-  });
-  return res.data;
-}
-
-export async function generateMetadata(): Promise<Metadata> {
-  const { perspective } = await getDynamicFetchOptions();
-  const { data: result } = await sanityFetchMetadata({
-    query: queryBlogIndexPageData,
-    perspective,
-  });
-  return getSEOMetadata({
-    title: result?.title ?? result?.seoTitle,
-    description: result?.description ?? result?.seoDescription,
-    slug: "/blog",
-    contentId: result?._id,
-    contentType: result?._type,
-  });
-}
-
-type BlogPageProps = {
+type BlogPageProps = Readonly<{
   searchParams: Promise<{
     page?: string;
+    category?: string;
   }>;
-};
+}>;
+
+export async function generateMetadata({
+  searchParams,
+}: BlogPageProps): Promise<Metadata> {
+  const [{ page, category }, { perspective }] = await Promise.all([
+    searchParams,
+    getDynamicFetchOptions(),
+  ]);
+  const currentPage = parseBlogPageParam(page);
+  if (currentPage === null) {
+    notFound();
+  }
+
+  const data = await fetchBlogIndexPage({
+    currentPage,
+    category: category ?? "",
+    perspective,
+    stega: false,
+  });
+  // No index document is a 404, matching the view's behavior.
+  if (!data) {
+    notFound();
+  }
+
+  // 404 out-of-range pages here, not in the view: metadata resolves before the
+  // status commits, while `notFound()` inside the Suspense boundary only
+  // streams a soft 404 after PPR flushed a 200 shell. `totalPages` floors at
+  // 1, so page 1 of an empty blog or category always survives.
+  const { totalPages } = calculateBlogPaginationMetadata(
+    data.total,
+    currentPage
+  );
+  if (currentPage > totalPages) {
+    notFound();
+  }
+
+  return seoFromDocument(data, { slug: "/blog" });
+}
 
 export default function BlogIndexPage({ searchParams }: BlogPageProps) {
+  // Deliberately unkeyed: a key would remount the boundary and repaint the
+  // fallback on every pagination click; unkeyed, the previous posts stay on
+  // screen until the new page resolves, so the fallback only paints on a
+  // fresh load.
   return (
-    <Suspense fallback={<BlogIndexFallback />}>
-      <DynamicBlogIndex searchParams={searchParams} />
+    <Suspense fallback={<BlogIndexShell />}>
+      <BlogIndexView searchParams={searchParams} />
     </Suspense>
   );
 }
 
-async function DynamicBlogIndex({ searchParams }: BlogPageProps) {
-  const [{ page }, { perspective, stega }] = await Promise.all([
+/**
+ * The static shell: real published page-1 content, no loading state. A deep
+ * link like `?page=2` shows page 1 until the right page resolves.
+ */
+async function BlogIndexShell() {
+  const data = await fetchBlogIndexPage({
+    currentPage: 1,
+    category: "",
+    perspective: "published",
+    stega: false,
+  });
+
+  if (!data) {
+    return null;
+  }
+
+  return <BlogIndexBody activeCategory="" currentPage={1} data={data} />;
+}
+
+async function BlogIndexView({ searchParams }: BlogPageProps) {
+  const [{ page, category }, { perspective, stega }] = await Promise.all([
     searchParams,
     getDynamicFetchOptions(),
   ]);
-  const currentPage = page ? Number(page) : 1;
+  const currentPage = parseBlogPageParam(page);
+  if (currentPage === null) {
+    notFound();
+  }
+  const activeCategory = category ?? "";
 
-  // Fetch page data and total count in parallel
-  const [[indexPageData, errIndexPageData], [totalCount, errTotalCount]] =
-    await Promise.all([
-      handleErrors(fetchBlogIndexPageData({ perspective, stega })),
-      handleErrors(fetchBlogIndexPageBlogsCount({ perspective, stega })),
-    ]);
-
-  if (errIndexPageData || !indexPageData) {
+  const data = await fetchBlogIndexPage({
+    currentPage,
+    category: activeCategory,
+    perspective,
+    stega,
+  });
+  if (!data) {
     notFound();
   }
 
-  if (errTotalCount || totalCount === null || totalCount === undefined) {
-    return (
-      <main className="container my-16">
-        <BlogHeader
-          description={indexPageData.description}
-          title={indexPageData.title}
-        />
-        <div className="py-12 text-center">
-          <p className="text-muted-foreground">
-            Unable to load blog posts at the moment.
-          </p>
-        </div>
-        {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
-          <>
-            <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
-            <PageBuilder
-              id={indexPageData._id}
-              pageBuilder={indexPageData.pageBuilder}
-              type={indexPageData._type}
-            />
-          </>
-        )}
-      </main>
-    );
-  }
-
-  const featuredBlogsCount = indexPageData.displayFeaturedBlogs
-    ? Number(indexPageData.featuredBlogsCount) || 0
-    : 0;
-
-  const paginationMetadata = calculatePaginationMetadata(
-    totalCount,
+  // Past the last page is a dead URL, not an empty list — the real 404 status
+  // was already sent by `generateMetadata`; this keeps the body consistent.
+  const { totalPages } = calculateBlogPaginationMetadata(
+    data.total,
     currentPage
   );
-
-  const { start, end } = getBlogPaginationStartEnd(currentPage);
-  const blogStart = currentPage === 1 ? 0 : start + featuredBlogsCount;
-  const blogEnd = end + featuredBlogsCount;
-
-  const [blogs, errBlogs] = await handleErrors(
-    fetchBlogIndexPageBlogs({
-      start: blogStart,
-      end: blogEnd,
-      perspective,
-      stega,
-    })
-  );
-
-  if (errBlogs || !blogs) {
-    return (
-      <main className="container my-16">
-        <BlogHeader
-          description={indexPageData.description}
-          title={indexPageData.title}
-        />
-        <div className="py-12 text-center">
-          <p className="text-muted-foreground">
-            No blog posts available at the moment.
-          </p>
-        </div>
-        {indexPageData.pageBuilder && indexPageData.pageBuilder.length > 0 && (
-          <>
-            <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
-            <PageBuilder
-              id={indexPageData._id}
-              pageBuilder={indexPageData.pageBuilder}
-              type={indexPageData._type}
-            />
-          </>
-        )}
-      </main>
-    );
+  if (currentPage > totalPages) {
+    notFound();
   }
 
   return (
-    <>
-      <PageBuilderJsonLd pageBuilder={indexPageData.pageBuilder} />
-      <BlogPageContent
-        blogs={blogs}
-        indexPageData={indexPageData}
-        paginationMetadata={paginationMetadata}
-      />
-    </>
+    <BlogIndexBody
+      activeCategory={activeCategory}
+      currentPage={currentPage}
+      data={data}
+    />
   );
 }
 
-function BlogIndexFallback() {
-  return <main className="container my-16 min-h-[50vh]" />;
+function BlogIndexBody({
+  data,
+  activeCategory,
+  currentPage,
+}: Readonly<{
+  data: BlogIndexPageData;
+  activeCategory: string;
+  currentPage: number;
+}>) {
+  const paginationMetadata = calculateBlogPaginationMetadata(
+    data.total,
+    currentPage
+  );
+
+  return (
+    <>
+      <PageBuilderJsonLd pageBuilder={data.pageBuilder} />
+      <BlogPageContent
+        activeCategory={activeCategory}
+        blogs={data.blogs}
+        featuredBlogs={data.featuredBlogs}
+        indexPageData={data}
+        paginationMetadata={paginationMetadata}
+      >
+        {data.pageBuilder && data.pageBuilder.length > 0 ? (
+          <div className="pb-16">
+            <PageBuilder
+              id={data._id}
+              pageBuilder={data.pageBuilder}
+              type={data._type}
+            />
+          </div>
+        ) : null}
+      </BlogPageContent>
+    </>
+  );
 }

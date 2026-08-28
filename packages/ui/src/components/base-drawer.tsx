@@ -2,26 +2,30 @@
 
 import { Drawer as DrawerPrimitive } from "@base-ui/react/drawer";
 import { cn } from "@workspace/tailwind-config/utils";
-import type { ComponentProps } from "react";
+import type * as React from "react";
 
-const Drawer = (props: ComponentProps<typeof DrawerPrimitive.Root>) => (
-  <DrawerPrimitive.Root data-slot="drawer" {...props} />
-);
+function Drawer(props: React.ComponentProps<typeof DrawerPrimitive.Root>) {
+  return <DrawerPrimitive.Root data-slot="drawer" {...props} />;
+}
 
-const DrawerTrigger = (
-  props: ComponentProps<typeof DrawerPrimitive.Trigger>
-) => <DrawerPrimitive.Trigger data-slot="drawer-trigger" {...props} />;
+function DrawerTrigger(
+  props: React.ComponentProps<typeof DrawerPrimitive.Trigger>
+) {
+  return <DrawerPrimitive.Trigger data-slot="drawer-trigger" {...props} />;
+}
 
-const DrawerClose = (props: ComponentProps<typeof DrawerPrimitive.Close>) => (
-  <DrawerPrimitive.Close data-slot="drawer-close" {...props} />
-);
+function DrawerClose(
+  props: React.ComponentProps<typeof DrawerPrimitive.Close>
+) {
+  return <DrawerPrimitive.Close data-slot="drawer-close" {...props} />;
+}
 
 const DrawerPortal = DrawerPrimitive.Portal;
 
 function DrawerTitle({
   className,
   ...props
-}: ComponentProps<typeof DrawerPrimitive.Title>) {
+}: React.ComponentProps<typeof DrawerPrimitive.Title>) {
   return (
     <DrawerPrimitive.Title
       className={cn("font-medium text-foreground", className)}
@@ -34,12 +38,12 @@ function DrawerTitle({
 function DrawerBackdrop({
   className,
   ...props
-}: ComponentProps<typeof DrawerPrimitive.Backdrop>) {
+}: React.ComponentProps<typeof DrawerPrimitive.Backdrop>) {
   return (
     <DrawerPrimitive.Backdrop
       className={cn(
-        "fixed inset-0 z-50 min-h-dvh bg-background/80 backdrop-blur-xs",
-        "opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-300 ease-out",
+        "fixed inset-0 z-50 min-h-dvh bg-background/95",
+        "opacity-[calc(1-var(--drawer-swipe-progress,0))] transition-opacity duration-300 ease-out motion-reduce:transition-none",
         "supports-[-webkit-touch-callout:none]:absolute",
         "data-ending-style:opacity-0 data-starting-style:opacity-0",
         className
@@ -53,7 +57,7 @@ function DrawerBackdrop({
 function DrawerViewport({
   className,
   ...props
-}: ComponentProps<typeof DrawerPrimitive.Viewport>) {
+}: React.ComponentProps<typeof DrawerPrimitive.Viewport>) {
   return (
     <DrawerPrimitive.Viewport
       className={cn("fixed inset-0 z-50 flex", className)}
@@ -66,11 +70,13 @@ function DrawerViewport({
 function DrawerPopup({
   className,
   ...props
-}: ComponentProps<typeof DrawerPrimitive.Popup>) {
+}: React.ComponentProps<typeof DrawerPrimitive.Popup>) {
   return (
     <DrawerPrimitive.Popup
       className={cn(
-        "relative flex flex-col overflow-hidden overscroll-contain bg-background text-foreground transition-transform duration-340 ease-[cubic-bezier(0.32,0.72,0,1)] data-swiping:select-none data-swiping:duration-0",
+        // The sheet still slides for everyone else; reduced motion gets the
+        // same open/closed states with the travel removed.
+        "relative flex flex-col overflow-hidden overscroll-contain bg-background text-foreground outline-none transition-transform duration-340 ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none data-swiping:select-none data-swiping:duration-0",
         className
       )}
       data-slot="drawer-popup"
@@ -82,7 +88,7 @@ function DrawerPopup({
 function DrawerContent({
   className,
   ...props
-}: ComponentProps<typeof DrawerPrimitive.Content>) {
+}: React.ComponentProps<typeof DrawerPrimitive.Content>) {
   return (
     <DrawerPrimitive.Content
       className={cn("flex min-h-0 flex-1 flex-col", className)}

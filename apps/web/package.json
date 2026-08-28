@@ -15,40 +15,32 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
-    "@sanity/asset-utils": "^2.3.0",
     "@sanity/client": "catalog:",
-    "@sanity/image-url": "^2.1.1",
-    "@sanity/visual-editing": "^5.4.3",
-    "@tanstack/react-query": "^5.90.21",
+    "@sanity/visual-editing": "^6.1.1",
+    "@tanstack/react-query": "^5.102.5",
     "@workspace/env": "workspace:*",
     "@workspace/logger": "workspace:*",
     "@workspace/sanity": "workspace:*",
     "@workspace/sanity-blocks": "workspace:*",
     "@workspace/tailwind-config": "workspace:*",
     "@workspace/ui": "workspace:*",
-    "babel-plugin-react-compiler": "19.1.0-rc.2",
-    "fuse.js": "^7.1.0",
+    "babel-plugin-react-compiler": "1.0.0",
+    "fuse.js": "^7.5.0",
     "lucide-react": "catalog:",
-    "next": "16.2.6",
-    "next-sanity": "13.0.7",
+    "next": "16.3.3",
+    "next-sanity": "13.3.3",
     "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sanity-image": "^1.1.0",
-    "schema-dts": "^1.1.5",
-    "server-only": "^0.0.1",
-    "slugify": "^1.6.8",
-    "swr": "^2.4.1",
-    "zod": "catalog:"
+    "schema-dts": "^2.0.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.58.2",
-    "@sanity/codegen": "^6.0.1",
+    "@playwright/test": "^1.62.1",
+    "@sanity/codegen": "^8.0.0",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@workspace/typescript-config": "workspace:*",
-    "baseline-browser-mapping": "^2.10.8",
-    "dotenv": "^17.3.1"
+    "dotenv": "^17.4.2"
   }
 }

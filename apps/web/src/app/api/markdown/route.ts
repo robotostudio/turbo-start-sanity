@@ -1,14 +1,19 @@
 import { Logger } from "@workspace/logger";
-import { sanityFetch } from "@workspace/sanity/live";
+import {
+  type DynamicFetchOptions,
+  getDynamicFetchOptions,
+  sanityFetch,
+} from "@workspace/sanity/live";
 import {
   queryAllBlogDataForSearch,
-  queryBlogIndexPageData,
   queryBlogSlugPageData,
   queryHomePageData,
   queryRedirects,
   querySlugPageData,
 } from "@workspace/sanity/query";
+import { draftMode } from "next/headers";
 
+import { fetchBlogIndexPage, parseBlogPageParam } from "@/lib/blog-index";
 import {
   blogIndexToMarkdown,
   blogPostToMarkdown,
@@ -17,51 +22,51 @@ import {
   pageToMarkdown,
 } from "@/lib/markdown";
 import { normalizeMarkdownPath } from "@/lib/markdown-path";
+import { calculateBlogPaginationMetadata } from "@/utils";
 
 const logger = new Logger("MarkdownRoute");
 
-const PUBLISHED = { perspective: "published", stega: false } as const;
+const PUBLISHED: DynamicFetchOptions = {
+  perspective: "published",
+  stega: false,
+};
 
-// sanityFetch calls cacheTag()/cacheLife() internally, so every call must run
-// inside a `"use cache"` scope (mirrors the page components). The dynamic
-// header read stays in GET, outside these cached helpers.
-
-async function fetchHome() {
+async function fetchHome(options: DynamicFetchOptions) {
   "use cache";
   const { data } = await sanityFetch({
     query: queryHomePageData,
-    ...PUBLISHED,
+    ...options,
   });
   return data;
 }
 
-async function fetchPage(slug: string) {
+async function fetchPage(slug: string, options: DynamicFetchOptions) {
   "use cache";
   const { data } = await sanityFetch({
     query: querySlugPageData,
     params: { slug },
-    ...PUBLISHED,
+    ...options,
   });
   return data;
 }
 
-async function fetchBlogPost(slug: string) {
+async function fetchBlogPost(slug: string, options: DynamicFetchOptions) {
   "use cache";
   const { data } = await sanityFetch({
     query: queryBlogSlugPageData,
     params: { slug },
-    ...PUBLISHED,
+    ...options,
   });
   return data;
 }
 
-async function fetchBlogIndex() {
+async function fetchAllBlogPosts(options: DynamicFetchOptions) {
   "use cache";
-  const [{ data: index }, { data: posts }] = await Promise.all([
-    sanityFetch({ query: queryBlogIndexPageData, ...PUBLISHED }),
-    sanityFetch({ query: queryAllBlogDataForSearch, ...PUBLISHED }),
-  ]);
-  return { index, posts };
+  const { data } = await sanityFetch({
+    query: queryAllBlogDataForSearch,
+    ...options,
+  });
+  return data;
 }
 
 async function fetchRedirects() {
@@ -70,29 +75,98 @@ async function fetchRedirects() {
   return data;
 }
 
-async function buildMarkdown(path: string): Promise<string | null> {
+/** The blog index's `?page`/`?category`, as forwarded by the proxy. */
+type BlogIndexQuery = {
+  page: string | null;
+  category: string | null;
+};
+
+/**
+ * One page of the blog index, matching what `/blog?page=…&category=…` renders,
+ * off the same cached fetch as the HTML route. Featured posts lead page 1
+ * (the query keeps them out of the list; an active category drops them) and
+ * flatten with the grid into one `orderRank`-sorted list.
+ */
+async function buildBlogIndexPageMarkdown(
+  query: BlogIndexQuery,
+  options: DynamicFetchOptions
+): Promise<string | null> {
+  const currentPage = parseBlogPageParam(query.page);
+  if (currentPage === null) {
+    return null;
+  }
+
+  const data = await fetchBlogIndexPage({
+    currentPage,
+    category: query.category ?? "",
+    ...options,
+  });
+  if (!data) {
+    return null;
+  }
+
+  const { totalPages } = calculateBlogPaginationMetadata(
+    data.total,
+    currentPage
+  );
+  // Past the last page is a dead URL, not an empty document. `totalPages`
+  // floors at 1, so page 1 of an empty category still renders.
+  if (currentPage > totalPages) {
+    return null;
+  }
+
+  const featured = currentPage === 1 ? data.featuredBlogs : [];
+  return blogIndexToMarkdown(data as MarkdownDocument, [
+    ...(featured as MarkdownBlogListItem[]),
+    ...(data.blogs as MarkdownBlogListItem[]),
+  ]);
+}
+
+async function buildBlogIndexMarkdown(
+  query: BlogIndexQuery,
+  options: DynamicFetchOptions
+): Promise<string | null> {
+  // Bare `/blog.md` is the whole corpus in one document, so LLM consumers get
+  // every post in a single fetch; `page`/`category` request a slice instead.
+  if (query.page !== null || query.category !== null) {
+    return buildBlogIndexPageMarkdown(query, options);
+  }
+
+  // Page 1's cache entry doubles as the index document; its post slice is
+  // ignored in favour of the full corpus.
+  const [index, posts] = await Promise.all([
+    fetchBlogIndexPage({ currentPage: 1, category: "", ...options }),
+    fetchAllBlogPosts(options),
+  ]);
+  return index
+    ? blogIndexToMarkdown(
+        index as MarkdownDocument,
+        (posts as MarkdownBlogListItem[] | null) ?? []
+      )
+    : null;
+}
+
+async function buildMarkdown(
+  path: string,
+  query: BlogIndexQuery,
+  options: DynamicFetchOptions
+): Promise<string | null> {
   const segments = path.split("/").filter(Boolean);
 
   if (segments.length === 0) {
-    const data = await fetchHome();
+    const data = await fetchHome(options);
     return data ? pageToMarkdown(data as MarkdownDocument) : null;
   }
 
   if (segments[0] === "blog") {
     if (segments.length === 1) {
-      const { index, posts } = await fetchBlogIndex();
-      return index
-        ? blogIndexToMarkdown(
-            index as MarkdownDocument,
-            (posts as MarkdownBlogListItem[] | null) ?? []
-          )
-        : null;
+      return buildBlogIndexMarkdown(query, options);
     }
-    const data = await fetchBlogPost(path);
+    const data = await fetchBlogPost(path, options);
     return data ? blogPostToMarkdown(data as MarkdownDocument) : null;
   }
 
-  const data = await fetchPage(path);
+  const data = await fetchPage(path, options);
   return data ? pageToMarkdown(data as MarkdownDocument) : null;
 }
 
@@ -106,18 +180,70 @@ async function findRedirect(
     : null;
 }
 
+async function resolveFetchOptions(): Promise<DynamicFetchOptions> {
+  const { isEnabled } = await draftMode();
+  if (!isEnabled) {
+    return PUBLISHED;
+  }
+  // Perspective follows draft mode, but stega stays off: its invisible
+  // metadata characters would end up inside the copied Markdown.
+  return { ...(await getDynamicFetchOptions()), stega: false };
+}
+
+/**
+ * Reads a value the proxy forwarded. The `x-markdown-*` header wins — a
+ * rewrite's query params aren't reliably visible on `request.url` downstream;
+ * the URL is the fallback for a direct hit on this route. Header values are
+ * percent-encoded; a malformed one (hand-rolled request) passes through as-is.
+ */
+function readForwarded(
+  request: Request,
+  url: URL,
+  name: string
+): string | null {
+  const header = request.headers.get(`x-markdown-${name}`);
+  if (header === null) {
+    return url.searchParams.get(name);
+  }
+  try {
+    return decodeURIComponent(header);
+  } catch {
+    return header;
+  }
+}
+
+/** The Markdown representation's own URL (`.md` suffix, `/` → `/index.md`)
+ * plus the params that shaped this doc, for `Content-Location`. */
+function representationOf(path: string, query: BlogIndexQuery): string {
+  const mdPath = path === "/" ? "/index.md" : `${path}.md`;
+  const params = new URLSearchParams();
+  if (query.page !== null) {
+    params.set("page", query.page);
+  }
+  if (query.category !== null) {
+    params.set("category", query.category);
+  }
+  const search = params.toString();
+  return search ? `${mdPath}?${search}` : mdPath;
+}
+
 export async function GET(request: Request): Promise<Response> {
-  // Path comes from the proxy header (survives the rewrite); `?path=` is a
-  // fallback for direct calls.
-  const headerPath = request.headers.get("x-markdown-path");
-  const queryPath = new URL(request.url).searchParams.get("path");
-  const path = normalizeMarkdownPath(headerPath ?? queryPath ?? "/");
+  const url = new URL(request.url);
+  const path = normalizeMarkdownPath(
+    readForwarded(request, url, "path") ?? "/"
+  );
+  const query: BlogIndexQuery = {
+    page: readForwarded(request, url, "page"),
+    category: readForwarded(request, url, "category"),
+  };
+
+  const options = await resolveFetchOptions();
+  const isDraft = options.perspective !== "published";
 
   let markdown: string | null;
   try {
-    markdown = await buildMarkdown(path);
+    markdown = await buildMarkdown(path, query, options);
   } catch (error) {
-    // A fetch failure must not look like a missing page (crawlers treat 404 as gone).
     logger.error("Markdown build failed", error);
     return new Response("Upstream content fetch failed\n", {
       status: 503,
@@ -134,30 +260,23 @@ export async function GET(request: Request): Promise<Response> {
       status: 200,
       headers: {
         "content-type": "text/markdown; charset=utf-8",
-        // Same URL serves HTML or Markdown by Accept — cache must key on it.
         vary: "Accept",
-        // Canonical HTML page; keep the Markdown twin out of search.
-        "content-location": path,
+        "content-location": representationOf(path, query),
         "x-robots-tag": "noindex, nofollow",
         "x-content-type-options": "nosniff",
-        // Short TTL: the Sanity fetch is tag-revalidated via `"use cache"`, but
-        // this rendered response isn't tag-purged, so bound CDN drift.
-        "cache-control": "public, s-maxage=60, stale-while-revalidate=300",
+        "cache-control": isDraft
+          ? "private, no-store"
+          : "public, s-maxage=60, stale-while-revalidate=300",
       },
     });
   }
 
-  // No document for this path — honor Sanity redirects before returning 404.
   try {
     const redirect = await findRedirect(path);
     if (redirect) {
-      // Parse so a destination's query/hash survive; only the pathname gets `.md`.
       const requestUrl = new URL(request.url);
       const target = new URL(redirect.destination, requestUrl);
-      // Same-origin only: a protocol-relative `//evil.com` (allowed by the
-      // schema's `startsWith("/")`) would redirect off-site. External → 404.
       if (target.origin === requestUrl.origin) {
-        // Map the destination to its `.md` form (root → `/index.md`).
         const normalized = normalizeMarkdownPath(target.pathname);
         target.pathname = normalized === "/" ? "/index.md" : `${normalized}.md`;
         return new Response(null, {
@@ -171,7 +290,6 @@ export async function GET(request: Request): Promise<Response> {
       }
     }
   } catch (error) {
-    // A redirect-lookup failure is a transient upstream error, not a missing page.
     logger.error("Redirect lookup failed", error);
     return new Response("Upstream content fetch failed\n", {
       status: 503,
@@ -183,7 +301,7 @@ export async function GET(request: Request): Promise<Response> {
     });
   }
 
-  return new Response(`Not found: ${path}\n`, {
+  return new Response(`Not found: ${representationOf(path, query)}\n`, {
     status: 404,
     headers: {
       "content-type": "text/plain; charset=utf-8",

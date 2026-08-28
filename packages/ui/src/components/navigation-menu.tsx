@@ -29,11 +29,11 @@ function NavigationMenu({
         <NavMenuPrimitive.Portal>
           <NavMenuPrimitive.Positioner
             align="center"
-            className="isolate z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] before:absolute before:inset-x-0 before:-top-6 before:h-6 before:content-[''] data-instant:transition-none"
+            className="isolate z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:content-[''] data-instant:transition-none"
             collisionPadding={16}
             sideOffset={22}
           >
-            <NavMenuPrimitive.Popup className="relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden rounded-lg border bg-popover text-popover-foreground shadow-sm outline-none transition-[opacity,transform,width,height,scale,translate] duration-[0.35s] ease-[cubic-bezier(0.22,1,0.36,1)] data-ending-style:scale-95 data-starting-style:scale-95 data-ending-style:opacity-0 data-starting-style:opacity-0 data-ending-style:duration-150">
+            <NavMenuPrimitive.Popup className="relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden rounded-none border bg-background text-foreground shadow-sm outline-none transition-[opacity,transform,width,height,scale,translate] duration-[0.35s] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none data-ending-style:scale-95 data-starting-style:scale-95 data-ending-style:opacity-0 data-starting-style:opacity-0 data-ending-style:duration-150">
               <NavMenuPrimitive.Viewport
                 className="relative size-full overflow-hidden"
                 data-slot="navigation-menu-viewport"
@@ -76,7 +76,7 @@ function NavigationMenuItem({
 }
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-full w-max items-center justify-center rounded-md bg-background px-5 py-2 font-medium text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-popup-open:bg-accent/50"
+  "group inline-flex h-full w-max items-center justify-center rounded-md bg-background px-5 py-2 font-medium text-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-ring disabled:pointer-events-none disabled:opacity-50 data-popup-open:bg-accent/50"
 );
 
 function NavigationMenuTrigger({
@@ -106,7 +106,7 @@ function NavigationMenuContent({
   return (
     <NavMenuPrimitive.Content
       className={cn(
-        "h-full w-auto transition-[opacity,transform,translate,height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] data-[activation-direction=left]:data-starting-style:translate-x-6 data-[activation-direction=right]:data-starting-style:-translate-x-6 data-ending-style:opacity-0 data-starting-style:opacity-0",
+        "h-full w-auto transition-[opacity,transform,translate,height] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none data-[activation-direction=left]:data-starting-style:translate-x-6 data-[activation-direction=right]:data-starting-style:-translate-x-6 data-ending-style:opacity-0 data-starting-style:opacity-0",
         className
       )}
       data-slot="navigation-menu-content"
@@ -121,10 +121,7 @@ function NavigationMenuLink({
 }: React.ComponentProps<typeof NavMenuPrimitive.Link>) {
   return (
     <NavMenuPrimitive.Link
-      className={cn(
-        "flex h-full outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-        className
-      )}
+      className={cn("flex h-full focus-ring", className)}
       data-slot="navigation-menu-link"
       {...props}
     />

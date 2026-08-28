@@ -3,53 +3,92 @@ name: E2E Smoke Tests
 on:
   deployment_status:
 
-permissions:
-  contents: read
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.deployment.id }}
   cancel-in-progress: true
 
 jobs:
-  e2e:
-    name: Playwright Smoke Tests
+  # Vercel builds fork pull requests too, and the deployment ref is a bare
+  # commit sha, so nothing in the event says which repository the commit came
+  # from. Without this gate a fork's own spec files run with the Vercel bypass
+  # secret in scope. A fork's head commit is never the head of a branch here,
+  # so ask the API before any secret is handed to code from that commit. This
+  # job holds no secrets. It also skips a deployment its branch has already
+  # moved past, which the newer deployment covers anyway.
+  guard:
+    name: Verify Deployed Commit
+    permissions:
+      contents: read
     if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      trusted: ${{ steps.check.outputs.trusted }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.deployment.sha }}
+        run: |
+          heads=$(gh api "repos/$REPO/commits/$SHA/branches-where-head" --jq 'length' 2>/dev/null || true)
+          # Anything but a positive count - a fork, or an API error - is untrusted.
+          if [ "$heads" -gt 0 ] 2>/dev/null; then
+            echo "trusted=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "$SHA heads no branch in $REPO - skipping" >&2
+            echo "trusted=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  e2e:
+    name: Playwright Smoke Tests
+    permissions:
+      contents: read
+    needs: guard
+    if: needs.guard.outputs.trusted == 'true'
+    runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
-      NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
-      NEXT_PUBLIC_SANITY_API_VERSION: ${{ secrets.NEXT_PUBLIC_SANITY_API_VERSION }}
-      NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL: ${{ github.event.deployment_status.target_url }}
-      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 1
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 22
+          node-version: 24
           cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --ignore-scripts
 
+      # Browsers are fetched here because the install step above passes
+      # --ignore-scripts, which skips Playwright's postinstall download.
+      # The binary is called directly instead of through `pnpm exec` so that
+      # `pnpm ... install` does not read as a package install (SonarQube
+      # S6505). Playwright's `install` downloads browsers and has no
+      # --ignore-scripts option of its own.
       - name: Install Playwright Chromium
-        run: pnpm --filter web exec playwright install --with-deps chromium
+        working-directory: apps/web
+        run: node_modules/.bin/playwright install --with-deps chromium
 
       - name: Run E2E tests
         run: pnpm --filter web test:e2e
         env:
           CI: true
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+          NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
+          NEXT_PUBLIC_SANITY_API_VERSION: ${{ secrets.NEXT_PUBLIC_SANITY_API_VERSION }}
+          NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL: ${{ github.event.deployment_status.target_url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       - name: Upload report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: always()
         with:
           name: playwright-report

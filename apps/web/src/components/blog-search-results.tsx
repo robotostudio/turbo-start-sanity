@@ -1,30 +1,38 @@
 "use client";
 
 import { cn } from "@workspace/tailwind-config/utils";
+import type { ReactNode } from "react";
 
 import { BlogList } from "@/components/blog-list";
 import type { Blog } from "@/types";
 
-type BlogSearchResultsProps = {
+type BlogSearchResultsProps = Readonly<{
   className?: string;
   results: Blog[];
   isSearching: boolean;
   hasQuery: boolean;
   searchQuery: string;
   error?: Error | null;
-};
+  onClear?: () => void;
+}>;
+
+function Term({ children }: Readonly<{ children: string }>) {
+  return <span className="text-foreground">“{children}”</span>;
+}
 
 function SearchResultsHeader({
   query,
   count,
-}: {
+}: Readonly<{
   query: string;
   count: number;
-}) {
+}>) {
   return (
-    <div className="mb-6">
-      <h2 className="font-semibold text-lg">Search Results for "{query}"</h2>
-      <p className="text-muted-foreground text-sm">
+    <div className="grid gap-1">
+      <h2 className="text-balance font-normal text-2xl tracking-tight">
+        Search results for <Term>{query}</Term>
+      </h2>
+      <p className="text-muted-foreground text-sm tabular-nums">
         {count === 0
           ? "No articles found"
           : `${count} article${count === 1 ? "" : "s"} found`}
@@ -33,84 +41,59 @@ function SearchResultsHeader({
   );
 }
 
-function EmptySearchState({ query }: { query: string }) {
+const STATE_TITLE = "font-medium text-foreground text-lg";
+
+function StateFrame({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <div className="py-12 text-center">
-      <div className="mx-auto max-w-md">
-        <h3 className="mb-2 font-medium text-foreground text-lg">
-          No articles found
-        </h3>
-        <p className="mb-4 text-muted-foreground">
-          We couldn't find any articles matching "{query}". Try adjusting your
-          search terms.
-        </p>
-        <div className="text-muted-foreground text-sm">
-          <p>Suggestions:</p>
-          <ul className="mt-2 space-y-1">
-            <li>• Check your spelling</li>
-            <li>• Try different keywords</li>
-            <li>• Use more general terms</li>
-          </ul>
-        </div>
-      </div>
+    <div className="grid h-full place-content-center justify-items-center gap-8 py-16 text-center">
+      {children}
     </div>
   );
 }
 
-function ErrorState({ query }: { query: string }) {
+const ACTION_CLASS =
+  "focus-ring inline-flex min-h-11 w-max shrink-0 items-center rounded-none border border-foreground px-3 font-mono text-foreground text-sm uppercase tracking-wide transition-colors hover:bg-foreground hover:text-background";
+
+function EmptySearchState({
+  query,
+  onClear,
+}: Readonly<{
+  query: string;
+  onClear?: () => void;
+}>) {
   return (
-    <div className="py-12 text-center">
-      <div className="mx-auto max-w-md">
-        <h3 className="mb-2 font-medium text-destructive text-lg">
-          Search failed
-        </h3>
-        <p className="mb-4 text-muted-foreground">
-          We encountered an error while searching for "{query}". Please try
-          again.
+    <>
+      <div className="grid gap-6">
+        <SearchResultsHeader count={0} query={query} />
+        <p className="max-w-[70ch] text-pretty text-foreground">
+          We couldn&rsquo;t find any articles matching <Term>{query}</Term>. Try
+          adjusting your search terms.
         </p>
-        <div className="text-muted-foreground text-sm">
-          <p>If the problem persists:</p>
-          <ul className="mt-2 space-y-1">
-            <li>• Check your internet connection</li>
-            <li>• Refresh the page</li>
-            <li>• Try again in a few moments</li>
-          </ul>
-        </div>
       </div>
-    </div>
+      {onClear ? (
+        <button className={ACTION_CLASS} onClick={onClear} type="button">
+          Clear search
+        </button>
+      ) : null}
+    </>
   );
 }
 
-const LOADING_SKELETONS = [
-  "skeleton-1",
-  "skeleton-2",
-  "skeleton-3",
-  "skeleton-4",
-  "skeleton-5",
-  "skeleton-6",
-] as const;
+function ErrorState({ query }: Readonly<{ query: string }>) {
+  return (
+    <div className="grid gap-6">
+      <SearchResultsHeader count={0} query={query} />
+      <h3 className={cn(STATE_TITLE, "text-destructive")}>Search failed</h3>
+      <p className="max-w-[70ch] text-pretty text-muted-foreground">
+        We encountered an error while searching for <Term>{query}</Term>. Please
+        try again.
+      </p>
+    </div>
+  );
+}
 
 function LoadingState() {
-  return (
-    <div className="space-y-6">
-      <div className="mb-6">
-        <div className="mb-2 h-6 w-48 animate-pulse rounded bg-muted" />
-        <div className="h-4 w-32 animate-pulse rounded bg-muted" />
-      </div>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-        {LOADING_SKELETONS.map((id) => (
-          <div className="space-y-4" key={id}>
-            <div className="aspect-video animate-pulse rounded-2xl bg-muted" />
-            <div className="space-y-2">
-              <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-              <div className="h-6 w-full animate-pulse rounded bg-muted" />
-              <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  return <output className="block text-muted-foreground">Searching…</output>;
 }
 
 export function BlogSearchResults({
@@ -120,6 +103,7 @@ export function BlogSearchResults({
   hasQuery,
   searchQuery,
   error,
+  onClear,
 }: BlogSearchResultsProps) {
   if (!hasQuery) {
     return null;
@@ -133,17 +117,24 @@ export function BlogSearchResults({
     );
   }
 
-  return (
-    <section className={cn("mt-8", className)}>
-      <SearchResultsHeader count={results.length} query={searchQuery} />
+  if (error || results.length === 0) {
+    return (
+      <section className={cn("min-h-full", className)}>
+        <StateFrame>
+          {error ? (
+            <ErrorState query={searchQuery} />
+          ) : (
+            <EmptySearchState onClear={onClear} query={searchQuery} />
+          )}
+        </StateFrame>
+      </section>
+    );
+  }
 
-      {error ? (
-        <ErrorState query={searchQuery} />
-      ) : results.length === 0 ? (
-        <EmptySearchState query={searchQuery} />
-      ) : (
-        <BlogList blogs={results} />
-      )}
+  return (
+    <section className={cn("mt-8 grid gap-6", className)}>
+      <SearchResultsHeader count={results.length} query={searchQuery} />
+      <BlogList blogs={results} />
     </section>
   );
 }

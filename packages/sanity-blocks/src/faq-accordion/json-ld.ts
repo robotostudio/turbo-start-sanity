@@ -4,8 +4,11 @@ type RichTextChild = { _type: string; text?: string };
 type RichTextBlock = { _type: string; children?: RichTextChild[] };
 
 type FaqInput = { title?: string | null; richText?: RichTextBlock[] | null };
+type FaqCategoryInput = { faqs?: FaqInput[] | null };
 
-export type FaqAccordionInput = { faqs?: FaqInput[] | null };
+export interface FaqAccordionInput {
+  categories?: FaqCategoryInput[] | null;
+}
 
 function extractPlainText(richText: RichTextBlock[]): string {
   return richText
@@ -32,7 +35,11 @@ function extractPlainText(richText: RichTextBlock[]): string {
 export function faqAccordionToJsonLd(
   block: FaqAccordionInput
 ): WithContext<FAQPage> | null {
-  const validFaqs = (block.faqs ?? []).filter(
+  // Serialize every question across all categories (that's what the UI shows).
+  const sourceFaqs = (block.categories ?? []).flatMap(
+    (category) => category?.faqs ?? []
+  );
+  const validFaqs = sourceFaqs.filter(
     (faq): faq is FaqInput & { title: string; richText: RichTextBlock[] } =>
       Boolean(faq.title && faq.richText)
   );

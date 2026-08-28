@@ -1,0 +1,16 @@
+{
+  "$schema": "https://shelve.cloud/schema.json",
+  "slug": "robotostudio",
+  "defaultEnv": "development",
+  "sync": {
+    "protectedEnvironments": ["production"],
+    "environments": {
+      "development": { "sourceOfTruth": "local" },
+      "production": {
+        "sourceOfTruth": "remote",
+        "allowPush": false,
+        "pullMode": "merge"
+      }
+    }
+  }
+}

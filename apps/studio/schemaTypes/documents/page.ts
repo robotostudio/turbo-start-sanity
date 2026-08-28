@@ -1,4 +1,4 @@
-import { DocumentIcon } from "@sanity/icons";
+import { File } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
 import {
@@ -12,11 +12,11 @@ import { seoFields } from "@/utils/seo-fields";
 
 export const page = defineType({
   name: "page",
-  title: "Page",
   type: "document",
-  icon: DocumentIcon,
+  title: "Page",
   description:
     "Create a new page for your website, like an 'About Us' or 'Contact' page. Each page has its own web address and content that you can customize.",
+  icon: File,
   groups: GROUPS,
   fields: [
     defineField({

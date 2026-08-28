@@ -4,7 +4,9 @@
  * here to stay DRY and avoid circular dependencies with the dispatcher.
  */
 
+import { type MuxVideoData, muxPlaybackId, muxThumbnailUrl } from "./mux";
 import {
+  absolutizeUrl,
   escapeMarkdown,
   formatUrl,
   type MarkdownImage,
@@ -24,7 +26,6 @@ export interface MarkdownCard {
   _key?: string | null;
   title?: string | null;
   description?: string | null;
-  href?: string | null;
   // Feature-card icon — intentionally dropped from Markdown (a test guards this).
   icon?: string | null;
   image?: MarkdownImage | null;
@@ -44,11 +45,65 @@ export interface MarkdownLink {
   href?: string | null;
 }
 
+export interface MarkdownLogo {
+  _key?: string | null;
+  href?: string | null;
+  image?: MarkdownImage | null;
+}
+
+export interface MarkdownSocial {
+  _key?: string | null;
+  platform?: string | null;
+  label?: string | null;
+  href?: string | null;
+}
+
+export interface MarkdownShowcaseItem {
+  _key?: string | null;
+  siteName?: string | null;
+  url?: string | null;
+  category?: string | null;
+}
+
+export interface MarkdownFaqCategory {
+  _key?: string | null;
+  title?: string | null;
+  faqs?: MarkdownFaq[] | null;
+}
+
+export interface MarkdownTestimonial {
+  eyebrow?: string | null;
+  quote?: PortableTextValue;
+  authorName?: string | null;
+  authorRole?: string | null;
+}
+
+export interface MarkdownVideoVariant {
+  /** Which delivery path the hero selected — see `hero/media-type`. */
+  mediaType?: string | null;
+  mux?: MuxVideoData | null;
+  poster?: MarkdownImage | null;
+}
+
+/**
+ * Every shape a `video` field takes: the hero's per-theme variants and the
+ * content embed. One optional-everything type, so serializers read the field
+ * without narrowing a union.
+ */
+export interface MarkdownVideo extends MuxVideoData {
+  asset?: MuxVideoData | null;
+  light?: MarkdownVideoVariant | null;
+  dark?: MarkdownVideoVariant | null;
+}
+
 export interface MarkdownBlock {
   _type?: string;
   _key?: string;
   title?: string | null;
+  caption?: string | null;
   eyebrow?: string | null;
+  description?: string | null;
+  items?: MarkdownShowcaseItem[] | null;
   badge?: string | null;
   subtitle?: string | null;
   richText?: PortableTextValue;
@@ -56,9 +111,12 @@ export interface MarkdownBlock {
   helperText?: PortableTextValue;
   buttons?: MarkdownButton[] | null;
   cards?: MarkdownCard[] | null;
-  faqs?: MarkdownFaq[] | null;
+  categories?: MarkdownFaqCategory[] | null;
   link?: MarkdownLink | null;
-  image?: MarkdownImage | null;
+  logos?: MarkdownLogo[] | null;
+  socials?: MarkdownSocial[] | null;
+  video?: MarkdownVideo | null;
+  testimonial?: MarkdownTestimonial | null;
 }
 
 /** Joins defined, non-empty sections with a blank line between them. */
@@ -81,7 +139,10 @@ export function headingToMarkdown(
   return text ? `${"#".repeat(level)} ${escapeMarkdown(text)}` : "";
 }
 
-export function buttonsToMarkdown(buttons?: MarkdownButton[] | null): string {
+export function buttonsToMarkdown(
+  buttons?: MarkdownButton[] | null,
+  options: MarkdownOptions = {}
+): string {
   if (!Array.isArray(buttons)) {
     return "";
   }
@@ -91,7 +152,8 @@ export function buttonsToMarkdown(buttons?: MarkdownButton[] | null): string {
       const text = (button.text ?? "").trim();
       const href = button.href;
       if (href && href !== "#") {
-        return `- [${escapeMarkdown(text || href)}](${formatUrl(href)})`;
+        const url = formatUrl(absolutizeUrl(href, options.baseUrl));
+        return `- [${escapeMarkdown(text || href)}](${url})`;
       }
       return text ? `- ${escapeMarkdown(text)}` : null;
     })
@@ -116,19 +178,33 @@ export function imageToMarkdown(
   return escapeMarkdown(caption || alt);
 }
 
-/** A Markdown link, or plain escaped text when the href is missing or `#`. */
-export function mdLink(label: string, href: string | null | undefined): string {
-  return href && href !== "#"
-    ? `[${escapeMarkdown(label)}](${formatUrl(href)})`
-    : escapeMarkdown(label);
+/** Enough for a reader; a source-resolution still would be pointless here. */
+const STILL_WIDTH = 1200;
+
+/** Mux holds no still in Sanity, so its generated thumbnail is the only one. */
+export function muxVideoToMarkdown(
+  video: MuxVideoData | null | undefined,
+  alt?: string | null
+): string {
+  const url = muxThumbnailUrl(
+    muxPlaybackId(video),
+    video?.thumbTime,
+    STILL_WIDTH
+  );
+  if (!url) {
+    return "";
+  }
+  const label = (alt ?? video?.title ?? "").trim();
+  return `![${escapeMarkdown(label)}](${formatUrl(url)})`;
 }
 
-export function cardHeading(
-  title: string,
-  href: string | null | undefined
+/** A Markdown link, or plain escaped text when the href is missing or `#`. */
+export function mdLink(
+  label: string,
+  href: string | null | undefined,
+  options: MarkdownOptions = {}
 ): string {
-  if (title) {
-    return `### ${mdLink(title, href)}`;
-  }
-  return href && href !== "#" ? `### ${formatUrl(href)}` : "";
+  return href && href !== "#"
+    ? `[${escapeMarkdown(label)}](${formatUrl(absolutizeUrl(href, options.baseUrl))})`
+    : escapeMarkdown(label);
 }

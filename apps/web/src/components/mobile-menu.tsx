@@ -23,14 +23,12 @@ import { Button } from "@workspace/ui/components/button";
 import { useMediaQuery } from "@workspace/ui/hooks/use-media-query";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
+import { MenuLink } from "@/components/elements/menu-link";
+import { Logo } from "@/components/logo";
 import type { ColumnLink, NavigationData } from "@/types";
-import { MenuLink } from "./elements/menu-link";
-import { Logo } from "./logo";
-
-const FOCUS_RING =
-  "outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset";
 
 const TABLET_QUERY = "(min-width: 768px) and (max-width: 1024px)";
 
@@ -51,6 +49,7 @@ export function MobileMenu({
   settingsData,
 }: Readonly<NavigationData>) {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
   const isTablet = useMediaQuery(TABLET_QUERY);
   const liveSide = isTablet ? "right" : "bottom";
   // Freeze the anchor at open-time and keep it for the whole session, so crossing
@@ -69,8 +68,13 @@ export function MobileMenu({
     setIsOpen(false);
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: pathname is the route-change trigger, not a value the effect body reads.
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
+
   const { columns, buttons } = navbarData || {};
-  const { logo, siteTitle } = settingsData || {};
+  const { siteTitle, logos } = settingsData || {};
 
   return (
     <Drawer
@@ -80,7 +84,11 @@ export function MobileMenu({
     >
       <DrawerTrigger
         render={
-          <Button size="icon" variant="ghost">
+          <Button
+            className="rounded-none focus-visible:outline-offset-0!"
+            size="icon"
+            variant="ghost"
+          >
             <Menu className="size-4" />
             <span className="sr-only">Open menu</span>
           </Button>
@@ -97,24 +105,29 @@ export function MobileMenu({
             )}
           >
             <DrawerContent>
-              <div className="flex flex-row items-center justify-between border-b px-6 py-4">
-                <DrawerTitle className={logo ? "sr-only" : "font-semibold"}>
+              <div className="flex flex-row items-center justify-between border-b px-6 py-2.5">
+                <DrawerTitle className="sr-only">
                   {siteTitle || "Menu"}
                 </DrawerTitle>
-                {logo ? (
-                  <div className="[&_img]:h-6 [&_img]:w-auto [&_img]:rounded-none">
-                    <Logo alt={siteTitle || ""} image={logo} />
-                  </div>
-                ) : null}
+                <div className="flex items-center [&_img]:h-5 [&_img]:w-auto [&_img]:rounded-none">
+                  <Logo
+                    alt={siteTitle ?? "Turbo Start Sanity"}
+                    image={logos?.logo}
+                    imageDark={logos?.logoDark}
+                  />
+                </div>
                 <DrawerClose
-                  className={cn(
-                    "rounded-sm opacity-70 transition-opacity hover:opacity-100",
-                    FOCUS_RING
-                  )}
-                >
-                  <X className="size-5" />
-                  <span className="sr-only">Close</span>
-                </DrawerClose>
+                  render={
+                    <Button
+                      className="-mr-3 rounded-none focus-visible:outline-offset-0!"
+                      size="icon"
+                      variant="ghost"
+                    >
+                      <X className="size-4" />
+                      <span className="sr-only">Close</span>
+                    </Button>
+                  }
+                />
               </div>
 
               <nav
@@ -129,10 +142,10 @@ export function MobileMenu({
                       }
                       return (
                         <Link
-                          className={cn(
-                            "-mx-3 flex items-center rounded-md px-3 py-3 font-medium text-sm transition-colors hover:text-primary",
-                            FOCUS_RING
-                          )}
+                          aria-current={
+                            column.href === pathname ? "page" : undefined
+                          }
+                          className="hover-surface focus-ring-inset -mx-3 flex items-center rounded-none px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal"
                           href={column.href}
                           key={column._key}
                           onClick={closeMenu}
@@ -149,7 +162,7 @@ export function MobileMenu({
                           key={column._key}
                           value={column._key}
                         >
-                          <AccordionTrigger className="-mx-3 px-3 py-3 hover:no-underline">
+                          <AccordionTrigger className="hover-surface focus-ring-inset -mx-3 rounded-none px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal hover:no-underline">
                             {column.title}
                           </AccordionTrigger>
                           <AccordionContent>
@@ -178,9 +191,9 @@ export function MobileMenu({
               </nav>
 
               {buttons?.length ? (
-                <div className="mt-auto grid gap-2 border-t p-4">
+                <div className="mt-auto grid border-t px-6 py-4">
                   <SanityButtons
-                    buttonClassName="w-full justify-center"
+                    buttonClassName="w-full justify-center font-mono font-normal text-sm uppercase tracking-wide"
                     buttons={buttons || []}
                     className="grid gap-3"
                   />

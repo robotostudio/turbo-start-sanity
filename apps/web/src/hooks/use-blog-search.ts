@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
+import { useDebounce } from "@/hooks/use-debounce";
 import type { Blog } from "@/types";
-import { useDebounce } from "./use-debounce";
 
 const SEARCH_DEBOUNCE_MS = 400;
 const CACHE_STALE_TIME_MS = 30_000;

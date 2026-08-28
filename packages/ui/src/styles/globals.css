@@ -1,39 +1,46 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 @source "../../../apps/**/*.{ts,tsx}";
 @source "../../../components/**/*.{ts,tsx}";
 @source "../**/*.{ts,tsx}";
 @source "../../../sanity-blocks/src/**/*.{ts,tsx}";
 
-@import "tw-animate-css";
+/* Relative path, not the bare specifier: Turbopack's postcss sandbox can't
+   resolve node_modules from a CSS file inside a workspace package. */
+@plugin "../../node_modules/@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
   --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --foreground: oklch(0.21 0.006 285.885);
+  --card: oklch(0.967 0.001 286.375);
+  --card-foreground: var(--foreground);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --popover-foreground: var(--foreground);
+  --primary: var(--foreground);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --secondary: var(--muted);
+  --secondary-foreground: var(--foreground);
+  --muted: var(--card);
+  --muted-foreground: oklch(0.442 0.017 285.786);
+  --accent: var(--muted);
+  --accent-foreground: var(--foreground);
+  --accent-green: oklch(0.935 0.226 122);
+  --accent-green-foreground: var(--foreground);
+  --success: oklch(0.48 0.16 122);
+  --danger: oklch(0.55 0.21 27);
   --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --destructive-foreground: var(--destructive);
+  --border: oklch(0.92 0.004 286.32);
+  --input: var(--border);
+  --ring: oklch(0.705 0.015 286.067);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
+  --radius: 0.75rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -42,28 +49,88 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Dot ink strength — bg-grid-dots mixes currentColor at this alpha. */
+  --dot-alpha: 80%;
+
+  /* Overscroll gutter surface, shown on the top rubber-band by the navbar. */
+  --overscroll-top: var(--background);
+
+  /* Damped spring sampled to a `linear()` curve — ~1% overshoot, so it settles
+     rather than bounces. A cubic-bezier can't overshoot at all. */
+  --ease-spring: linear(
+    0,
+    0.0668,
+    0.2132,
+    0.3826,
+    0.5435,
+    0.6806,
+    0.7891,
+    0.87,
+    0.9269,
+    0.9648,
+    0.9884,
+    1.0019,
+    1.0085,
+    1.0109,
+    1.0108,
+    1.0095,
+    1.0076,
+    1.0058,
+    1.0041,
+    1.0028,
+    1.0018,
+    1.001,
+    1
+  );
+
+  /* Space the leading hero's copy takes. The pinned banner is `100svh` minus
+     this, so the copy sits on the fold. Mobile reserves more (taller wrapped
+     title + full-width button); retune if the title grows past two lines. */
+  --hero-copy: 420px;
+
+  /* Inline gutter shared by the navbar's `container` and page content, so they
+     line up at every width. */
+  --container-px: 1.25rem;
+}
+
+@media (width >= 40rem) {
+  :root {
+    --hero-copy: 340px;
+  }
+}
+
+@media (width >= 64rem) {
+  :root {
+    --hero-copy: 285px;
+  }
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: oklch(0 0 0);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --card: oklch(0.21 0.006 285.885);
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: oklch(0.967 0.001 286.375);
+  --primary-foreground: oklch(0 0 0);
+  --secondary: var(--muted);
+  --secondary-foreground: var(--foreground);
+  --muted: oklch(0.274 0.006 286.033);
+  --muted-foreground: oklch(0.705 0.015 286.067);
+  --accent: var(--card);
+  --accent-foreground: var(--foreground);
+  --accent-green-foreground: oklch(0.21 0.006 285.885);
+  /* Lifted for the dark ground — success can just be the accent, danger has to
+     climb well above the fill-tuned `--destructive` (L 0.396) to read at all. */
+  --success: var(--accent-green);
+  --danger: oklch(0.72 0.19 27);
   --destructive: oklch(0.396 0.141 25.723);
   --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.556 0 0);
+  --border: var(--muted);
+  --input: var(--border);
+  --ring: oklch(0.442 0.017 285.786);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -77,9 +144,22 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
+  --dot-alpha: 80%;
+
+  /* Lifted off pure black so the bounce doesn't read as a hard block. */
+  --overscroll-top: color-mix(
+    in oklab,
+    var(--background) 90%,
+    var(--foreground) 10%
+  );
 }
 
 @theme inline {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --animate-marquee: marquee 40s linear infinite;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -94,6 +174,10 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-green: var(--accent-green);
+  --color-accent-green-foreground: var(--accent-green-foreground);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
@@ -118,13 +202,339 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Overrides Tailwind's built-in `container`. Both rules are emitted; this
- * `max-width` wins by source order (equal specificity), not by replacement.
- * Correct on the pinned Tailwind version — if an upgrade reorders emission, the
- * built-in's larger 2xl max-width could reassert. Revisit (or move to a distinct
- * utility name) when upgrading Tailwind. */
+/* Rest sits one fold down: iOS Safari composites the ~60px just scrolled past
+   behind the status bar, but paints an opaque strip at scrollY 0 — so the
+   parked mirror is what shows through the notch. Initial position and the
+   return spring are both scroll-snap; the snap point is a 1px marker because
+   snap-align on a tall element made Safari re-snap deep when late layout
+   (hydration, --footer-height) changed the document height. */
+#notch-slot,
+#notch-snap {
+  height: 0;
+}
+
+/* Below lg the page parks one fold down (the notch effect); from lg up the
+   fold is the fixed strip revealed by the browser's own elastic overscroll,
+   and rest stays at 0. --hero-rest is the park offset the scroll ranges key
+   off, so both breakpoints resolve their own rest position. */
+@media (width < 64rem) and (hover: none) and (pointer: coarse) {
+  :root:has(#hero-fold) {
+    --hero-fold: 140px;
+    --hero-rest: 140px;
+    scroll-snap-type: y proximity;
+    scroll-behavior: smooth;
+  }
+
+  :root:has(#hero-fold) #notch-slot {
+    height: 140px;
+  }
+
+  :root:has(#hero-fold) #notch-snap {
+    height: 1px;
+    margin-bottom: -1px;
+    scroll-snap-align: start;
+  }
+}
+
+@media (width >= 64rem) {
+  :root:has(#hero-fold) {
+    --hero-fold: 160px;
+  }
+}
+
+/* Overrides Tailwind's `container`. Inset defaults to 8px via a fallback var,
+ * so [--container-px:…] can override it per instance. */
 @utility container {
-  @apply mx-auto w-full max-w-7xl px-4 md:px-6;
+  @apply mx-auto w-full max-w-[90rem] px-[var(--container-px,0.5rem)];
+}
+
+/* Cancels the container's padding (hardcoding it caused mobile scroll). */
+@utility bleed-x {
+  margin-inline: calc(var(--container-px, 0.5rem) * -1);
+}
+
+/* The one hover wash, shared by nav, the FAQ accordion and blog cards. Any
+ * surface using it must rest on `--background` (white/black), or the wash and
+ * the rest state collapse into each other. */
+@utility hover-surface {
+  @apply hover:bg-zinc-100 dark:hover:bg-zinc-900;
+}
+
+@utility body-text {
+  @apply text-pretty font-normal text-base leading-6 sm:text-lg sm:leading-7;
+}
+
+@utility block-title {
+  @apply text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] md:text-5xl;
+}
+
+/* Top padding scale for top-anchored page-builder sections, in one place. */
+@utility block-section {
+  @apply bg-background py-10 sm:py-14 lg:py-[68px];
+}
+
+/* Preflight resets buttons to cursor:default — restore the pointer. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  label[for],
+  summary {
+    cursor: pointer;
+  }
+
+  body {
+    overflow-x: clip;
+  }
+}
+
+/* The app's single dotted-surface utility: a 5.2px tile with a 1.2px dot,
+ * tinted by currentColor at `--dot-alpha`.
+ *
+ * `background-repeat: round` fits a whole number of dots per box on both axes,
+ * so edges land between dots (no half-cut dots) and grid seams stay aligned.
+ *
+ * The pitch is fixed at 5.2px, so a component's dot rows = padding ÷ 5.2px.
+ * Change density via padding — do NOT resize the tile. */
+@utility bg-grid-dots {
+  background-image: radial-gradient(
+    circle at center,
+    color-mix(in oklch, currentColor var(--dot-alpha), transparent) 0 0.6px,
+    transparent 1px
+  );
+  background-size: 5.2px 5.2px;
+  background-repeat: round;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Slides the navbar out as the footer finishes taking over the screen. Sticky
+   cannot do this on its own while the footer is pinned: a fixed footer adds
+   only `--footer-height` of scroll past the content, so the header's container
+   comes to rest `100vh - --footer-height` below the top and never runs out.
+   Anchored to the end of the document, so it works pinned or in flow. */
+@keyframes nav-exit {
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@utility nav-exit {
+  animation-name: nav-exit;
+  /* Ignored on a scroll timeline, which drives progress from the range below. */
+  animation-duration: 1ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root block);
+  animation-range: calc(100% - 180px) calc(100% - 20px);
+}
+
+/* Blurs the leading hero's banner as the page scrolls over it: the banner is
+   pinned under the content, so scroll progress maps to how covered it is.
+   Offset by the fold's strip so the banner rests sharp, not mid-ramp. */
+@keyframes hero-blur {
+  to {
+    filter: blur(4px);
+  }
+}
+
+@utility hero-blur {
+  animation-name: hero-blur;
+  /* Ignored on a scroll timeline, which drives progress from the range below. */
+  animation-duration: 1ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root block);
+  animation-range: var(--hero-rest, 0px)
+    calc(var(--hero-rest, 0px) + 100svh - var(--hero-copy, 420px));
+}
+
+@keyframes nav-cover {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lg\:nav-exit::before {
+  animation-name: nav-cover;
+  animation-duration: 1ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root block);
+  animation-range: var(--hero-rest, 0px) 100vh;
+}
+
+/* The sticky banner paints at the viewport top for the whole page, so it
+   would surface again in the footer's full-screen reveal. Once the content
+   has fully covered it (~one viewport of scroll) it switches off. */
+@keyframes hero-park {
+  to {
+    visibility: hidden;
+  }
+}
+
+@utility hero-park {
+  animation-name: hero-park;
+  animation-duration: 1ms;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root block);
+  animation-range: calc(var(--hero-rest, 0px) + 100svh)
+    calc(var(--hero-rest, 0px) + 100svh + 1px);
+}
+
+/* The surface iOS samples for its status-bar and toolbar strips — see the
+   `html, body` rule in @layer base. */
+@keyframes canvas-footer {
+  to {
+    background-color: var(--accent-green);
+  }
+}
+
+@supports not (animation-timeline: scroll()) {
+  html,
+  body,
+  .nav-exit,
+  .lg\:nav-exit,
+  .lg\:nav-exit::before,
+  .hero-blur,
+  .hero-park {
+    animation-name: none;
+  }
+}
+
+/* No `to`, so settled is the element's own state and anything ignoring the
+   animation still shows the stroke. User units: SVG % needs `transform-box`. */
+@keyframes mark-frame {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 120px, 0);
+  }
+  20% {
+    opacity: 1;
+  }
+}
+
+/* The pinned footer's top edge lands inside the navbar's row, and the navbar
+   paints only a blur — the page's `z-10` box starts below it, so nothing opaque
+   is behind. A top rubber-band moves that box down while a fixed element stays
+   put, uncovering the accent band. Driven from the scroll timeline to stay on
+   the compositor: React state committed a frame late and the flash got through.
+   Both degradations land visible rather than hidden. */
+@keyframes footer-uncover {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@utility footer-pinned {
+  animation-name: footer-uncover;
+  animation-duration: auto;
+  animation-fill-mode: both;
+  animation-timeline: scroll(root block);
+  animation-range: var(--hero-rest, 0px) calc(var(--hero-rest, 0px) + 1px);
+}
+
+/* Document scroll, not `view()`: the footer is fixed and never enters the
+ * viewport. `--frame-index` offsets each range; delay is ignored here. */
+@utility mark-frame {
+  --frame-index: 0;
+  will-change: transform, opacity;
+  animation-name: mark-frame;
+  /* Drops to 0s without scroll timelines — lands on the settled state. */
+  animation-duration: auto;
+  animation-timing-function: var(--ease-spring);
+  animation-fill-mode: backwards;
+  animation-timeline: scroll(root block);
+  animation-range: calc(
+      100% -
+      var(--footer-height, 800px) +
+      320px +
+      var(--frame-index) *
+      44px
+    )
+    calc(100% - var(--footer-height, 800px) + 490px + var(--frame-index) * 44px);
+}
+
+/* Too fast to scrub: `StickyFooter` stamps this and the strokes run on real
+ * time instead. Unlayered so it beats the utility however Tailwind sorts it. */
+[data-mark-play="fast"] .mark-frame {
+  animation-duration: 170ms;
+  animation-delay: calc(var(--frame-index) * 22ms);
+  animation-timing-function: var(--ease-spring);
+  animation-fill-mode: both;
+  animation-timeline: auto;
+  animation-range: normal;
+}
+
+/* Underline that wipes in from the left on hover/focus (and while a Base-UI
+   popup trigger is open). currentColor adapts it to any surface. */
+@layer utilities {
+  .link-underline {
+    position: relative;
+  }
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    /* Baseline for unpadded links; padded links override with `after:bottom-*`. */
+    bottom: 0.125rem;
+    height: 1px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .link-underline:hover::after,
+  .link-underline:focus-visible::after,
+  .link-underline[data-popup-open]::after {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .link-underline::after {
+    transition: none;
+  }
+}
+
+/* Keyboard focus ring, for elements that re-enable or scope :focus-visible. */
+@layer utilities {
+  .focus-ring {
+    outline: none;
+  }
+  .focus-ring:focus-visible {
+    outline: 2px dotted var(--foreground);
+    outline-offset: 2px;
+  }
+
+  /* Inset variant: outline drawn inside the element so an overflow-hidden
+     ancestor or packed sibling can't clip it. For tight cards / edge links. */
+  .focus-ring-inset {
+    outline: none;
+  }
+  .focus-ring-inset:focus-visible {
+    outline: 2px dotted var(--foreground);
+    outline-offset: -3px;
+  }
+
+  /* Rings the whole card when a link inside it is focused. */
+  .focus-ring-within:has(a:focus-visible) {
+    outline: 2px dotted var(--foreground);
+    outline-offset: 2px;
+  }
 }
 
 @layer base {
@@ -134,41 +544,146 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Colour the overscroll gutters — mainly the top rubber-band by the navbar. */
+  html {
+    background-color: var(--overscroll-top);
+    overscroll-behavior-x: none;
+  }
+  /* iOS paints the strips behind its toolbar and status bar from the document
+     background — WebKit takes `body`'s, with the root covering the hairline at
+     the document's own edge (measured on iOS 26). Those strips only show the
+     document background at the very end of the scroll, where the footer fills
+     the screen, so flip both there: any earlier and the notch takes green
+     while the page is still dark. */
+  html,
+  body {
+    animation-name: canvas-footer;
+    animation-duration: 1ms;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(root block);
+    animation-range: calc(100% - 24px) 100%;
+  }
+  ::selection {
+    background-color: var(--accent-green);
+    color: var(--accent-green-foreground);
+  }
+  /* On solid accent-green surfaces (e.g. the footer) the green-on-green
+     selection is invisible, so invert it: dark highlight, green text. */
+  [class~="bg-accent-green"] ::selection,
+  [class~="bg-accent-green"]::selection {
+    background-color: var(--accent-green-foreground);
+    color: var(--accent-green);
+  }
+  /* ...and back again inside a dark chip on that green (the status pill), where
+     the inverted rule would otherwise paint dark-on-dark. Listed after, so the
+     nested case wins on order at equal specificity. */
+  [class~="bg-accent-green-foreground"] ::selection,
+  [class~="bg-accent-green-foreground"]::selection {
+    background-color: var(--accent-green);
+    color: var(--accent-green-foreground);
+  }
+  /* Global keyboard focus indicator; components opt out with `outline-none`. */
+  :focus-visible {
+    outline: 2px dotted var(--foreground);
+    outline-offset: 2px;
+  }
+
+  /* In @layer base so Tailwind utilities (w-40, object-contain, …) still win;
+     an unlayered rule would beat every utility in v4's cascade. */
+  img {
+    display: block;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  /* Media isn't text — keep it out of selections and iOS long-press callouts. */
+  img,
+  svg,
+  video {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Autofill: paint with the app palette, not the browser's yellow/blue. The
+     inset box-shadow overrides the UA background in both themes. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px var(--autofill-bg, var(--background)) inset;
+    -webkit-text-fill-color: var(--foreground);
+    caret-color: var(--foreground);
+    transition: background-color 9999s ease-out 0s;
+  }
+
+  /* Nearest-neighbor upscale so LQIP placeholders load in pixelated, not blurred. */
+  img[data-lqip] {
+    image-rendering: pixelated;
+  }
 }
 
-img {
+/* Code blocks (rich-text). Plain, unhighlighted monospace with a line-number
+   gutter — no syntax coloring, tabs preserved. */
+.rich-code {
+  /* One inset for both columns: the block padding has to match or number N and
+     line N start on different rows, and the inline inset matches the header's
+     px-3 so the badge, the numbers and the code share one 0.75rem rhythm. */
+  --rich-code-inset-block: 1rem;
+  --rich-code-inset-inline: 0.75rem;
+}
+
+.rich-code-pre {
+  margin: 0;
+  padding: var(--rich-code-inset-block) var(--rich-code-inset-inline);
+  /* Inherited from .rich-code, so the gutter and the code cannot drift apart. */
+  line-height: inherit;
+  /* max-content + min-width keeps the background full-width when lines overflow. */
+  width: max-content;
+  min-width: 100%;
+  white-space: pre;
+  tab-size: 2;
+  color: var(--foreground);
+}
+
+/* Line-number gutter — a fixed column beside the horizontally-scrolling code. */
+.rich-code-gutter {
+  flex: none;
+  padding: var(--rich-code-inset-block) var(--rich-code-inset-inline);
+  /* Reserve two digits: the column is otherwise content-sized, so a 9-line and
+     a 90-line block would indent their code by different amounts. */
+  min-width: calc(2.5ch + var(--rich-code-inset-inline) * 2);
+  line-height: inherit;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklab, var(--muted-foreground) 60%, transparent);
+  user-select: none;
+  border-right: 1px solid var(--border);
+  background-color: var(--muted);
+}
+
+.rich-code-gutter span {
   display: block;
-  max-width: 100%;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  border-radius: var(--radius-md);
 }
 
-/* Render the `sanity-image` LQIP placeholder as crisp pixel blocks
-   (nearest-neighbor upscale) so images load in pixelated rather than blurred. */
-img[data-lqip] {
-  image-rendering: pixelated;
-}
-
-/* FAQ disclosure: smooth open/close, instant fallback where unsupported. */
-@media (prefers-reduced-motion: no-preference) {
-  .faq-disclosure {
-    interpolate-size: allow-keywords;
-  }
-
-  .faq-disclosure::details-content {
-    overflow: hidden;
-    block-size: 0;
+@keyframes hero-enter {
+  from {
     opacity: 0;
-    transition:
-      block-size 0.2s ease,
-      opacity 0.2s ease,
-      content-visibility 0.2s ease allow-discrete;
+    transform: translateY(8px);
+    filter: blur(2px);
   }
+}
 
-  .faq-disclosure[open]::details-content {
-    block-size: auto;
-    opacity: 1;
+@utility hero-enter {
+  animation: hero-enter 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Reduced motion: land on the final state instead of animating to it. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-enter {
+    animation: none;
   }
 }

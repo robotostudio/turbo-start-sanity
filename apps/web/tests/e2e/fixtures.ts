@@ -1,17 +1,17 @@
 import { test as base } from "@playwright/test";
 import { createClient } from "@sanity/client";
 
-interface SlugPages {
+type SlugPages = {
   pages: string[];
   blogs: string[];
-}
+};
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET;
 
 if (!projectId || !dataset) {
   throw new Error(
-    "Missing NEXT_PUBLIC_SANITY_PROJECT_ID or NEXT_PUBLIC_SANITY_DATASET",
+    "Missing NEXT_PUBLIC_SANITY_PROJECT_ID or NEXT_PUBLIC_SANITY_DATASET"
   );
 }
 
@@ -31,13 +31,16 @@ function sanitizeSlugs(slugs: string[]): string[] {
 }
 
 export const test = base.extend<{ slugPages: SlugPages }>({
-  slugPages: async ({}, use) => {
+  // Playwright reads the destructured names to work out fixture dependencies,
+  // so an empty pattern is how a fixture declares it depends on nothing.
+  // biome-ignore lint/correctness/noEmptyPattern: required by Playwright
+  slugPages: async ({}, provide) => {
     const result = await sanityClient.fetch<SlugPages>(`{
       "pages": *[_type == "page" && defined(slug.current)].slug.current,
       "blogs": *[_type == "blog" && defined(slug.current)].slug.current
     }`);
 
-    await use({
+    await provide({
       pages: sanitizeSlugs(result.pages ?? []),
       blogs: sanitizeSlugs(result.blogs ?? []),
     });

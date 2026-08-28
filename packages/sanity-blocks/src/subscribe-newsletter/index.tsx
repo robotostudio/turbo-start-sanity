@@ -1,11 +1,23 @@
 "use client";
 
+import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
+import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
+import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
+import { cn } from "@workspace/tailwind-config/utils";
 import { Button } from "@workspace/ui/components/button";
-import { ChevronRight, LoaderCircle } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import type { ComponentProps } from "react";
 import { useFormStatus } from "react-dom";
+
+export interface NewsletterTestimonial {
+  authorImage?: SanityImageData | null;
+  authorName?: string | null;
+  authorRole?: string | null;
+  eyebrow?: string | null;
+  quote?: RichTextValue;
+}
 
 export interface SubscribeNewsletterProps {
   action?: ComponentProps<"form">["action"];
@@ -13,6 +25,7 @@ export interface SubscribeNewsletterProps {
   method?: ComponentProps<"form">["method"];
   onSubmit?: ComponentProps<"form">["onSubmit"];
   subTitle?: RichTextValue;
+  testimonial?: NewsletterTestimonial | null;
   title?: string | null;
 }
 
@@ -21,29 +34,68 @@ function SubscribeNewsletterButton() {
   return (
     <Button
       aria-label={pending ? "Subscribing..." : "Subscribe to newsletter"}
-      className="aspect-square size-8 bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+      className="shrink-0 rounded-none px-5 py-2.5"
       disabled={pending}
-      size="icon"
+      size="sm"
       type="submit"
+      variant="secondary"
     >
-      <span className="flex items-center justify-center gap-2">
-        {pending ? (
-          <LoaderCircle
-            aria-hidden="true"
-            className="animate-spin text-black"
-            size={16}
-            strokeWidth={2}
-          />
-        ) : (
-          <ChevronRight
-            aria-hidden="true"
-            className="text-black dark:text-neutral-300"
-            size={16}
-            strokeWidth={2}
-          />
-        )}
+      {pending ? (
+        <LoaderCircle
+          aria-hidden="true"
+          className="animate-spin"
+          size={16}
+          strokeWidth={2}
+        />
+      ) : (
+        "Subscribe"
+      )}
+      <span aria-live="polite" className="sr-only" role="status">
+        {pending ? "Subscribing…" : ""}
       </span>
     </Button>
+  );
+}
+
+function TestimonialPanel({
+  testimonial,
+}: Readonly<{ testimonial: NewsletterTestimonial }>) {
+  const { eyebrow, quote, authorImage, authorName, authorRole } = testimonial;
+  return (
+    <div className="bleed-x bg-grid-dots p-[var(--container-px,0.5rem)] text-zinc-800 lg:mx-0 lg:p-8 dark:text-zinc-50">
+      <div className="flex h-full flex-col gap-12 bg-background p-8">
+        <BlockEyebrow eyebrow={eyebrow} />
+        <div className="flex flex-col gap-8">
+          <RichText
+            className="body-text text-muted-foreground [&_strong]:font-normal [&_strong]:text-foreground"
+            richText={quote}
+          />
+          <div className="flex items-center gap-4">
+            {authorImage?.id && (
+              <div className="size-[42px] shrink-0 overflow-hidden">
+                <SanityImage
+                  className="h-full w-full rounded-none! object-cover"
+                  height={42}
+                  image={authorImage}
+                  loading="lazy"
+                  width={42}
+                />
+              </div>
+            )}
+            <div className="flex flex-col text-base leading-6">
+              {authorName && (
+                <span className="font-medium text-foreground">
+                  {authorName}
+                </span>
+              )}
+              {authorRole && (
+                <span className="text-muted-foreground">{authorRole}</span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -54,48 +106,70 @@ export function SubscribeNewsletter({
   helperText,
   method,
   onSubmit,
+  testimonial,
 }: Readonly<SubscribeNewsletterProps>) {
+  // A cleared Sanity object is still truthy; only treat the testimonial as
+  // present when it actually carries content.
+  const hasTestimonialContent = Boolean(
+    testimonial &&
+      (testimonial.eyebrow ||
+        testimonial.authorName ||
+        testimonial.authorRole ||
+        testimonial.authorImage?.id ||
+        (Array.isArray(testimonial.quote) && testimonial.quote.length > 0))
+  );
+
   return (
-    <section className="py-8 sm:py-12 md:py-16" id="subscribe">
+    <section className="block-section" id="subscribe">
       <div className="container">
-        <div className="relative overflow-hidden rounded-3xl bg-gray-50 px-4 py-8 sm:py-16 md:px-8 md:py-24 lg:py-32 dark:bg-zinc-900">
-          <div className="relative z-10 mx-auto text-center">
-            {title && (
-              <h2 className="mb-4 text-balance font-semibold text-gray-900 text-xl sm:text-3xl md:text-5xl dark:text-neutral-300">
-                {title}
-              </h2>
-            )}
-            {subTitle && (
-              <RichText
-                className="mb-6 text-balance text-gray-600 text-sm sm:mb-8 sm:text-base dark:text-neutral-300"
-                richText={subTitle}
-              />
-            )}
-            <form
-              action={action}
-              className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-2"
-              method={method ?? "post"}
-              onSubmit={onSubmit}
-            >
-              <div className="flex items-center justify-between rounded-xl border bg-white p-2 pl-4 drop-shadow-lg md:w-96 dark:bg-zinc-200">
+        <div
+          className={cn(
+            hasTestimonialContent &&
+              "grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)] lg:items-stretch lg:gap-48"
+          )}
+        >
+          <div className="flex max-w-3xl flex-col items-start gap-8 pb-12">
+            <div className="flex flex-col items-start gap-5">
+              {title && (
+                <h2 className="max-w-none text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] sm:text-5xl">
+                  {title}
+                </h2>
+              )}
+              {subTitle && (
+                <RichText
+                  className="body-text max-w-[360px] text-muted-foreground"
+                  richText={subTitle}
+                />
+              )}
+            </div>
+            <div className="flex w-full flex-col items-start gap-3">
+              <form
+                action={action}
+                className="flex w-full items-center gap-1.5 bg-muted py-1.5 pr-1.5 pl-4 has-[input:focus-visible]:[outline:2px_dotted_var(--foreground)] has-[input:focus-visible]:outline-offset-2"
+                method={method ?? "post"}
+                onSubmit={onSubmit}
+              >
                 <input
                   aria-label="Email address"
-                  className="w-full rounded-e-none border-e-0 bg-transparent outline-none focus-visible:ring-0 dark:text-zinc-900 dark:placeholder:text-zinc-900"
+                  className="w-full min-w-0 flex-1 bg-transparent py-1.5 text-base text-foreground outline-none [--autofill-bg:var(--muted)] placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
                   name="email"
                   placeholder="Enter your email address"
                   required
                   type="email"
                 />
                 <SubscribeNewsletterButton />
-              </div>
-            </form>
-            {helperText && (
-              <RichText
-                className="mt-3 text-gray-800 text-sm opacity-80 sm:mt-4 dark:text-neutral-300"
-                richText={helperText}
-              />
-            )}
+              </form>
+              {helperText && (
+                <RichText
+                  className="text-muted-foreground text-sm leading-5 [&_a]:rounded-none [&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-solid"
+                  richText={helperText}
+                />
+              )}
+            </div>
           </div>
+          {hasTestimonialContent && testimonial && (
+            <TestimonialPanel testimonial={testimonial} />
+          )}
         </div>
       </div>
     </section>

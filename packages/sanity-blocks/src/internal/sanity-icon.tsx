@@ -3,10 +3,10 @@ import { TriangleAlert } from "lucide-react";
 import { DynamicIcon, type IconName } from "lucide-react/dynamic";
 import type { ComponentProps } from "react";
 
-interface IconProps extends Omit<ComponentProps<"svg">, "src"> {
+type IconProps = Omit<ComponentProps<"svg">, "src"> & {
   icon?: string | null;
   alt?: string;
-}
+};
 
 const ICON_SIZE = 24;
 

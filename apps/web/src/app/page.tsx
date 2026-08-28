@@ -1,6 +1,8 @@
 import {
+  DRAFTS_WITHOUT_SESSION,
   type DynamicFetchOptions,
   getDynamicFetchOptions,
+  resolvePageFetchOptions,
   sanityFetch,
   sanityFetchMetadata,
 } from "@workspace/sanity/live";
@@ -11,7 +13,7 @@ import { Suspense } from "react";
 
 import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
-import { getSEOMetadata } from "@/lib/seo";
+import { seoFromDocument } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { perspective } = await getDynamicFetchOptions();
@@ -19,29 +21,25 @@ export async function generateMetadata(): Promise<Metadata> {
     query: queryHomePageData,
     perspective,
   });
-  return getSEOMetadata({
-    title: homePageData?.title ?? homePageData?.seoTitle,
-    description: homePageData?.description ?? homePageData?.seoDescription,
-    slug: "/",
-    contentId: homePageData?._id,
-    contentType: homePageData?._type,
-  });
+  return seoFromDocument(homePageData, { slug: "/" });
 }
 
 export default async function Page() {
   const { isEnabled: isDraftMode } = await draftMode();
-  if (isDraftMode) {
+
+  if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
     return (
-      <Suspense fallback={<HomeFallback />}>
-        <DynamicHome />
+      <Suspense fallback={null}>
+        <HomeContent />
       </Suspense>
     );
   }
+
   return <CachedHome perspective="published" stega={false} />;
 }
 
-async function DynamicHome() {
-  const { perspective, stega } = await getDynamicFetchOptions();
+async function HomeContent() {
+  const { perspective, stega } = await resolvePageFetchOptions();
   return <CachedHome perspective={perspective} stega={stega} />;
 }
 
@@ -62,11 +60,9 @@ async function CachedHome({ perspective, stega }: DynamicFetchOptions) {
   return (
     <>
       <PageBuilderJsonLd pageBuilder={pageBuilder} />
-      <PageBuilder id={_id} pageBuilder={pageBuilder ?? []} type={_type} />
+      <main className="-mt-16">
+        <PageBuilder id={_id} pageBuilder={pageBuilder ?? []} type={_type} />
+      </main>
     </>
   );
-}
-
-function HomeFallback() {
-  return <div className="min-h-[50vh]" />;
 }

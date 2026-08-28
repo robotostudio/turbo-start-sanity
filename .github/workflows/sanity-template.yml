@@ -11,6 +11,8 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - name: Validate Sanity Template
-        uses: sanity-io/template-validator@v2
+        uses: sanity-io/template-validator@579a9fcc32543d373eb4c8e0d0c2a4c32b413ef6 # v3.1.0

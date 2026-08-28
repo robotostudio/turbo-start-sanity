@@ -3,7 +3,7 @@
  * Kept free of heavy imports so the proxy bundle stays light.
  */
 
-export const MARKDOWN_MEDIA_TYPE = "text/markdown";
+const MARKDOWN_MEDIA_TYPE = "text/markdown";
 
 /** Canonicalizes a path: strips `.md` and trailing slash, maps `/index` → `/`. */
 export function normalizeMarkdownPath(raw: string): string {

@@ -4,9 +4,9 @@ import {
   iconField,
 } from "@workspace/sanity-blocks/internal/schema-fields";
 import { LayoutGrid } from "lucide-react";
-import { defineField, defineType } from "sanity";
+import { defineArrayMember, defineField, defineType } from "sanity";
 
-const featureCardIconItem = defineField({
+const featureCardIconItem = defineArrayMember({
   name: "featureCardIcon",
   type: "object",
   fields: [
@@ -14,10 +14,12 @@ const featureCardIconItem = defineField({
     defineField({
       name: "title",
       type: "string",
+      title: "Title",
       description: "The heading text for this feature card",
     }),
     definePortableTextField(["block"], {
       name: "richText",
+      description: "The short description shown beneath this card's heading",
     }),
   ],
   preview: {
@@ -35,26 +37,31 @@ const featureCardIconItem = defineField({
 export const featureCardsIconSchema = defineType({
   name: "featureCardsIcon",
   type: "object",
-  icon: LayoutGrid,
   description:
     "A grid of feature cards, each with an icon, title and description",
+  icon: LayoutGrid,
   fields: [
     defineField({
       name: "eyebrow",
       type: "string",
+      title: "Eyebrow",
       description: "Optional text that appears above the main title",
     }),
     defineField({
       name: "title",
       type: "string",
+      title: "Title",
       description: "The main heading for this feature section",
     }),
     definePortableTextField(["block"], {
       name: "richText",
+      description:
+        "The supporting paragraph shown beneath the title, introducing the cards below",
     }),
     defineField({
       name: "cards",
       type: "array",
+      title: "Cards",
       description: "The individual feature cards to display in the grid",
       of: [featureCardIconItem],
     }),

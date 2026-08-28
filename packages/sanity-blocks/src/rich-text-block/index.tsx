@@ -1,6 +1,6 @@
+import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
-import { Badge } from "@workspace/ui/components/badge";
 
 export interface RichTextBlockProps {
   eyebrow?: string | null;
@@ -14,18 +14,14 @@ export function RichTextBlock({
   eyebrow,
 }: Readonly<RichTextBlockProps>) {
   return (
-    <section className="my-6 md:my-16">
+    <section className="block-section">
       <div className="container">
-        <div className="flex w-full flex-col items-center">
-          <div className="flex flex-col items-center space-y-4 text-center sm:space-y-6 md:text-center">
-            {eyebrow && <Badge variant="secondary">{eyebrow}</Badge>}
-            {title && (
-              <h2 className="font-semibold text-3xl md:text-5xl">{title}</h2>
-            )}
-          </div>
+        <div className="flex flex-col items-start gap-6">
+          <BlockEyebrow eyebrow={eyebrow} />
+          {title && <h2 className="max-w-2xl block-title">{title}</h2>}
         </div>
         {richText && (
-          <div className="mx-auto mt-8 max-w-4xl">
+          <div className="mt-8 max-w-3xl">
             <RichText richText={richText} />
           </div>
         )}

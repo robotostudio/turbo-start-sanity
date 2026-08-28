@@ -11,17 +11,16 @@ import { VisualEditing } from "next-sanity/visual-editing";
 import { Suspense } from "react";
 import { preconnect, prefetchDNS } from "react-dom";
 
-import {
-  CachedFooter,
-  DynamicFooter,
-  FooterSkeleton,
-} from "@/components/footer";
+import { revalidateSyncTags } from "@/app/actions/revalidate";
+import { CachedFooter, DynamicFooter } from "@/components/footer";
 import { CombinedJsonLd } from "@/components/json-ld";
-import { Navbar, NavbarSkeleton } from "@/components/navbar";
+import { Navbar } from "@/components/navbar";
 import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
+import { ScrollToTop } from "@/components/scroll-to-top";
+import { StickyFooter } from "@/components/sticky-footer";
+import { getGithubStars } from "@/lib/github-stars";
 import { getNavigationData } from "@/lib/navigation";
-import { sanityLiveAction } from "@/lib/sanity-live-action";
 
 const fontSans = Geist({
   subsets: ["latin"],
@@ -40,41 +39,68 @@ export default async function RootLayout({
 }>) {
   preconnect("https://cdn.sanity.io");
   prefetchDNS("https://cdn.sanity.io");
-  const { isEnabled: isDraftMode } = await draftMode();
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
         <Providers>
-          {isDraftMode ? (
-            <Suspense fallback={<NavbarSkeleton />}>
+          <ScrollToTop />
+          <div id="notch-slot" />
+          <div id="notch-snap" />
+          <div
+            className="relative"
+            id="page-shell"
+            style={{ marginBottom: "var(--footer-height)" }}
+          >
+            {/* Session-gated, not environment-gated, so the deployed Studio can
+                edit the nav; the published fallback keeps real content in the
+                static shell. */}
+            <Suspense fallback={<PublishedNavbar />}>
               <DynamicNavbar />
             </Suspense>
-          ) : (
-            <CachedNavbar perspective="published" stega={false} />
-          )}
-          {children}
-          {isDraftMode ? (
-            <Suspense fallback={<FooterSkeleton />}>
+            <div className="relative z-10 min-h-dvh bg-background pt-16 lg:-mt-16">
+              {children}
+            </div>
+          </div>
+          <StickyFooter>
+            <Suspense
+              fallback={<CachedFooter perspective="published" stega={false} />}
+            >
               <DynamicFooter />
             </Suspense>
-          ) : (
-            <CachedFooter perspective="published" stega={false} />
-          )}
-          <SanityLive action={sanityLiveAction} includeDrafts={isDraftMode} />
+          </StickyFooter>
+          {/* Reads draftMode(), so it must stay behind Suspense — otherwise the
+              whole layout opts out of prerendering for every visitor. */}
+          <Suspense fallback={null}>
+            <LivePreviewLayer />
+          </Suspense>
           <Suspense fallback={null}>
             <CombinedJsonLd includeOrganization includeWebsite />
           </Suspense>
-          {isDraftMode && (
-            <>
-              <PreviewBar />
-              <VisualEditing />
-            </>
-          )}
         </Providers>
       </body>
     </html>
+  );
+}
+
+/**
+ * Live updates plus the Presentation overlay. The overlay renders wherever a
+ * validated draft-mode session exists — production included — which is what
+ * lets the deployed Studio preview the live site.
+ */
+async function LivePreviewLayer() {
+  const { isEnabled: isDraftMode } = await draftMode();
+  return (
+    <>
+      <SanityLive action={revalidateSyncTags} includeDrafts={isDraftMode} />
+      {isDraftMode && (
+        <>
+          <PreviewBar />
+          <VisualEditing />
+        </>
+      )}
+    </>
   );
 }
 
@@ -83,11 +109,25 @@ async function DynamicNavbar() {
   return <CachedNavbar perspective={perspective} stega={stega} />;
 }
 
+/** Static shell for the nav. A Suspense fallback renders in the parent, so it
+ * may only await cached data — `getGithubStars` memoizes at runtime, so the
+ * count arrives with DynamicNavbar instead. */
+async function PublishedNavbar() {
+  const { navbarData, settingsData } = await getNavigationData({
+    perspective: "published",
+    stega: false,
+  });
+  return <Navbar navbarData={navbarData} settingsData={settingsData} />;
+}
+
 async function CachedNavbar({ perspective, stega }: DynamicFetchOptions) {
-  "use cache";
   const { navbarData, settingsData } = await getNavigationData({
     perspective,
     stega,
   });
-  return <Navbar navbarData={navbarData} settingsData={settingsData} />;
+  const stars = await getGithubStars(navbarData?.gitHubUrl);
+
+  return (
+    <Navbar navbarData={navbarData} settingsData={settingsData} stars={stars} />
+  );
 }

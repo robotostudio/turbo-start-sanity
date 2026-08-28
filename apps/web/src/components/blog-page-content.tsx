@@ -1,104 +1,74 @@
-"use client";
+import type { QueryBlogIndexPageResult } from "@workspace/sanity/types";
+import type { ReactNode } from "react";
 
-import type { QueryBlogIndexPageDataResult } from "@workspace/sanity/types";
-
-import { BlogHeader } from "@/components/blog-card";
+import { BlogHeader, FeaturedBlogCard } from "@/components/blog-card";
+import { BlogCategoryFilter } from "@/components/blog-category-filter";
+import { BlogList } from "@/components/blog-list";
 import { BlogPagination } from "@/components/blog-pagination";
-import { BlogSearchResults } from "@/components/blog-search-results";
-import { BlogSection } from "@/components/blog-section";
-import { PageBuilder } from "@/components/pagebuilder";
-import { useBlogSearch } from "@/hooks/use-blog-search";
+import { BlogSearchLayout } from "@/components/blog-search-layout";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import type { Blog } from "@/types";
 import type { PaginationMetadata } from "@/utils";
-import { SearchInput } from "./blog-search";
 
 type BlogPageContentProps = {
-  indexPageData: NonNullable<QueryBlogIndexPageDataResult>;
+  indexPageData: NonNullable<QueryBlogIndexPageResult>;
   blogs: Blog[];
+  // Already excluded from `blogs` by the query, so the two never overlap.
+  featuredBlogs: Blog[];
   paginationMetadata: PaginationMetadata;
+  activeCategory: string;
+  children?: ReactNode;
 };
 
 export function BlogPageContent({
   indexPageData,
   blogs,
+  featuredBlogs,
   paginationMetadata,
+  activeCategory,
+  children,
 }: BlogPageContentProps) {
-  const {
-    title,
-    description,
-    pageBuilder = [],
-    _id,
-    _type,
-    featuredBlogsCount,
-    displayFeaturedBlogs,
-  } = indexPageData;
+  const { title, description } = indexPageData;
 
-  const { searchQuery, setSearchQuery, results, isSearching, hasQuery, error } =
-    useBlogSearch();
-
-  const validFeaturedBlogsCount = featuredBlogsCount
-    ? Number.parseInt(featuredBlogsCount, 10)
-    : 0;
-
-  const shouldDisplayFeaturedBlogs =
-    displayFeaturedBlogs &&
-    validFeaturedBlogsCount > 0 &&
-    paginationMetadata.currentPage === 1 &&
-    !hasQuery;
-
-  const featuredBlogs = shouldDisplayFeaturedBlogs
-    ? blogs.slice(0, validFeaturedBlogsCount)
-    : [];
-
-  const remainingBlogs = shouldDisplayFeaturedBlogs
-    ? blogs.slice(validFeaturedBlogsCount)
-    : blogs;
+  const showFeatured =
+    paginationMetadata.currentPage === 1 && featuredBlogs.length > 0;
 
   return (
     <main className="bg-background">
-      <div className="container my-16">
+      <Breadcrumbs crumbs={[{ label: "Home", href: "/" }, { label: "Blog" }]} />
+      <div className="container mt-8 mb-16 md:my-16">
         <BlogHeader description={description} title={title} />
 
-        <SearchInput
-          className="mt-8 mb-12"
-          onChange={setSearchQuery}
-          onClear={() => setSearchQuery("")}
-          placeholder="Search blogs..."
-          value={searchQuery}
+        <BlogSearchLayout
+          categoryFilter={
+            <BlogCategoryFilter activeCategory={activeCategory} />
+          }
+          featured={
+            showFeatured
+              ? featuredBlogs.map((blog) => (
+                  <FeaturedBlogCard blog={blog} key={blog._id} />
+                ))
+              : null
+          }
+          list={
+            <>
+              <BlogList blogs={blogs} />
+              {paginationMetadata.totalPages > 1 && (
+                <BlogPagination
+                  category={activeCategory}
+                  className="mt-12"
+                  currentPage={paginationMetadata.currentPage}
+                  hasNextPage={paginationMetadata.hasNextPage}
+                  hasPreviousPage={paginationMetadata.hasPreviousPage}
+                  totalPages={paginationMetadata.totalPages}
+                />
+              )}
+            </>
+          }
         />
-
-        {hasQuery ? (
-          <BlogSearchResults
-            error={error}
-            hasQuery={hasQuery}
-            isSearching={isSearching}
-            results={results}
-            searchQuery={searchQuery}
-          />
-        ) : (
-          <>
-            <BlogSection
-              blogs={featuredBlogs}
-              isFeatured
-              title="Featured Posts"
-            />
-            <BlogSection blogs={remainingBlogs} title="All Posts" />
-            {paginationMetadata?.totalPages > 1 && (
-              <BlogPagination
-                className="mt-12 flex justify-center"
-                currentPage={paginationMetadata.currentPage}
-                hasNextPage={paginationMetadata.hasNextPage}
-                hasPreviousPage={paginationMetadata.hasPreviousPage}
-                totalPages={paginationMetadata.totalPages}
-              />
-            )}
-          </>
-        )}
       </div>
 
-      {pageBuilder && pageBuilder.length > 0 && (
-        <PageBuilder id={_id} pageBuilder={pageBuilder} type={_type} />
-      )}
+      {children}
     </main>
   );
 }

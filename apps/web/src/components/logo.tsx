@@ -1,54 +1,75 @@
-import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
-import Image from "next/image";
+import {
+  SanityImage,
+  type SanityImageData,
+} from "@workspace/sanity-blocks/internal/sanity-image";
+import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 
-import type { Maybe, SanityImageProps } from "@/types";
-
-const LOGO_URL =
-  "https://cdn.sanity.io/images/s6kuy1ts/production/68c438f68264717e93c7ba1e85f1d0c4b58b33c2-1200x621.svg";
-
 type LogoProps = {
-  src?: Maybe<string>;
-  image?: Maybe<SanityImageProps>;
-  alt?: Maybe<string>;
-  width?: number;
-  height?: number;
+  image?: SanityImageData | null;
+  imageDark?: SanityImageData | null;
+  alt?: string | null;
+  className?: string;
+  linkClassName?: string;
   priority?: boolean;
 };
 
 export function Logo({
-  src,
-  alt = "logo",
   image,
-  width = 170,
-  height = 40,
+  imageDark,
+  alt = "logo",
+  className,
+  linkClassName,
   priority = true,
 }: LogoProps) {
+  if (!image?.id) {
+    return (
+      <Link
+        className={cn(
+          "focus-ring inline-block rounded-none font-semibold text-lg",
+          linkClassName
+        )}
+        href="/"
+      >
+        {alt ?? "Home"}
+      </Link>
+    );
+  }
+
+  const loading = priority ? "eager" : "lazy";
+
   return (
     <Link
-      className="inline-block rounded-md outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className={cn("focus-ring inline-block rounded-none", linkClassName)}
       href="/"
     >
-      {image ? (
-        <SanityImage
-          alt={alt ?? "logo"}
-          className="w-[170px] dark:invert"
-          // width={width}
-          // height={height}
-          decoding="sync"
-          image={image}
-          loading="eager"
-        />
+      {imageDark?.id ? (
+        <>
+          <SanityImage
+            className={cn("h-auto w-44 dark:hidden", className)}
+            height={32}
+            image={{ ...image, alt: alt ?? image.alt }}
+            loading={loading}
+            sizes="210px"
+            width={210}
+          />
+          <SanityImage
+            className={cn("hidden h-auto w-44 dark:block", className)}
+            height={32}
+            image={{ ...imageDark, alt: alt ?? imageDark.alt }}
+            loading={loading}
+            sizes="210px"
+            width={210}
+          />
+        </>
       ) : (
-        <Image
-          alt={alt ?? "logo"}
-          className="h-[40px] w-[170px] dark:invert"
-          decoding="sync"
-          height={height}
-          loading="eager"
-          priority={priority}
-          src={src ?? LOGO_URL}
-          width={width}
+        <SanityImage
+          className={cn("h-auto w-44", className)}
+          height={32}
+          image={{ ...image, alt: alt ?? image.alt }}
+          loading={loading}
+          sizes="210px"
+          width={210}
         />
       )}
     </Link>

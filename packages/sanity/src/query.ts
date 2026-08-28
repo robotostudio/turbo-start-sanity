@@ -2,9 +2,12 @@ import { ctaGroqProjection } from "@workspace/sanity-blocks/cta/cta.groq";
 import { faqAccordionGroqProjection } from "@workspace/sanity-blocks/faq-accordion/faq-accordion.groq";
 import { featureCardsIconGroqProjection } from "@workspace/sanity-blocks/feature-cards-icon/feature-cards-icon.groq";
 import { heroGroqProjection } from "@workspace/sanity-blocks/hero/hero.groq";
-import { imageLinkCardsGroqProjection } from "@workspace/sanity-blocks/image-link-cards/image-link-cards.groq";
+import { logoCloudGroqProjection } from "@workspace/sanity-blocks/logo-cloud/logo-cloud.groq";
 import { richTextBlockGroqProjection } from "@workspace/sanity-blocks/rich-text-block/rich-text-block.groq";
+import { showcaseGridGroqProjection } from "@workspace/sanity-blocks/showcase-grid/showcase-grid.groq";
+import { socialGridGroqProjection } from "@workspace/sanity-blocks/social-grid/social-grid.groq";
 import { subscribeNewsletterGroqProjection } from "@workspace/sanity-blocks/subscribe-newsletter/subscribe-newsletter.groq";
+import { videoFeatureGroqProjection } from "@workspace/sanity-blocks/video-feature/video-feature.groq";
 import { defineQuery } from "next-sanity";
 
 const imageFields = /* groq */ `
@@ -28,7 +31,6 @@ const imageFields = /* groq */ `
     top
   }
 `;
-// Base fragments for reusable query parts
 const imageFragment = /* groq */ `
   image {
     ${imageFields}
@@ -63,6 +65,22 @@ const richTextFragment = /* groq */ `
     _type == "image" => {
       ${imageFields},
       "caption": caption
+    },
+    _type == "table" => {
+      ...,
+      rows[]{
+        ...,
+        cells[]{
+          ...,
+          value[]{
+            ...,
+            _type == "block" => {
+              ...,
+              ${markDefsFragment}
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -83,6 +101,7 @@ const blogCardFragment = /* groq */ `
   description,
   "slug":slug.current,
   orderRank,
+  category,
   ${imageFragment},
   publishedAt,
   ${blogAuthorFragment}
@@ -115,16 +134,15 @@ const pageBuilderFragment = /* groq */ `
     ${faqAccordionGroqProjection},
     ${featureCardsIconGroqProjection},
     ${subscribeNewsletterGroqProjection},
-    ${imageLinkCardsGroqProjection},
-    ${richTextBlockGroqProjection}
+    ${logoCloudGroqProjection},
+    ${socialGridGroqProjection},
+    ${showcaseGridGroqProjection},
+    ${richTextBlockGroqProjection},
+    ${videoFeatureGroqProjection}
   }
 `;
 
-/**
- * Query to extract a single image from a page document
- * This is used as a type reference only and not for actual data fetching
- * Helps with TypeScript inference for image objects
- */
+/** Type-reference only — never fetched; drives TS inference for image objects. */
 export const queryImageType = defineQuery(`
   *[_type == "page" && defined(image)][0]{
     ${imageFragment}
@@ -139,6 +157,8 @@ export const queryHomePageData =
     "slug": slug.current,
     title,
     description,
+    ogTitle,
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${pageBuilderFragment}
   }`);
 
@@ -146,6 +166,8 @@ export const querySlugPageData = defineQuery(`
   *[_type == "page" && defined(slug.current) && slug.current == $slug][0]{
     ...,
     "slug": slug.current,
+    ogTitle,
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${pageBuilderFragment}
   }
   `);
@@ -154,23 +176,33 @@ export const querySlugPagePaths = defineQuery(`
   *[_type == "page" && defined(slug.current)].slug.current
 `);
 
-export const queryBlogIndexPageData = defineQuery(`
+/**
+ * The whole blog index page in one round trip. The list excludes featured
+ * posts only when no category is active (`$category == ""`) — the same
+ * condition that renders the strip — so a promoted post is never counted
+ * twice or paginated into a gap.
+ */
+export const queryBlogIndexPage = defineQuery(`
   *[_type == "blogIndex"][0]{
     ...,
     _id,
     _type,
     title,
     description,
-    "displayFeaturedBlogs" : displayFeaturedBlogs == "yes",
-    "featuredBlogsCount" : featuredBlogsCount,
+    ogTitle,
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${pageBuilderFragment},
-    "slug": slug.current
-  }
-`);
-
-export const queryBlogIndexPageBlogs = defineQuery(`
-  *[_type == "blog" && (seoHideFromLists != true)] | order(orderRank asc) [$start...$end]{
-    ${blogCardFragment}
+    "slug": slug.current,
+    "featuredBlogs": select(
+      $category == "" => *[_type == "blog" && featured == true && defined(slug.current) && (seoHideFromLists != true)] | order(orderRank asc){
+        ${blogCardFragment}
+      },
+      []
+    ),
+    "blogs": *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true) && ($category == "" || category == $category) && ($category != "" || featured != true)] | order(orderRank asc) [$start...$end]{
+      ${blogCardFragment}
+    },
+    "total": count(*[_type == "blog" && defined(slug.current) && (seoHideFromLists != true) && ($category == "" || category == $category) && ($category != "" || featured != true)])
   }
 `);
 
@@ -180,13 +212,12 @@ export const queryAllBlogDataForSearch = defineQuery(`
   }
 `);
 
-export const queryBlogIndexPageBlogsCount = defineQuery(`
-  count(*[_type == "blog" && (seoHideFromLists != true)])
-`);
 export const queryBlogSlugPageData = defineQuery(`
   *[_type == "blog" && slug.current == $slug][0]{
     ...,
     "slug": slug.current,
+    ogTitle,
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     ${blogAuthorFragment},
     ${imageFragment},
     ${richTextFragment},
@@ -196,41 +227,6 @@ export const queryBlogSlugPageData = defineQuery(`
 
 export const queryBlogPaths = defineQuery(`
   *[_type == "blog" && defined(slug.current)].slug.current
-`);
-
-const ogFieldsFragment = /* groq */ `
-  _type,
-  "title": select(
-    defined(ogTitle) => ogTitle,
-    defined(seoTitle) => seoTitle,
-    title
-  ),
-  "seoImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
-  "siteTitle": *[_type == "settings"][0].siteTitle
-`;
-
-export const queryHomePageOGData = defineQuery(`
-  *[_type == "homePage" && _id == $id][0]{
-    ${ogFieldsFragment}
-  }
-  `);
-
-export const querySlugPageOGData = defineQuery(`
-  *[_type == "page" && _id == $id][0]{
-    ${ogFieldsFragment}
-  }
-`);
-
-export const queryBlogPageOGData = defineQuery(`
-  *[_type == "blog" && _id == $id][0]{
-    ${ogFieldsFragment}
-  }
-`);
-
-export const queryGenericPageOGData = defineQuery(`
-  *[ defined(slug.current) && _id == $id][0]{
-    ${ogFieldsFragment}
-  }
 `);
 
 export const queryFooterData = defineQuery(`
@@ -249,6 +245,15 @@ export const queryFooterData = defineQuery(`
           url.type == "external" => url.external,
           url.href
         ),
+      }
+    },
+    copyright,
+    credits[]{
+      _key,
+      label,
+      url,
+      logo {
+        ${imageFields}
       }
     }
   }
@@ -288,15 +293,19 @@ export const queryNavbarData = defineQuery(`
       }
     },
     ${buttonsFragment},
+    gitHubUrl,
   }
 `);
 
+// `seoNoIndex` is excluded here as well as in the page metadata — advertising a
+// URL in the sitemap while its own robots tag says noindex is a contradiction
+// search engines report as an error.
 export const querySitemapData = defineQuery(`{
-  "slugPages": *[_type == "page" && defined(slug.current)]{
+  "slugPages": *[_type == "page" && defined(slug.current) && seoNoIndex != true]{
     "slug": slug.current,
     "lastModified": _updatedAt
   },
-  "blogPages": *[_type == "blog" && defined(slug.current)]{
+  "blogPages": *[_type == "blog" && defined(slug.current) && seoNoIndex != true]{
     "slug": slug.current,
     "lastModified": _updatedAt
   }
@@ -306,16 +315,26 @@ export const queryGlobalSeoSettings = defineQuery(`
     _id,
     _type,
     siteTitle,
-    logo {
-      ${imageFields}
+    logos {
+      logo {
+        ${imageFields}
+      },
+      logoDark {
+        ${imageFields}
+      },
+      footerLogo {
+        ${imageFields}
+      }
     },
+    "ogImage": ogImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     siteDescription,
     socialLinks{
       linkedin,
       facebook,
       twitter,
       instagram,
-      youtube
+      youtube,
+      reddit
     }
   }
 `);
@@ -326,7 +345,7 @@ export const querySettingsData = defineQuery(`
     _type,
     siteTitle,
     siteDescription,
-    "logo": logo.asset->url + "?w=80&h=40&dpr=3&fit=max",
+    "logo": logos.logo.asset->url + "?w=80&h=40&dpr=3&fit=max",
     "socialLinks": socialLinks,
     "contactEmail": contactEmail,
   }

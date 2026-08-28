@@ -15,22 +15,21 @@
     "@sanity/image-url": "^2.1.1",
     "@workspace/env": "workspace:*",
     "@workspace/sanity-blocks": "workspace:*",
-    "next-sanity": "13.0.7",
-    "react-is": "catalog:",
-    "sanity-image": "^1.1.0"
+    "next-sanity": "13.3.3",
+    "react-is": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@workspace/typescript-config": "workspace:*",
-    "next": "16.2.6",
+    "next": "16.3.3",
+    "sanity": "catalog:",
     "typescript": "catalog:"
   },
   "exports": {
     "./client": "./src/client.ts",
     "./query": "./src/query.ts",
     "./live": "./src/live.ts",
-    "./image": "./src/image.ts",
     "./types": "./src/sanity.types.ts"
   }
 }
