@@ -148,10 +148,11 @@ export function PricingTable({
 `../internal/portable-text-to-markdown`.
 
 `MarkdownBlock` in `../internal/markdown.ts` is one wide interface of optional
-fields accumulated across every block, not a per-block type. If the serializer
-reads a field that is not already on it (`items`, `cards`, `logos`, `socials`,
-`testimonial`, …), add that field — and any row type it needs — to
-`MarkdownBlock` in the same edit, or the serializer will not compile:
+fields accumulated across every block, not a per-block type — it already
+carries `items`, `cards`, `logos`, `socials`, `testimonial` and more. If the
+serializer reads a field that is *not* yet there, add it — and any row type it
+needs — to `MarkdownBlock` in the same edit, or the serializer will not
+compile:
 
 ```ts
 import {
