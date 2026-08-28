@@ -36,10 +36,19 @@ dataset, so a public dataset exposes that secret to anyone who can query it.
 pnpm dev                # sanity dev
 pnpm build              # sanity build
 pnpm run deploy         # sanity deploy — note `run`; `pnpm deploy` is a pnpm builtin
+pnpm extract            # sanity schema extract --force -> schema.json
 pnpm type               # sanity typegen generate -> packages/sanity/src/sanity.types.ts
-pnpm extract            # sanity schema extract only
 pnpm sync-thumbnails    # copy block thumbnails into static/thumbnails
 ```
+
+After a schema change run `pnpm extract` **then** `pnpm type`, in that order.
+Typegen reads the committed `schema.json`, not the schema source, so `pnpm type`
+alone regenerates against a stale schema and still reports success — the new
+field or block simply never appears in `sanity.types.ts`.
+
+`extract` carries `--force` because `schema.json` is committed and therefore
+always present, and the CLI refuses to overwrite an existing schema file without
+it. Drop the flag and the script fails with exit 2 every time.
 
 ## Learn more
 
