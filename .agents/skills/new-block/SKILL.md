@@ -177,8 +177,9 @@ and assert primary content appears (see `cta/cta.test.tsx`).
 
 **`<kebab>-markdown.test.ts`** — cover: empty block returns `""`, fields
 serialize joined by blank lines, markdown chars are escaped, and **no HTML/JSX
-leaks** (`expect(result).not.toMatch(/<[A-Za-z]/)`). Mirror
-`cta/cta-markdown.test.ts`.
+leaks** (`expect(result).not.toMatch(/<\/?[A-Za-z]/)` — the `\/?` also catches a
+stray closing tag like `</p>`, which the bare `/<[A-Za-z]/` in the existing
+tests misses). Mirror `cta/cta-markdown.test.ts` for the rest.
 
 ### 2. Register in the package root
 
