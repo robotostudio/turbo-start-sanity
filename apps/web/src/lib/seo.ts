@@ -13,6 +13,7 @@ type SiteConfig = {
   description: string;
   twitterHandle: string;
   keywords: string[];
+  favicon?: string | null;
   ogImage?: string | null;
 };
 
@@ -47,6 +48,7 @@ async function resolveSiteConfig(): Promise<SiteConfig> {
     description: settings?.siteDescription || FALLBACK_SITE_CONFIG.description,
     twitterHandle: twitter ? `@${twitter}` : FALLBACK_SITE_CONFIG.twitterHandle,
     keywords: FALLBACK_SITE_CONFIG.keywords,
+    favicon: settings?.favicon ?? null,
     ogImage: settings?.ogImage ?? null,
   };
 }
@@ -177,11 +179,16 @@ export async function getSEOMetadata(
     metadataBase: new URL(baseUrl),
     creator: siteConfig.title,
     authors: [{ name: siteConfig.title }],
+    // The fallback pair lives in `public/`, not `app/`: a `favicon.ico` under
+    // `app/` is a Next file convention and gets its own <link> injected next to
+    // this one, which can outrank the Sanity icon.
     icons: {
-      icon: [
-        { url: `${baseUrl}/favicon.svg`, type: "image/svg+xml" },
-        { url: `${baseUrl}/favicon.ico`, sizes: "16x16 32x32 48x48" },
-      ],
+      icon: siteConfig.favicon
+        ? [{ url: siteConfig.favicon }]
+        : [
+            { url: `${baseUrl}/favicon.svg`, type: "image/svg+xml" },
+            { url: `${baseUrl}/favicon.ico`, sizes: "16x16 32x32 48x48" },
+          ],
     },
     keywords: allKeywords,
     robots: seoNoIndex ? "noindex, nofollow" : "index, follow",

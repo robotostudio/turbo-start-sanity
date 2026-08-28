@@ -110,6 +110,13 @@ export const settings = defineType({
       ],
     }),
     defineField({
+      name: "favicon",
+      type: "image",
+      title: "Favicon",
+      description:
+        "The small icon shown in browser tabs and bookmarks. Use a square image, at least 48×48.",
+    }),
+    defineField({
       name: "ogImage",
       type: "image",
       title: "Default Social Share Image",
