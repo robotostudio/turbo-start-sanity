@@ -197,8 +197,12 @@ thumbnail.
 After schema changes, regenerate types with:
 
 ```sh
+pnpm --filter studio extract
 pnpm type
 ```
+
+Both, in that order — typegen reads the committed `apps/studio/schema.json`,
+so `pnpm type` alone regenerates a stale schema and still reports success.
 
 Generated types land in `packages/sanity/src/sanity.types.ts`; the frontend
 derives every content type from that file rather than redeclaring shapes. See
