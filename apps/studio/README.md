@@ -37,7 +37,7 @@ pnpm dev                # sanity dev
 pnpm build              # sanity build
 pnpm run deploy         # sanity deploy — note `run`; `pnpm deploy` is a pnpm builtin
 pnpm extract            # sanity schema extract --force -> schema.json
-pnpm type               # sanity typegen generate -> packages/sanity/src/sanity.types.ts
+pnpm type               # typegen generate + biome format -> sanity.types.ts
 pnpm sync-thumbnails    # copy block thumbnails into static/thumbnails
 ```
 
