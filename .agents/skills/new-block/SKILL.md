@@ -27,13 +27,14 @@ Before writing files, establish:
    Reuse shared field helpers from
    `packages/sanity-blocks/src/internal/schema-fields.ts`
    (`buttonsField`, `definePortableTextField`, etc.) before defining new shapes.
-3. **An icon** — every existing block schema imports one from `lucide-react`;
-   `@sanity/icons` also works, but match the neighbours. Whichever you pick,
-   add a matching stub to
-   `packages/sanity-blocks/src/internal/testing/lucide-react.mock.tsx` —
-   `lucide-mock-coverage.test.ts` fails the whole suite on any icon imported
-   under `src/` that has no stub, and an unstubbed icon renders as `undefined`
-   ("Element type is invalid") in every component test.
+3. **An icon** — all ten block schemas import one from `lucide-react`; match
+   them. Then add a matching stub to
+   `packages/sanity-blocks/src/internal/testing/lucide-react.mock.tsx`:
+   `lucide-mock-coverage.test.ts` greps `src/` for `from "lucide-react"` and
+   fails the whole suite on any icon with no stub, and an unstubbed icon
+   renders as `undefined` ("Element type is invalid") in every component test.
+   (`@sanity/icons` is not scanned, so it needs no stub — but it is used for
+   Studio UI, not block schemas.)
 
 Study the closest existing block in `packages/sanity-blocks/src/` (e.g. `cta`
 for text+buttons, `showcase-grid` for card grids, `faq-accordion` for

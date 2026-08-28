@@ -169,7 +169,9 @@ All frontend types derive from generated Sanity types. `apps/web/src/types.ts` e
 
 - Always use `defineType`, `defineField`, `defineArrayMember` from `sanity`
 - Include `description` on every field (written for non-technical users)
-- Icons: prefer `@sanity/icons`, fall back to `lucide-react`
+- Icons: block schemas use `lucide-react` (all ten do) — stub any new one in
+  `sanity-blocks/src/internal/testing/lucide-react.mock.tsx`. `@sanity/icons` is
+  for Studio UI and Portable Text config
 - GROQ: don't expand images unless explicitly needed. Use `defineQuery` from `next-sanity`
 
 ### Frontend
