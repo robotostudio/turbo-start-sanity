@@ -31,9 +31,9 @@ pnpm check-types      # TypeScript type checking
 cd apps/web && pnpm lint
 cd apps/studio && pnpm format
 
-# Sanity type generation (run after schema changes)
-pnpm type             # Generates types — works from root (turbo) or apps/studio
-cd apps/studio && pnpm extract   # Schema extract only (studio-scoped)
+# Sanity type generation (run after schema changes — both, in this order)
+pnpm --filter studio extract   # Refresh the committed apps/studio/schema.json
+pnpm type                      # Generate types from schema.json (root via turbo, or apps/studio)
 
 # Tests
 pnpm test             # Vitest unit tests (currently only @workspace/sanity-blocks)
@@ -65,7 +65,7 @@ packages/
 ### Data Flow: Sanity → Next.js
 
 1. **Schema** block types defined in `packages/sanity-blocks/src/` and re-exported via `@workspace/sanity-blocks`. Studio registers them via `apps/studio/schemaTypes/index.ts`
-2. **Type generation**: `pnpm type` (from repo root via turbo, or in `apps/studio`) generates TS types at `packages/sanity/src/sanity.types.ts`
+2. **Type generation**: `pnpm --filter studio extract` refreshes the committed `apps/studio/schema.json`, then `pnpm type` (repo root via turbo, or in `apps/studio`) generates TS types at `packages/sanity/src/sanity.types.ts`. `pnpm type` alone reads the old `schema.json`, so a new block silently never reaches the generated types
 3. **GROQ queries** live in `packages/sanity/src/query.ts` using `defineQuery` from `next-sanity`, with reusable fragments
 4. **Data fetching** uses `sanityFetch` from `packages/sanity/src/live.ts` (wraps `defineLive` for automatic revalidation)
 5. **Client** configured in `packages/sanity/src/client.ts` with stega for visual editing
@@ -83,8 +83,8 @@ To add a new page builder block:
 
 1. Create `packages/sanity-blocks/src/<new-block>/` with `<new-block>.schema.ts` and `<new-block>.groq.ts`
 2. Export the schema from `packages/sanity-blocks/src/sanity-blocks.ts` and add it to the `blockSchemas` array — Studio then picks it up automatically through `apps/studio/schemaTypes/index.ts` and `definitions/pagebuilder.ts`
-3. Run `pnpm type` (from repo root or `apps/studio`) to regenerate Sanity types
-4. Import the block's GROQ projection in `packages/sanity/src/query.ts` and include it in `pageBuilderFragment`
+3. Import the block's GROQ projection in `packages/sanity/src/query.ts` and include it in `pageBuilderFragment`
+4. Run `pnpm --filter studio extract` then `pnpm type` to regenerate Sanity types — both, in that order
 5. Create the styled component as `packages/sanity-blocks/src/<new-block>/index.tsx`
 6. Register in `renderBlockComponent` in `apps/web/src/components/pagebuilder.tsx` (imported from `@workspace/sanity-blocks/<new-block>/index`)
 7. Add `packages/sanity-blocks/src/<new-block>/markdown.ts` exporting a `<newBlock>ToMarkdown` serializer, then wire it into the `blockToMarkdown` switch in `packages/sanity-blocks/src/internal/page-builder-to-markdown.ts` (a thin dispatcher — the serializers themselves live with their blocks) so the block degrades to semantic Markdown. Reuse `headingToMarkdown` from `internal/markdown.ts` and `portableTextToMarkdown` from `internal/portable-text-to-markdown.ts`, and add a test asserting no JSX leaks. Without this, the new block renders blank in `.md` output
