@@ -57,22 +57,22 @@ export function FeatureCardsWithIcon({
 }: Readonly<FeatureCardsIconProps>) {
   return (
     <section className="block-section" id="features">
-      <div className="mx-auto w-full max-w-6xl px-[var(--container-px,0.5rem)]">
+      <div className="container">
         <BlockHeader eyebrow={eyebrow} title={title}>
           <RichText
             className="body-text max-w-xl text-muted-foreground"
             richText={richText}
           />
         </BlockHeader>
-      </div>
-      <div className="mt-12 bg-grid-dots p-[var(--container-px,0.5rem)] text-zinc-800 md:mt-16 lg:p-[42px] dark:text-zinc-50 [background-size:7px_7px]">
-        <div className="grid gap-[var(--container-px,0.5rem)] lg:grid-cols-3 lg:gap-0">
-          {cards?.map((card, index) => (
-            <FeatureCardItem
-              card={card}
-              key={card._key ?? `FeatureCard-${index}`}
-            />
-          ))}
+        <div className="bleed-x mt-12 bg-grid-dots p-[var(--container-px,0.5rem)] text-zinc-800 md:mt-16 lg:p-[42px] dark:text-zinc-50 [background-size:7px_7px]">
+          <div className="grid gap-[var(--container-px,0.5rem)] lg:grid-cols-3 lg:gap-0">
+            {cards?.map((card, index) => (
+              <FeatureCardItem
+                card={card}
+                key={card._key ?? `FeatureCard-${index}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

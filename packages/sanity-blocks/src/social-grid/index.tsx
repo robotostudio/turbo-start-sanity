@@ -137,7 +137,7 @@ export function SocialGrid({
 
   return (
     <section className="block-section" id="socials">
-      <div className="mx-auto w-full max-w-6xl px-[var(--container-px,0.5rem)]">
+      <div className="container">
         <BlockHeader eyebrow={eyebrow} title={title}>
           {subtitle ? (
             <p className="body-text max-w-xl text-muted-foreground">
@@ -145,11 +145,11 @@ export function SocialGrid({
             </p>
           ) : null}
         </BlockHeader>
-      </div>
-      <div className="mt-12 grid grid-cols-1 bg-grid-dots bg-background bg-size-[5.7px_6px] text-zinc-800 sm:grid-cols-2 md:mt-16 lg:grid-cols-4 dark:text-zinc-50">
-        {socials.map((social) => (
-          <SocialCard key={social._key} social={social} />
-        ))}
+        <div className="bleed-x mt-12 grid grid-cols-1 bg-grid-dots bg-background bg-size-[5.7px_6px] text-zinc-800 sm:grid-cols-2 md:mt-16 lg:grid-cols-4 dark:text-zinc-50">
+          {socials.map((social) => (
+            <SocialCard key={social._key} social={social} />
+          ))}
+        </div>
       </div>
     </section>
   );
