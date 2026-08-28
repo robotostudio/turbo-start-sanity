@@ -1,6 +1,6 @@
 ---
 name: new-block
-description: Scaffold a new page builder block for Turbo Start Sanity end-to-end — Sanity schema, GROQ projection, styled React component, Markdown serializer, tests, and all registrations. Use when asked to add, create, or scaffold a new page builder block, section, or content module (e.g. "add a testimonials block", "create a logo cloud section", "/new-block stats").
+description: Scaffold a new page builder block for Turbo Start Sanity end-to-end — Sanity schema, GROQ projection, styled React component, Markdown serializer, tests, and all registrations. Use when asked to add, create, or scaffold a new page builder block, section, or content module (e.g. "add a testimonials block", "create a pricing table section", "/new-block stats").
 ---
 
 # New Page Builder Block
@@ -18,16 +18,25 @@ is automatic once the schema joins `blockSchemas`.
 Before writing files, establish:
 
 1. **Block name** — two forms, used consistently everywhere:
-   - `camelCase` schema type name, e.g. `logoCloud` (matches `_type`)
-   - `kebab-case` directory/file name, e.g. `logo-cloud`
+   - `camelCase` schema type name, e.g. `pricingTable` (matches `_type`)
+   - `kebab-case` directory/file name, e.g. `pricing-table`
+
+   Check `blockSchemas` in `packages/sanity-blocks/src/sanity-blocks.ts`
+   first — if the name is taken you are editing a block, not adding one.
 2. **Fields** — what content editors manage. If the request doesn't say, ask.
    Reuse shared field helpers from
    `packages/sanity-blocks/src/internal/schema-fields.ts`
    (`buttonsField`, `definePortableTextField`, etc.) before defining new shapes.
-3. **An icon** — prefer `@sanity/icons`, fall back to `lucide-react`.
+3. **An icon** — every existing block schema imports one from `lucide-react`;
+   `@sanity/icons` also works, but match the neighbours. Whichever you pick,
+   add a matching stub to
+   `packages/sanity-blocks/src/internal/testing/lucide-react.mock.tsx` —
+   `lucide-mock-coverage.test.ts` fails the whole suite on any icon imported
+   under `src/` that has no stub, and an unstubbed icon renders as `undefined`
+   ("Element type is invalid") in every component test.
 
 Study the closest existing block in `packages/sanity-blocks/src/` (e.g. `cta`
-for text+buttons, `image-link-cards` for card grids, `faq-accordion` for
+for text+buttons, `showcase-grid` for card grids, `faq-accordion` for
 nested arrays) and mirror its structure and idioms.
 
 ## Steps
@@ -42,13 +51,13 @@ Work through all steps in order — a block missing any registration renders as
 **`<kebab>.schema.ts`** — the Sanity schema:
 
 ```ts
-import { StarIcon } from "@sanity/icons";
+import { Table } from "lucide-react";
 import { defineField, defineType } from "sanity";
 
-export const logoCloudSchema = defineType({
-  name: "logoCloud",
+export const pricingTableSchema = defineType({
+  name: "pricingTable",
   type: "object",
-  icon: StarIcon,
+  icon: Table,
   fields: [
     defineField({
       name: "title",
@@ -63,7 +72,7 @@ export const logoCloudSchema = defineType({
     select: { title: "title" },
     prepare: ({ title }) => ({
       title,
-      subtitle: "Logo Cloud",
+      subtitle: "Pricing Table",
     }),
   },
 });
@@ -77,8 +86,8 @@ expanded fields:
 ```ts
 import { buttonsFragment, richTextFragment } from "../internal/groq-fragments";
 
-export const logoCloudGroqProjection = /* groq */ `
-  _type == "logoCloud" => {
+export const pricingTableGroqProjection = /* groq */ `
+  _type == "pricingTable" => {
     ...,
     ${richTextFragment},
     ${buttonsFragment},
@@ -91,25 +100,30 @@ export const logoCloudGroqProjection = /* groq */ `
 optional/nullable — the web app asserts the generated query type onto it, so
 looser is safer. Conventions: wrap in `<section>` with its own
 `<div className="container">` rail, prefer `grid` over `flex` unless two
-siblings, use `SanityImage` / `SanityButtons` / `RichText` from
-`../internal/*`:
+siblings, use `SanityImage` / `SanityButtons` / `RichText` / `BlockEyebrow`
+from `../internal/*`, and give the `<section>` the shared `block-section`
+class every existing block uses:
 
 ```tsx
+import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 
-export interface LogoCloudBlockProps {
+export interface PricingTableProps {
+  eyebrow?: string | null;
   richText?: RichTextValue;
   title?: string | null;
 }
 
-export function LogoCloudBlock({
+export function PricingTable({
+  eyebrow,
   title,
   richText,
-}: Readonly<LogoCloudBlockProps>) {
+}: Readonly<PricingTableProps>) {
   return (
-    <section className="my-6 md:my-16" id="logo-cloud">
+    <section className="block-section" id="pricing-table">
       <div className="container">
+        <BlockEyebrow eyebrow={eyebrow} />
         <h2 className="text-balance font-semibold text-3xl md:text-5xl">
           {title}
         </h2>
@@ -123,7 +137,13 @@ export function LogoCloudBlock({
 **`markdown.ts`** — the Markdown serializer, composing helpers from
 `../internal/markdown` (`headingToMarkdown`, `eyebrowToMarkdown`,
 `buttonsToMarkdown`, `joinSections`) and
-`../internal/portable-text-to-markdown`:
+`../internal/portable-text-to-markdown`.
+
+`MarkdownBlock` in `../internal/markdown.ts` is one wide interface of optional
+fields accumulated across every block, not a per-block type. If the serializer
+reads a field that is not already on it (`items`, `cards`, `logos`, `socials`,
+`testimonial`, …), add that field — and any row type it needs — to
+`MarkdownBlock` in the same edit, or the serializer will not compile:
 
 ```ts
 import {
@@ -134,7 +154,7 @@ import {
 } from "../internal/markdown";
 import { portableTextToMarkdown } from "../internal/portable-text-to-markdown";
 
-export function logoCloudToMarkdown(
+export function pricingTableToMarkdown(
   block: MarkdownBlock,
   options: MarkdownOptions
 ): string {
@@ -148,10 +168,10 @@ export function logoCloudToMarkdown(
 **`<kebab>.test.tsx`** — render the component with `renderToStaticMarkup`
 and assert primary content appears (see `cta/cta.test.tsx`).
 
-**`<kebab>-markdown.test.tsx`** — cover: empty block returns `""`, fields
+**`<kebab>-markdown.test.ts`** — cover: empty block returns `""`, fields
 serialize joined by blank lines, markdown chars are escaped, and **no HTML/JSX
 leaks** (`expect(result).not.toMatch(/<[A-Za-z]/)`). Mirror
-`cta/cta-markdown.test.tsx`.
+`cta/cta-markdown.test.ts`.
 
 ### 2. Register in the package root
 
@@ -172,10 +192,19 @@ and add it to `pageBuilderFragment` alongside the existing projections.
 ### 4. Regenerate Sanity types
 
 ```bash
-pnpm type   # from repo root (turbo) or apps/studio
+pnpm --filter studio exec sanity schema extract --force
+pnpm type
 ```
 
-This updates `packages/sanity/src/sanity.types.ts`; the web app's
+Both commands are required, in that order. `pnpm type` runs
+`sanity typegen generate`, which reads the **committed**
+`apps/studio/schema.json` — it does not look at the schema source. Only
+`sanity schema extract` refreshes that file, and without `--force` it refuses
+to overwrite the existing one. Run `pnpm type` alone and the generated types
+silently keep the old schema, leaving `PagebuilderType<"<camel>">` unresolvable
+in step 5 (never paper over that with a cast — it means extract didn't run).
+
+Together they update `packages/sanity/src/sanity.types.ts`; the web app's
 `PagebuilderType<"<camel>">` in `apps/web/src/types.ts` picks the new block up
 automatically — never hand-write Sanity shapes.
 
@@ -186,8 +215,8 @@ In `apps/web/src/components/pagebuilder.tsx`: import the component from
 `renderBlockComponent`:
 
 ```tsx
-case "logoCloud":
-  return <LogoCloudBlock {...(block as PagebuilderType<"logoCloud">)} />;
+case "pricingTable":
+  return <PricingTable {...(block as PagebuilderType<"pricingTable">)} />;
 ```
 
 ### 6. Register the Markdown serializer
@@ -202,28 +231,43 @@ content negotiation (`/page.md`, `Accept: text/markdown`).
 The page builder insert menu looks for
 `apps/studio/static/thumbnails/preview-<kebab>.png`, synced at install time
 from `packages/sanity-blocks/src/<kebab>/thumbnail.png` by
-`pnpm --filter studio sync-thumbnails`. Generate one with the
-`generate-thumbnails-agentic` skill if available, or note in the PR that the
-thumbnail is pending — the block works without it; the menu tile just has no
-preview image.
+`pnpm --filter studio sync-thumbnails`. Generate one if you have a thumbnail
+skill available (this repo ships none), or note in the PR that the thumbnail is
+pending — the block works without it; the menu tile just has no preview image.
 
 ### 8. Verify
 
 ```bash
 pnpm --filter @workspace/sanity-blocks test   # component + markdown tests
-pnpm check-types                              # fails if a registration is missing
+pnpm check-types
 pnpm format                                   # Biome, auto-fix
 pnpm lint
 ```
+
+`check-types` does **not** catch a missing registration. Both switches —
+`renderBlockComponent` and `blockToMarkdown` — end in a `default` arm with no
+`never` exhaustiveness guard, so a missing `case` type-checks clean and only
+shows up at runtime as the "Component not found for block type" placeholder, or
+as a blank section in `.md` output. Grep for the two `case` arms instead:
+
+```bash
+grep -rn 'case "<camel>":' apps/web/src/components/pagebuilder.tsx \
+  packages/sanity-blocks/src/internal/page-builder-to-markdown.ts
+```
+
+One hit per file. Fewer means a registration is missing.
 
 ## Checklist
 
 - [ ] `packages/sanity-blocks/src/<kebab>/` — schema, groq, index.tsx, markdown.ts, two test files
 - [ ] Every schema field has a `description`
+- [ ] Schema icon stubbed in `internal/testing/lucide-react.mock.tsx`
 - [ ] Exported + appended to `blockSchemas` in `sanity-blocks.ts`
 - [ ] Projection added to `pageBuilderFragment` in `packages/sanity/src/query.ts`
-- [ ] `pnpm type` run — generated types include the block
+- [ ] `sanity schema extract --force` **then** `pnpm type` — types include the block
 - [ ] `case` added in `renderBlockComponent` (`apps/web/src/components/pagebuilder.tsx`)
 - [ ] `case` added in `blockToMarkdown` (`internal/page-builder-to-markdown.ts`)
+- [ ] Any new field the serializer reads added to `MarkdownBlock`
 - [ ] Thumbnail added or flagged as pending
+- [ ] Both `case` arms grepped for — `check-types` will not flag a missing one
 - [ ] Tests, `check-types`, and lint pass
