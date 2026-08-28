@@ -45,7 +45,6 @@ import { pageBuilderToMarkdown } from "@workspace/sanity-blocks/internal/page-bu
 
 ```sh
 pnpm --filter @workspace/sanity-blocks test
-pnpm --filter @workspace/sanity-blocks test:coverage
 ```
 
 Vitest stubs `@workspace/env/client`, `lucide-react`, and `next/link`, so the

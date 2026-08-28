@@ -9,8 +9,7 @@
     "format:check": "biome format .",
     "lint": "biome lint .",
     "sync-thumbnails": "node --experimental-strip-types scripts/sync-thumbnails.ts",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test": "vitest run"
   },
   "peerDependencies": {
     "next": ">=16",
