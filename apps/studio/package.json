@@ -13,7 +13,7 @@
     "format": "biome format --write .",
     "format:check": "biome format .",
     "deploy-graphql": "sanity graphql deploy",
-    "extract": "sanity schema extract",
+    "extract": "sanity schema extract --force",
     "check-types": "tsc --noEmit",
     "type": "sanity typegen generate",
     "sync-thumbnails": "node --experimental-strip-types ../../packages/sanity-blocks/scripts/sync-thumbnails.ts --target-root ../../apps/studio/static/thumbnails --file-prefix preview-",
