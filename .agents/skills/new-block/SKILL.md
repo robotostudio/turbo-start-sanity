@@ -101,8 +101,9 @@ optional/nullable — the web app asserts the generated query type onto it, so
 looser is safer. Conventions: wrap in `<section>` with its own
 `<div className="container">` rail, prefer `grid` over `flex` unless two
 siblings, use `SanityImage` / `SanityButtons` / `RichText` / `BlockEyebrow`
-from `../internal/*`, and give the `<section>` the shared `block-section`
-class every existing block uses.
+from `@workspace/sanity-blocks/internal/*`, and give the `<section>` the shared
+`block-section` class (`hero` and `logo-cloud` are the two that opt out, both
+with their own full-bleed layout).
 
 The hardcoded `id` is the repo-wide convention (`id="cta"`, `id="faq"`,
 `id="showcase"`, …) and doubles as the in-page anchor. It assumes one instance
