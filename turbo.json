@@ -1,6 +1,12 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  // Gitignored, so `$TURBO_DEFAULT$` (git-tracked files) would not hash them
+  // and every task could replay a stale pass after a schema change.
+  "globalDependencies": [
+    "apps/studio/schema.json",
+    "packages/sanity/src/sanity.types.ts"
+  ],
   "globalEnv": [
     "NEXT_PUBLIC_SANITY_PROJECT_ID",
     "NEXT_PUBLIC_SANITY_DATASET",

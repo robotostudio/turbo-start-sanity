@@ -15,9 +15,9 @@
     "deploy-graphql": "sanity graphql deploy",
     "extract": "sanity schema extract --force",
     "check-types": "tsc --noEmit",
-    "type": "sanity typegen generate && biome format --write ../../packages/sanity/src/sanity.types.ts",
+    "type": "sanity typegen generate",
     "sync-thumbnails": "node --experimental-strip-types ../../packages/sanity-blocks/scripts/sync-thumbnails.ts --target-root ../../apps/studio/static/thumbnails --file-prefix preview-",
-    "postinstall": "sanity exec scripts/cli-alert-for-data.ts && pnpm sync-thumbnails"
+    "postinstall": "sanity exec scripts/cli-alert-for-data.ts && pnpm sync-thumbnails && pnpm extract && pnpm type"
   },
   "keywords": [
     "sanity"

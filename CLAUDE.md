@@ -32,7 +32,7 @@ cd apps/web && pnpm lint
 cd apps/studio && pnpm format
 
 # Sanity type generation (run after schema changes — both, in this order)
-pnpm --filter studio extract   # Refresh the committed apps/studio/schema.json
+pnpm --filter studio extract   # Refresh apps/studio/schema.json
 pnpm type                      # Generate types from schema.json (root via turbo, or apps/studio)
 
 # Tests
@@ -65,7 +65,9 @@ packages/
 ### Data Flow: Sanity → Next.js
 
 1. **Schema** block types defined in `packages/sanity-blocks/src/` and re-exported via `@workspace/sanity-blocks`. Studio registers them via `apps/studio/schemaTypes/index.ts`
-2. **Type generation**: `pnpm --filter studio extract` refreshes the committed `apps/studio/schema.json`, then `pnpm type` (repo root via turbo, or in `apps/studio`) generates TS types at `packages/sanity/src/sanity.types.ts`. `pnpm type` alone reads the old `schema.json`, so a new block silently never reaches the generated types
+2. **Type generation**: `pnpm --filter studio extract` refreshes `apps/studio/schema.json`, then `pnpm type` (repo root via turbo, or in `apps/studio`) generates TS types at `packages/sanity/src/sanity.types.ts`. `pnpm type` alone reads the old `schema.json`, so a new block silently never reaches the generated types.
+
+   Both files are **gitignored** — they are build output, not source. The studio's `postinstall` regenerates them, so a fresh `pnpm install` produces both; CI regenerates them explicitly because it installs with `--ignore-scripts`. Regenerating after a schema change is still manual (the two commands above), but nothing needs committing afterwards. `turbo.json` lists both under `globalDependencies` so tasks re-run when they change — without that, gitignored files fall out of `$TURBO_DEFAULT$` and `check-types` can replay a stale pass. If you ever see `TS2307: Cannot find module '@workspace/sanity/types'`, they were never generated: run `pnpm install` or the two commands above.
 3. **GROQ queries** live in `packages/sanity/src/query.ts` using `defineQuery` from `next-sanity`, with reusable fragments
 4. **Data fetching** uses `sanityFetch` from `packages/sanity/src/live.ts` (wraps `defineLive` for automatic revalidation)
 5. **Client** configured in `packages/sanity/src/client.ts` with stega for visual editing

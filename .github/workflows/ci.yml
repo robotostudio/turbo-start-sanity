@@ -37,6 +37,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts
 
+      # `--ignore-scripts` skips the postinstall that generates these gitignored
+      # files; without it, Type Check fails on a missing `@workspace/sanity/types`.
+      - name: Generate Sanity schema and types
+        run: pnpm --filter studio extract && pnpm --filter studio type
+
       - name: Cache Turbo
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:

@@ -30,6 +30,10 @@ build
 dist
 next-env.d.ts
 
+# Rebuilt by the studio's postinstall: `pnpm extract && pnpm type`
+apps/studio/schema.json
+packages/sanity/src/sanity.types.ts
+
 
 # Debug
 npm-debug.log*
