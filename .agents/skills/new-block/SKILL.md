@@ -241,9 +241,9 @@ content negotiation (`/page.md`, `Accept: text/markdown`).
 The page builder insert menu looks for
 `apps/studio/static/thumbnails/preview-<kebab>.png`, synced at install time
 from `packages/sanity-blocks/src/<kebab>/thumbnail.png` by
-`pnpm --filter studio sync-thumbnails`. Generate one if you have a thumbnail
-skill available (this repo ships none), or note in the PR that the thumbnail is
-pending — the block works without it; the menu tile just has no preview image.
+`pnpm --filter studio sync-thumbnails`. The `generate-thumbnails-agentic` skill
+does this, or note in the PR that the thumbnail is pending — the block works
+without it; the menu tile just has no preview image.
 
 ### 8. Verify
 
