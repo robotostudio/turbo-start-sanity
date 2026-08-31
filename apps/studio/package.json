@@ -30,6 +30,7 @@
     "@sanity/orderable-document-list": "^2.0.22",
     "@sanity/ui": "^3.5.3",
     "@sanity/vision": "^6.11.0",
+    "@workspace/env": "workspace:*",
     "@workspace/logger": "workspace:*",
     "@workspace/sanity-blocks": "workspace:*",
     "dotenv": "^17.4.2",
