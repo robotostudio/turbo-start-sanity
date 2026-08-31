@@ -3473,7 +3473,13 @@ export type QueryBlogIndexPageResult = {
         slug: string | null;
         orderRank: string | null;
         category:
-          "aeo" | "changelog" | "nextjs" | "sanity" | "seo" | "skills" | null;
+          | "aeo"
+          | "changelog"
+          | "nextjs"
+          | "sanity"
+          | "seo"
+          | "skills"
+          | null;
         image: {
           id: string | null;
           preview: string | null;
@@ -3520,7 +3526,13 @@ export type QueryBlogIndexPageResult = {
     slug: string | null;
     orderRank: string | null;
     category:
-      "aeo" | "changelog" | "nextjs" | "sanity" | "seo" | "skills" | null;
+      | "aeo"
+      | "changelog"
+      | "nextjs"
+      | "sanity"
+      | "seo"
+      | "skills"
+      | null;
     image: {
       id: string | null;
       preview: string | null;

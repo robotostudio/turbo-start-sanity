@@ -39,7 +39,7 @@ const env = createEnv({
     NEXT_PUBLIC_SANITY_DATASET: z.string().min(1),
     NEXT_PUBLIC_SANITY_API_VERSION: z.preprocess(
       (value) => (value === "" ? undefined : value),
-      z.string().min(1).optional(),
+      z.string().min(1).optional()
     ),
     NEXT_PUBLIC_SANITY_STUDIO_URL: z.url().min(1),
   },
