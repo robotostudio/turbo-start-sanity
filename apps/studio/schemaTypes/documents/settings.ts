@@ -114,7 +114,22 @@ export const settings = defineType({
       type: "image",
       title: "Favicon",
       description:
-        "The small icon shown in browser tabs and bookmarks. Use a square image, at least 48×48.",
+        "The small icon shown in browser tabs and bookmarks. SVG or ICO only — use a square image, at least 48×48.",
+      // `accept` only filters the picker — drag-drop and the media library
+      // bypass it, so the validation below is the real enforcement. The
+      // extension is the last segment of the ref (…-<width>x<height>-<ext>).
+      options: { accept: "image/svg+xml,image/vnd.microsoft.icon,.ico" },
+      validation: (rule) =>
+        rule.custom((value) => {
+          const ref = (value as { asset?: { _ref?: string } })?.asset?._ref;
+          if (!ref) {
+            return true;
+          }
+          const extension = ref.split("-").pop();
+          return extension === "svg" || extension === "ico"
+            ? true
+            : "The favicon must be an SVG or ICO file";
+        }),
     }),
     defineField({
       name: "ogImage",
