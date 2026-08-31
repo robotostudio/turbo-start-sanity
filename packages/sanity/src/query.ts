@@ -326,6 +326,10 @@ export const queryGlobalSeoSettings = defineQuery(`
         ${imageFields}
       }
     },
+    favicon {
+      "svg": svg.asset->url,
+      "ico": ico.asset->url
+    },
     "ogImage": ogImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
     siteDescription,
     socialLinks{

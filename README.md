@@ -42,8 +42,8 @@ packages/
 
 ## Requirements
 
-- Node.js `>=22.12`
-- pnpm `10.32.1` — pinned via `packageManager`, so the simplest setup is
+- Node.js `>=24`
+- pnpm `11.24.0` — pinned via `packageManager`, so the simplest setup is
   `corepack enable` and letting Corepack install the right version
 - A free [Sanity](https://www.sanity.io/) account
 
@@ -197,8 +197,12 @@ thumbnail.
 After schema changes, regenerate types with:
 
 ```sh
+pnpm --filter studio extract
 pnpm type
 ```
+
+Both, in that order — typegen reads the committed `apps/studio/schema.json`,
+so `pnpm type` alone regenerates a stale schema and still reports success.
 
 Generated types land in `packages/sanity/src/sanity.types.ts`; the frontend
 derives every content type from that file rather than redeclaring shapes. See

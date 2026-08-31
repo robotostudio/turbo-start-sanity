@@ -50,20 +50,23 @@ test.each([
       title: null,
     },
   ],
-])("VideoFeature keeps the copy but drops the video with %s", (_label, asset) => {
-  const html = render({
-    caption: "Recorded live",
-    eyebrow: "Watch",
-    title: "The tour",
-    video: { asset },
-  });
+])(
+  "VideoFeature keeps the copy but drops the video with %s",
+  (_label, asset) => {
+    const html = render({
+      caption: "Recorded live",
+      eyebrow: "Watch",
+      title: "The tour",
+      video: { asset },
+    });
 
-  expect(html).toMatch(/Watch/);
-  expect(html).toMatch(/The tour/);
-  expect(html).toMatch(/Recorded live/);
-  expect(html).not.toMatch(/Play video/);
-  expect(html).not.toMatch(/image\.mux\.com/);
-});
+    expect(html).toMatch(/Watch/);
+    expect(html).toMatch(/The tour/);
+    expect(html).toMatch(/Recorded live/);
+    expect(html).not.toMatch(/Play video/);
+    expect(html).not.toMatch(/image\.mux\.com/);
+  }
+);
 
 test("VideoFeature posters from the editor's chosen frame", () => {
   const html = render({

@@ -1,22 +1,21 @@
 import { BlockHeader } from "@workspace/sanity-blocks/internal/block-header";
 import {
+  FacebookIcon,
+  GithubIcon,
+  InstagramBrandIcon,
+  LinkedinBrandIcon,
   RedditBrandIcon,
+  SlackIcon,
   XLogoIcon,
+  YoutubeIcon,
 } from "@workspace/sanity-blocks/internal/icons";
 import { sanitizeHref } from "@workspace/sanity-blocks/internal/safe-href";
 import {
   SanityImage,
   type SanityImageData,
 } from "@workspace/sanity-blocks/internal/sanity-image";
-import {
-  ArrowRight,
-  Facebook,
-  Github,
-  Instagram,
-  Linkedin,
-  Slack,
-  Youtube,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { stegaClean } from "next-sanity";
 import Link from "next/link";
 import type { ComponentType } from "react";
 
@@ -41,21 +40,27 @@ type IconProps = Readonly<{ className?: string }>;
 const PLATFORM_ICONS: Record<string, ComponentType<IconProps>> = {
   reddit: RedditBrandIcon,
   x: XLogoIcon,
-  youtube: Youtube,
-  github: Github,
-  linkedin: Linkedin,
-  facebook: Facebook,
-  instagram: Instagram,
-  slack: Slack,
+  youtube: YoutubeIcon,
+  github: GithubIcon,
+  linkedin: LinkedinBrandIcon,
+  facebook: FacebookIcon,
+  instagram: InstagramBrandIcon,
+  slack: SlackIcon,
 };
 
 function SocialCard({ social }: Readonly<{ social: SocialGridItem }>) {
   const { platform, label, logo, openInNewTab } = social;
   const href = sanitizeHref(social.href);
-  const Icon = platform ? PLATFORM_ICONS[platform] : undefined;
+  // stegaClean: `platform` is not on the default stega denylist, so in
+  // Presentation the raw value carries invisible characters and the lookup
+  // misses — no icons in preview, icons in production.
+  const key = stegaClean(platform);
+  const Icon = key ? PLATFORM_ICONS[key] : undefined;
   const displayLabel = label ?? platform ?? "";
 
-  const iconMedia = Icon ? <Icon className="h-[42px] w-auto" /> : null;
+  const iconMedia = Icon ? (
+    <Icon className="h-[42px] w-auto fill-current" />
+  ) : null;
   const media = logo?.id ? (
     <span className="flex h-[42px] shrink-0 items-center justify-center">
       <SanityImage
@@ -132,7 +137,7 @@ export function SocialGrid({
 
   return (
     <section className="block-section" id="socials">
-      <div className="mx-auto w-full max-w-6xl px-[var(--container-px,0.5rem)]">
+      <div className="container">
         <BlockHeader eyebrow={eyebrow} title={title}>
           {subtitle ? (
             <p className="body-text max-w-xl text-muted-foreground">
@@ -140,11 +145,11 @@ export function SocialGrid({
             </p>
           ) : null}
         </BlockHeader>
-      </div>
-      <div className="mt-12 grid grid-cols-1 bg-grid-dots bg-background bg-size-[5.7px_6px] text-zinc-800 sm:grid-cols-2 md:mt-16 lg:grid-cols-4 dark:text-zinc-50">
-        {socials.map((social) => (
-          <SocialCard key={social._key} social={social} />
-        ))}
+        <div className="bleed-x mt-12 grid grid-cols-1 bg-grid-dots bg-background bg-size-[5.7px_6px] text-zinc-800 sm:grid-cols-2 md:mt-16 lg:grid-cols-4 dark:text-zinc-50">
+          {socials.map((social) => (
+            <SocialCard key={social._key} social={social} />
+          ))}
+        </div>
       </div>
     </section>
   );

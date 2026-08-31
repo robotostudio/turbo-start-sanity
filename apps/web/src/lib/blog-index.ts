@@ -1,5 +1,6 @@
 import { type DynamicFetchOptions, sanityFetch } from "@workspace/sanity/live";
 import { queryBlogIndexPage } from "@workspace/sanity/query";
+import type { QueryBlogIndexPageResult } from "@workspace/sanity/types";
 
 import { getBlogPaginationRange } from "@/utils";
 
@@ -32,7 +33,10 @@ export async function fetchBlogIndexPage({
   category,
   perspective,
   stega,
-}: { currentPage: number; category: string } & DynamicFetchOptions) {
+}: {
+  currentPage: number;
+  category: string;
+} & DynamicFetchOptions): Promise<QueryBlogIndexPageResult> {
   "use cache";
   const { start, end } = getBlogPaginationRange(currentPage);
   const { data } = await sanityFetch({

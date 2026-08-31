@@ -56,8 +56,5 @@ export default defineConfig({
     environment: "node",
     globals: true,
     include: ["src/**/*.test.{ts,tsx}"],
-    coverage: {
-      reporter: ["text", "lcov", "clover"],
-    },
   },
 });

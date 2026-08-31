@@ -17,7 +17,7 @@ cp apps/studio/.env.example apps/studio/.env
 pnpm dev
 ```
 
-Node `>=22.12` and the pinned pnpm version from `packageManager` are required.
+Node `>=24` and the pinned pnpm version from `packageManager` are required.
 
 ## How to submit a change
 
