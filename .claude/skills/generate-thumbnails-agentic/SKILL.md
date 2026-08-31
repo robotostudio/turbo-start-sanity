@@ -79,8 +79,13 @@ entry maps to a directory `packages/sanity-blocks/src/<kebab>/` containing
 For each block, record:
 
 - the **directory name** (this is the output filename)
-- the schema `name` (matches the block folder once kebab-cased)
-- which fields are images or video, from `<kebab>.schema.ts`
+- the **exported component name** — not derivable from the folder (`cta` →
+  `CTABlock`, `feature-cards-icon` → `FeatureCardsWithIcon`, `hero` →
+  `HeroBlock`). Copy the import block at the top of
+  `apps/web/src/components/pagebuilder.tsx`; it already imports all ten with the
+  right specifiers.
+- which fields carry images or video — read this from `<kebab>.groq.ts`, not the
+  schema. The projection is what the component actually receives (see Step 2).
 
 ## Step 2: Read the components and their GROQ
 
@@ -97,6 +102,8 @@ Images are the trap. Components take `SanityImageData` from
 
 ```typescript
 image: {
+  // a REAL asset id from Step 3 — this placeholder fails the regex below
+  // and renders blank, which is the very failure this gate is about
   id: "image-<hash>-1200x800-jpg",   // asset._ref, flattened to a string
   alt: "Placeholder image",
   preview: null,                      // lqip, optional
@@ -106,8 +113,13 @@ image: {
 ```
 
 A raw `{ _type: "image", asset: { _type: "reference", _ref } }` renders
-**nothing** — `resolveAssetId` rejects it. Same for video: read the
-`muxVideoFields` fragment, don't invent the shape.
+**nothing** — `resolveAssetId` rejects it. What passes is an `id` matching
+`/^image-[a-zA-Z0-9]+-\d+x\d+-\w+$/`, in
+`packages/sanity-blocks/src/internal/sanity-image.tsx`. A leading `drafts.` is
+stripped, so draft asset ids are safe.
+
+Same for video: read the `muxVideoFields` fragment, don't invent the shape —
+and note the hero does not take a plain video (Step 4).
 </HARD-GATE>
 
 ## Step 3: Get image asset ids
@@ -123,10 +135,15 @@ DATASET=$NEXT_PUBLIC_SANITY_DATASET
 
 curl -s -G "https://$PROJECT_ID.api.sanity.io/v2024-01-01/data/query/$DATASET" \
   -H "Authorization: Bearer $SANITY_API_READ_TOKEN" \
-  --data-urlencode 'query=*[_type == "sanity.imageAsset"][0...20]{ _id, originalFilename, metadata { dimensions } }'
+  --data-urlencode 'query=*[_type == "sanity.imageAsset" && !(_id in path("drafts.**"))][0...20]{ _id, originalFilename, metadata { dimensions } }'
 ```
 
-Ask for 10–20, not 5 — you want options.
+Ask for 10–20, not 5 — you want options. The `drafts.**` exclusion matters:
+`_id` sorts `drafts.*` ahead of `image-*`, so without it the first ten rows are
+draft assets.
+
+Every shell here is a fresh one — **re-run the `source` line in each command
+block**, or `$PROJECT_ID` is empty and the URL silently malforms.
 
 <HARD-GATE>
 **Look at the candidates before picking.** The first landscape asset in a dataset
@@ -134,18 +151,23 @@ is often a partner or competitor logo, or a branded marketing graphic. Pick it
 blind and that logo ends up across every hero tile in Studio. (This has
 happened.)
 
+**This one is a template, not copy-pasteable** — substitute `{hash}`, `{w}`,
+`{h}` and `{ext}` from the asset's `_id`. Note the `-f`: without it a wrong
+substitution exits 0 and writes an 87-byte JSON error you will mistake for an
+image.
+
 ```bash
-# extension must match the _id suffix, or the CDN returns a JSON error
-curl -s -o /tmp/preview-{hash}.{ext} \
-  "https://cdn.sanity.io/images/$PROJECT_ID/$DATASET/{hash}-{w}x{h}.{ext}?w=400"
+curl -fsS -o "/tmp/preview-<hash>.<ext>" \
+  "https://cdn.sanity.io/images/$PROJECT_ID/$DATASET/<hash>-<w>x<h>.<ext>?w=400"
 ```
 
-`Read` each file to actually see it. Reject anything carrying a third-party mark.
+`Read` each file to actually see it. Reject anything carrying a third-party mark
+— **except for the logo blocks**: `logo-cloud` and `cta.usedByTeams` exist to
+show third-party logos, so real brand marks are the correct content there.
 </HARD-GATE>
 
 Pick 5–8 varied subjects and spread them across blocks deliberately — one image
-repeated down the whole grid is a red flag. `apps/web/public/` is worth a look
-too for intended background textures.
+repeated down the whole grid is a red flag.
 
 **3b. Only if the dataset has none**, upload placeholders — and **ask first**,
 it writes to their dataset:
@@ -191,14 +213,29 @@ Mock data rules:
 - **Rich text** is Portable Text, never a plain string:
   `[{ _type: "block", _key: "k1", style: "normal", markDefs: [], children: [{ _type: "span", _key: "s1", text: "…", marks: [] }] }]`
 - **Images** use the flattened shape from Step 2's gate.
-- **Every array item** needs a unique `_key`. It does **not** need `_type` —
-  these components take plain typed interfaces (`FeatureCard`, `LogoCloudLogo`,
-  `ShowcaseGridItem`), not discriminated unions. `FaqItem` is the one that wants
-  an `_id` instead. Read the interface; don't assume.
-- **Video blocks**: pass a `playbackId` for a public Mux asset, or accept that
-  the block renders its copy with no video (both `video-feature` and `hero`
-  handle a missing video deliberately — see CLAUDE.md → Video).
-- `as any` / `@ts-expect-error` is fine here; the page is deleted in Step 7.
+- **No array item needs `_type`** — these are plain typed interfaces
+  (`FeatureCard`, `LogoCloudLogo`, `ShowcaseGridItem`), not discriminated
+  unions. Give every item a unique `_key` anyway (required on
+  `ShowcaseGridItem` and `LogoCloudLogo`, optional on the rest), and note
+  `FaqItem` needs a required `_id` **as well as** its optional `_key`.
+- **`video-feature`** takes `video: { asset: { playbackId, policy: "public",
+  status: "ready", … } }`, or renders its copy with no video.
+- **The hero is different, and getting it wrong blanks the most prominent tile.**
+  `video` is not a video — it is a light/dark **variant** object, each variant
+  carrying `mediaType` plus a poster or a Mux/webm source (`hero/hero-video.tsx`,
+  `HeroVideoData`). With no poster and no Mux still it renders **nothing**, so a
+  full-viewport blank. Give both variants a poster:
+
+  ```tsx
+  video={{
+    light: { mediaType: "sanity", poster: img(POSTER_ID, "…") },
+    dark:  { mediaType: "sanity", poster: img(POSTER_ID, "…") },
+  }}
+  ```
+- **Don't reach for `as any` or `@ts-expect-error`.** The page type-checks clean
+  if you read the interfaces, and silencing the checker hides exactly the shape
+  mistakes Step 2 warns about — wrong image shape, `FaqItem` missing `_id` —
+  which fail by rendering blank, not by erroring.
 - Don't put a background colour on the wrappers — it adds noise to every tile.
 
 ## Step 5: Screenshot each block
@@ -212,15 +249,35 @@ Use the Playwright MCP tools in sequence:
 <HARD-GATE>
 **Pin the colour scheme; never inherit the browser's default.** A fresh
 Playwright Chromium has no dark preference, so this site renders **light**,
-while a normal dev session renders dark. The captures and the padding in Step 6
-must agree, and the tiles should match what editors see in Studio. Choose one
-and set it explicitly (`browser_emulate_media` with `colorScheme`, or an
-`prefers-color-scheme` override), then pad to match in Step 6.
+while a normal dev session renders dark. Captures and Step 6's padding must
+agree, and the tiles should match what editors see in Studio.
+
+There is **no `browser_emulate_media` tool**, and media emulation alone is not
+enough here: the site runs next-themes with `attribute="class"` and
+`defaultTheme="system"` (`apps/web/src/components/providers.tsx`), so the theme
+is a class on `<html>` backed by localStorage. Media emulation only wins when no
+theme is stored.
+
+The reliable route is to set it directly, then reload:
+
+```js
+browser_evaluate: () => {
+  localStorage.setItem("theme", "light");   // or "dark"
+  location.reload();
+}
+```
+
+Then pad to match in Step 6.
 </HARD-GATE>
 
 <HARD-GATE>
-**Hide the layout chrome before capturing.** `apps/web/src/app/layout.tsx` wraps
-this page in the real site, and its `header` is `position: sticky; z-index: 40`.
+**Hide the layout chrome before capturing.** The real site wraps this page: a
+`header` from `apps/web/src/components/navbar.tsx` (`z-40`, `lg:sticky` — sticky
+at the 1440px viewport used here) and a `footer` from `components/footer.tsx`.
+
+The hero also draws **its own** `lg:fixed` strip, `#hero-fold`
+(`hero/index.tsx`), which stitches into tall captures exactly like the header
+does and is not matched by the chrome selector.
 
 Easy to miss, because it only affects some blocks: one *shorter* than the
 viewport captures clean, since the header sits outside the element bounds. One
@@ -233,13 +290,13 @@ Inject once after navigating, and again after any reload:
 ```js
 browser_evaluate: () => {
   const s = document.createElement("style");
-  s.textContent = "header,footer,nextjs-portal{display:none !important}";
+  s.textContent =
+    "header,footer,nextjs-portal,#hero-fold{display:none !important}";
   document.head.appendChild(s);
 }
 ```
 
-The `footer` (~690px) and the Next dev indicator (`nextjs-portal`) go the same
-way.
+`nextjs-portal` is the Next dev indicator.
 </HARD-GATE>
 
 Then, for each block:
@@ -248,16 +305,29 @@ Then, for each block:
   they are `loading="lazy"`)
 - wait for that block's images to actually decode, rather than guessing a delay:
 
-  ```js
-  browser_evaluate: (sel) =>
-    [...document.querySelectorAll(`${sel} img`)]
-      .every((i) => i.complete && i.naturalWidth > 0)
   ```
+  browser_evaluate:
+    target:   [data-block="<kebab>"]
+    element:  "the <kebab> block"
+    function: (element) => [...element.querySelectorAll("img")]
+                             .every((i) => i.complete && i.naturalWidth > 0)
+  ```
+
+  The one-argument form receives the **resolved element** named by `target` —
+  you cannot pass it a selector string, so query relative to `element` rather
+  than reaching for `document`.
 
   Poll it, and stop with an error if it hasn't settled in a few seconds — a
   block that never loads should fail loudly, not screenshot blank.
-- `browser_take_screenshot` of **that element**, saved as
-  `/tmp/thumbnails/<kebab>-raw.png`
+- `browser_take_screenshot` scoped to **that element** — pass the selector as
+  `target` (it accepts a snapshot ref *or* a unique selector) plus a human
+  `element` description, and `filename` `<kebab>-raw.png`. Do not set
+  `fullPage`; it cannot combine with an element screenshot.
+
+**`filename` is relative to the MCP server's own output directory**
+(`.playwright-mcp/`), not to `/tmp`. Note where the tool reports it wrote each
+file, and move them into `/tmp/thumbnails/` before Step 6 — otherwise Step 6's
+glob matches nothing.
 
 **Sanity-check the captures before processing.** A mean-luminance read spots an
 empty one faster than opening ten files:
@@ -303,10 +373,14 @@ Two shapes need checking afterwards:
 - **Blocks much taller than 3:2** (`showcase-grid`, `video-feature`, `hero` run
   1000–1400px) lose their lower half to the crop — the hero's headline can end
   mid-word. Usually fine; the tile only has to be recognisable.
-- **Thin strips** (`logo-cloud` is ~72px) become a band floating in padding.
-  Centre the pad instead of cropping from the top.
+- **Thin strips** (`logo-cloud` is ~72px) become a band floating in centred
+  padding — the command already centres it. Accept it, or capture that block
+  with some surrounding space.
 
-sharp equivalent, if ffmpeg isn't around:
+sharp equivalent, if ffmpeg isn't around. **`require('sharp')` fails from the
+repo root** — it exists only transitively under `node_modules/.pnpm/`, so this
+needs an install first, and unlike the ffmpeg version it is not wired into a
+loop:
 
 ```bash
 node -e "
@@ -364,7 +438,7 @@ files and their synced copies under `apps/studio/static/thumbnails/`.
 | **Layout chrome baked into tall tiles** | **The sticky `header` (z-40) stitches into the middle of any block taller than the viewport — hide `header,footer,nextjs-portal` first** |
 | **Screenshotting before scrolling** | **Images are `loading="lazy"` — a block only loads its images once scrolled into view** |
 | **Hardcoding the pad colour** | **Pad with the captured theme's background, or the tile gets a glaring band** |
-| Missing `_key` on mock array items | `_key` is required; `_type` is not — these are plain interfaces, not discriminated unions (`FaqItem` wants `_id`) |
+| Missing `_key` on mock array items | No item needs `_type`. `_key` is required on `ShowcaseGridItem`/`LogoCloudLogo`, optional elsewhere; `FaqItem` also needs a required `_id` |
 | Rich text as a plain string | Portable Text block format only |
 | Going through `PageBuilder` | Import block components directly — `PageBuilder` needs Visual Editing context |
 | Grabbing the first landscape asset | View candidates first — it's often a partner logo |
