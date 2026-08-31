@@ -111,25 +111,53 @@ export const settings = defineType({
     }),
     defineField({
       name: "favicon",
-      type: "image",
+      type: "object",
       title: "Favicon",
-      description:
-        "The small icon shown in browser tabs and bookmarks. SVG or ICO only — use a square image, at least 48×48.",
-      // `accept` only filters the picker — drag-drop and the media library
-      // bypass it, so the validation below is the real enforcement. The
-      // extension is the last segment of the ref (…-<width>x<height>-<ext>).
-      options: { accept: "image/svg+xml,image/vnd.microsoft.icon,.ico" },
-      validation: (rule) =>
-        rule.custom((value) => {
-          const ref = (value as { asset?: { _ref?: string } })?.asset?._ref;
-          if (!ref) {
-            return true;
-          }
-          const extension = ref.split("-").pop();
-          return extension === "svg" || extension === "ico"
-            ? true
-            : "The favicon must be an SVG or ICO file";
+      description: "The small icon shown in browser tabs and bookmarks.",
+      options: { collapsible: true, collapsed: false },
+      fields: [
+        defineField({
+          name: "svg",
+          type: "image",
+          title: "SVG",
+          description:
+            "Stays sharp at every size and can adapt to dark mode. Chrome, Firefox and Edge use this; Safari ignores it.",
+          // `accept` only filters the picker — drag-drop and the media library
+          // bypass it, so the validation is the real enforcement. An asset ref
+          // ends in its extension (image-<hash>-<width>x<height>-<ext>).
+          options: { accept: "image/svg+xml" },
+          validation: (rule) =>
+            rule.custom((value) => {
+              const ref = (value as { asset?: { _ref?: string } })?.asset?._ref;
+              if (!ref) {
+                return true;
+              }
+              return ref.split("-").pop() === "svg"
+                ? true
+                : "Must be an SVG file";
+            }),
         }),
+        defineField({
+          name: "ico",
+          // A file, not an image: Sanity's image pipeline rejects ICO outright,
+          // so an image field could never hold one.
+          type: "file",
+          title: "ICO",
+          description:
+            "The universal fallback every browser reads, Safari included. Should hold 16, 32 and 48px icons.",
+          options: { accept: "image/vnd.microsoft.icon,.ico" },
+          validation: (rule) =>
+            rule.custom((value) => {
+              const ref = (value as { asset?: { _ref?: string } })?.asset?._ref;
+              if (!ref) {
+                return true;
+              }
+              return ref.split("-").pop() === "ico"
+                ? true
+                : "Must be an ICO file";
+            }),
+        }),
+      ],
     }),
     defineField({
       name: "ogImage",
