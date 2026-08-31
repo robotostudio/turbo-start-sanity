@@ -113,8 +113,25 @@ export const settings = defineType({
       name: "favicon",
       type: "object",
       title: "Favicon",
-      description: "The small icon shown in browser tabs and bookmarks.",
+      description:
+        "The small icon shown in browser tabs and bookmarks. Add both formats or neither — each browser reads only one of them.",
       options: { collapsible: true, collapsed: false },
+      // Both or neither: a browser that can't read the format you uploaded
+      // keeps the built-in icon, so the site shows two different favicons.
+      validation: (rule) =>
+        rule.custom((value) => {
+          const favicon = value as
+            | { svg?: { asset?: unknown }; ico?: { asset?: unknown } }
+            | undefined;
+          const hasSvg = Boolean(favicon?.svg?.asset);
+          const hasIco = Boolean(favicon?.ico?.asset);
+          if (hasSvg === hasIco) {
+            return true;
+          }
+          return hasSvg
+            ? "Add an ICO too — Safari cannot render an SVG favicon and would keep the built-in one"
+            : "Add an SVG too — every other browser prefers it and would keep the built-in one";
+        }),
       fields: [
         defineField({
           name: "svg",
@@ -122,9 +139,8 @@ export const settings = defineType({
           title: "SVG",
           description:
             "Stays sharp at every size and can adapt to dark mode. Chrome, Firefox and Edge use this; Safari ignores it.",
-          // `accept` only filters the picker — drag-drop and the media library
-          // bypass it, so the validation is the real enforcement. An asset ref
-          // ends in its extension (image-<hash>-<width>x<height>-<ext>).
+          // `accept` only filters the picker; drag-drop and the media library
+          // bypass it, so validation is the enforcement. Refs end in `-<ext>`.
           options: { accept: "image/svg+xml" },
           validation: (rule) =>
             rule.custom((value) => {

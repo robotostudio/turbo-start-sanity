@@ -167,21 +167,18 @@ export async function getSEOMetadata(
       ? defaultTitle
       : `${defaultTitle} / ${siteConfig.title}`;
 
-  // SVG first so browsers that render it win the pick; Safari skips it on the
-  // declared type and takes the ICO.
-  const faviconIcons: { url: string; type?: string; sizes?: string }[] = [];
-  if (siteConfig.favicon?.svg) {
-    faviconIcons.push({
-      url: siteConfig.favicon.svg,
+  // SVG first so browsers that support it take it. Each slot falls back
+  // separately: an SVG-only setting must still emit the ICO for Safari.
+  const faviconIcons = [
+    {
+      url: siteConfig.favicon?.svg ?? `${baseUrl}/favicon.svg`,
       type: "image/svg+xml",
-    });
-  }
-  if (siteConfig.favicon?.ico) {
-    faviconIcons.push({
-      url: siteConfig.favicon.ico,
+    },
+    {
+      url: siteConfig.favicon?.ico ?? `${baseUrl}/favicon.ico`,
       sizes: "16x16 32x32 48x48",
-    });
-  }
+    },
+  ];
 
   const markdownUrl =
     slug && slug !== "/" ? `${pageUrl}.md` : `${baseUrl}/index.md`;
@@ -198,15 +195,7 @@ export async function getSEOMetadata(
     // The fallback pair lives in `public/`, not `app/`: a `favicon.ico` under
     // `app/` is a Next file convention and gets its own <link> injected next to
     // this one, which can outrank the Sanity icon.
-    icons: {
-      icon:
-        faviconIcons.length > 0
-          ? faviconIcons
-          : [
-              { url: `${baseUrl}/favicon.svg`, type: "image/svg+xml" },
-              { url: `${baseUrl}/favicon.ico`, sizes: "16x16 32x32 48x48" },
-            ],
-    },
+    icons: { icon: faviconIcons },
     keywords: allKeywords,
     robots: seoNoIndex ? "noindex, nofollow" : "index, follow",
     twitter: {
