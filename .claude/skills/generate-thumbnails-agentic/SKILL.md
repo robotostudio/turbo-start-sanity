@@ -67,7 +67,10 @@ the schema name and appends `.png`:
 
 4. **Sanity credentials**, to look at dataset images:
    `NEXT_PUBLIC_SANITY_PROJECT_ID` / `NEXT_PUBLIC_SANITY_DATASET` and
-   `SANITY_API_READ_TOKEN` from `apps/web/.env.local` (or `.env`).
+   `SANITY_API_READ_TOKEN`, from `apps/web/.env.local` (or `.env`).
+   Step 3b additionally needs `SANITY_API_WRITE_TOKEN` — check it is non-empty
+   before uploading, or the POST goes out with an empty bearer and fails
+   confusingly.
 
 ## Step 1: Discover the blocks
 
@@ -129,7 +132,9 @@ Blocks with image fields need a real asset id or they screenshot blank.
 **3a. Use what's already in the dataset.** Query it:
 
 ```bash
-set -a; source apps/web/.env.local; set +a
+ENV_FILE=$(ls apps/web/.env.local apps/web/.env 2>/dev/null | head -1)
+[ -n "$ENV_FILE" ] || { echo "no apps/web/.env.local or .env"; exit 1; }
+set -a; source "$ENV_FILE"; set +a
 PROJECT_ID=$NEXT_PUBLIC_SANITY_PROJECT_ID
 DATASET=$NEXT_PUBLIC_SANITY_DATASET
 
@@ -173,6 +178,7 @@ repeated down the whole grid is a red flag.
 it writes to their dataset:
 
 ```bash
+[ -n "$SANITY_API_WRITE_TOKEN" ] || { echo "SANITY_API_WRITE_TOKEN unset"; exit 1; }
 curl -L -o /tmp/placeholder-landscape.jpg "https://picsum.photos/seed/thumb-land/1600/1200"
 
 curl -s -X POST "https://$PROJECT_ID.api.sanity.io/v2024-01-01/assets/images/$DATASET" \
@@ -309,15 +315,26 @@ Then, for each block:
   browser_evaluate:
     target:   [data-block="<kebab>"]
     element:  "the <kebab> block"
-    function: (element) => [...element.querySelectorAll("img")]
-                             .every((i) => i.complete && i.naturalWidth > 0)
+    function: (element) => {
+                const imgs = [...element.querySelectorAll("img")];
+                return {
+                  total: imgs.length,
+                  loaded: imgs.filter((i) => i.complete && i.naturalWidth > 0).length,
+                };
+              }
   ```
 
   The one-argument form receives the **resolved element** named by `target` —
   you cannot pass it a selector string, so query relative to `element` rather
   than reaching for `document`.
 
-  Poll it, and stop with an error if it hasn't settled in a few seconds — a
+  It returns counts, not a boolean, because `.every()` is **true for a block
+  with no images at all** — which is exactly the blank capture you are trying to
+  catch. Compare `total` against the images your mock gave that block: equal and
+  fully `loaded` means go; `total: 0` on a block you gave images to means the id
+  was rejected (Step 2's gate), not that it is ready.
+
+  Poll until `loaded === total`, and stop with an error after a few seconds — a
   block that never loads should fail loudly, not screenshot blank.
 - `browser_take_screenshot` scoped to **that element** — pass the selector as
   `target` (it accepts a snapshot ref *or* a unique selector) plus a human
@@ -359,14 +376,19 @@ band across it. Read it rather than assuming:
 `browser_evaluate: () => getComputedStyle(document.body).backgroundColor`.
 
 ```bash
-PAD=white     # must match the colour scheme pinned in Step 5
+export PAD=white   # must match Step 5's colour scheme; exported so sharp sees it too
 for f in /tmp/thumbnails/*-raw.png; do
   name=$(basename "$f" -raw.png)
+  out="packages/sanity-blocks/src/${name}/thumbnail.png"
   ffmpeg -y -loglevel error -i "$f" \
     -vf "scale=1200:-1:flags=lanczos,crop=1200:min(ih\,800):0:0,pad=1200:800:0:(oh-ih)/2:$PAD" \
-    "packages/sanity-blocks/src/${name}/thumbnail.png"
+    "$out" || { echo "convert failed: $name"; exit 1; }
+  [ -s "$out" ] || { echo "no output: $out"; exit 1; }
 done
 ```
+
+Stop on the first failure rather than pressing on — `sync-thumbnails` copies
+whatever is on disk, so a half-finished run silently republishes stale tiles.
 
 Two shapes need checking afterwards:
 
@@ -383,19 +405,23 @@ needs an install first, and unlike the ffmpeg version it is not wired into a
 loop:
 
 ```bash
-node -e "
+export PAD=white
+for f in /tmp/thumbnails/*-raw.png; do
+  name=$(basename "$f" -raw.png)
+  IN="$f" OUT="packages/sanity-blocks/src/${name}/thumbnail.png" node -e "
 const sharp = require('sharp');
-const PAD = process.env.PAD || 'white';   // same value as the ffmpeg pipeline
+const PAD = process.env.PAD || 'white';
 (async () => {
-  const buf = await sharp('input.png').resize(1200, null).toBuffer();
+  const buf = await sharp(process.env.IN).resize(1200, null).toBuffer();
   const { height } = await sharp(buf).metadata();
   const top = Math.floor((800 - height) / 2);
   const pipeline = height >= 800
     ? sharp(buf).extract({ left: 0, top: 0, width: 1200, height: 800 })
     : sharp(buf).extend({ top, bottom: 800 - height - top, background: PAD });
-  await pipeline.png().toFile('output.png');
+  await pipeline.png().toFile(process.env.OUT);
 })();
-"
+" || { echo "convert failed: $name"; exit 1; }
+done
 ```
 
 Then sync and check the Studio menu:
