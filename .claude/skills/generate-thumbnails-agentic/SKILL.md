@@ -335,16 +335,34 @@ Then, for each block:
   was rejected (Step 2's gate), not that it is ready.
 
   Poll until `loaded === total`, and stop with an error after a few seconds — a
-  block that never loads should fail loudly, not screenshot blank.
+  block that never loads should fail loudly, not screenshot blank. This is not
+  theoretical: on a real run `showcase-grid` reported `{total: 6, loaded: 2}`
+  immediately after the page settled.
 - `browser_take_screenshot` scoped to **that element** — pass the selector as
   `target` (it accepts a snapshot ref *or* a unique selector) plus a human
-  `element` description, and `filename` `<kebab>-raw.png`. Do not set
-  `fullPage`; it cannot combine with an element screenshot.
+  `element` description, and `filename`
+  `.playwright-mcp/<kebab>-raw.png`. Do not set `fullPage`; it cannot combine
+  with an element screenshot.
 
-**`filename` is relative to the MCP server's own output directory**
-(`.playwright-mcp/`), not to `/tmp`. Note where the tool reports it wrote each
-file, and move them into `/tmp/thumbnails/` before Step 6 — otherwise Step 6's
-glob matches nothing.
+<HARD-GATE>
+**Always prefix `filename` with `.playwright-mcp/`.** The server sandboxes
+writes to two roots — its working directory (the repo root) and
+`.playwright-mcp/` under it:
+
+- a bare `<kebab>-raw.png` writes to the **repo root**, dropping ten untracked
+  PNGs next to `package.json`. Verified: it reports success and litters the repo.
+- an absolute path outside those roots is **rejected**:
+  `File access denied: … is outside allowed roots`. `/tmp/thumbnails/…` does
+  not work.
+- `.playwright-mcp/<kebab>-raw.png` is accepted and is already gitignored-by-
+  cleanup in Step 7.
+</HARD-GATE>
+
+Then move them where Step 6 expects:
+
+```bash
+mkdir -p /tmp/thumbnails && mv .playwright-mcp/*-raw.png /tmp/thumbnails/
+```
 
 **Sanity-check the captures before processing.** A mean-luminance read spots an
 empty one faster than opening ten files:
