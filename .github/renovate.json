@@ -1,0 +1,30 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Sanity ecosystem presets, then Roboto policy LAST so it wins - preset packageRules are appended in order and the last matching rule sets each option.",
+  "extends": [
+    "github>sanity-io/renovate-config",
+    "github>sanity-io/renovate-config:automerge",
+    "local>robotostudio/.github"
+  ],
+  "ignorePresets": [
+    "github>sanity-io/renovate-config:schedule",
+    "github>sanity-io/renovate-config:lock-file-maintenance"
+  ],
+  "packageRules": [
+    {
+      "description": "The Studio is held on the @sanity/ui v3 / @sanity/icons v3 line by sanity-plugin-lucide-icon-picker: 1.0.3 is its last release, and it imports Popover/Menu from the @sanity/ui root and TrashIcon/SyncIcon/EllipsisHorizontalIcon from the @sanity/icons root - all moved to subpaths in @sanity/ui v4 / @sanity/icons v4, so `sanity build` fails with MISSING_EXPORT the moment either crosses. Capped rather than disabled so fixes inside v3 still land. Crossing means replacing that plugin; lift both caps together when it happens.",
+      "matchPackageNames": [
+        "@sanity/ui",
+        "@sanity/icons"
+      ],
+      "allowedVersions": "<4"
+    },
+    {
+      "description": "Held at 7 to match the catalog: next-sanity 13 imports `unstable__adapter`, which @sanity/client 8 removed, and next build dies loading next.config.ts. Lift when next-sanity ships a v8-compatible release.",
+      "matchPackageNames": [
+        "@sanity/client"
+      ],
+      "allowedVersions": "<8"
+    }
+  ]
+}

@@ -1,154 +1,449 @@
 # Turbo Start Sanity
 
-![Turbo Start Sanity](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/tasteful-safe-option-og.png)
+Turbo Start Sanity is an open-source Sanity template built as a `pnpm`
+monorepo with Turborepo, a Next.js 16 frontend, and a Sanity Studio 6
+workspace.
 
-## A bare-metal, nitro-fuelled Sanity template welded in the garage of Roboto Studio. Ready to rip with pagebuilders, hyper-optimised SEO, and a need for speed.
+It is designed for teams that want a production-ready page-builder starter with
+visual editing, shared packages, and a clear split between the web app and the
+CMS.
 
-![Engine Divider](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/engine-divider.png)
+![Turbo Start Sanity](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/assets/og-image.png)
 
-## Features
+## What is included
 
-### Monorepo Structure
+- `apps/web`: Next.js 16 App Router frontend with React 19, Tailwind CSS v4,
+  Visual Editing, SEO routes, and Playwright smoke tests
+- `apps/studio`: Sanity Studio 6 workspace with page, blog, FAQ, redirect, and
+  singleton schemas
+- `packages/sanity-blocks`: shared page-builder block schemas, GROQ fragments,
+  React renderers, Markdown serializers, and tests
+- `packages/sanity`: shared Sanity client, live query helpers, GROQ queries,
+  the `urlFor` image URL helper, and the generated Sanity types
+- `packages/ui`, `packages/tailwind-config`, `packages/env`,
+  `packages/logger`, `packages/typescript-config`: shared workspace packages for
+  UI, styling, env validation, logging, and TypeScript config
 
-- Apps: web (Next.js frontend) and studio (Sanity Studio)
-- Shared packages: UI components, TypeScript config, environment utilities, logger
-- Turborepo for build orchestration and caching
+## Repo layout
 
-### Frontend (Web)
+```txt
+apps/
+  studio/   Sanity Studio
+  web/      Next.js frontend
+packages/
+  env/
+  logger/
+  sanity/
+  sanity-blocks/
+  tailwind-config/
+  typescript-config/
+  ui/
+```
 
-- Next.js App Router with TypeScript
-- Shadcn UI components with Tailwind CSS
-- Server Components and Server Actions
-- SEO optimization with metadata
-- Blog system with rich text editor
-- Table of contents generation
-- Responsive layouts
+## Requirements
 
-### Content Management (Studio)
+- Node.js `>=24`
+- pnpm `11.24.0` — pinned via `packageManager`, so the simplest setup is
+  `corepack enable` and letting Corepack install the right version
+- A free [Sanity](https://www.sanity.io/) account
 
-- Sanity Studio v5
-- Custom document types (Blog, FAQ, Pages)
-- Visual editing integration
-- Structured content with schemas
-- Live preview capabilities
-- Asset management
+## Getting started
 
-## Getting Started
+There is no zero-config run: the web app validates its environment (and reads
+redirects from Sanity) at startup, so you need a Sanity project and API tokens
+before `pnpm dev` will boot. Steps 1–5 below take about five minutes.
 
-### Installing the template
+### 1. Get the code
 
-#### 1. Initialize template with Sanity CLI
+Either scaffold a fresh project — this also creates a Sanity project and fills
+in the Studio env for you:
 
-Run the command in your Terminal to initialize this template on your local computer.
-
-See the documentation if you are [having issues with the CLI](https://www.sanity.io/help/cli-errors).
-
-```shell
+```sh
 npm create sanity@latest -- --template robotostudio/turbo-start-sanity
 ```
 
-#### 2. Run Studio and Next.js app locally
+…or clone the repository directly:
 
-Navigate to the template directory using `cd <your app name>`, and start the development servers by running the following command
-
-```shell
-pnpm run dev
+```sh
+git clone https://github.com/robotostudio/turbo-start-sanity.git
+cd turbo-start-sanity
+corepack enable
+pnpm install
 ```
 
-#### 3. Open the app and sign in to the Studio
+### 2. Create a Sanity project
 
-Open the Next.js app running locally in your browser on [http://localhost:3000](http://localhost:3000).
+If you used `npm create sanity@latest` above, the project already exists — skip
+to step 3 below. Steps 3–5 are still required either way: the scaffold does not
+create API tokens or CORS origins, and the web app will not boot without them.
 
-Open the Studio running locally in your browser on [http://localhost:3333](http://localhost:3333). You should now see a screen prompting you to log in to the Studio. Use the same service (Google, GitHub, or email) that you used when you logged in to the CLI.
+1. Go to [sanity.io/manage](https://www.sanity.io/manage) and create a project.
+2. Note the **Project ID** and the **dataset** name (`production` by default).
+3. Under **API > Tokens**, create a token with the **Viewer** role. This is your
+   `SANITY_API_READ_TOKEN`, used for drafts, live preview, and Visual Editing.
+4. Create a second token with the **Editor** role for `SANITY_API_WRITE_TOKEN`.
+5. Under **API > CORS origins**, add `http://localhost:3000` with
+   **Allow credentials** enabled.
 
-### Adding content with Sanity
+### 3. Configure environment variables
 
-#### 1. Publish your first document
+Copy the example env files:
 
-The template comes pre-defined with a schema containing `Author`, `Blog`, `BlogIndex`, `FAQ`, `Footer`, `HomePage`, `Navbar`, `Page`, and `Settings` document types.
+```sh
+cp apps/web/.env.example apps/web/.env
+cp apps/studio/.env.example apps/studio/.env
+```
 
-From the Studio, click "+ Create" and select the `Blog` document type. Go ahead and create and publish the document.
+`apps/web/.env` — validated by `@workspace/env`, so the app refuses to start if
+a required value is missing:
 
-Your content should now appear in your Next.js app ([http://localhost:3000](http://localhost:3000)) as well as in the Studio on the "Presentation" Tab
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `NEXT_PUBLIC_SANITY_PROJECT_ID` | yes | From sanity.io/manage |
+| `NEXT_PUBLIC_SANITY_DATASET` | yes | Usually `production` |
+| `NEXT_PUBLIC_SANITY_API_VERSION` | yes | Pre-filled with a valid date |
+| `NEXT_PUBLIC_SANITY_STUDIO_URL` | yes | `http://localhost:3333` locally |
+| `SANITY_API_READ_TOKEN` | yes | Viewer token — drafts, live preview, Visual Editing |
+| `SANITY_API_WRITE_TOKEN` | yes | Editor token. Validation requires it even though no runtime code reads it yet, so it must be set for `pnpm dev` and `pnpm build` to start |
+| `SANITY_REVALIDATE_SECRET` | no | Shared secret for the `/api/revalidate-sync-tags` webhook. The route rejects all requests while unset |
 
-#### 2. Sample Content
+`apps/studio/.env` — read via plain `process.env`, no schema validation:
 
-When you initialize the template using the Sanity CLI, sample content is not automatically imported into your project. However, you can import it after the init is done. This data includes example blog posts, authors, and other content types to help you get started quickly (see next step).
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `SANITY_STUDIO_PROJECT_ID` | yes | Same project ID as the web app |
+| `SANITY_STUDIO_DATASET` | yes | Same dataset as the web app |
+| `SANITY_STUDIO_TITLE` | no | Studio display name |
+| `SANITY_STUDIO_API_VERSION` | no | Defaults to `2025-05-08` |
+| `SANITY_STUDIO_PRESENTATION_URL` | non-dev | The deployed web URL. Only `NODE_ENV=development` gets the `http://localhost:3000` default; anything else (production, `test`, unset) throws when this is missing |
+| `SANITY_STUDIO_APP_ID` | no | Empty until your first `sanity deploy` returns one — see [Deploying](#sanity-studio) |
+| `NEXT_PUBLIC_SITE_URL` | no | Used by the `invalidate-tags` Sanity Function, not by the Studio UI |
+| `SANITY_REVALIDATE_SECRET` | no | Same — must match the web app's value for cache invalidation to work |
 
-#### 3. Seed data using script
+Notes:
 
-To add sample data programmatically, run the following command:
+- Video is hosted on **Mux**, not stored in Sanity. There is no env var for it:
+  the first time an editor uploads a video, the Studio asks for a Mux Access
+  Token ID and Secret Key, and stores both in the dataset as `secrets.mux`.
+  Give that token only the Mux Video read and write scopes — on a public dataset it is readable by anyone who can
+  query the dataset. Nothing else in the template needs a Mux account until
+  then.
+- Local development defaults are `http://localhost:3000` for the web app and
+  `http://localhost:3333` for Studio.
+- On Vercel, framework environment variables such as
+  `NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL` are auto-injected and used for
+  absolute URLs in features like `llms.txt` and Markdown output.
+- The `.env.example` files inside `packages/*` exist for template validation.
+  Only `apps/web` and `apps/studio` need env files to run the project.
 
-```shell
+### 4. Load the sample content
+
+The template ships with seed data so the site is not blank on first run
+(`pnpm install` prints this reminder too):
+
+```sh
 cd apps/studio
-npx sanity dataset import ./seed-data.tar.gz production --replace
+npx sanity dataset import seed-data.tar.gz production --replace
 ```
 
-This command imports seed content into your Sanity dataset.
+Replace `production` with your dataset name if it differs. `--replace`
+overwrites documents that already have the same `_id`.
 
-#### 4. Extending the Sanity schema
+### 5. Start the apps
 
-The schemas for all document types are defined in the `studio/schemaTypes/documents` directory. You can [add more document types](https://www.sanity.io/docs/schema-types) to the schema to suit your needs.
-
-### Deploying your application and inviting editors
-
-#### 1. Deploy Sanity Studio
-
-Your Next.js frontend (`/web`) and Sanity Studio (`/studio`) are still only running on your local computer. It's time to deploy and get it into the hands of other content editors.
-
-> **⚠️ Important**: When initializing the template with the Sanity CLI, the `.github` folder may not be included or might be renamed to `github` (without the dot). If you don't see a `.github` folder in your project root, you'll need to manually create it and copy the GitHub Actions workflows from the [template repository](https://github.com/robotostudio/turbo-start-sanity/tree/main/.github) for the deployment automation to work.
-
-The template includes a GitHub Actions workflow [`deploy-sanity.yml`](https://raw.githubusercontent.com/robotostudio/turbo-start-sanity/main/.github/workflows/deploy-sanity.yml) that automatically deploys your Sanity Studio whenever changes are pushed to the `studio` directory.
-
-> **Note**: To use the GitHub Actions workflow, make sure to configure the following secrets in your repository settings:
->
-> - `SANITY_DEPLOY_TOKEN`
-> - `SANITY_STUDIO_PROJECT_ID`
-> - `SANITY_STUDIO_DATASET`
-> - `SANITY_STUDIO_TITLE`
-> - `SANITY_STUDIO_PRESENTATION_URL`
-> - `SANITY_STUDIO_PRODUCTION_HOSTNAME`
-
-Set `SANITY_STUDIO_PRODUCTION_HOSTNAME` to whatever you want your deployed Sanity Studio hostname to be. Eg. for `SANITY_STUDIO_PRODUCTION_HOSTNAME=my-cool-project` you'll get a studio URL of `https://my-cool-project.sanity.studio` (and `<my-branch-name>-my-cool-project.sanity.studio` for PR previews builds done automatically via the `deploy-sanity.yml` github CI workflow when you open a PR.)
-
-Set `SANITY_STUDIO_PRESENTATION_URL` to your web app front-end URL (from the Vercel deployment). This URL is required for production deployments and should be:
-
-- Set in your GitHub repository secrets for CI/CD deployments
-- Set in your local environment if deploying manually with `npx sanity deploy`
-- Not needed for local development, where preview will automatically use `http://localhost:3000`
-
-You can then manually deploy from your Studio directory (`/studio`) using:
-
-```shell
-npx sanity deploy
+```sh
+pnpm dev
 ```
 
-**Note**: To use the live preview feature, your browser needs to enable third party cookies.
+Then open:
 
-#### 2. Deploy Next.js app to Vercel
+- Web: `http://localhost:3000`
+- Studio: `http://localhost:3333`
 
-You have the freedom to deploy your Next.js app to your hosting provider of choice. With Vercel and GitHub being a popular choice, we'll cover the basics of that approach.
+## Useful commands
 
-1. Create a GitHub repository from this project. [Learn more](https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/adding-locally-hosted-code-to-github).
-2. Create a new Vercel project and connect it to your Github repository.
-3. Set the `Root Directory` to your Next.js app (`/apps/web`).
-4. Configure your Environment Variables.
+```sh
+pnpm dev              # Run all dev tasks through Turbo
+pnpm dev:web          # Next.js only
+pnpm dev:studio       # Sanity Studio only
 
-#### 3. Configure CORS Origins
+pnpm build            # Build all packages
+pnpm build:web        # Build the web app
+pnpm build:studio     # Build Studio
 
-Your production URLs must be added to your Sanity project's CORS origins, otherwise the frontend will be blocked from fetching content.
+pnpm lint             # Biome lint across the workspace
+pnpm format           # Biome format across the workspace
+pnpm format:check     # Check formatting without writing
+pnpm check-types      # TypeScript checks across the workspace
+pnpm type             # Run Sanity type generation tasks
 
-1. Go to [Sanity Manage](https://www.sanity.io/manage), select your project, and navigate to **API** > **CORS origins**.
-2. Add the following origins:
-   - Your production URL (e.g. `https://your-app.vercel.app`)
-   - Your custom domain if applicable (e.g. `https://yourdomain.com`)
-   - `http://localhost:3000` (for local development — added by default)
-3. Enable **Allow credentials** for each origin that needs authenticated requests (e.g. live preview, visual editing).
+pnpm test             # Vitest unit tests (packages/sanity-blocks)
+pnpm test:e2e         # Playwright smoke tests against a running or deployed site
+```
 
-> **Note**: Vercel preview deployments use unique URLs per commit. If you need CORS access on preview deployments, add a wildcard origin like `https://*-your-project.vercel.app` or add specific preview URLs as needed.
+## Content model
 
-#### 4. Invite a collaborator
+The Studio currently includes these document types:
 
-Now that you've deployed your Next.js application and Sanity Studio, you can optionally invite a collaborator to your Studio. Open up [Manage](https://www.sanity.io/manage), select your project and click "Invite project members"
+- Singletons: `homePage`, `blogIndex`, `settings`, `footer`, `navbar`
+- Documents: `blog`, `page`, `faq`, `author`, `redirect`
 
-They will be able to access the deployed Studio, where you can collaborate together on creating content.
+The document definitions live in
+`apps/studio/schemaTypes/documents`, and the shared page-builder blocks live in
+`packages/sanity-blocks/src` — one directory per block, each holding its schema,
+GROQ projection, React component, Markdown serializer, and its insert-menu
+thumbnail.
+
+After schema changes, regenerate types with:
+
+```sh
+pnpm --filter studio extract
+pnpm type
+```
+
+Both, in that order — typegen reads the committed `apps/studio/schema.json`,
+so `pnpm type` alone regenerates a stale schema and still reports success.
+
+Generated types land in `packages/sanity/src/sanity.types.ts`; the frontend
+derives every content type from that file rather than redeclaring shapes. See
+[CLAUDE.md](CLAUDE.md) for the architecture in detail, including the checklist
+for adding a new page-builder block.
+
+## Documenting your routes
+
+The Studio tells editors what fields exist, not what any document *does* or which
+URL it ends up at. [`sanity-plugin-md-notes`](https://www.npmjs.com/package/sanity-plugin-md-notes)
+fixes that: drop a `<schemaName>.help.md` next to a schema and editors get a Help
+panel inside the Studio, rendered from your markdown.
+
+Rather than ship help files that won't match your content model, paste the prompt
+below into Claude Code (or your agent of choice). It installs the plugin, works out
+what routes your site actually has by reading your schemas and querying your
+dataset, and writes the documentation against your content.
+
+```
+Document every route in this project.
+
+This repo is Turbo Start Sanity: a pnpm/Turborepo monorepo with a Vite-based Sanity
+Studio in `apps/studio` and a Next.js frontend in `apps/web`. You're going to install
+`sanity-plugin-md-notes`, which turns a `<schemaName>.help.md` file sitting next to a
+schema into a Help panel inside the Studio, and then write those files for every route
+this site has.
+
+1. Install and register the plugin
+
+Read the plugin README and follow its Vite setup, not the Turbopack/codegen one -
+this Studio runs on `sanity dev`. npmjs.com returns 403 to programmatic fetches, so
+pull the README from the registry instead:
+`curl -s https://registry.npmjs.org/sanity-plugin-md-notes | jq -r .readme`
+
+Document the four URL-owning types at minimum (`homePage`, `page`, `blogIndex`,
+`blog`) plus `redirect`. The global config types (`navbar`, `footer`, `settings`)
+and reference-only types (`author`, `faq`) are optional - say which you chose.
+
+You need three things:
+
+- `helpPlugin({ files })` in the `plugins` array of `apps/studio/sanity.config.ts`,
+  with `files` from `import.meta.glob("./schemaTypes/**/*.help.md", { eager: true,
+  query: "?raw", import: "default" })`
+- `defaultDocumentNode: withHelpDefaultDocumentNode()` on the existing
+  `structureTool(...)` call
+- `withHelp()` wrapped around each document schema you intend to document
+
+One thing will bite you. `apps/studio/tsconfig.json` sets `"types": []`, so
+`import.meta.glob` won't typecheck and the build fails with `Property 'glob' does
+not exist on type 'ImportMeta'`. Add `"vite/client"`.
+
+Leave the page-builder block schemas in `packages/sanity-blocks` alone. `apps/web`
+imports that package, and `withHelp` would pull a Studio-only dependency into the
+frontend's dependency graph. Document types only.
+
+2. Work out what the routes actually are
+
+Don't infer routes from the files in `apps/web/src/app`. Only a handful are static.
+The real inventory is the home page, every `page` document's slug, the blog index,
+and every `blog` document's slug. Work it out from the content, not the filesystem:
+
+a. List the document types in `apps/studio/schemaTypes/documents/`. Mark which own a
+   URL, which are global config consumed by the layout (navbar, footer, settings),
+   and which are only ever referenced by other documents (author, faq).
+b. For each URL-owning type, read its route file in `apps/web/src/app`, the GROQ
+   query in `packages/sanity/src/query.ts` that feeds it, and its entry in
+   `apps/studio/utils/slug-validation.ts`. Note the exact query names and paths.
+   You'll cite them.
+c. Query the dataset for the live slugs of each type, so you document real URLs
+   rather than hypothetical ones. `apps/web/src/app/llms.txt/route.ts` already does
+   this exact enumeration. Read it first. If no dataset is configured, fall back to
+   the seed data in `apps/studio/seed-data.tar.gz`.
+d. Trace everything downstream of each type: `sitemap.ts`, `llms.txt`, the `.md` twin
+   rewrite in `apps/web/src/proxy.ts`, build-time redirects in
+   `apps/web/next.config.ts`, and the Presentation mapping in
+   `apps/studio/location.ts`.
+e. Collect the rules an editor can trip over: reserved slug prefixes, required exact
+   slugs, uniqueness constraints, and anything that fires automatically on publish
+   (this template mints a `redirect` document whenever a published slug changes).
+
+Write the inventory out as a table before you start writing help files, so it can be
+checked against what you produce.
+
+3. Write the help files
+
+One `<schemaName>.help.md` per wrapped schema, in `apps/studio/schemaTypes/documents/`.
+The glob root is `schemaTypes/` - files anywhere else produce an empty map and no
+error.
+
+The filename must equal the schema's `name:` exactly, because the plugin keys its
+registry on the basename. `blog-index.ts` declares `name: "blogIndex"`, so it needs
+`blogIndex.help.md`. A mismatch fails silently: the Help icon just never appears.
+
+This knowingly breaks the kebab-case file convention in `CLAUDE.md`. Follow the
+plugin, not the convention, and add a note to `CLAUDE.md` saying why.
+
+Write for a non-technical editor. Each file:
+
+- `lastUpdated` frontmatter with today's date
+- One sentence on what the document type is for
+- The URL it produces, with a real example taken from the dataset
+- A table of the slug rules
+- What happens when you publish it: redirects, revalidation, anything automatic
+- Where it surfaces beyond its own page (navigation, sitemap, `llms.txt`, `.md` twin)
+- `> [!WARNING]` for anything destructive or irreversible, `> [!IMPORTANT]` for rules
+  that will reject a save
+
+Cross-link sibling types with in-Studio intent links. Editing an existing document is
+`[Navigation](/structure/intent/edit/id=navbar;type=navbar)`; creating a new one is
+`[Redirects](/structure/intent/create/type=redirect)`. Querystring syntax crashes the
+router. The format is semicolon-separated path segments and the `/structure/` prefix
+is required.
+
+4. Verify
+
+`S.document()` bypasses `defaultDocumentNode`, so every call site needs
+`helpView(S, { schemaType })` spread into `.views([...])` or the tab silently never
+appears. There are two files to fix, not one:
+
+- `apps/studio/structure.ts` - the singletons. Note `blogIndex` already calls
+  `.views([S.view.form()])`; extend that array rather than replacing it.
+- `apps/studio/components/nested-pages-structure.ts` - three more call sites, which
+  build every `page` document under "Pages by Path". Miss these and Pages, the
+  most-edited type, has no Help tab on that route. Reaching a Page via "All Pages"
+  goes through `S.documentTypeListItem` and does get the tab, so the bug looks fixed
+  unless you check "Pages by Path" specifically.
+
+Run `pnpm dev:studio` and open a document of each type, including a singleton and a
+Page reached via "Pages by Path". Confirm the Help inspector (book icon, top right)
+renders your markdown.
+
+Finish with `pnpm check-types`, `pnpm lint` and `pnpm format:check`.
+```
+
+Wrapping schemas in `withHelp()` reindents them, so review the resulting diff with
+`git diff -w`.
+
+## Notable features
+
+- Page-builder architecture backed by shared block schemas and renderers
+- Video through Mux — one upload per clip, adaptive streaming, no format matrix
+- Sanity Visual Editing / Presentation integration
+- Blog index and blog post routes
+- Redirect support managed in Sanity
+- Markdown twins for pages via `.md` URLs and `Accept: text/markdown`
+- `llms.txt` generation at `/llms.txt`
+- Copy-paste prompt for documenting your routes inside the Studio
+- GitHub Actions for CI, template validation, E2E smoke tests, and Studio deploy
+
+## Deploying
+
+### Web app
+
+The frontend is intended to be deployed from `apps/web`.
+
+For Vercel:
+
+1. Create a new project from this repository.
+2. Set the Root Directory to `apps/web`.
+3. Add the web environment variables from `apps/web/.env.example`.
+4. Add your production domain to Sanity CORS origins.
+
+### Sanity Studio
+
+Studio can be deployed locally from `apps/studio`:
+
+```sh
+cd apps/studio
+pnpm run deploy
+```
+
+Use `pnpm run deploy`, not `pnpm deploy` — the latter is pnpm's own built-in
+command and will not run this script.
+
+The first Studio deploy must be done locally so Sanity can create the hosted
+Studio app and return an app ID. Save that value as `SANITY_STUDIO_APP_ID` for
+future deploys.
+
+This repository also includes a manual GitHub Actions workflow at
+`.github/workflows/deploy-sanity.yml`. It is triggered with
+`workflow_dispatch`, not automatically on every push.
+
+To use that workflow, configure these GitHub repository secrets:
+
+- `SANITY_DEPLOY_TOKEN`
+- `SANITY_STUDIO_PROJECT_ID`
+- `SANITY_STUDIO_DATASET`
+- `SANITY_STUDIO_TITLE`
+- `SANITY_STUDIO_PRESENTATION_URL`
+- `SANITY_STUDIO_APP_ID`
+
+### Configure Sanity CORS origins
+
+Add your web app URLs in Sanity Manage under **API > CORS origins**:
+
+- your production URL
+- your custom domain, if you use one
+- `http://localhost:3000` for local development
+
+Enable credentials for origins that need authenticated preview or visual
+editing requests.
+
+## Troubleshooting
+
+**`pnpm dev` exits immediately with an env validation error.** `apps/web` reads
+`@workspace/env` from `next.config.ts`, so every required variable in the table
+above must be present before the dev server starts — including
+`SANITY_API_WRITE_TOKEN`.
+
+**The web app starts but every page 404s or the site looks empty.** The dataset
+has no content yet. Run the seed import in step 4, or publish a `homePage`
+document in the Studio.
+
+**Studio loads but Presentation shows a blank or blocked preview.** Add
+`http://localhost:3000` to **API > CORS origins** in sanity.io/manage with
+credentials allowed.
+
+**`sanity deploy` asks for a Studio host every time.** Copy the app ID returned
+by the first deploy into `SANITY_STUDIO_APP_ID`.
+
+**Wrong pnpm version.** Run `corepack enable`; the repo pins pnpm through the
+`packageManager` field.
+
+## Contributing
+
+Bug reports and pull requests are welcome — see
+[CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and the checks CI runs, and
+[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md). Security issues should be reported
+privately as described in [SECURITY.md](SECURITY.md).
+
+## Workflows
+
+The repository currently ships with:
+
+- `.github/workflows/ci.yml`: lint, format check, type check, and unit tests on
+  push/PR to `main`
+- `.github/workflows/e2e.yml`: Playwright smoke tests on successful deployment
+  status events
+- `.github/workflows/deploy-sanity.yml`: manual Studio deploy workflow
+- `.github/workflows/sanity-template.yml`: Sanity template validation on `main`
+
+## License
+
+[MIT](LICENSE)

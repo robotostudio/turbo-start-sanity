@@ -1,14 +1,14 @@
 import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 import {
   BookMarked,
-  CogIcon,
+  Cog,
   File,
   FileText,
-  HomeIcon,
+  House,
   type LucideIcon,
   MessageCircle,
   PanelBottom,
-  PanelBottomIcon,
+  PanelTop,
   Settings2,
   TrendingUpDown,
   User,
@@ -45,11 +45,6 @@ const createSingleTon = ({ S, type, title, icon }: CreateSingleTon) => {
 type CreateList = {
   S: StructureBuilder;
 } & Base;
-
-// This function creates a list item for a type. It takes a StructureBuilder instance (S),
-// a type, an icon, and a title as parameters. It generates a title for the type if not provided,
-// and uses a default icon if not provided. It then returns a list item with the generated or
-// provided title and icon.
 
 const createList = ({ S, type, icon, title, id }: CreateList) => {
   const newTitle = title ?? getTitleCase(type);
@@ -108,7 +103,7 @@ export const structure = (
   S.list()
     .title("Content")
     .items([
-      createSingleTon({ S, type: "homePage", icon: HomeIcon }),
+      createSingleTon({ S, type: "homePage", icon: House }),
       S.divider(),
       createSlugBasedStructure(S, "page"),
       createIndexListWithOrderableItems({
@@ -142,19 +137,19 @@ export const structure = (
                 S,
                 type: "navbar",
                 title: "Navigation",
-                icon: PanelBottom,
+                icon: PanelTop,
               }),
               createSingleTon({
                 S,
                 type: "footer",
                 title: "Footer",
-                icon: PanelBottomIcon,
+                icon: PanelBottom,
               }),
               createSingleTon({
                 S,
                 type: "settings",
                 title: "Global Settings",
-                icon: CogIcon,
+                icon: Cog,
               }),
             ])
         ),

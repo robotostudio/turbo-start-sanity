@@ -1,28 +1,55 @@
-import { sanityFetch } from "@workspace/sanity/live";
+import {
+  DRAFTS_WITHOUT_SESSION,
+  type DynamicFetchOptions,
+  getDynamicFetchOptions,
+  resolvePageFetchOptions,
+  sanityFetch,
+  sanityFetchMetadata,
+} from "@workspace/sanity/live";
 import { queryHomePageData } from "@workspace/sanity/query";
+import type { Metadata } from "next";
+import { draftMode } from "next/headers";
+import { Suspense } from "react";
 
+import { PageBuilderJsonLd } from "@/components/page-builder-json-ld";
 import { PageBuilder } from "@/components/pagebuilder";
-import { getSEOMetadata } from "@/lib/seo";
+import { seoFromDocument } from "@/lib/seo";
 
-async function fetchHomePageData() {
-  return await sanityFetch({
+export async function generateMetadata(): Promise<Metadata> {
+  const { perspective } = await getDynamicFetchOptions();
+  const { data: homePageData } = await sanityFetchMetadata({
     query: queryHomePageData,
+    perspective,
   });
-}
-
-export async function generateMetadata() {
-  const { data: homePageData } = await fetchHomePageData();
-  return getSEOMetadata({
-    title: homePageData?.title ?? homePageData?.seoTitle,
-    description: homePageData?.description ?? homePageData?.seoDescription,
-    slug: "/",
-    contentId: homePageData?._id,
-    contentType: homePageData?._type,
-  });
+  return seoFromDocument(homePageData, { slug: "/" });
 }
 
 export default async function Page() {
-  const { data: homePageData } = await fetchHomePageData();
+  const { isEnabled: isDraftMode } = await draftMode();
+
+  if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
+    return (
+      <Suspense fallback={null}>
+        <HomeContent />
+      </Suspense>
+    );
+  }
+
+  return <CachedHome perspective="published" stega={false} />;
+}
+
+async function HomeContent() {
+  const { perspective, stega } = await resolvePageFetchOptions();
+  return <CachedHome perspective={perspective} stega={stega} />;
+}
+
+async function CachedHome({ perspective, stega }: DynamicFetchOptions) {
+  "use cache";
+  const { data: homePageData } = await sanityFetch({
+    query: queryHomePageData,
+    perspective,
+    stega,
+  });
 
   if (!homePageData) {
     return <div>No home page data</div>;
@@ -30,5 +57,12 @@ export default async function Page() {
 
   const { _id, _type, pageBuilder } = homePageData ?? {};
 
-  return <PageBuilder id={_id} pageBuilder={pageBuilder ?? []} type={_type} />;
+  return (
+    <>
+      <PageBuilderJsonLd pageBuilder={pageBuilder} />
+      <main className="-mt-16">
+        <PageBuilder id={_id} pageBuilder={pageBuilder ?? []} type={_type} />
+      </main>
+    </>
+  );
 }

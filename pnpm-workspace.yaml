@@ -3,19 +3,110 @@ packages:
   - packages/*
 
 catalog:
-  "@sanity/client": ^7.17.0
-  "@types/node": ^25.5.0
-  "@types/react": ^19.2.14
-  "@types/react-dom": ^19.2.3
-  lucide-react: ^0.577.0
+  # Held at 7: next-sanity 13 imports `unstable__adapter`, which @sanity/client 8 removed.
+  "@sanity/client": ^7.26.2
+  "@tailwindcss/postcss": ^4.3.3
+  "@types/node": ^24.13.3
+  "@types/react": ^19.2.18
+  "@types/react-dom": ^19.2.5
+  # v1 dropped 19 brand icons (github, slack, facebook, linkedin, youtube,
+  # figma, twitch, ...). sanity-plugin-lucide-icon-picker bundles its own
+  # lucide-react ^0.532.0, so the Studio picker still offers them and
+  # DynamicIcon falls back to a warning triangle. Brand marks live in
+  # sanity-blocks/src/internal/icons.tsx instead.
+  lucide-react: ^1.34.0
   next-themes: ^0.4.6
-  react: ^19.2.4
-  react-dom: ^19.2.4
-  react-is: ^19.2.4
-  typescript: 5.9.2
-  zod: ^4.3.6
+  react: ^19.2.8
+  react-dom: ^19.2.8
+  react-is: ^19.2.8
+  # Table editing needs the Portable Text table plugin, bundled since 6.6.0.
+  sanity: ^6.11.0
+  tailwindcss: ^4.3.3
+  tw-animate-css: ^1.4.0
+  typescript: 5.9.3
+  vitest: ^4.1.11
+  zod: ^4.4.3
 
-onlyBuiltDependencies:
-  - "@tailwindcss/oxide"
-  - esbuild
-  - sharp
+allowBuilds:
+  "@tailwindcss/oxide": true
+  esbuild: true
+  sharp: true
+
+peerDependencyRules:
+  allowedVersions:
+    sanity-plugin-utils>sanity: ">=5"
+    sanity-plugin-lucide-icon-picker>sanity: ">=5"
+    # This plugin is why apps/studio and @workspace/sanity-blocks hold
+    # @sanity/ui at 3 and @sanity/icons at 3: it imports Menu, Popover,
+    # TrashIcon and friends, which ui 4 / icons 5 moved or dropped, and it
+    # takes them from the Studio as peers, so `sanity build` fails. sanity
+    # itself still ships ui 4 / icons 5 internally, as it did before.
+    sanity-plugin-lucide-icon-picker>@sanity/ui: ">=3"
+    sanity-plugin-media>sanity: ">=5"
+    sanity-plugin-asset-source-unsplash>sanity: ">=5"
+    next-sanity>sanity: ">=5"
+    "@csstools/css-syntax-patches-for-csstree>css-tree": ">=3"
+
+overrides:
+  "@codemirror/state": ^6.7.1
+  undici@<6.24.0: ^6.24.0
+  minimatch@<3.1.4: ^3.1.4
+  minimatch@>=5.0.0 <5.1.8: ^5.1.8
+  picomatch@<2.3.2: ^2.3.2
+  picomatch@>=4.0.0 <4.0.4: ^4.0.4
+  brace-expansion@<1.1.13: ^1.1.13
+  brace-expansion@>=2.0.0 <2.0.3: ^2.0.3
+  rollup@<4.59.0: ^4.59.0
+  dompurify@<3.4.0: ^3.4.0
+  prismjs@<1.30.0: ^1.30.0
+  postcss@<8.5.10: ^8.5.10
+  js-yaml@<3.14.2: ^3.14.2
+  yaml@<1.10.3: ^1.10.3
+  "@babel/plugin-transform-modules-systemjs@<7.29.4": ^7.29.4
+  lodash@<4.18.0: ^4.18.0
+  lodash-es@<4.18.0: ^4.18.0
+  esbuild@<0.28.1: ^0.28.1
+  "@trpc/server@<11.8.0": ^11.8.0
+
+# Each entry is a version this bump deliberately accepted before it aged out.
+minimumReleaseAgeExclude:
+  - '@turbo/darwin-64@2.10.12'
+  - '@turbo/darwin-arm64@2.10.12'
+  - '@turbo/linux-64@2.10.12'
+  - '@turbo/linux-arm64@2.10.12'
+  - '@turbo/windows-64@2.10.12'
+  - '@turbo/windows-arm64@2.10.12'
+  - turbo@2.10.12
+  - '@portabletext/editor@8.0.2'
+  - '@portabletext/plugin-character-pair-decorator@9.0.2'
+  - '@portabletext/plugin-dnd@2.0.2'
+  - '@portabletext/plugin-input-rule@7.0.2'
+  - '@portabletext/plugin-list-index@2.0.2'
+  - '@portabletext/plugin-markdown-shortcuts@9.0.2'
+  - '@portabletext/plugin-one-line@8.0.2'
+  - '@portabletext/plugin-paste-link@5.0.2'
+  - '@portabletext/plugin-table@2.0.2'
+  - '@portabletext/plugin-typography@9.0.2'
+  - '@sanity/access-ui@6.11.0'
+  - '@sanity/blueprints@0.24.0'
+  - '@sanity/client@8.3.0'
+  - '@sanity/diff@6.11.0'
+  - '@sanity/functions@1.6.9'
+  - '@sanity/mutator@6.11.0'
+  - '@sanity/schema@6.11.0'
+  - '@sanity/types@6.11.0'
+  - '@sanity/util@6.11.0'
+  - '@sanity/vision@6.11.0'
+  - sanity@6.11.0
+  - '@next/env@16.3.3'
+  - '@next/swc-darwin-arm64@16.3.3'
+  - '@next/swc-darwin-x64@16.3.3'
+  - '@next/swc-linux-arm64-gnu@16.3.3'
+  - '@next/swc-linux-arm64-musl@16.3.3'
+  - '@next/swc-linux-x64-gnu@16.3.3'
+  - '@next/swc-linux-x64-musl@16.3.3'
+  - '@next/swc-win32-arm64-msvc@16.3.3'
+  - '@next/swc-win32-x64-msvc@16.3.3'
+  - next@16.3.3
+  - '@tanstack/query-core@5.102.5'
+  - '@tanstack/react-query@5.102.5'

@@ -1,1 +1,1 @@
-export { default } from "@workspace/ui/postcss.config";
+../../packages/tailwind-config/postcss.config.mjs

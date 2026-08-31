@@ -1,13 +1,5 @@
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@workspace/ui/components/pagination";
-import { useCallback } from "react";
+import { cn } from "@workspace/tailwind-config/utils";
+import Link from "next/link";
 
 export type PaginationProps = {
   currentPage: number;
@@ -17,29 +9,31 @@ export type PaginationProps = {
   basePath?: string;
 };
 
-interface BlogPaginationProps extends PaginationProps {
+type BlogPaginationProps = PaginationProps & {
   className?: string;
-}
+  category?: string;
+};
 
-function generatePaginationItems(currentPage: number, totalPages: number) {
-  const items: (number | "ellipsis")[] = [];
+type PaginationItem = number | "ellipsis-start" | "ellipsis-end";
+
+function generatePaginationItems(
+  currentPage: number,
+  totalPages: number
+): PaginationItem[] {
+  const items: PaginationItem[] = [];
   const delta = 2; // Number of pages to show around current page
 
   if (totalPages <= 7) {
-    // Show all pages if total is small
     for (let i = 1; i <= totalPages; i++) {
       items.push(i);
     }
   } else {
-    // Always show first page
     items.push(1);
 
-    // Add ellipsis if needed
     if (currentPage - delta > 2) {
-      items.push("ellipsis");
+      items.push("ellipsis-start");
     }
 
-    // Add pages around current page
     const start = Math.max(2, currentPage - delta);
     const end = Math.min(totalPages - 1, currentPage + delta);
 
@@ -47,12 +41,10 @@ function generatePaginationItems(currentPage: number, totalPages: number) {
       items.push(i);
     }
 
-    // Add ellipsis if needed
     if (currentPage + delta < totalPages - 1) {
-      items.push("ellipsis");
+      items.push("ellipsis-end");
     }
 
-    // Always show last page
     if (totalPages > 1) {
       items.push(totalPages);
     }
@@ -61,6 +53,8 @@ function generatePaginationItems(currentPage: number, totalPages: number) {
   return items;
 }
 
+const navLabelBase = "font-light text-base leading-5 transition-colors";
+
 export function BlogPagination({
   currentPage,
   totalPages,
@@ -68,63 +62,99 @@ export function BlogPagination({
   hasPreviousPage,
   basePath = "/blog",
   className,
+  category,
 }: BlogPaginationProps) {
   const paginationItems = generatePaginationItems(currentPage, totalPages);
 
-  const getPageUrl = useCallback(
-    (page: number): string => {
-      if (page === 1) {
-        return basePath;
-      }
-      return `${basePath}?page=${page}`;
-    },
-    [basePath]
-  );
+  const getPageUrl = (page: number): string => {
+    const params = new URLSearchParams();
+    if (category) {
+      params.set("category", category);
+    }
+    if (page > 1) {
+      params.set("page", String(page));
+    }
+    const query = params.toString();
+    return query ? `${basePath}?${query}` : basePath;
+  };
 
   return (
-    <div className={className}>
-      <Pagination>
-        <PaginationContent>
-          {hasPreviousPage && (
-            <PaginationItem>
-              <PaginationPrevious
-                aria-label={`Go to page ${currentPage - 1}`}
-                href={getPageUrl(currentPage - 1)}
-                size="default"
-              />
-            </PaginationItem>
+    <nav
+      aria-label="Blog pagination"
+      className={cn("flex items-center justify-start gap-5", className)}
+    >
+      {hasPreviousPage ? (
+        <Link
+          aria-label={`Previous page, page ${currentPage - 1}`}
+          className={cn(
+            navLabelBase,
+            "focus-ring rounded-none text-zinc-400 hover:text-foreground"
           )}
+          href={getPageUrl(currentPage - 1)}
+        >
+          Previous
+        </Link>
+      ) : null}
 
-          {paginationItems.map((item, index) => (
-            <PaginationItem
-              key={item === "ellipsis" ? `ellipsis-${index}` : item}
+      {paginationItems.map((item) => {
+        if (item === "ellipsis-start" || item === "ellipsis-end") {
+          return (
+            <span
+              aria-hidden="true"
+              className="font-light font-mono text-base text-zinc-400 leading-5"
+              key={item}
             >
-              {item === "ellipsis" ? (
-                <PaginationEllipsis />
-              ) : (
-                <PaginationLink
-                  aria-label={`Go to page ${item}`}
-                  href={getPageUrl(item)}
-                  isActive={item === currentPage}
-                  size="icon"
-                >
-                  {item}
-                </PaginationLink>
-              )}
-            </PaginationItem>
-          ))}
+              &hellip;
+            </span>
+          );
+        }
 
-          {hasNextPage && (
-            <PaginationItem>
-              <PaginationNext
-                aria-label={`Go to page ${currentPage + 1}`}
-                href={getPageUrl(currentPage + 1)}
-                size="default"
-              />
-            </PaginationItem>
+        if (item === currentPage) {
+          return (
+            <span
+              aria-current="page"
+              className="flex items-center justify-center rounded-none border border-foreground px-2 pt-0.5 pb-1 font-mono text-base text-foreground leading-5 dark:border-accent-green dark:text-accent-green"
+              key={item}
+            >
+              {item}
+            </span>
+          );
+        }
+
+        return (
+          <Link
+            aria-label={`Go to page ${item}`}
+            className="focus-ring rounded-none px-0.5 font-light font-mono text-base text-zinc-400 leading-5 transition-colors hover:text-foreground"
+            href={getPageUrl(item)}
+            key={item}
+          >
+            {item}
+          </Link>
+        );
+      })}
+
+      {hasNextPage ? (
+        <Link
+          aria-label={`Next page, page ${currentPage + 1}`}
+          className={cn(
+            navLabelBase,
+            "focus-ring rounded-none text-zinc-400 hover:text-foreground"
           )}
-        </PaginationContent>
-      </Pagination>
-    </div>
+          href={getPageUrl(currentPage + 1)}
+        >
+          Next
+        </Link>
+      ) : (
+        <span
+          aria-disabled="true"
+          className={cn(
+            navLabelBase,
+            "pointer-events-none select-none text-muted-foreground/40"
+          )}
+        >
+          Next
+        </span>
+      )}
+    </nav>
   );
 }

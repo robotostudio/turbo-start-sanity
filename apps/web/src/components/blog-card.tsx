@@ -1,63 +1,37 @@
+import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
+import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
+import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 
+import { getBlogCategoryLabel } from "@/lib/blog-categories";
 import type { Blog } from "@/types";
-import { SanityImage } from "./elements/sanity-image";
+import { formatDate } from "@/utils";
 
 type BlogImageProps = {
   image: Blog["image"];
   title?: string | null;
+  className?: string;
 };
 
-function BlogImage({ image, title }: BlogImageProps) {
+function BlogImage({ image, title, className }: Readonly<BlogImageProps>) {
   if (!image?.id) {
     return null;
   }
 
   return (
     <SanityImage
-      alt={title ?? "Blog post image"}
-      className="aspect-video w-full rounded-2xl bg-gray-100 object-cover sm:aspect-2/1 lg:aspect-3/2"
-      height={400}
+      alt={title ?? "Blog post"}
+      className={cn(
+        "absolute inset-0 size-full rounded-none object-cover",
+        className
+      )}
+      fetchPriority="high"
+      height={600}
       image={image}
+      loading="eager"
+      sizes="(min-width: 1440px) 700px, (min-width: 1024px) calc((100vw - 40px) / 2), calc(100vw - 40px)"
       width={800}
     />
-  );
-}
-
-type AuthorImageProps = {
-  author: Blog["authors"];
-};
-
-function AuthorImage({ author }: AuthorImageProps) {
-  if (!author?.image) {
-    return null;
-  }
-
-  return (
-    <SanityImage
-      alt={author.name ?? "Author image"}
-      className="size-8 flex-none rounded-full bg-gray-50"
-      height={40}
-      image={author.image}
-      width={40}
-    />
-  );
-}
-
-type BlogAuthorProps = {
-  author: Blog["authors"];
-};
-
-export function BlogAuthor({ author }: BlogAuthorProps) {
-  if (!author) {
-    return null;
-  }
-
-  return (
-    <div className="flex items-center gap-x-2.5 font-semibold text-gray-900 text-sm/6">
-      <AuthorImage author={author} />
-      {author.name}
-    </div>
   );
 }
 
@@ -65,67 +39,112 @@ type BlogCardProps = {
   blog: Blog;
 };
 
-function BlogMeta({ publishedAt }: { publishedAt: string | null }) {
+function BlogDate({
+  publishedAt,
+  className,
+}: Readonly<{
+  publishedAt: string | null;
+  className?: string;
+}>) {
+  const formatted = formatDate(publishedAt);
+
+  if (!formatted) {
+    return null;
+  }
+
   return (
-    <div className="my-4 flex items-center gap-x-4 text-xs">
-      <time className="text-muted-foreground" dateTime={publishedAt ?? ""}>
-        {publishedAt
-          ? new Date(publishedAt).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })
-          : ""}
-      </time>
+    <time
+      className={cn("text-sm text-zinc-800 dark:text-zinc-200", className)}
+      dateTime={publishedAt ?? ""}
+    >
+      {formatted}
+    </time>
+  );
+}
+
+function BlogAuthor({
+  author,
+  className,
+}: Readonly<{ author: Blog["authors"]; className?: string }>) {
+  if (!author?.name) {
+    return null;
+  }
+
+  return (
+    <div className={cn("flex items-center gap-2", className)}>
+      {author.image?.id ? (
+        <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted">
+          <SanityImage
+            alt={author.name}
+            className="h-full w-full object-cover"
+            height={24}
+            image={author.image}
+            width={24}
+          />
+        </span>
+      ) : (
+        <span className="size-6 shrink-0 rounded-full bg-muted" />
+      )}
+      <span className="text-sm text-zinc-700 dark:text-zinc-300">
+        {author.name}
+      </span>
     </div>
   );
 }
 
-function BlogContent({
-  title,
-  slug,
-  description,
-  isFeatured,
-}: {
-  title: string | null;
-  slug: string | null;
-  description: string | null;
-  isFeatured?: boolean;
-}) {
-  const HeadingTag = isFeatured ? "h2" : "h3";
-  const headingClasses = isFeatured
-    ? "mt-3 text-3xl font-semibold leading-tight"
-    : "mt-3 text-lg font-semibold leading-6";
+function BlogCategoryTag({ category }: Readonly<{ category?: string | null }>) {
+  const label = getBlogCategoryLabel(category);
+
+  if (!label) {
+    return null;
+  }
 
   return (
-    <div className="group relative">
-      <HeadingTag className={headingClasses}>
-        <Link href={slug ?? "#"}>
-          <span className="absolute inset-0" />
-          {title}
-        </Link>
-      </HeadingTag>
-      <p className="mt-5 text-muted-foreground text-sm leading-6">
-        {description}
-      </p>
+    <span className="text-sm text-zinc-700 capitalize dark:text-zinc-300">
+      {label}
+    </span>
+  );
+}
+
+function BlogMeta({
+  publishedAt,
+  category,
+}: Readonly<{
+  publishedAt: string | null;
+  category?: string | null;
+}>) {
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <BlogDate publishedAt={publishedAt} />
+      <BlogCategoryTag category={category} />
     </div>
   );
 }
 
 export function FeaturedBlogCard({ blog }: BlogCardProps) {
-  const { title, publishedAt, slug, description, image } = blog ?? {};
+  const { title, publishedAt, slug, description, image, authors, category } =
+    blog ?? {};
 
   return (
-    <article className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-      <BlogImage image={image} title={title} />
-      <div className="space-y-6">
-        <BlogMeta publishedAt={publishedAt} />
-        <BlogContent
-          description={description}
-          isFeatured
-          slug={slug}
-          title={title}
-        />
+    <article className="hover-surface group focus-ring-within relative grid grid-cols-1 border border-border lg:grid-cols-2">
+      <div className="flex flex-col justify-between gap-10 p-6 sm:p-8">
+        <BlockEyebrow eyebrow="Featured" />
+        <div className="grid gap-4">
+          <BlogMeta category={category} publishedAt={publishedAt} />
+          <h2 className="text-balance font-normal text-3xl leading-tight tracking-tight sm:text-4xl">
+            <Link className="outline-none" href={slug ?? "#"}>
+              <span className="absolute inset-0 z-10" />
+              {title}
+            </Link>
+          </h2>
+          {description ? (
+            <p className="body-text text-muted-foreground">{description}</p>
+          ) : null}
+          <BlogAuthor author={authors} />
+        </div>
+      </div>
+      <div className="relative order-first min-h-60 overflow-hidden border-border border-b lg:order-last lg:min-h-full lg:border-b-0 lg:border-s">
+        <BlogImage image={image} title={title} />
       </div>
     </article>
   );
@@ -133,30 +152,28 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
 
 export function BlogCard({ blog }: BlogCardProps) {
   if (!blog) {
-    return (
-      <article className="grid w-full grid-cols-1 gap-4">
-        <div className="h-48 animate-pulse rounded-2xl bg-muted" />
-        <div className="space-y-2">
-          <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-          <div className="h-6 w-full animate-pulse rounded bg-muted" />
-          <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
-        </div>
-      </article>
-    );
+    return null;
   }
 
-  const { title, publishedAt, slug, description, image } = blog;
+  const { title, publishedAt, slug, description, authors, category } = blog;
 
   return (
-    <article className="grid w-full grid-cols-1 gap-4">
-      <div className="relative aspect-video h-auto w-full overflow-hidden rounded-2xl">
-        <BlogImage image={image} title={title} />
-        <div className="absolute inset-0 rounded-2xl ring-1 ring-gray-900/10 ring-inset" />
+    <article className="hover-surface group focus-ring-within relative flex flex-col gap-4 border border-border p-6">
+      <BlogMeta category={category} publishedAt={publishedAt} />
+      <div className="flex flex-col gap-3">
+        <h3 className="font-normal text-2xl text-zinc-900 leading-8.5 dark:text-zinc-50">
+          <Link className="outline-none" href={slug ?? "#"}>
+            <span className="absolute inset-0 z-10" />
+            {title}
+          </Link>
+        </h3>
+        {description ? (
+          <p className="body-text line-clamp-3 text-muted-foreground">
+            {description}
+          </p>
+        ) : null}
       </div>
-      <div className="w-full space-y-4">
-        <BlogMeta publishedAt={publishedAt} />
-        <BlogContent description={description} slug={slug} title={title} />
-      </div>
+      <BlogAuthor author={authors} className="mt-auto" />
     </article>
   );
 }
@@ -169,13 +186,15 @@ export function BlogHeader({
   description: string | null;
 }) {
   return (
-    <div className="mx-auto max-w-7xl px-6 lg:px-8">
-      <div className="mx-auto max-w-2xl text-center">
-        <h1 className="font-bold text-3xl sm:text-4xl">{title}</h1>
-        <p className="mt-4 text-lg text-muted-foreground leading-8">
+    <div className="grid gap-6">
+      <h1 className="text-balance font-normal text-4xl tracking-tight sm:text-5xl">
+        {title}
+      </h1>
+      {description ? (
+        <p className="body-text max-w-2xl text-muted-foreground">
           {description}
         </p>
-      </div>
+      ) : null}
     </div>
   );
 }

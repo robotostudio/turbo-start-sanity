@@ -1,34 +1,47 @@
 import { Logger } from "@workspace/logger";
-import { client } from "@workspace/sanity/client";
-import { sanityFetch } from "@workspace/sanity/live";
+import {
+  DRAFTS_WITHOUT_SESSION,
+  type DynamicFetchOptions,
+  getDynamicFetchOptions,
+  resolvePageFetchOptions,
+  sanityFetch,
+  sanityFetchMetadata,
+  sanityFetchStaticParams,
+} from "@workspace/sanity/live";
 import { queryBlogPaths, queryBlogSlugPageData } from "@workspace/sanity/query";
+import {
+  RichText,
+  type RichTextValue,
+} from "@workspace/sanity-blocks/internal/rich-text";
+import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
+import type { Metadata } from "next";
+import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 
-import { RichText } from "@/components/elements/rich-text";
-import { SanityImage } from "@/components/elements/sanity-image";
-import { TableOfContent } from "@/components/elements/table-of-content";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import {
+  MobileTableOfContent,
+  TableOfContent,
+} from "@/components/elements/table-of-content";
 import { ArticleJsonLd } from "@/components/json-ld";
-import { getSEOMetadata } from "@/lib/seo";
+import { seoFromDocument } from "@/lib/seo";
+import { formatDate, getBaseUrl, PLACEHOLDER_SLUG } from "@/utils";
 
 const logger = new Logger("BlogSlug");
 
-async function fetchBlogSlugPageData(slug: string) {
-  return await sanityFetch({
-    query: queryBlogSlugPageData,
-    params: { slug },
-  });
-}
+type BlogParams = { slug: string };
 
-async function fetchBlogPaths() {
+export async function generateStaticParams() {
   try {
-    const slugs = await client.fetch(queryBlogPaths);
+    const { data: slugs } = await sanityFetchStaticParams({
+      query: queryBlogPaths,
+    });
 
-    // If no slugs found, return empty array to prevent build errors
     if (!Array.isArray(slugs) || slugs.length === 0) {
-      return [];
+      return [{ slug: PLACEHOLDER_SLUG }];
     }
 
-    const paths: { slug: string }[] = [];
+    const paths: BlogParams[] = [];
     for (const slug of slugs) {
       if (!slug) {
         continue;
@@ -41,80 +54,186 @@ async function fetchBlogPaths() {
     return paths;
   } catch (error) {
     logger.error("Error fetching blog paths", error);
-    // Return empty array to allow build to continue
-    return [];
+    return [{ slug: PLACEHOLDER_SLUG }];
   }
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
+  params: Promise<BlogParams>;
+}): Promise<Metadata> {
+  const [{ slug }, { perspective }] = await Promise.all([
+    params,
+    getDynamicFetchOptions(),
+  ]);
   const slugString = `/blog/${slug}`;
-  const { data } = await fetchBlogSlugPageData(slugString);
-  return getSEOMetadata({
-    title: data?.title ?? data?.seoTitle,
-    description: data?.description ?? data?.seoDescription,
-    slug: slugString,
-    contentId: data?._id,
-    contentType: data?._type,
-    pageType: "article",
+  const { data } = await sanityFetchMetadata({
+    query: queryBlogSlugPageData,
+    params: { slug: slugString },
+    perspective,
   });
+  return seoFromDocument(data, { slug: slugString, pageType: "article" });
 }
-
-export async function generateStaticParams() {
-  const paths = await fetchBlogPaths();
-  return paths;
-}
-
-// Allow dynamic params for paths not generated at build time
-export const dynamicParams = true;
 
 export default async function BlogSlugPage({
   params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const slugString = `/blog/${slug}`;
-  const { data } = await fetchBlogSlugPageData(slugString);
-  if (!data) {
-    return notFound();
+}: Readonly<{
+  params: Promise<BlogParams>;
+}>) {
+  const { isEnabled: isDraftMode } = await draftMode();
+
+  // Presentation sessions and local dev take the draft-aware path, so draft
+  // edits and unpublished posts render. No Suspense: draft mode disables
+  // `use cache` entirely, so a boundary would always paint its fallback;
+  // blocking keeps the previous page on screen, as editors expect.
+  if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
+    return <BlogSlugInner params={params} />;
   }
-  const { title, description, image, richText } = data ?? {};
+
+  // Published render, with a real 404 — not a soft one streamed inside
+  // Suspense.
+  const { slug } = await params;
+  const data = await getPublishedBlogPage(slug);
+  if (!data) {
+    notFound();
+  }
+  return <BlogPageContent data={data} />;
+}
+
+// Cached published fetch; a miss lets the caller return a real 404.
+async function getPublishedBlogPage(slug: string) {
+  "use cache";
+  const slugString = `/blog/${slug}`;
+  const { data } = await sanityFetch({
+    query: queryBlogSlugPageData,
+    params: { slug: slugString },
+    perspective: "published",
+    stega: false,
+  });
+  return data;
+}
+
+type BlogPageData = NonNullable<
+  Awaited<ReturnType<typeof getPublishedBlogPage>>
+>;
+
+async function BlogSlugInner({
+  params,
+}: Readonly<{ params: Promise<BlogParams> }>) {
+  const [{ slug }, { perspective, stega }] = await Promise.all([
+    params,
+    resolvePageFetchOptions(),
+  ]);
+  const data = await getDraftBlogPage({ slug, perspective, stega });
+  if (!data) {
+    notFound();
+  }
+  return <BlogPageContent data={data} />;
+}
+
+async function getDraftBlogPage({
+  slug,
+  perspective,
+  stega,
+}: BlogParams & DynamicFetchOptions) {
+  "use cache";
+  const slugString = `/blog/${slug}`;
+  const { data } = await sanityFetch({
+    query: queryBlogSlugPageData,
+    params: { slug: slugString },
+    perspective,
+    stega,
+  });
+  return data;
+}
+
+function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
+  const { title, richText, publishedAt, _updatedAt } = data ?? {};
+  const author = data?.authors;
+  const publishedDate = formatDate(publishedAt);
+  const updatedDate = formatDate(_updatedAt);
+  const shareUrl = data?.slug ? `${getBaseUrl()}${data.slug}` : undefined;
 
   return (
-    <div className="container mx-auto my-16 px-4 md:px-6">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_300px]">
-        <main>
-          <ArticleJsonLd article={data} />
-          <header className="mb-8">
-            <h1 className="mt-2 font-bold text-4xl">{title}</h1>
-            <p className="mt-4 text-lg text-muted-foreground">{description}</p>
-          </header>
-          {image && (
-            <div className="mb-12">
-              <SanityImage
-                alt={title}
-                className="h-auto w-full rounded-lg"
-                height={900}
-                image={image}
-                loading="eager"
-                width={1600}
+    <main className="bg-background">
+      <ArticleJsonLd article={data} />
+      <Breadcrumbs
+        crumbs={[
+          { label: "Home", href: "/" },
+          { label: "Blog", href: "/blog" },
+          { label: title },
+        ]}
+      />
+      <div className="container flex flex-col gap-16 pt-12 pb-24 md:gap-24 md:pt-16">
+        <header className="flex flex-col gap-6">
+          <h1 className="text-balance font-normal text-4xl tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.1]">
+            {title}
+          </h1>
+
+          <div className="flex flex-col gap-4">
+            <dl className="flex flex-col text-sm">
+              {publishedDate && (
+                <div className="flex gap-1.5">
+                  <dt className="text-muted-foreground">Published At:</dt>
+                  <dd className="text-foreground/90">{publishedDate}</dd>
+                </div>
+              )}
+              {updatedDate && (
+                <div className="flex gap-1.5">
+                  <dt className="text-muted-foreground">Last Updated At:</dt>
+                  <dd className="text-foreground/90">{updatedDate}</dd>
+                </div>
+              )}
+            </dl>
+
+            {author?.name && (
+              <div className="flex items-center gap-2">
+                {author.image?.id && (
+                  <span className="inline-block size-6 overflow-hidden rounded-full">
+                    <SanityImage
+                      alt={author.name}
+                      className="size-6 rounded-full object-cover"
+                      height={24}
+                      image={author.image}
+                      sizes="24px"
+                      width={24}
+                    />
+                  </span>
+                )}
+                <span className="text-muted-foreground text-sm">
+                  {author.name}
+                </span>
+              </div>
+            )}
+          </div>
+        </header>
+
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_390px] lg:gap-32">
+          <article className="min-w-0">
+            <MobileTableOfContent
+              className="mb-12"
+              richText={richText ?? []}
+              shareTitle={title}
+              shareUrl={shareUrl}
+            />
+            <RichText
+              className="prose-lg prose-p:my-0 prose-p:leading-7 prose-p:tracking-[0.013em] prose-li:leading-7 [&>p+p]:mt-8 [&_blockquote]:border-none [&_blockquote]:bg-grid-dots [&_blockquote]:p-4 [&_blockquote]:font-normal [&_blockquote]:not-italic [&_blockquote]:text-zinc-800 dark:[&_blockquote]:text-zinc-50 [&_blockquote_p]:my-0 [&_blockquote_p]:bg-background [&_blockquote_p]:p-8 [&_blockquote_p]:text-lg [&_blockquote_p]:text-muted-foreground [&_blockquote_p]:leading-7 [&_blockquote_p]:before:content-none [&_blockquote_p]:after:content-none [&_blockquote_strong]:font-normal [&_blockquote_strong]:text-foreground"
+              richText={richText as RichTextValue}
+            />
+          </article>
+
+          <div className="hidden lg:block">
+            <div className="sticky top-24">
+              <TableOfContent
+                richText={richText ?? []}
+                shareTitle={title}
+                shareUrl={shareUrl}
               />
             </div>
-          )}
-          <RichText richText={richText} />
-        </main>
-
-        <div className="hidden lg:block">
-          <div className="sticky top-4 rounded-lg">
-            <TableOfContent richText={richText ?? []} />
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

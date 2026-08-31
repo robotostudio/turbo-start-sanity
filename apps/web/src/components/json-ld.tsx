@@ -1,111 +1,43 @@
-import { client, urlFor } from "@workspace/sanity/client";
-import { querySettingsData } from "@workspace/sanity/query";
+import { urlFor } from "@workspace/sanity/client";
 import type {
   QueryBlogSlugPageDataResult,
   QuerySettingsDataResult,
 } from "@workspace/sanity/types";
 import { stegaClean } from "next-sanity";
 import type {
-  Answer,
   Article,
   ContactPoint,
-  FAQPage,
   ImageObject,
   Organization,
   Person,
-  Question,
   WebPage,
   WebSite,
   WithContext,
 } from "schema-dts";
 
-import { getBaseUrl, handleErrors } from "@/utils";
+import { getJsonLdSettings } from "@/lib/json-ld-data";
+import { getBaseUrl } from "@/utils";
 
-type RichTextChild = {
-  _type: string;
-  text?: string;
-  marks?: string[];
-  _key: string;
-};
-
-type RichTextBlock = {
-  _type: string;
-  children?: RichTextChild[];
-  style?: string;
-  _key: string;
-};
-
-// Flexible FAQ type that can accept different rich text structures
-type FlexibleFaq = {
-  _id: string;
-  title: string;
-  richText?: RichTextBlock[] | null;
-};
-
-// Utility function to safely extract plain text from rich text blocks
-function extractPlainTextFromRichText(
-  richText: RichTextBlock[] | null | undefined
-): string {
-  if (!Array.isArray(richText)) {
-    return "";
-  }
-
-  return richText
-    .filter((block) => block._type === "block" && Array.isArray(block.children))
-    .map(
-      (block) =>
-        block.children
-          ?.filter((child) => child._type === "span" && Boolean(child.text))
-          .map((child) => child.text)
-          .join("") ?? ""
-    )
-    .join(" ")
-    .trim();
+// Escape <, >, & to \uXXXX so a "</script>" in any CMS field can't break out of
+// the tag. JSON-LD is parsed as data (not executed), so escaping < is what
+// matters; the result stays valid JSON for crawlers.
+function serializeJsonLd<T>(data: T): string {
+  return JSON.stringify(data)
+    .replaceAll("<", String.raw`\u003c`)
+    .replaceAll(">", String.raw`\u003e`)
+    .replaceAll("&", String.raw`\u0026`);
 }
 
-// Utility function to safely render JSON-LD
 export function JsonLdScript<T>({ data, id }: { data: T; id: string }) {
   return (
-    <script id={id} type="application/ld+json">
-      {JSON.stringify(data, null, 0)}
-    </script>
+    <script
+      // Raw injection is required so the JSON-LD reaches crawlers unescaped;
+      // serializeJsonLd already escapes <, >, & to prevent script breakout.
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }}
+      id={id}
+      type="application/ld+json"
+    />
   );
-}
-
-// FAQ JSON-LD Component
-type FaqJsonLdProps = {
-  faqs: FlexibleFaq[];
-};
-
-export function FaqJsonLd({ faqs }: FaqJsonLdProps) {
-  if (!faqs?.length) {
-    return null;
-  }
-
-  const validFaqs = stegaClean(
-    faqs.filter((faq) => faq?.title && faq?.richText)
-  );
-
-  if (!validFaqs.length) {
-    return null;
-  }
-
-  const faqJsonLd: WithContext<FAQPage> = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: validFaqs.map(
-      (faq): Question => ({
-        "@type": "Question",
-        name: faq.title,
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: extractPlainTextFromRichText(faq.richText),
-        } as Answer,
-      })
-    ),
-  };
-
-  return <JsonLdScript data={faqJsonLd} id="faq-json-ld" />;
 }
 
 const IMAGE_SIZE_WIDTH = 1920;
@@ -124,7 +56,6 @@ function buildSafeImageUrl(image?: { id?: string | null }) {
     .url();
 }
 
-// Article JSON-LD Component
 type ArticleJsonLdProps = {
   article: QueryBlogSlugPageDataResult;
   settings?: QuerySettingsDataResult;
@@ -165,7 +96,7 @@ export function ArticleJsonLd({
       : [],
     publisher: {
       "@type": "Organization",
-      name: settings?.siteTitle || "Website",
+      name: settings?.siteTitle || "Turbo Start Sanity",
       logo: settings?.logo
         ? ({
             "@type": "ImageObject",
@@ -191,12 +122,11 @@ export function ArticleJsonLd({
   );
 }
 
-// Organization JSON-LD Component
 type OrganizationJsonLdProps = {
   settings: QuerySettingsDataResult;
 };
 
-export function OrganizationJsonLd({ settings }: OrganizationJsonLdProps) {
+function OrganizationJsonLd({ settings }: Readonly<OrganizationJsonLdProps>) {
   if (!settings) {
     return null;
   }
@@ -232,12 +162,11 @@ export function OrganizationJsonLd({ settings }: OrganizationJsonLdProps) {
   return <JsonLdScript data={organizationJsonLd} id="organization-json-ld" />;
 }
 
-// Website JSON-LD Component
 type WebSiteJsonLdProps = {
   settings: QuerySettingsDataResult;
 };
 
-export function WebSiteJsonLd({ settings }: WebSiteJsonLdProps) {
+function WebSiteJsonLd({ settings }: Readonly<WebSiteJsonLdProps>) {
   if (!settings) {
     return null;
   }
@@ -259,11 +188,9 @@ export function WebSiteJsonLd({ settings }: WebSiteJsonLdProps) {
   return <JsonLdScript data={websiteJsonLd} id="website-json-ld" />;
 }
 
-// Combined JSON-LD Component for pages with multiple structured data
 type CombinedJsonLdProps = {
   settings?: QuerySettingsDataResult;
   article?: QueryBlogSlugPageDataResult;
-  faqs?: FlexibleFaq[];
   includeWebsite?: boolean;
   includeOrganization?: boolean;
 };
@@ -272,7 +199,7 @@ export async function CombinedJsonLd({
   includeWebsite = false,
   includeOrganization = false,
 }: CombinedJsonLdProps) {
-  const [res] = await handleErrors(client.fetch(querySettingsData));
+  const res = await getJsonLdSettings();
 
   const cleanSettings = stegaClean(res);
   return (
