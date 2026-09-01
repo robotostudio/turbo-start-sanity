@@ -4,6 +4,10 @@ import { stegaClean } from "next-sanity";
 import { JsonLdScript } from "@/components/json-ld";
 import type { PageBuilderBlock, PagebuilderType } from "@/types";
 
+/**
+ * Emits ONE FAQPage for the whole page: Google reads a single FAQPage per URL,
+ * so a second faqAccordion block's questions are dropped if it gets its own.
+ */
 export function PageBuilderJsonLd({
   pageBuilder,
 }: Readonly<{
@@ -11,22 +15,24 @@ export function PageBuilderJsonLd({
 }>) {
   if (!pageBuilder?.length) return null;
 
+  const questions = pageBuilder.flatMap((block) => {
+    if (block?._type !== "faqAccordion") return [];
+    const data = faqAccordionToJsonLd(
+      stegaClean(block as PagebuilderType<"faqAccordion">)
+    );
+    return data?.mainEntity ?? [];
+  });
+
+  if (!questions.length) return null;
+
   return (
-    <>
-      {pageBuilder.map((block) => {
-        if (block?._type !== "faqAccordion") return null;
-        const data = faqAccordionToJsonLd(
-          stegaClean(block as PagebuilderType<"faqAccordion">)
-        );
-        if (!data) return null;
-        return (
-          <JsonLdScript
-            data={data}
-            id={`faq-json-ld-${block._key}`}
-            key={`faq-json-ld-${block._key}`}
-          />
-        );
-      })}
-    </>
+    <JsonLdScript
+      data={{
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: questions,
+      }}
+      id="faq-json-ld"
+    />
   );
 }
