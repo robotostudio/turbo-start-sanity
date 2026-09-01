@@ -37,7 +37,7 @@ export function FooterThemeToggle() {
   };
 
   return (
-    <div className="relative flex items-center rounded-full border border-accent-green-foreground/40">
+    <div className="relative grid grid-flow-col items-center rounded-full border border-accent-green-foreground/40">
       <span
         aria-hidden="true"
         className={cn(
