@@ -1,6 +1,11 @@
 import { env } from "@workspace/env/client";
 
 export const getBaseUrl = () => {
+  // Checked first: the Vercel vars below exist only on Vercel.
+  if (env.NEXT_PUBLIC_SITE_URL) {
+    return env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
+  }
+
   if (env.NEXT_PUBLIC_VERCEL_ENV === "production") {
     return env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL;
   }
