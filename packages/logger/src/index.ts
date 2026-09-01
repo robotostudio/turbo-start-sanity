@@ -1,5 +1,5 @@
 export class Logger {
-  private context: string;
+  private readonly context: string;
 
   constructor(context: string) {
     this.context = context;
