@@ -74,7 +74,9 @@ export function CopyMarkdownButton({
                 SWAP_LAYER,
                 "size-4.5",
                 active ? SWAP_SHOWN : SWAP_HIDDEN,
-                active && s === "loading" && "animate-spin"
+                active &&
+                  s === "loading" &&
+                  "animate-spin motion-reduce:animate-none"
               )}
               key={s}
             />
