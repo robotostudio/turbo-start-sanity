@@ -28,7 +28,7 @@ export function GithubStars({
     <a
       aria-label={`GitHub repository, ${formatStars(stars)} stars (opens in a new tab)`}
       className={cn(
-        "focus-ring inline-flex h-8 items-center gap-2 rounded-full px-2 font-mono font-normal text-foreground text-sm uppercase tracking-wide",
+        "focus-ring inline-flex h-8 items-center gap-2 rounded-full px-2 font-mono font-normal text-foreground text-sm uppercase tracking-wide group-data-[nav-on=dark]:text-white group-data-[nav-on=light]:text-zinc-900",
         className
       )}
       href={gitHubUrl}

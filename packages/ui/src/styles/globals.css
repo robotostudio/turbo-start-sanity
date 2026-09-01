@@ -245,7 +245,7 @@
 /* Overrides Tailwind's `container`. Inset defaults to 8px via a fallback var,
  * so [--container-px:…] can override it per instance. */
 @utility container {
-  @apply mx-auto w-full max-w-[90rem] px-[var(--container-px,0.5rem)];
+  @apply mx-auto w-full max-w-360 px-(--container-px,0.5rem);
 }
 
 /* Cancels the container's padding (hardcoding it caused mobile scroll). */
