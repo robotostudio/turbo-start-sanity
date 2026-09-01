@@ -64,6 +64,11 @@ export function MobileMenu({
     setIsOpen(false);
   }
 
+  // On desktop the trigger is display:none, so focus would drop to body.
+  const finalFocus = isDesktop
+    ? () => document.querySelector<HTMLElement>("header a[href]")
+    : undefined;
+
   function handleOpenChange(next: boolean) {
     if (next) {
       setSide(liveSide);
@@ -86,7 +91,7 @@ export function MobileMenu({
   return (
     <Drawer
       onOpenChange={handleOpenChange}
-      open={isOpen && !isDesktop}
+      open={isOpen}
       swipeDirection={side === "right" ? "right" : "down"}
     >
       <DrawerTrigger
@@ -110,6 +115,7 @@ export function MobileMenu({
               "w-full pb-[env(safe-area-inset-bottom)]",
               POPUP_SLIDE[side]
             )}
+            finalFocus={finalFocus}
           >
             <DrawerContent>
               <div className="flex flex-row items-center justify-between border-b px-6 py-2.5">
