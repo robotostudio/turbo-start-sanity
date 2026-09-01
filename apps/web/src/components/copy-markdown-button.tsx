@@ -4,6 +4,11 @@ import { CopyIcon } from "@workspace/sanity-blocks/internal/icons";
 import {
   COPY_STATUS_CLASS,
   type CopyStatus,
+  SWAP_HIDDEN,
+  SWAP_LAYER,
+  SWAP_SHOWN,
+  SWAP_TEXT_HIDDEN,
+  SWAP_TEXT_SHOWN,
   useCopyToClipboard,
 } from "@workspace/sanity-blocks/internal/use-copy";
 import { cn } from "@workspace/tailwind-config/utils";
@@ -23,7 +28,9 @@ const STATUS_ICONS = {
   loading: Loader2,
   copied: Check,
   error: X,
-};
+} as const;
+
+const STATUSES = Object.keys(STATUS_ICONS) as CopyStatus[];
 
 /** Every page is also served as Markdown at its `.md` path. */
 function markdownPath(pathname: string): string {
@@ -43,8 +50,6 @@ export function CopyMarkdownButton({
   }, [pathname]);
   const { status, copy } = useCopyToClipboard(getMarkdown);
 
-  const StatusIcon = STATUS_ICONS[status];
-
   return (
     <button
       aria-label={LABELS.idle}
@@ -60,20 +65,41 @@ export function CopyMarkdownButton({
         aria-hidden="true"
         className="grid size-4.5 flex-none place-items-center"
       >
-        <StatusIcon
-          className={cn("size-4.5", status === "loading" && "animate-spin")}
-        />
+        {STATUSES.map((s) => {
+          const Icon = STATUS_ICONS[s];
+          const active = s === status;
+          return (
+            <Icon
+              className={cn(
+                SWAP_LAYER,
+                "size-4.5",
+                active ? SWAP_SHOWN : SWAP_HIDDEN,
+                active && s === "loading" && "animate-spin"
+              )}
+              key={s}
+            />
+          );
+        })}
       </span>
       <span className="grid text-left">
         <span aria-hidden="true" className="col-start-1 row-start-1 invisible">
           {LABELS.idle}
         </span>
-        {/* The label is the only thing that reports the outcome, and it swaps
-            in place. As a live region the change is spoken; without it a
-            screen-reader user gets no confirmation the copy landed. */}
-        <output className="col-start-1 row-start-1 truncate">
-          {LABELS[status]}
-        </output>
+        {STATUSES.map((s) => (
+          <span
+            aria-hidden="true"
+            className={cn(
+              SWAP_LAYER,
+              "truncate",
+              s === status ? SWAP_TEXT_SHOWN : SWAP_TEXT_HIDDEN
+            )}
+            key={s}
+          >
+            {LABELS[s]}
+          </span>
+        ))}
+        {/* Live region: the spoken confirmation that the copy landed. */}
+        <output className="sr-only">{LABELS[status]}</output>
       </span>
     </button>
   );
