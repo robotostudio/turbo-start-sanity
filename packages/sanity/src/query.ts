@@ -297,17 +297,20 @@ export const queryNavbarData = defineQuery(`
   }
 `);
 
+// The set of publicly indexable URLs, shared by the sitemap and llms.txt.
 // `seoNoIndex` is excluded here as well as in the page metadata — advertising a
 // URL in the sitemap while its own robots tag says noindex is a contradiction
-// search engines report as an error.
+// search engines report as an error. `title` and the ordering serve llms.txt;
+// the sitemap ignores both.
 export const querySitemapData = defineQuery(`{
   "slugPages": *[_type == "page" && defined(slug.current) && seoNoIndex != true]{
     "slug": slug.current,
     "lastModified": _updatedAt
   },
-  "blogPages": *[_type == "blog" && defined(slug.current) && seoNoIndex != true]{
+  "blogPages": *[_type == "blog" && defined(slug.current) && seoNoIndex != true] | order(orderRank asc){
     "slug": slug.current,
-    "lastModified": _updatedAt
+    "lastModified": _updatedAt,
+    title
   }
 }`);
 export const queryGlobalSeoSettings = defineQuery(`
