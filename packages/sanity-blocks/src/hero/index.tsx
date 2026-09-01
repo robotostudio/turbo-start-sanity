@@ -192,7 +192,7 @@ export function HeroBlock({
     <div className="container grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-12">
       <div className="grid gap-5">
         <BlockEyebrow eyebrow={badge} />
-        <h1 className="hero-enter max-w-[827px] break-words font-normal text-4xl text-foreground leading-[1.1] tracking-[-0.24px] sm:text-5xl lg:text-[64px]">
+        <h1 className="hero-enter max-w-[827px] text-pretty break-words font-normal text-4xl text-foreground leading-[1.1] tracking-[-0.24px] sm:text-5xl lg:text-[64px]">
           {title}
         </h1>
         <RichText
