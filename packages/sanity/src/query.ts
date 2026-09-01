@@ -158,7 +158,7 @@ export const queryHomePageData =
     title,
     description,
     ogTitle,
-    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
     ${pageBuilderFragment}
   }`);
 
@@ -167,7 +167,7 @@ export const querySlugPageData = defineQuery(`
     ...,
     "slug": slug.current,
     ogTitle,
-    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
     ${pageBuilderFragment}
   }
   `);
@@ -190,7 +190,7 @@ export const queryBlogIndexPage = defineQuery(`
     title,
     description,
     ogTitle,
-    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
     ${pageBuilderFragment},
     "slug": slug.current,
     "featuredBlogs": select(
@@ -217,7 +217,7 @@ export const queryBlogSlugPageData = defineQuery(`
     ...,
     "slug": slug.current,
     ogTitle,
-    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
     ${blogAuthorFragment},
     ${imageFragment},
     ${richTextFragment},
@@ -297,17 +297,20 @@ export const queryNavbarData = defineQuery(`
   }
 `);
 
+// The set of publicly indexable URLs, shared by the sitemap and llms.txt.
 // `seoNoIndex` is excluded here as well as in the page metadata — advertising a
 // URL in the sitemap while its own robots tag says noindex is a contradiction
-// search engines report as an error.
+// search engines report as an error. `title` and the ordering serve llms.txt;
+// the sitemap ignores both.
 export const querySitemapData = defineQuery(`{
   "slugPages": *[_type == "page" && defined(slug.current) && seoNoIndex != true]{
     "slug": slug.current,
     "lastModified": _updatedAt
   },
-  "blogPages": *[_type == "blog" && defined(slug.current) && seoNoIndex != true]{
+  "blogPages": *[_type == "blog" && defined(slug.current) && seoNoIndex != true] | order(orderRank asc){
     "slug": slug.current,
-    "lastModified": _updatedAt
+    "lastModified": _updatedAt,
+    title
   }
 }`);
 export const queryGlobalSeoSettings = defineQuery(`
@@ -330,7 +333,7 @@ export const queryGlobalSeoSettings = defineQuery(`
       "svg": svg.asset->url,
       "ico": ico.asset->url
     },
-    "ogImage": ogImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
+    "ogImage": ogImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
     siteDescription,
     socialLinks{
       linkedin,

@@ -1,9 +1,8 @@
 import { Logger } from "@workspace/logger";
 import { sanityFetch } from "@workspace/sanity/live";
 import {
-  queryAllBlogDataForSearch,
   queryGlobalSeoSettings,
-  querySlugPagePaths,
+  querySitemapData,
 } from "@workspace/sanity/query";
 import { absolutizeUrl } from "@workspace/sanity-blocks/internal/portable-text-to-markdown";
 
@@ -23,6 +22,8 @@ const PUBLISHED = { perspective: "published", stega: false } as const;
 const HEADERS = {
   "content-type": "text/plain; charset=utf-8",
   "cache-control": "public, s-maxage=3600, stale-while-revalidate=86400",
+  // For agents, not search results; every entry it lists is indexable already.
+  "x-robots-tag": "noindex",
 } as const;
 
 async function fetchSettings() {
@@ -34,19 +35,13 @@ async function fetchSettings() {
   return data;
 }
 
-async function fetchSlugs() {
+// Shares the sitemap's query — same `seoNoIndex != true` filter. Not
+// `querySlugPagePaths` / `queryAllBlogDataForSearch`: those feed
+// `generateStaticParams` and on-site search, which must still see noindexed docs.
+async function fetchIndex() {
   "use cache";
   const { data } = await sanityFetch({
-    query: querySlugPagePaths,
-    ...PUBLISHED,
-  });
-  return data;
-}
-
-async function fetchPosts() {
-  "use cache";
-  const { data } = await sanityFetch({
-    query: queryAllBlogDataForSearch,
+    query: querySitemapData,
     ...PUBLISHED,
   });
   return data;
@@ -67,47 +62,52 @@ function slugToTitle(slug: string): string {
 }
 
 export async function GET(): Promise<Response> {
-  const [settingsResult, slugsResult, postsResult] = await Promise.allSettled([
+  const [settingsResult, indexResult] = await Promise.allSettled([
     fetchSettings(),
-    fetchSlugs(),
-    fetchPosts(),
+    fetchIndex(),
   ]);
 
   if (settingsResult.status === "rejected") {
     logger.error("llms.txt: settings fetch failed", settingsResult.reason);
   }
-  if (slugsResult.status === "rejected") {
-    logger.error("llms.txt: page slugs fetch failed", slugsResult.reason);
-  }
-  if (postsResult.status === "rejected") {
-    logger.error("llms.txt: blog posts fetch failed", postsResult.reason);
+
+  // Settings only decorate the header, but the index IS the document: a 200
+  // with an empty one tells crawlers the site has no pages, for an hour.
+  if (indexResult.status === "rejected") {
+    logger.error("llms.txt: content fetch failed", indexResult.reason);
+    return new Response("llms.txt is temporarily unavailable\n", {
+      status: 503,
+      headers: {
+        "content-type": "text/plain; charset=utf-8",
+        "cache-control": "no-store",
+        "x-robots-tag": "noindex",
+      },
+    });
   }
 
   const settings =
     settingsResult.status === "fulfilled" ? settingsResult.value : null;
-  const slugs =
-    slugsResult.status === "fulfilled" ? (slugsResult.value ?? []) : [];
-  const posts =
-    postsResult.status === "fulfilled" ? (postsResult.value ?? []) : [];
+  const index = indexResult.value;
+  const slugs = index?.slugPages ?? [];
+  const posts = index?.blogPages ?? [];
 
   const siteTitle = settings?.siteTitle ?? "Turbo Start Sanity";
   const siteDescription = settings?.siteDescription ?? "";
 
   const pageLines = [
     `- [Home](${mdHref("/index")})`,
-    ...slugs
-      .filter((s): s is string => Boolean(s))
-      .map((slug) => {
-        const path = slug.startsWith("/") ? slug : `/${slug}`;
-        return `- [${slugToTitle(path)}](${mdHref(path)})`;
-      }),
+    // A singleton, not a `page`, so it is absent from the slug list above.
+    `- [Blog](${mdHref("/blog")})`,
+    ...slugs.flatMap(({ slug }) => {
+      if (!slug) {
+        return [];
+      }
+      const path = slug.startsWith("/") ? slug : `/${slug}`;
+      return [`- [${slugToTitle(path)}](${mdHref(path)})`];
+    }),
   ];
 
-  const sortedPosts = [...posts].sort((a, b) =>
-    (a.orderRank ?? "").localeCompare(b.orderRank ?? "")
-  );
-
-  const blogLines = sortedPosts.flatMap((post) =>
+  const blogLines = posts.flatMap((post) =>
     post.slug
       ? [`- [${post.title ?? slugToTitle(post.slug)}](${mdHref(post.slug)})`]
       : []
