@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isSafeHref, sanitizeHref } from "./safe-href";
+import { internalPathOnly, isSafeHref, sanitizeHref } from "./safe-href";
 
 describe("isSafeHref", () => {
   it.each([
@@ -46,5 +46,28 @@ describe("sanitizeHref", () => {
 
   it("drops a javascript: url that leans on leading whitespace to hide", () => {
     expect(sanitizeHref("\n javascript:alert(1)")).toBeUndefined();
+  });
+});
+
+describe("internalPathOnly", () => {
+  it("passes a plain same-origin path through untouched", () => {
+    expect(internalPathOnly("/blog/hello")).toBe("/blog/hello");
+    expect(internalPathOnly("/")).toBe("/");
+  });
+
+  it("rejects an absolute url", () => {
+    expect(internalPathOnly("https://evil.com")).toBe("/");
+    expect(internalPathOnly("//evil.com")).toBe("/");
+  });
+
+  it("rejects a backslash protocol-relative url browsers normalize to //", () => {
+    expect(internalPathOnly("/\\evil.com")).toBe("/");
+  });
+
+  it("falls back to / for missing values", () => {
+    expect(internalPathOnly(null)).toBe("/");
+    expect(internalPathOnly(undefined)).toBe("/");
+    expect(internalPathOnly("")).toBe("/");
+    expect(internalPathOnly("blog")).toBe("/");
   });
 });
