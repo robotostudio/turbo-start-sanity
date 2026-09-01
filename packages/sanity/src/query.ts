@@ -158,7 +158,7 @@ export const queryHomePageData =
     title,
     description,
     ogTitle,
-    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
     ${pageBuilderFragment}
   }`);
 
@@ -167,7 +167,7 @@ export const querySlugPageData = defineQuery(`
     ...,
     "slug": slug.current,
     ogTitle,
-    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
     ${pageBuilderFragment}
   }
   `);
@@ -190,7 +190,7 @@ export const queryBlogIndexPage = defineQuery(`
     title,
     description,
     ogTitle,
-    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
     ${pageBuilderFragment},
     "slug": slug.current,
     "featuredBlogs": select(
@@ -217,7 +217,7 @@ export const queryBlogSlugPageData = defineQuery(`
     ...,
     "slug": slug.current,
     ogTitle,
-    "ogImage": seoImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
+    "ogImage": seoImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
     ${blogAuthorFragment},
     ${imageFragment},
     ${richTextFragment},
@@ -330,7 +330,7 @@ export const queryGlobalSeoSettings = defineQuery(`
       "svg": svg.asset->url,
       "ico": ico.asset->url
     },
-    "ogImage": ogImage.asset->url + "?w=1200&h=630&dpr=2&fit=max",
+    "ogImage": ogImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
     siteDescription,
     socialLinks{
       linkedin,
