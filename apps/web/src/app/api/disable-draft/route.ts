@@ -6,7 +6,8 @@ import type { NextRequest } from "next/server";
 export async function GET(request: NextRequest) {
   // `redirect()` accepts absolute URLs, so an unchecked `?slug=` is an open one.
   const redirectUrl = internalPathOnly(
-    request.nextUrl.searchParams.get("slug")
+    request.nextUrl.searchParams.get("slug"),
+    request.url
   );
 
   (await draftMode()).disable();
