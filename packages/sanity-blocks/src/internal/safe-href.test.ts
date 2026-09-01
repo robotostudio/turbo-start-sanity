@@ -52,35 +52,35 @@ describe("sanitizeHref", () => {
 const BASE = "http://localhost:3000/api/disable-draft";
 
 describe("internalPathOnly", () => {
-  it("passes a same-origin path through, query and hash included", () => {
-    expect(internalPathOnly("/blog/hello", BASE)).toBe("/blog/hello");
-    expect(internalPathOnly("/", BASE)).toBe("/");
-    expect(internalPathOnly("/blog?page=2#top", BASE)).toBe("/blog?page=2#top");
+  it.each([
+    "/blog/hello",
+    "/",
+    "/blog?page=2#top",
+    // Not off-origin, just similar-looking — the guard must not over-reject.
+    "/vil.com",
+    "/evil.com-review",
+  ])("passes %j through", (path) => {
+    expect(internalPathOnly(path, BASE)).toBe(path);
   });
 
-  it("rejects absolute and protocol-relative urls", () => {
-    expect(internalPathOnly("https://evil.com", BASE)).toBe("/");
-    expect(internalPathOnly("//evil.com", BASE)).toBe("/");
-    expect(internalPathOnly("/\\evil.com", BASE)).toBe("/");
+  // The control characters arrive percent-encoded (`?slug=/%09/evil.com`) and
+  // are decoded before the guard sees them; the browser then deletes them from
+  // the Location header, leaving `//evil.com`.
+  it.each([
+    "https://evil.com",
+    "//evil.com",
+    "/\\evil.com",
+    "/\t/evil.com",
+    "/\n/evil.com",
+    "/\r/evil.com",
+    "",
+  ])("rejects %j", (path) => {
+    expect(internalPathOnly(path, BASE)).toBe("/");
   });
 
-  it("rejects control characters the browser strips from Location", () => {
-    // `?slug=/%09/evil.com` decodes to these before the guard sees them; the
-    // browser then deletes the control char, leaving `//evil.com`.
-    expect(internalPathOnly("/\t/evil.com", BASE)).toBe("/");
-    expect(internalPathOnly("/\n/evil.com", BASE)).toBe("/");
-    expect(internalPathOnly("/\r/evil.com", BASE)).toBe("/");
-  });
-
-  it("does not over-reject paths that merely look suspicious", () => {
-    expect(internalPathOnly("/vil.com", BASE)).toBe("/vil.com");
-    expect(internalPathOnly("/evil.com-review", BASE)).toBe("/evil.com-review");
-  });
-
-  it("falls back to / for missing or unresolvable values", () => {
+  it("falls back to / for missing values and an unusable base", () => {
     expect(internalPathOnly(null, BASE)).toBe("/");
     expect(internalPathOnly(undefined, BASE)).toBe("/");
-    expect(internalPathOnly("", BASE)).toBe("/");
     expect(internalPathOnly("/ok", "not-a-url")).toBe("/");
   });
 });
