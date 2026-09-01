@@ -96,17 +96,16 @@ type SeoSourceDocument = {
 };
 
 /**
- * Maps a fetched Sanity document to page metadata, applying the shared
- * `title ?? seoTitle` / `description ?? seoDescription` fallback used by every
- * route's `generateMetadata`.
+ * `seo*` are overrides, so they win; `title` is required, so it can never be
+ * the field that falls back.
  */
 export function seoFromDocument(
   doc: SeoSourceDocument | null | undefined,
   { slug, pageType }: { slug: string; pageType?: PageSeoData["pageType"] }
 ): Promise<Metadata> {
   return getSEOMetadata({
-    title: doc?.title ?? doc?.seoTitle ?? undefined,
-    description: doc?.description ?? doc?.seoDescription ?? undefined,
+    title: doc?.seoTitle || doc?.title || undefined,
+    description: doc?.seoDescription || doc?.description || undefined,
     ogTitle: doc?.ogTitle,
     ogDescription: doc?.ogDescription,
     ogImage: doc?.ogImage,
@@ -160,12 +159,12 @@ export async function getSEOMetadata(
       ]
     : undefined;
 
-  // "Page / Site" tab titles; bare site title when they are one and the same
-  // (the homepage), so it never reads "Site / Site".
-  const fullTitle =
-    defaultTitle === siteConfig.title
-      ? defaultTitle
-      : `${defaultTitle} / ${siteConfig.title}`;
+  // "Page / Site" tab titles, unless the title already carries the site name —
+  // the homepage, and any `seoTitle` override written as a complete meta title
+  // ("Careers — Acme"), which must not come out as "Careers — Acme / Acme".
+  const fullTitle = defaultTitle.includes(siteConfig.title)
+    ? defaultTitle
+    : `${defaultTitle} / ${siteConfig.title}`;
 
   // SVG first so browsers that support it take it. Each slot falls back
   // separately: an SVG-only setting must still emit the ICO for Safari.
