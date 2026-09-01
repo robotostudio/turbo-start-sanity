@@ -30,7 +30,8 @@ import { MenuLink } from "@/components/elements/menu-link";
 import { Logo } from "@/components/logo";
 import type { ColumnLink, NavigationData } from "@/types";
 
-const TABLET_QUERY = "(min-width: 768px) and (max-width: 1024px)";
+const TABLET_QUERY = "(min-width: 768px) and (max-width: 1023.98px)";
+const DESKTOP_QUERY = "(min-width: 1024px)";
 
 const VIEWPORT_ANCHOR = {
   bottom: "items-end justify-center",
@@ -51,11 +52,17 @@ export function MobileMenu({
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const isTablet = useMediaQuery(TABLET_QUERY);
+  const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const liveSide = isTablet ? "right" : "bottom";
+
   // Freeze the anchor at open-time and keep it for the whole session, so crossing
   // the breakpoint (e.g. a tablet rotation) or closing never re-anchors a visible
   // panel — re-anchoring on close would jump the sheet mid-exit-animation.
   const [side, setSide] = useState<"bottom" | "right">(liveSide);
+
+  if (isOpen && (isDesktop || side !== liveSide)) {
+    setIsOpen(false);
+  }
 
   function handleOpenChange(next: boolean) {
     if (next) {
@@ -79,7 +86,7 @@ export function MobileMenu({
   return (
     <Drawer
       onOpenChange={handleOpenChange}
-      open={isOpen}
+      open={isOpen && !isDesktop}
       swipeDirection={side === "right" ? "right" : "down"}
     >
       <DrawerTrigger
