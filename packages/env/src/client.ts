@@ -37,17 +37,11 @@ const env = createEnv({
 
     /** Canonical public origin. Required off Vercel — without it every
      *  canonical, OG url, sitemap entry and JSON-LD @id is localhost. */
-    NEXT_PUBLIC_SITE_URL: z.preprocess(
-      (value) => (value === "" ? undefined : value),
-      z.url().optional()
-    ),
+    NEXT_PUBLIC_SITE_URL: z.url().optional(),
 
     NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().min(1),
     NEXT_PUBLIC_SANITY_DATASET: z.string().min(1),
-    NEXT_PUBLIC_SANITY_API_VERSION: z.preprocess(
-      (value) => (value === "" ? undefined : value),
-      z.string().min(1).optional()
-    ),
+    NEXT_PUBLIC_SANITY_API_VERSION: z.string().min(1).optional(),
     NEXT_PUBLIC_SANITY_STUDIO_URL: z.url().min(1),
   },
 
@@ -65,6 +59,9 @@ const env = createEnv({
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
   },
+
+  // Treat empty env strings as unset so `.optional()` vars accept a blank value.
+  emptyStringAsUndefined: true,
 });
 
 export { env };

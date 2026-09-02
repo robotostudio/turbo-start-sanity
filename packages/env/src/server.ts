@@ -21,6 +21,10 @@ const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
   },
 
+  // Treat empty env strings (e.g. `SANITY_REVALIDATE_SECRET=` in .env.example)
+  // as unset, so `.optional()` vars don't fail `.min(1)` on a blank value.
+  emptyStringAsUndefined: true,
+
   extends: [vercel()],
 });
 
