@@ -110,3 +110,4 @@ minimumReleaseAgeExclude:
   - next@16.3.3
   - '@tanstack/query-core@5.102.5'
   - '@tanstack/react-query@5.102.5'
+  - '@robotostudio/sanity-plugin-lucide-icon-picker@1.0.0'

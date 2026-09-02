@@ -1,10 +1,10 @@
+import { lucideIconPicker } from "@robotostudio/sanity-plugin-lucide-icon-picker";
 import { assist } from "@sanity/assist";
 import { visionTool } from "@sanity/vision";
 import { defineConfig } from "sanity";
 import { presentationTool } from "sanity/presentation";
 import { structureTool } from "sanity/structure";
 import { unsplashImageAsset } from "sanity-plugin-asset-source-unsplash";
-import { lucideIconPicker } from "sanity-plugin-lucide-icon-picker";
 import { media } from "sanity-plugin-media";
 import { muxInput } from "sanity-plugin-mux-input";
 
