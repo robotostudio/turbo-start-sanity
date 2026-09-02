@@ -1,6 +1,6 @@
 import type { SanityDocument } from "@sanity/client";
-import { EarthGlobeIcon } from "@sanity/icons";
-import { useToast } from "@sanity/ui";
+import { EarthGlobeIcon } from "@sanity/icons/EarthGlobe";
+import { useToast } from "@sanity/ui/toast";
 import { useCallback } from "react";
 import {
   type DocumentActionComponent,

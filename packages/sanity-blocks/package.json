@@ -23,7 +23,7 @@
     "@mux/mux-video-react": "^0.31.2",
     "@portabletext/markdown": "^2.0.0",
     "@sanity/client": "catalog:",
-    "@sanity/icons": "^3.8.0",
+    "@sanity/icons": "^5.2.1",
     "@workspace/env": "workspace:*",
     "@workspace/logger": "workspace:*",
     "@workspace/tailwind-config": "workspace:*",

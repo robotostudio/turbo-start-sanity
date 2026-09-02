@@ -24,7 +24,7 @@ export function ValidationMessages({
   }
 
   return (
-    <Stack space={2}>
+    <Stack gap={2}>
       {uniqueErrors.map((error) => (
         <Card key={error} padding={3} radius={2} tone="critical">
           <Text size={1} style={errorTextStyle}>
