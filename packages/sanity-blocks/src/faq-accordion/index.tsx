@@ -68,7 +68,11 @@ function FaqDisclosure({
 
   return (
     <details
-      className={cn(DISCLOSURE_BASE_CLASS, DISCLOSURE_ANIMATION_CLASS)}
+      className={cn(
+        DISCLOSURE_BASE_CLASS,
+        DISCLOSURE_ANIMATION_CLASS,
+        isOpen && "border-transparent bg-zinc-100 dark:bg-zinc-900"
+      )}
       open={initialOpen}
       ref={detailsRef}
       style={{ animationDelay }}
@@ -78,7 +82,7 @@ function FaqDisclosure({
         className="flex cursor-pointer list-none items-center justify-between gap-2.5 py-4 outline-none [&::-webkit-details-marker]:hidden"
         onClick={handleSummaryClick}
       >
-        <h3 className="font-normal text-foreground text-lg leading-6">
+        <h3 className="font-medium text-foreground text-lg leading-6">
           {faq.title}
         </h3>
         <Plus
