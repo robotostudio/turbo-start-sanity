@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isSafeHref, sanitizeHref } from "./safe-href";
+import { internalPathOnly, isSafeHref, sanitizeHref } from "./safe-href";
 
 describe("isSafeHref", () => {
   it.each([
@@ -46,5 +46,41 @@ describe("sanitizeHref", () => {
 
   it("drops a javascript: url that leans on leading whitespace to hide", () => {
     expect(sanitizeHref("\n javascript:alert(1)")).toBeUndefined();
+  });
+});
+
+const BASE = "http://localhost:3000/api/disable-draft";
+
+describe("internalPathOnly", () => {
+  it.each([
+    "/blog/hello",
+    "/",
+    "/blog?page=2#top",
+    // Not off-origin, just similar-looking — the guard must not over-reject.
+    "/vil.com",
+    "/evil.com-review",
+  ])("passes %j through", (path) => {
+    expect(internalPathOnly(path, BASE)).toBe(path);
+  });
+
+  // The control characters arrive percent-encoded (`?slug=/%09/evil.com`) and
+  // are decoded before the guard sees them; the browser then deletes them from
+  // the Location header, leaving `//evil.com`.
+  it.each([
+    "https://evil.com",
+    "//evil.com",
+    "/\\evil.com",
+    "/\t/evil.com",
+    "/\n/evil.com",
+    "/\r/evil.com",
+    "",
+  ])("rejects %j", (path) => {
+    expect(internalPathOnly(path, BASE)).toBe("/");
+  });
+
+  it("falls back to / for missing values and an unusable base", () => {
+    expect(internalPathOnly(null, BASE)).toBe("/");
+    expect(internalPathOnly(undefined, BASE)).toBe("/");
+    expect(internalPathOnly("/ok", "not-a-url")).toBe("/");
   });
 });

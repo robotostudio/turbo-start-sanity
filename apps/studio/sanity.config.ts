@@ -6,6 +6,7 @@ import { structureTool } from "sanity/structure";
 import { unsplashImageAsset } from "sanity-plugin-asset-source-unsplash";
 import { lucideIconPicker } from "sanity-plugin-lucide-icon-picker";
 import { media } from "sanity-plugin-media";
+import { muxInput } from "sanity-plugin-mux-input";
 
 import { Logo } from "@/components/logo";
 import { locations } from "@/location";
@@ -24,6 +25,7 @@ const hiddenTemplateIds = new Set([
   ...singletonTypes,
   "assist.instruction.context",
   "media.tag",
+  "mux.videoAsset",
 ]);
 
 export default defineConfig({
@@ -55,6 +57,12 @@ export default defineConfig({
     lucideIconPicker(),
     unsplashImageAsset(),
     media(),
+    // Plugin defaults: `video_quality: "plus"`, 1080p ceiling, public
+    // playback. Uploads are billed, so choose per project — `basic` is
+    // cheaper, `premium` plus `max_resolution_tier: "2160p"` unlocks 4K,
+    // `static_renditions` adds downloadable MP4s. `tool: false` hides the
+    // "Videos" tab this adds to the nav.
+    muxInput(),
     assist(),
   ],
   document: {
@@ -66,6 +74,20 @@ export default defineConfig({
         );
       }
       return prev;
+    },
+  },
+  form: {
+    components: {
+      portableText: {
+        plugins: (props) =>
+          props.renderDefault({
+            ...props,
+            plugins: {
+              ...props.plugins,
+              table: { enabled: true },
+            },
+          }),
+      },
     },
   },
   schema: {

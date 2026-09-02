@@ -1,5 +1,5 @@
-import { DocumentIcon, FolderIcon } from "@sanity/icons";
 import { friendlyWords } from "friendlier-words";
+import { File, Folder } from "lucide-react";
 import { getPublishedId } from "sanity";
 import type { ListItemBuilder, StructureBuilder } from "sanity/structure";
 
@@ -156,7 +156,7 @@ const createDocumentListItems = (
     S.listItem()
       .id(`doc-${uniqueId}-${docIndex}`)
       .title(doc.title || "Untitled")
-      .icon(DocumentIcon)
+      .icon(File)
       .child(S.document().documentId(doc._id).schemaType(schemaType))
   );
 
@@ -170,7 +170,7 @@ const createMainPageListItem = (
   S.listItem()
     .id(`main-${uniqueId}`)
     .title(mainPageDoc.title || "Untitled")
-    .icon(FolderIcon)
+    .icon(Folder)
     .child(S.document().documentId(mainPageDoc._id).schemaType(schemaType));
 
 // Folders get an "Add page" action pre-filled with a random child slug.
@@ -186,7 +186,7 @@ const createFolderListItem = (
   return S.listItem()
     .id(uniqueId)
     .title(`${folder.title} (${folder.count})`)
-    .icon(FolderIcon)
+    .icon(Folder)
     .child(
       S.list()
         .title(folder.title)
@@ -217,7 +217,7 @@ const createSingleDocumentListItem = (
   S.listItem()
     .id(`single-${doc._id}`)
     .title(doc.title || "Untitled")
-    .icon(DocumentIcon)
+    .icon(File)
     .child(S.document().documentId(doc._id).schemaType(schemaType));
 
 type FolderProcessConfig = {
@@ -322,7 +322,7 @@ export const createSlugBasedStructure = (
 
   return S.listItem()
     .title(`${getTitleCase(schemaType)}s by Path`)
-    .icon(FolderIcon)
+    .icon(Folder)
     .child(async () => {
       try {
         const client = S.context.getClient({ apiVersion: API_VERSION });

@@ -4,7 +4,13 @@ import { cn } from "@workspace/tailwind-config/utils";
 import { Check } from "lucide-react";
 
 import { CopyIcon } from "./icons";
-import { COPY_STATUS_CLASS, useCopyToClipboard } from "./use-copy";
+import {
+  COPY_STATUS_CLASS,
+  SWAP_HIDDEN,
+  SWAP_LAYER,
+  SWAP_SHOWN,
+  useCopyToClipboard,
+} from "./use-copy";
 
 export function CopyButton({ code }: Readonly<{ code: string }>) {
   const { status, copy } = useCopyToClipboard(() => code);
@@ -23,12 +29,21 @@ export function CopyButton({ code }: Readonly<{ code: string }>) {
       onClick={copy}
       type="button"
     >
-      <span className="grid size-4 place-items-center">
-        {copied ? (
-          <Check aria-hidden="true" className="size-4" />
-        ) : (
-          <CopyIcon className="size-4" />
-        )}
+      <span aria-hidden="true" className="grid size-4 place-items-center">
+        <Check
+          className={cn(
+            SWAP_LAYER,
+            "size-4",
+            copied ? SWAP_SHOWN : SWAP_HIDDEN
+          )}
+        />
+        <CopyIcon
+          className={cn(
+            SWAP_LAYER,
+            "size-4",
+            copied ? SWAP_HIDDEN : SWAP_SHOWN
+          )}
+        />
       </span>
       <output className="sr-only">{copied ? "Copied to clipboard" : ""}</output>
     </button>

@@ -13,6 +13,7 @@ type SiteConfig = {
   description: string;
   twitterHandle: string;
   keywords: string[];
+  favicon?: { svg?: string | null; ico?: string | null } | null;
   ogImage?: string | null;
 };
 
@@ -47,6 +48,7 @@ async function resolveSiteConfig(): Promise<SiteConfig> {
     description: settings?.siteDescription || FALLBACK_SITE_CONFIG.description,
     twitterHandle: twitter ? `@${twitter}` : FALLBACK_SITE_CONFIG.twitterHandle,
     keywords: FALLBACK_SITE_CONFIG.keywords,
+    favicon: settings?.favicon ?? null,
     ogImage: settings?.ogImage ?? null,
   };
 }
@@ -94,17 +96,16 @@ type SeoSourceDocument = {
 };
 
 /**
- * Maps a fetched Sanity document to page metadata, applying the shared
- * `title ?? seoTitle` / `description ?? seoDescription` fallback used by every
- * route's `generateMetadata`.
+ * `seo*` are overrides, so they win; `title` is required, so it can never be
+ * the field that falls back.
  */
 export function seoFromDocument(
   doc: SeoSourceDocument | null | undefined,
   { slug, pageType }: { slug: string; pageType?: PageSeoData["pageType"] }
 ): Promise<Metadata> {
   return getSEOMetadata({
-    title: doc?.title ?? doc?.seoTitle ?? undefined,
-    description: doc?.description ?? doc?.seoDescription ?? undefined,
+    title: doc?.seoTitle || doc?.title || undefined,
+    description: doc?.seoDescription || doc?.description || undefined,
     ogTitle: doc?.ogTitle,
     ogDescription: doc?.ogDescription,
     ogImage: doc?.ogImage,
@@ -158,12 +159,25 @@ export async function getSEOMetadata(
       ]
     : undefined;
 
-  // "Page / Site" tab titles; bare site title when they are one and the same
-  // (the homepage), so it never reads "Site / Site".
-  const fullTitle =
-    defaultTitle === siteConfig.title
-      ? defaultTitle
-      : `${defaultTitle} / ${siteConfig.title}`;
+  // "Page / Site" tab titles, unless the title already carries the site name —
+  // the homepage, and any `seoTitle` override written as a complete meta title
+  // ("Careers — Acme"), which must not come out as "Careers — Acme / Acme".
+  const fullTitle = defaultTitle.includes(siteConfig.title)
+    ? defaultTitle
+    : `${defaultTitle} / ${siteConfig.title}`;
+
+  // SVG first so browsers that support it take it. Each slot falls back
+  // separately: an SVG-only setting must still emit the ICO for Safari.
+  const faviconIcons = [
+    {
+      url: siteConfig.favicon?.svg ?? `${baseUrl}/favicon.svg`,
+      type: "image/svg+xml",
+    },
+    {
+      url: siteConfig.favicon?.ico ?? `${baseUrl}/favicon.ico`,
+      sizes: "16x16 32x32 48x48",
+    },
+  ];
 
   const markdownUrl =
     slug && slug !== "/" ? `${pageUrl}.md` : `${baseUrl}/index.md`;
@@ -177,12 +191,10 @@ export async function getSEOMetadata(
     metadataBase: new URL(baseUrl),
     creator: siteConfig.title,
     authors: [{ name: siteConfig.title }],
-    icons: {
-      icon: [
-        { url: `${baseUrl}/favicon.svg`, type: "image/svg+xml" },
-        { url: `${baseUrl}/favicon.ico`, sizes: "16x16 32x32 48x48" },
-      ],
-    },
+    // The fallback pair lives in `public/`, not `app/`: a `favicon.ico` under
+    // `app/` is a Next file convention and gets its own <link> injected next to
+    // this one, which can outrank the Sanity icon.
+    icons: { icon: faviconIcons },
     keywords: allKeywords,
     robots: seoNoIndex ? "noindex, nofollow" : "index, follow",
     twitter: {

@@ -10,8 +10,10 @@ import {
 } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
 
+import { muxPlaybackId, muxThumbnailUrl } from "../internal/mux";
 import type { HeroVideoData, HeroVideoVariant } from "./hero-video";
 import { HeroVideo } from "./hero-video";
+import { isMuxPath, mediaTypeOf } from "./media-type";
 
 export type { HeroVideoData, HeroVideoVariant } from "./hero-video";
 
@@ -29,35 +31,76 @@ const bannerFill = "absolute inset-0 size-full";
 
 const POSTER_WIDTH = 1440;
 
-function posterOf(variant?: HeroVideoVariant | null): SanityImageData | null {
-  return variant?.poster?.id ? variant.poster : null;
+/** `key` compares themes: these objects are rebuilt each render, so identity cannot. */
+type HeroStill = {
+  image?: SanityImageData;
+  key: string;
+  url?: string;
+};
+
+function stillOf(variant?: HeroVideoVariant | null): HeroStill | null {
+  if (variant?.poster?.id) {
+    return { image: variant.poster, key: variant.poster.id };
+  }
+  // Only the Mux path may borrow Mux's generated still. A hero served from the
+  // Sanity CDN must not reach image.mux.com for its poster, or the two
+  // delivery paths stop being measurable against each other.
+  if (!isMuxPath(mediaTypeOf(variant))) {
+    return null;
+  }
+  const url = muxThumbnailUrl(
+    muxPlaybackId(variant?.mux),
+    variant?.mux?.thumbTime,
+    POSTER_WIDTH
+  );
+  return url ? { key: url, url } : null;
 }
 
 function HeroPoster({
   className,
   eager,
-  poster,
+  fill = true,
+  still,
 }: Readonly<{
   className?: string;
   eager?: boolean;
-  poster: SanityImageData;
+  /** Off for the fold's mirror: a `top: 0` would over-constrain its own
+   * bottom/height and pin the flip to the wrong edge. */
+  fill?: boolean;
+  still: HeroStill;
 }>) {
-  const dimensions = getImageDimensions(poster);
+  const shared = cn(
+    fill && bannerFill,
+    "rounded-none! object-cover object-[50%_45%]",
+    className
+  );
+
+  if (still.url) {
+    return (
+      // biome-ignore lint/performance/noImgElement: Mux serves this already sized and encoded from its own CDN; next/image would add a proxy hop for nothing.
+      <img
+        alt=""
+        className={shared}
+        fetchPriority={eager ? "high" : undefined}
+        loading={eager ? "eager" : "lazy"}
+        src={still.url}
+      />
+    );
+  }
+
+  const image = still.image as SanityImageData;
+  const dimensions = getImageDimensions(image);
   return (
     <SanityImage
       alt=""
-      className={cn(
-        bannerFill,
-        "rounded-none! object-cover object-[50%_45%]",
-        className
-      )}
+      className={shared}
       fetchPriority={eager ? "high" : undefined}
       height={
         dimensions
           ? Math.round(POSTER_WIDTH / dimensions.aspectRatio)
           : undefined
       }
-      image={poster}
+      image={image}
       loading={eager ? "eager" : "lazy"}
       width={POSTER_WIDTH}
     />
@@ -65,13 +108,13 @@ function HeroPoster({
 }
 
 function HeroFold({ video }: Readonly<{ video?: HeroVideoData | null }>) {
-  const light = posterOf(video?.light) ?? posterOf(video?.dark);
-  const dark = posterOf(video?.dark) ?? light;
+  const light = stillOf(video?.light) ?? stillOf(video?.dark);
+  const dark = stillOf(video?.dark) ?? light;
   if (!light) {
     return null;
   }
 
-  const split = dark !== null && dark !== light;
+  const split = dark !== null && dark.key !== light.key;
   const mirror =
     "absolute inset-x-0 bottom-0 h-[calc(100svh-var(--hero-copy))] w-full scale-y-[-1] rounded-none! object-cover object-[50%_45%] blur-[16px]";
 
@@ -81,20 +124,16 @@ function HeroFold({ video }: Readonly<{ video?: HeroVideoData | null }>) {
       className="hero-park -top-[var(--hero-fold,0px)] absolute inset-x-0 z-0 h-[calc(var(--hero-fold,0px)+4rem)] overflow-hidden bg-background lg:fixed lg:top-0 lg:h-[var(--hero-fold)]"
       id="hero-fold"
     >
-      <SanityImage
-        alt=""
+      <HeroPoster
         className={cn(mirror, split && "dark:hidden")}
-        image={light}
-        loading="lazy"
-        width={POSTER_WIDTH}
+        fill={false}
+        still={light}
       />
       {split && dark && (
-        <SanityImage
-          alt=""
+        <HeroPoster
           className={cn(mirror, "hidden dark:block")}
-          image={dark}
-          loading="lazy"
-          width={POSTER_WIDTH}
+          fill={false}
+          still={dark}
         />
       )}
     </div>
@@ -102,30 +141,33 @@ function HeroFold({ video }: Readonly<{ video?: HeroVideoData | null }>) {
 }
 
 /**
- * The video's first frame, painted under the clip so the load is covered.
- * Split light/dark in CSS because this renders on the server, where the
- * active theme isn't known.
+ * The still under the clip, and the whole background when there is no video.
+ * Split light/dark in CSS: this renders on the server, which has no theme.
  */
 function HeroPosters({
   eager,
   video,
 }: Readonly<{ eager?: boolean; video?: HeroVideoData | null }>) {
-  const light = posterOf(video?.light) ?? posterOf(video?.dark);
-  const dark = posterOf(video?.dark) ?? light;
+  const light = stillOf(video?.light) ?? stillOf(video?.dark);
+  const dark = stillOf(video?.dark) ?? light;
   if (!light) {
     return null;
   }
 
-  const split = dark !== null && dark !== light;
+  const split = dark !== null && dark.key !== light.key;
 
   return (
     <>
       <HeroPoster
         className={split ? "dark:hidden" : undefined}
         eager={eager}
-        poster={light}
+        still={light}
       />
-      {split && <HeroPoster className="hidden dark:block" poster={dark} />}
+      {/* Never eager: the server cannot know the theme, so preloading both
+          halves of a CSS-split pair always wastes one full-size download and
+          earns a "preloaded but not used" warning. The light one carries the
+          priority; the dark one arrives a beat later in dark mode. */}
+      {split && <HeroPoster className="hidden dark:block" still={dark} />}
     </>
   );
 }
@@ -150,7 +192,7 @@ export function HeroBlock({
     <div className="container grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-12">
       <div className="grid gap-5">
         <BlockEyebrow eyebrow={badge} />
-        <h1 className="hero-enter max-w-[827px] break-words font-normal text-4xl text-foreground leading-[1.1] tracking-[-0.24px] sm:text-5xl lg:text-[64px]">
+        <h1 className="hero-enter max-w-[827px] text-pretty break-words font-normal text-4xl text-foreground leading-[1.1] tracking-[-0.24px] sm:text-5xl lg:text-[64px]">
           {title}
         </h1>
         <RichText

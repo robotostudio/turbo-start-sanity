@@ -30,7 +30,8 @@ import { MenuLink } from "@/components/elements/menu-link";
 import { Logo } from "@/components/logo";
 import type { ColumnLink, NavigationData } from "@/types";
 
-const TABLET_QUERY = "(min-width: 768px) and (max-width: 1024px)";
+const TABLET_QUERY = "(min-width: 768px) and (max-width: 1023.98px)";
+const DESKTOP_QUERY = "(min-width: 1024px)";
 
 const VIEWPORT_ANCHOR = {
   bottom: "items-end justify-center",
@@ -39,7 +40,7 @@ const VIEWPORT_ANCHOR = {
 
 const POPUP_SLIDE = {
   bottom:
-    "h-[90dvh] border-t origin-bottom [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-starting-style:[transform:translateY(100%)] data-ending-style:[transform:translateY(100%)]",
+    "h-dvh origin-bottom [transform:translateY(var(--drawer-swipe-movement-y,0px))] data-starting-style:[transform:translateY(100%)] data-ending-style:[transform:translateY(100%)]",
   right:
     "h-dvh max-w-md border-s origin-right [transform:translateX(var(--drawer-swipe-movement-x,0px))] data-starting-style:[transform:translateX(100%)] data-ending-style:[transform:translateX(100%)]",
 } as const;
@@ -51,11 +52,22 @@ export function MobileMenu({
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const isTablet = useMediaQuery(TABLET_QUERY);
+  const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const liveSide = isTablet ? "right" : "bottom";
+
   // Freeze the anchor at open-time and keep it for the whole session, so crossing
   // the breakpoint (e.g. a tablet rotation) or closing never re-anchors a visible
   // panel — re-anchoring on close would jump the sheet mid-exit-animation.
   const [side, setSide] = useState<"bottom" | "right">(liveSide);
+
+  if (isOpen && (isDesktop || side !== liveSide)) {
+    setIsOpen(false);
+  }
+
+  // On desktop the trigger is display:none, so focus would drop to body.
+  const finalFocus = isDesktop
+    ? () => document.querySelector<HTMLElement>("header a[href]")
+    : undefined;
 
   function handleOpenChange(next: boolean) {
     if (next) {
@@ -103,6 +115,7 @@ export function MobileMenu({
               "w-full pb-[env(safe-area-inset-bottom)]",
               POPUP_SLIDE[side]
             )}
+            finalFocus={finalFocus}
           >
             <DrawerContent>
               <div className="flex flex-row items-center justify-between border-b px-6 py-2.5">

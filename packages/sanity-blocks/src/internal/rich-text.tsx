@@ -11,6 +11,7 @@ import { CodeBlock } from "./code-block";
 import { headingChildrenToSlug as parseChildrenToSlug } from "./heading-slug";
 import { sanitizeHref } from "./safe-href";
 import { SanityImage } from "./sanity-image";
+import { TableBlock } from "./table-block";
 
 const logger = new Logger("RichText");
 
@@ -151,6 +152,13 @@ const components: Partial<PortableTextReactComponents> = {
         </figure>
       );
     },
+    table: ({ value }) => (
+      <TableBlock
+        cellComponents={components}
+        headerRows={value?.headerRows}
+        rows={value?.rows}
+      />
+    ),
   },
   hardBreak: () => <br />,
 };

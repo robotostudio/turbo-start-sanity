@@ -13,6 +13,11 @@ import {
 } from "@workspace/sanity-blocks/internal/icons";
 import {
   COPY_STATUS_CLASS,
+  SWAP_HIDDEN,
+  SWAP_LAYER,
+  SWAP_SHOWN,
+  SWAP_TEXT_HIDDEN,
+  SWAP_TEXT_SHOWN,
   useCopyToClipboard,
 } from "@workspace/sanity-blocks/internal/use-copy";
 import {
@@ -645,26 +650,35 @@ function ShareOptions({
         onClick={copy}
         type="button"
       >
-        <span className="grid size-4.5 place-items-center">
-          {copied ? (
-            <Check aria-hidden="true" className="size-4.5" />
-          ) : (
-            <CopyIcon className="size-4.5" />
-          )}
+        <span aria-hidden="true" className="grid size-4.5 place-items-center">
+          <Check
+            className={cn(
+              SWAP_LAYER,
+              "size-4.5",
+              copied ? SWAP_SHOWN : SWAP_HIDDEN
+            )}
+          />
+          <CopyIcon
+            className={cn(
+              SWAP_LAYER,
+              "size-4.5",
+              copied ? SWAP_HIDDEN : SWAP_SHOWN
+            )}
+          />
         </span>
-        <span className="grid text-xs tracking-[0.02em]">
+        <span aria-hidden="true" className="grid text-xs tracking-[0.02em]">
           <span
             className={cn(
-              "col-start-1 row-start-1",
-              copied ? "visible" : "invisible"
+              SWAP_LAYER,
+              copied ? SWAP_TEXT_SHOWN : SWAP_TEXT_HIDDEN
             )}
           >
             Copied
           </span>
           <span
             className={cn(
-              "col-start-1 row-start-1",
-              copied ? "invisible" : "visible"
+              SWAP_LAYER,
+              copied ? SWAP_TEXT_HIDDEN : SWAP_TEXT_SHOWN
             )}
           >
             Copy

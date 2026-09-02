@@ -93,7 +93,7 @@ export function ArticleJsonLd({
               : undefined,
           } as Person,
         ]
-      : [],
+      : undefined,
     publisher: {
       "@type": "Organization",
       name: settings?.siteTitle || "Turbo Start Sanity",
