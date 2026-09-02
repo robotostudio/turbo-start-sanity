@@ -23,12 +23,13 @@
     "sanity"
   ],
   "dependencies": {
+    "@robotostudio/sanity-plugin-lucide-icon-picker": "^1.0.2",
     "@sanity/assist": "^6.1.21",
     "@sanity/client": "catalog:",
     "@sanity/functions": "^1.6.9",
-    "@sanity/icons": "^3.8.0",
+    "@sanity/icons": "^5.2.1",
     "@sanity/orderable-document-list": "^2.0.22",
-    "@sanity/ui": "^3.5.3",
+    "@sanity/ui": "^4.0.6",
     "@sanity/vision": "^6.11.0",
     "@workspace/env": "workspace:*",
     "@workspace/logger": "workspace:*",
@@ -41,7 +42,6 @@
     "react-is": "catalog:",
     "sanity": "catalog:",
     "sanity-plugin-asset-source-unsplash": "^7.0.25",
-    "sanity-plugin-lucide-icon-picker": "^1.0.3",
     "sanity-plugin-media": "^6.1.6",
     "sanity-plugin-mux-input": "^5.0.12",
     "slugify": "^1.6.9",
