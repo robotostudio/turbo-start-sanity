@@ -16,8 +16,9 @@ export async function revalidateSyncTags(unsafeTags: unknown) {
     for (const tag of tags) {
       updateTag(tag);
     }
-    // `updateTag` alone doesn't trigger the router refresh Presentation needs.
-    return "refresh" as const;
+    // No refresh in draft: `updateTag` (with `cacheTag` in live.ts) surfaces the
+    // edit live, and a `router.refresh()` here flashes prefetched sibling routes.
+    return;
   }
 
   for (const tag of tags) {
