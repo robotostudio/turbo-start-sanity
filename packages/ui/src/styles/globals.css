@@ -202,46 +202,6 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Rest sits one fold down: iOS Safari composites the ~60px just scrolled past
-   behind the status bar, but paints an opaque strip at scrollY 0 — so the
-   parked mirror is what shows through the notch. Initial position and the
-   return spring are both scroll-snap; the snap point is a 1px marker because
-   snap-align on a tall element made Safari re-snap deep when late layout
-   (hydration, --footer-height) changed the document height. */
-#notch-slot,
-#notch-snap {
-  height: 0;
-}
-
-/* Below lg the page parks one fold down (the notch effect); from lg up the
-   fold is the fixed strip revealed by the browser's own elastic overscroll,
-   and rest stays at 0. --hero-rest is the park offset the scroll ranges key
-   off, so both breakpoints resolve their own rest position. */
-@media (width < 64rem) and (hover: none) and (pointer: coarse) {
-  :root:has(#hero-fold) {
-    --hero-fold: 140px;
-    --hero-rest: 140px;
-    scroll-snap-type: y proximity;
-    scroll-behavior: smooth;
-  }
-
-  :root:has(#hero-fold) #notch-slot {
-    height: 140px;
-  }
-
-  :root:has(#hero-fold) #notch-snap {
-    height: 1px;
-    margin-bottom: -1px;
-    scroll-snap-align: start;
-  }
-}
-
-@media (width >= 64rem) {
-  :root:has(#hero-fold) {
-    --hero-fold: 160px;
-  }
-}
-
 /* Overrides Tailwind's `container`. Inset defaults to 8px via a fallback var,
  * so [--container-px:…] can override it per instance. */
 @utility container {
@@ -336,8 +296,7 @@
 }
 
 /* Blurs the leading hero's banner as the page scrolls over it: the banner is
-   pinned under the content, so scroll progress maps to how covered it is.
-   Offset by the fold's strip so the banner rests sharp, not mid-ramp. */
+   pinned under the content, so scroll progress maps to how covered it is. */
 @keyframes hero-blur {
   to {
     filter: blur(4px);
@@ -351,8 +310,7 @@
   animation-timing-function: linear;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: var(--hero-rest, 0px)
-    calc(var(--hero-rest, 0px) + 100svh - var(--hero-copy, 420px));
+  animation-range: 0px calc(100svh - var(--hero-copy, 420px));
 }
 
 @keyframes nav-cover {
@@ -370,7 +328,7 @@
   animation-timing-function: linear;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: var(--hero-rest, 0px) 100vh;
+  animation-range: 0px 100vh;
 }
 
 /* The sticky banner paints at the viewport top for the whole page, so it
@@ -388,8 +346,7 @@
   animation-timing-function: linear;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: calc(var(--hero-rest, 0px) + 100svh)
-    calc(var(--hero-rest, 0px) + 100svh + 1px);
+  animation-range: 100svh calc(100svh + 1px);
 }
 
 /* The surface iOS samples for its status-bar and toolbar strips — see the
@@ -444,7 +401,7 @@
   animation-duration: auto;
   animation-fill-mode: both;
   animation-timeline: scroll(root block);
-  animation-range: var(--hero-rest, 0px) calc(var(--hero-rest, 0px) + 1px);
+  animation-range: 0px 1px;
 }
 
 /* Document scroll, not `view()`: the footer is fixed and never enters the
@@ -543,11 +500,13 @@
   }
   body {
     @apply bg-background text-foreground;
+
+    overscroll-behavior: none;
   }
   /* Colour the overscroll gutters — mainly the top rubber-band by the navbar. */
   html {
     background-color: var(--overscroll-top);
-    overscroll-behavior-x: none;
+    overscroll-behavior: none;
   }
   /* iOS paints the strips behind its toolbar and status bar from the document
      background — WebKit takes `body`'s, with the root covering the hairline at
