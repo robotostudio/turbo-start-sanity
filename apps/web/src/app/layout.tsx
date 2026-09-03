@@ -1,5 +1,6 @@
 import "@workspace/ui/globals.css";
 
+import { Analytics } from "@vercel/analytics/next";
 import {
   type DynamicFetchOptions,
   getDynamicFetchOptions,
@@ -77,6 +78,7 @@ export default async function RootLayout({
             <CombinedJsonLd includeOrganization includeWebsite />
           </Suspense>
         </Providers>
+        <Analytics />
       </body>
     </html>
   );

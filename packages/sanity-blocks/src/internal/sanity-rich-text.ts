@@ -1,4 +1,7 @@
-import { CodeBlockIcon, ImageIcon, LinkIcon, ThLargeIcon } from "@sanity/icons";
+import { CodeBlockIcon } from "@sanity/icons/CodeBlock";
+import { ImageIcon } from "@sanity/icons/Image";
+import { LinkIcon } from "@sanity/icons/Link";
+import { ThLargeIcon } from "@sanity/icons/ThLarge";
 import {
   type ConditionalProperty,
   defineArrayMember,

@@ -11,7 +11,6 @@ import {
   queryRedirects,
   querySlugPageData,
 } from "@workspace/sanity/query";
-import { draftMode } from "next/headers";
 
 import { fetchBlogIndexPage, parseBlogPageParam } from "@/lib/blog-index";
 import {
@@ -181,12 +180,8 @@ async function findRedirect(
 }
 
 async function resolveFetchOptions(): Promise<DynamicFetchOptions> {
-  const { isEnabled } = await draftMode();
-  if (!isEnabled) {
-    return PUBLISHED;
-  }
-  // Perspective follows draft mode, but stega stays off: its invisible
-  // metadata characters would end up inside the copied Markdown.
+  // Match the page routes' draft/published resolution. stega stays off: its
+  // invisible metadata characters would end up inside the copied Markdown.
   return { ...(await getDynamicFetchOptions()), stega: false };
 }
 

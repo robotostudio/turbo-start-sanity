@@ -1,4 +1,4 @@
-import { CopyIcon } from "@sanity/icons";
+import { CopyIcon } from "@sanity/icons/Copy";
 import { Box, Button, Card, Flex, Stack, Text, TextInput } from "@sanity/ui";
 import type { ChangeEvent } from "react";
 import { useCallback, useMemo } from "react";
@@ -123,9 +123,9 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
     !(typeof document?.title === "string" && document.title.trim()) || readOnly;
 
   return (
-    <Stack space={4}>
+    <Stack gap={4}>
       {(title || description) && (
-        <Stack space={2}>
+        <Stack gap={2}>
           {title && (
             <Text size={1} weight="semibold">
               {title}
@@ -139,8 +139,8 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
         </Stack>
       )}
 
-      <Stack space={4}>
-        <Stack space={2}>
+      <Stack gap={4}>
+        <Stack gap={2}>
           <Text size={1} weight="medium">
             URL Path
           </Text>
@@ -175,7 +175,7 @@ export function PathnameFieldComponent(props: ObjectFieldProps<SlugValue>) {
         </Text>
 
         {currentSlug && errors.length === 0 && (
-          <Stack space={2}>
+          <Stack gap={2}>
             <Text size={1} weight="medium">
               Preview
             </Text>
