@@ -42,12 +42,11 @@ const NAV_BUTTON_CLASS = cn(
 );
 
 // Anchored in px from the wrapper's bottom (`to top`), so the bar keeps this
-// progression at rest however tall the fold strip above is. Only the top
-// layer reaches into the strip, fading linearly across it.
+// progression at rest.
 const BLUR_LAYERS = [
   {
     radius: 24,
-    mask: "linear-gradient(to top, transparent 45px, black 56px, black 83px, transparent calc(83px + var(--hero-fold, 0px)))",
+    mask: "linear-gradient(to top, transparent 45px, black 56px, black 83px, transparent 83px)",
   },
   {
     radius: 8,
@@ -80,7 +79,7 @@ function ProgressiveBlur() {
         className="absolute inset-0 [-webkit-backdrop-filter:saturate(1.5)] [backdrop-filter:saturate(1.5)]"
         style={{ WebkitMaskImage: SATURATE_MASK, maskImage: SATURATE_MASK }}
       />
-      <div className="-top-[var(--hero-fold,0px)] absolute inset-x-0 bottom-0">
+      <div className="absolute inset-x-0 top-0 bottom-0">
         {BLUR_LAYERS.map(({ radius, mask }) => (
           <div
             className="absolute inset-0"

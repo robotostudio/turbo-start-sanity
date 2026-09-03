@@ -59,18 +59,14 @@ function stillOf(variant?: HeroVideoVariant | null): HeroStill | null {
 function HeroPoster({
   className,
   eager,
-  fill = true,
   still,
 }: Readonly<{
   className?: string;
   eager?: boolean;
-  /** Off for the fold's mirror: a `top: 0` would over-constrain its own
-   * bottom/height and pin the flip to the wrong edge. */
-  fill?: boolean;
   still: HeroStill;
 }>) {
   const shared = cn(
-    fill && bannerFill,
+    bannerFill,
     "rounded-none! object-cover object-[50%_45%]",
     className
   );
@@ -104,39 +100,6 @@ function HeroPoster({
       loading={eager ? "eager" : "lazy"}
       width={POSTER_WIDTH}
     />
-  );
-}
-
-function HeroFold({ video }: Readonly<{ video?: HeroVideoData | null }>) {
-  const light = stillOf(video?.light) ?? stillOf(video?.dark);
-  const dark = stillOf(video?.dark) ?? light;
-  if (!light) {
-    return null;
-  }
-
-  const split = dark !== null && dark.key !== light.key;
-  const mirror =
-    "absolute inset-x-0 bottom-0 h-[calc(100svh-var(--hero-copy))] w-full scale-y-[-1] rounded-none! object-cover object-[50%_45%] blur-[16px]";
-
-  return (
-    <div
-      aria-hidden="true"
-      className="hero-park -top-[var(--hero-fold,0px)] absolute inset-x-0 z-0 h-[calc(var(--hero-fold,0px)+4rem)] overflow-hidden bg-background lg:fixed lg:top-0 lg:h-[var(--hero-fold)]"
-      id="hero-fold"
-    >
-      <HeroPoster
-        className={cn(mirror, split && "dark:hidden")}
-        fill={false}
-        still={light}
-      />
-      {split && dark && (
-        <HeroPoster
-          className={cn(mirror, "hidden dark:block")}
-          fill={false}
-          still={dark}
-        />
-      )}
-    </div>
   );
 }
 
@@ -224,7 +187,6 @@ export function HeroBlock({
 
   return (
     <>
-      <HeroFold video={video} />
       <div
         className="hero-park relative z-0 h-[calc(100svh-var(--hero-copy))] overflow-hidden bg-background lg:sticky lg:top-0"
         data-sanity={dataSanity}
