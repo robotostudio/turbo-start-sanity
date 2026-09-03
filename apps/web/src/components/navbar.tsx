@@ -94,7 +94,6 @@ function ProgressiveBlur() {
         ))}
       </div>
       <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-30% via-background/25 to-transparent dark:from-background/70 dark:via-background/45" />
-      <div className="-top-16 absolute inset-x-0 h-16 bg-gradient-to-b from-transparent to-background/30 dark:to-background/70" />
     </div>
   );
 }
