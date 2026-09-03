@@ -54,7 +54,7 @@
   --dot-alpha: 80%;
 
   /* Overscroll gutter surface, shown on the top rubber-band by the navbar. */
-  --overscroll-top: var(--accent-green);
+  --overscroll-top: var(--background);
 
   /* Damped spring sampled to a `linear()` curve — ~1% overshoot, so it settles
      rather than bounces. A cubic-bezier can't overshoot at all. */
@@ -145,6 +145,13 @@
   --sidebar-border: oklch(0.269 0 0);
   --sidebar-ring: oklch(0.439 0 0);
   --dot-alpha: 80%;
+
+  /* Lifted off pure black so the bounce doesn't read as a hard block. */
+  --overscroll-top: color-mix(
+    in oklab,
+    var(--background) 90%,
+    var(--foreground) 10%
+  );
 }
 
 @theme inline {
@@ -493,11 +500,12 @@
   }
   body {
     @apply bg-background text-foreground;
+    overscroll-behavior: none;
   }
   /* Colour the overscroll gutters — mainly the top rubber-band by the navbar. */
   html {
     background-color: var(--overscroll-top);
-    overscroll-behavior-x: none;
+    overscroll-behavior: none;
   }
   /* iOS paints the strips behind its toolbar and status bar from the document
      background — WebKit takes `body`'s, with the root covering the hairline at
