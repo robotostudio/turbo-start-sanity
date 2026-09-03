@@ -500,6 +500,7 @@
   }
   body {
     @apply bg-background text-foreground;
+
     overscroll-behavior: none;
   }
   /* Colour the overscroll gutters — mainly the top rubber-band by the navbar. */
