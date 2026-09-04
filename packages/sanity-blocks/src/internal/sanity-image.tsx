@@ -49,6 +49,13 @@ export function svgUrlFromAssetId(id: string | null): string | null {
   return `${SANITY_BASE_URL}${filename}`;
 }
 
+// Plain CDN URL for a raster asset id, used by the no-JS <img> fallback:
+// `image-<hash>-<w>x<h>-<fmt>` -> `${SANITY_BASE_URL}<hash>-<w>x<h>.<fmt>?...`.
+export function rasterUrlFromAssetId(id: string, width?: number): string {
+  const filename = id.replace(/^image-/, "").replace(/-(\w+)$/, ".$1");
+  return `${SANITY_BASE_URL}${filename}?w=${width ?? 1200}&auto=format&fit=max`;
+}
+
 // Normalize a Sanity image ref to its canonical asset id, or null when it's
 // missing/malformed. Selecting an asset via the media library can prepend a
 // stray `drafts.` prefix (assets have no draft/published split); strip it and
@@ -141,5 +148,30 @@ export function SanityImage({ image, ...props }: SanityImageProps) {
     ...(isFiniteAll(image.crop, CROP_KEYS) && { crop: image.crop }),
   };
 
-  return <ImageWrapper {...props} {...processedData} />;
+  // The sanity-image lib renders the real <img> at opacity:0 until an onLoad
+  // handler reveals it, so a preview image never appears without JS. Emit a
+  // plain, correctly-sized <img> as a <noscript> fallback (no preview, no
+  // reveal) reusing the same layout props, so every variant — logo, cover,
+  // absolute fill — sizes itself without any global CSS override.
+  return (
+    <>
+      <ImageWrapper {...props} {...processedData} />
+      {image.preview ? (
+        <noscript>
+          {/* biome-ignore lint/performance/noImgElement: no-JS fallback; next/image needs JS. */}
+          <img
+            alt={processedData.alt}
+            className={props.className}
+            height={props.height}
+            src={rasterUrlFromAssetId(
+              id,
+              typeof props.width === "number" ? props.width : undefined
+            )}
+            style={props.style}
+            width={props.width}
+          />
+        </noscript>
+      ) : null}
+    </>
+  );
 }
