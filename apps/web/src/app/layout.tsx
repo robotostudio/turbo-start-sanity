@@ -45,6 +45,35 @@ export default async function RootLayout({
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
+        {/* No-JS fallback: reveal the footer and images, which JS otherwise unhides. */}
+        <noscript>
+          <style>{`
+            #page-shell { margin-bottom: 0 !important; }
+            .footer-pinned { position: static !important; height: auto !important; }
+            .footer-pinned::before, .footer-pinned::after { display: none !important; }
+            img[data-loading] {
+              opacity: 1 !important;
+              z-index: auto !important;
+              pointer-events: auto !important;
+            }
+            /* In-flow images: let their own size classes take over. */
+            img[data-loading]:not(.absolute) {
+              position: static !important;
+              width: auto !important;
+              height: auto !important;
+              max-width: 100% !important;
+            }
+            /* Fill images (e.g. hero posters, absolute inset-0 size-full):
+               restore the cover fill the inline hide style flattened. */
+            img[data-loading].absolute {
+              position: absolute !important;
+              inset: 0 !important;
+              width: 100% !important;
+              height: 100% !important;
+            }
+            img[data-lqip] { display: none !important; }
+          `}</style>
+        </noscript>
         <Providers>
           <ScrollToTop />
           <div
