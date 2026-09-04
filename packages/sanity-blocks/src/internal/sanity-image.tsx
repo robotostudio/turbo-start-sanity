@@ -4,6 +4,8 @@ import { cn } from "@workspace/tailwind-config/utils";
 import type { ElementType } from "react";
 import {
   SanityImage as BaseSanityImage,
+  buildSrc,
+  buildSrcSet,
   type WrapperProps,
 } from "sanity-image";
 
@@ -141,5 +143,64 @@ export function SanityImage({ image, ...props }: SanityImageProps) {
     ...(isFiniteAll(image.crop, CROP_KEYS) && { crop: image.crop }),
   };
 
-  return <ImageWrapper {...props} {...processedData} />;
+  // The sanity-image lib hides the real <img> (opacity:0) until an onLoad
+  // handler reveals it, so a preview image never appears without JS.
+  // NoScriptFallback renders a plain, correctly-sized <img> for that case; the
+  // global `img[data-lqip]{display:none}` no-JS rule hides the lib placeholder.
+  return (
+    <>
+      <ImageWrapper {...props} {...processedData} />
+      {image.preview ? (
+        <NoScriptFallback
+          alt={processedData.alt}
+          crop={processedData.crop}
+          hotspot={processedData.hotspot}
+          id={id}
+          imgProps={props}
+        />
+      ) : null}
+    </>
+  );
+}
+
+// Plain <img> shown only with JS off, reusing the caller's layout props and the
+// same URL builder the lib uses, so crop/hotspot framing matches the JS render.
+function NoScriptFallback({
+  alt,
+  crop,
+  hotspot,
+  id,
+  imgProps,
+}: Readonly<{
+  alt: string;
+  crop?: SanityImageData["crop"];
+  hotspot?: SanityImageData["hotspot"];
+  id: string;
+  imgProps: Omit<WrapperProps<"img">, "id">;
+}>) {
+  const query = {
+    baseUrl: SANITY_BASE_URL,
+    id,
+    width: typeof imgProps.width === "number" ? imgProps.width : undefined,
+    height: typeof imgProps.height === "number" ? imgProps.height : undefined,
+    mode: imgProps.mode,
+    ...(hotspot && { hotspot }),
+    ...(crop && { crop }),
+  };
+  return (
+    <noscript>
+      {/* biome-ignore lint/performance/noImgElement: no-JS fallback; next/image needs JS. */}
+      <img
+        alt={alt}
+        className={imgProps.className}
+        height={imgProps.height}
+        loading={imgProps.loading}
+        sizes={imgProps.sizes}
+        src={buildSrc(query).src}
+        srcSet={buildSrcSet(query).join(", ")}
+        style={imgProps.style}
+        width={imgProps.width}
+      />
+    </noscript>
+  );
 }
