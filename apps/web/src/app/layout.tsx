@@ -46,12 +46,14 @@ export default async function RootLayout({
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased`}
       >
         {/* No-JS fallback: the footer is revealed by a JS-set --footer-height,
-            so with JS off drop it into normal flow. (Images have their own
-            per-image noscript fallback in SanityImage.) */}
+            so with JS off drop it into normal flow. Images render their own
+            plain <img> in a per-image noscript (SanityImage); hide the lib's
+            LQIP placeholder here so it doesn't stack under that fallback. */}
         <noscript>
           <style>{`
             .footer-pinned { position: static !important; height: auto !important; }
             .footer-pinned::before, .footer-pinned::after { display: none !important; }
+            img[data-lqip] { display: none !important; }
           `}</style>
         </noscript>
         <Providers>

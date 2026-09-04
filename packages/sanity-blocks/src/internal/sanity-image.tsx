@@ -4,6 +4,8 @@ import { cn } from "@workspace/tailwind-config/utils";
 import type { ElementType } from "react";
 import {
   SanityImage as BaseSanityImage,
+  buildSrc,
+  buildSrcSet,
   type WrapperProps,
 } from "sanity-image";
 
@@ -47,13 +49,6 @@ export function svgUrlFromAssetId(id: string | null): string | null {
   }
   const filename = `${id.replace(/^image-/, "").replace(/-svg$/, "")}.svg`;
   return `${SANITY_BASE_URL}${filename}`;
-}
-
-// Plain CDN URL for a raster asset id, used by the no-JS <img> fallback:
-// `image-<hash>-<w>x<h>-<fmt>` -> `${SANITY_BASE_URL}<hash>-<w>x<h>.<fmt>?...`.
-export function rasterUrlFromAssetId(id: string, width?: number): string {
-  const filename = id.replace(/^image-/, "").replace(/-(\w+)$/, ".$1");
-  return `${SANITY_BASE_URL}${filename}?w=${width ?? 1200}&auto=format&fit=max`;
 }
 
 // Normalize a Sanity image ref to its canonical asset id, or null when it's
@@ -152,26 +147,39 @@ export function SanityImage({ image, ...props }: SanityImageProps) {
   // handler reveals it, so a preview image never appears without JS. Emit a
   // plain, correctly-sized <img> as a <noscript> fallback (no preview, no
   // reveal) reusing the same layout props, so every variant — logo, cover,
-  // absolute fill — sizes itself without any global CSS override.
-  return (
-    <>
-      <ImageWrapper {...props} {...processedData} />
-      {image.preview ? (
+  // absolute fill — sizes itself without any global CSS override. The global
+  // `img[data-lqip]{display:none}` no-JS rule hides the lib's placeholder so
+  // only this one shows. Built with the same URL builder the lib uses, so the
+  // authored crop/hotspot framing matches the JS render.
+  if (image.preview) {
+    const query = {
+      baseUrl: SANITY_BASE_URL,
+      id,
+      width: typeof props.width === "number" ? props.width : undefined,
+      height: typeof props.height === "number" ? props.height : undefined,
+      mode: props.mode,
+      ...(processedData.hotspot && { hotspot: processedData.hotspot }),
+      ...(processedData.crop && { crop: processedData.crop }),
+    };
+    return (
+      <>
+        <ImageWrapper {...props} {...processedData} />
         <noscript>
           {/* biome-ignore lint/performance/noImgElement: no-JS fallback; next/image needs JS. */}
           <img
             alt={processedData.alt}
             className={props.className}
             height={props.height}
-            src={rasterUrlFromAssetId(
-              id,
-              typeof props.width === "number" ? props.width : undefined
-            )}
+            sizes={props.sizes}
+            src={buildSrc(query).src}
+            srcSet={buildSrcSet(query).join(", ")}
             style={props.style}
             width={props.width}
           />
         </noscript>
-      ) : null}
-    </>
-  );
+      </>
+    );
+  }
+
+  return <ImageWrapper {...props} {...processedData} />;
 }
