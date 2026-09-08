@@ -81,7 +81,9 @@ test("new page: draft renders in Presentation, 404s publicly", async ({
     .poll(() => onSlug() !== null, { timeout: SYNC_TIMEOUT })
     .toBe(true);
   const frame = onSlug();
-  await frame?.evaluate(() => location.reload());
+  // `evaluate` can reject when the navigation destroys its context; the
+  // heading assertion below is what proves the reload happened.
+  await frame?.evaluate(() => location.reload()).catch(() => undefined);
 
   const preview = studio.frameLocator("iframe");
   await expect(

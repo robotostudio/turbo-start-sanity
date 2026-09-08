@@ -122,7 +122,10 @@ test("nested: parent and template-made child publish and enter the sitemap", asy
   await expect
     .poll(() => onChild() !== null, { timeout: SYNC_TIMEOUT })
     .toBe(true);
-  await onChild()?.evaluate(() => location.reload());
+  // `evaluate` can reject when the navigation destroys its context.
+  await onChild()
+    ?.evaluate(() => location.reload())
+    .catch(() => undefined);
   await expect(
     preview.getByRole("heading", { level: 1, name: child.title })
   ).toBeVisible({ timeout: LIVE_TIMEOUT });
