@@ -94,3 +94,88 @@ jobs:
           name: playwright-report
           path: apps/web/playwright-report/
           retention-days: 14
+
+  # Studio → website loop against the PR's own preview. The Studio is built
+  # here from the PR's schema and served inside the runner, pointed at the
+  # preview URL, so a Studio or schema change is what gets tested. Hands a
+  # write-capable token to code from the PR, hence the same `guard` gate. It
+  # publishes and deletes documents in the shared dataset, so it never runs
+  # against a production deployment.
+  presentation:
+    name: Playwright Presentation Tests
+    permissions:
+      contents: read
+    needs: guard
+    # One at a time across the whole repo. The workflow-level group keys on the
+    # deployment id, which is unique per deployment and so never queues
+    # anything — two PRs would run two suites at once against one dataset, and
+    # presentation-singletons.spec.ts publishes the real navbar/footer/settings.
+    # A lost race restores the other run's edits as if they were the original.
+    concurrency:
+      group: presentation-e2e
+      cancel-in-progress: false
+    # Both fields are checked: Vercel has shipped the environment name on the
+    # deployment and on the status in different integration versions, and a
+    # gate that matches neither would leave this job a permanent green no-op.
+    # Confirm the value in the first run's log before trusting it.
+    if: >-
+      needs.guard.outputs.trusted == 'true' &&
+      (startsWith(github.event.deployment_status.environment, 'Preview') ||
+       startsWith(github.event.deployment.environment, 'Preview'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Install Playwright Chromium
+        working-directory: apps/web
+        run: node_modules/.bin/playwright install --with-deps chromium
+
+      # A production build: `sanity dev` hardcodes Presentation to
+      # localhost:3000. Playwright's webServer serves `dist` with `sanity start`.
+      - name: Build Studio against the preview URL
+        run: pnpm --filter studio build
+        env:
+          SANITY_STUDIO_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+          SANITY_STUDIO_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
+          SANITY_STUDIO_API_VERSION: ${{ secrets.NEXT_PUBLIC_SANITY_API_VERSION }}
+          SANITY_STUDIO_PRESENTATION_URL: ${{ github.event.deployment_status.target_url }}
+
+      - name: Run Presentation tests
+        run: pnpm --filter web test:e2e:presentation
+        env:
+          CI: true
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+          NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
+          NEXT_PUBLIC_SANITY_API_VERSION: ${{ secrets.NEXT_PUBLIC_SANITY_API_VERSION }}
+          NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL: ${{ github.event.deployment_status.target_url }}
+          SANITY_STUDIO_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+          SANITY_STUDIO_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
+          SANITY_E2E_SESSION_TOKEN: ${{ secrets.SANITY_E2E_SESSION_TOKEN }}
+          SANITY_REVALIDATE_SECRET: ${{ secrets.SANITY_REVALIDATE_SECRET }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+          SANITY_E2E_FUNCTIONS_DEPLOYED: ${{ vars.SANITY_E2E_FUNCTIONS_DEPLOYED }}
+
+      - name: Upload report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: playwright-report-presentation
+          path: apps/web/playwright-report/
+          retention-days: 14
