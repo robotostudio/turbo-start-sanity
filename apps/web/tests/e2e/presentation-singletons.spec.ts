@@ -144,13 +144,12 @@ test.afterAll(async ({ browser }) => {
     // to real editors. Failure-tolerant: a site that is down is exactly the run
     // whose singletons must still be restored.
     const opened = await Promise.all(
-      ["/", "/blog"].map(async (route) => {
-        const tab = await visitor.newPage();
-        return await tab.goto(route).then(
-          () => tab,
+      ["/", "/blog"].map((route) =>
+        visit(visitor, route).then(
+          (tab) => tab,
           () => null
-        );
-      })
+        )
+      )
     );
     await restore([...before]);
     await client.delete(SINGLETON_SNAPSHOT_ID);
