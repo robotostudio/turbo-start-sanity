@@ -4,6 +4,7 @@ import {
   client,
   deleteOwn,
   expect,
+  html,
   fillStable,
   LIVE_TIMEOUT,
   prefix,
@@ -184,6 +185,12 @@ test("publish: public page goes live, updates live, keeps new drafts private", a
   await expect(
     publicTab.getByRole("heading", { level: 1, name: drafted, exact: true })
   ).toBeHidden();
+  // Both assertions above resolve at t+0 — `patched` is already painted and
+  // `drafted` never was. One fresh anonymous read, anchored on `patched` so an
+  // error body cannot satisfy it, catches a leak that lands a moment later.
+  const publicBody = await html(request, pageDoc.slug)();
+  expect(publicBody).toContain(patched);
+  expect(publicBody).not.toContain(drafted);
   await visitor.close();
 });
 

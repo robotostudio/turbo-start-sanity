@@ -5,6 +5,7 @@ import {
   deleteOwn,
   expect,
   fillStable,
+  html,
   LIVE_TIMEOUT,
   prefix,
   runId,
@@ -69,7 +70,7 @@ test("nested: parent and template-made child publish and enter the sitemap", asy
   browser,
   request,
 }) => {
-  const sitemap = soft(async () => (await request.get("/sitemap.xml")).text());
+  const sitemap = html(request, "/sitemap.xml");
   const preview = studio.frameLocator("iframe");
 
   await studio.goto(
@@ -159,7 +160,7 @@ test("rename: child moves to the new slug, old slug 404s, sitemap follows", asyn
   browser,
   request,
 }) => {
-  const sitemap = soft(async () => (await request.get("/sitemap.xml")).text());
+  const sitemap = html(request, "/sitemap.xml");
   const visitor = await visit(browser, [parent.slug, child.slug]);
 
   await studio.goto(
@@ -260,7 +261,7 @@ test("unpublish: parent 404s, child stays live, sitemap drops the parent", async
   browser,
   request,
 }) => {
-  const sitemap = soft(async () => (await request.get("/sitemap.xml")).text());
+  const sitemap = html(request, "/sitemap.xml");
   const visitor = await visit(browser, [parent.slug, child.renamed]);
 
   // Unpublish is hidden in the drafts perspective — `useUnpublishAction`
@@ -302,7 +303,7 @@ test("cleanup: deleted pages 404 and leave the sitemap", async ({
   browser,
   request,
 }) => {
-  const sitemap = soft(async () => (await request.get("/sitemap.xml")).text());
+  const sitemap = html(request, "/sitemap.xml");
   const visitor = await visit(browser, [parent.slug, child.renamed]);
 
   await deleteOwn();
@@ -314,6 +315,10 @@ test("cleanup: deleted pages 404 and leave the sitemap", async ({
   await expect
     .poll(sitemap, { timeout: SYNC_TIMEOUT })
     .not.toContain(loc(child.renamed));
-  expect(await sitemap()).not.toContain(loc(parent.slug));
+  const xml = await sitemap();
+  // The only positive here: without it a sitemap that lost every URL, or an
+  // error body, would satisfy both `not.toContain` assertions.
+  expect(xml, "sitemap served no entries at all").toContain("<loc>");
+  expect(xml).not.toContain(loc(parent.slug));
   await visitor.close();
 });

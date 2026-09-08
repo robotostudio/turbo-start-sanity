@@ -270,7 +270,11 @@ test("cleanup: the release is deleted and its document is gone", async ({
   // `releases::all()` on the Releases-capable client, not a `system.release`
   // document query on the app's version: that query returns [] both when the
   // release is gone and when the version cannot see release documents at all.
-  await expect.poll(soft(findRelease), { timeout: SYNC_TIMEOUT }).toBeNull();
+  // `toPass`, not `expect.poll(soft(...))`: `soft` returns null on rejection and
+  // null is the expected value, so a broken Releases API would satisfy it.
+  await expect(async () => {
+    expect(await findRelease()).toBeNull();
+  }).toPass({ timeout: SYNC_TIMEOUT });
   // The published page outlives the release.
   expect(await status(request, pageDoc.slug)()).toBe(200);
 });

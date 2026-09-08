@@ -148,6 +148,17 @@ export const soft =
     return error === undefined ? (value as T) : null;
   };
 
+/**
+ * `() => body` for `expect.poll`, guarded on 200 — an error body contains none
+ * of the strings a `not.toContain` looks for, so it satisfies them all.
+ */
+export const html = (request: APIRequestContext, path: string) =>
+  soft(async () => {
+    const response = await request.get(path);
+    expect(response.status(), path).toBe(200);
+    return response.text();
+  });
+
 /** `() => status` for `expect.poll`; `request` carries no cookies, so this is an anonymous visitor. */
 export const status =
   (request: APIRequestContext, path: string) => async () => {
@@ -192,11 +203,13 @@ export const test = base.extend<
       }
       // Own prefix (a re-run of the same run id) plus whatever a run that died
       // mid-way left behind more than an hour ago. Concurrent runs keep theirs.
+      // Releases first: a stale release still owns its `versions.*` documents,
+      // and the document sweep below cannot delete those while it is active.
+      await sweepStaleReleases();
       await client.delete({
         query: `*[${inPrefix} || ${isStale}]`,
         params: { prefix },
       });
-      await sweepStaleReleases();
       await use(undefined);
       await deleteOwn();
     },

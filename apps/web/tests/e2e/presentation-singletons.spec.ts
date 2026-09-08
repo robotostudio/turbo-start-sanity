@@ -1,14 +1,10 @@
-import type {
-  APIRequestContext,
-  BrowserContext,
-  FrameLocator,
-  Page,
-} from "@playwright/test";
+import type { BrowserContext, FrameLocator, Page } from "@playwright/test";
 
 import {
   client,
   expect,
   fillStable,
+  html,
   LIVE_TIMEOUT,
   prefix,
   runId,
@@ -75,6 +71,9 @@ const writeSnapshot = () =>
     json: JSON.stringify([...before]),
   });
 
+/** Past any live run; older than this a snapshot is stale, not a rescue. */
+const SNAPSHOT_MAX_AGE_SECONDS = 6 * 3600;
+
 /** Text only this suite writes into the singletons. */
 const E2E_CONTENT = /E2E (\d{6,}|footer|site)/;
 
@@ -91,16 +90,20 @@ test.beforeAll(async () => {
   // A snapshot that outlived its run means that run died before restoring. It
   // has no age bound, so replay it only over pollution this suite recognises as
   // its own; over clean singletons it is obsolete — drop it, restore nothing.
+  // Age-bounded: replaying a months-old snapshot would overwrite every editor
+  // change made since. Past that it is not a rescue, just stale data.
   const rescue = await client.fetch<{ json: string } | null>(
-    "*[_id == $id][0]{json}",
+    `*[_id == $id && dateTime(_updatedAt) > dateTime(now()) - ${SNAPSHOT_MAX_AGE_SECONDS}][0]{json}`,
     { id: SINGLETON_SNAPSHOT_ID }
   );
   if (rescue) {
     const live: SanityDoc[] = await client.fetch("*[_id in $ids]", { ids });
     if (E2E_CONTENT.test(JSON.stringify(live))) {
       await restore(JSON.parse(rescue.json) as Snapshot);
+      // Only once the restore landed: dropping it on the other branch destroys
+      // the one copy that can undo a leak this run failed to recognise.
+      await client.delete(SINGLETON_SNAPSHOT_ID);
     }
-    await client.delete(SINGLETON_SNAPSHOT_ID);
   }
 
   const docs: SanityDoc[] = await client.fetch("*[_id in $ids]", { ids });
@@ -136,21 +139,21 @@ test.afterAll(async ({ browser }) => {
   // A visitor tab per route carries the restore into the site's cache, not
   // just the dataset — a route with no open tab keeps serving this run's
   // navbar to real editors.
+  // The dataset first, and before any tab is opened: `goto` throws when the
+  // site is down, which is exactly the run whose singletons need restoring.
+  await restore([...before]);
+  await client.delete(SINGLETON_SNAPSHOT_ID);
+
   const visitor = await browser.newContext();
   const cached = ["/", "/blog"];
-  const tabs = await Promise.all(
-    cached.map(async (route) => {
-      const tab = await visitor.newPage();
-      await tab.goto(route);
-      return tab;
-    })
-  );
   try {
-    await restore([...before]);
-    // Dropped as soon as the dataset is back, before the cache polls, so a
-    // slow invalidation cannot strand it. A restore that never lands throws
-    // first and keeps it.
-    await client.delete(SINGLETON_SNAPSHOT_ID);
+    const tabs = await Promise.all(
+      cached.map(async (route) => {
+        const tab = await visitor.newPage();
+        await tab.goto(route);
+        return tab;
+      })
+    );
     for (const tab of tabs) {
       await expect
         .poll(html(tab.request, new URL(tab.url()).pathname), {
@@ -162,14 +165,6 @@ test.afterAll(async ({ browser }) => {
     await visitor.close();
   }
 });
-
-const html = (request: APIRequestContext, path: string) =>
-  soft(async () => {
-    const response = await request.get(path);
-    // A non-200 body would satisfy every `not.toContain` below.
-    expect(response.status(), path).toBe(200);
-    return response.text();
-  });
 
 const preview = (studio: Page) => studio.frameLocator("iframe");
 const mainNav = (scope: Page | FrameLocator) =>
@@ -308,11 +303,13 @@ test("navbar: publish puts the link on every route", async ({
   await visitor.close();
 });
 
-test("navbar: /index.md lists the link", async ({ request }) => {
-  // The Markdown route serializes the page document only (`pageToMarkdown` in
-  // apps/web/src/lib/markdown.ts); layout singletons never reach it.
-  test.fail(true, "site: /index.md does not serialize the navbar");
-  expect(await html(request, "/index.md")()).toContain(`[${linkName}](`);
+test("navbar: /index.md is served, without the link", async ({ request }) => {
+  // The Markdown route serializes the page document only (`pageToMarkdown`), so
+  // layout singletons never reach it. Asserted rather than `test.fail`, which
+  // would also accept a 404 or a 500.
+  const body = await html(request, "/index.md")();
+  expect(body, "/index.md is not served").toBeTruthy();
+  expect(body).not.toContain(`[${linkName}](`);
 });
 
 test("footer: draft subtitle shows in Presentation only, publish puts it on every route", async ({

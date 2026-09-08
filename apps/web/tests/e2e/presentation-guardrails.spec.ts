@@ -3,6 +3,7 @@ import {
   client,
   expect,
   fillStable,
+  html,
   LIVE_TIMEOUT,
   prefix,
   runId,
@@ -61,7 +62,7 @@ test("validation: publish stays disabled until title and slug are filled", async
   await expect(description).toBeVisible({ timeout: 90_000 });
   await fillStable(description, "An editor forgot the title and the slug.");
   await expect
-    .poll(() => client.getDocument(`drafts.${invalidPage.id}`), {
+    .poll(soft(() => client.getDocument(`drafts.${invalidPage.id}`)), {
       timeout: SYNC_TIMEOUT,
     })
     .toBeTruthy();
@@ -143,20 +144,19 @@ test("seo: overrides reach the metadata, noindex hides the page from the sitemap
     "content",
     seoPage.seoDescription
   );
-  if (asset) {
-    await expect(
-      publicTab.locator('meta[property="og:image"]').first()
-    ).toHaveAttribute("content", new RegExp(`^${asset.url}`));
-  }
+  // A skip, not a silent `if`: without a second asset the og:image half of the
+  // ticket proves nothing, and that should show in the report.
+  test.skip(!asset, "dataset has no image asset besides the settings og:image");
+  await expect(
+    publicTab.locator('meta[property="og:image"]').first()
+  ).toHaveAttribute("content", new RegExp(`^${asset?.url}`));
 
   await expect(publicTab.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
     /index, follow/
   );
 
-  const sitemapLocs = soft(async () =>
-    (await request.get("/sitemap.xml")).text()
-  );
+  const sitemapLocs = html(request, "/sitemap.xml");
   await expect
     .poll(sitemapLocs, { timeout: SYNC_TIMEOUT })
     .toContain(`${seoPage.slug}<`);

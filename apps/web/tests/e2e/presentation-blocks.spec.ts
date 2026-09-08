@@ -42,8 +42,8 @@ test.describe.configure({ mode: "serial" });
 
 test.beforeAll(async () => {
   assets = await client.fetch<BlockAssets>(`{
-    "imageId": *[_type == "sanity.imageAsset"][0]._id,
-    "muxAssetId": *[_type == "mux.videoAsset" && status != "errored" && defined(playbackId) && data.playback_ids[0].policy == "public"][0]._id
+    "imageId": *[_type == "sanity.imageAsset" && !(_id in path("drafts.**"))] | order(_id asc) [0]._id,
+    "muxAssetId": *[_type == "mux.videoAsset" && !(_id in path("drafts.**")) && status != "errored" && defined(playbackId) && data.playback_ids[0].policy == "public"] | order(_id asc) [0]._id
   }`);
 
   await client.createOrReplace({
@@ -87,11 +87,14 @@ test("the insert menu offers every block", async ({ page: studio }) => {
   // Multi-type arrays label the button "Add item...".
   await pageBuilder.getByRole("button", { name: "Add item" }).first().click();
 
+  // Scoped to the open menu: unscoped, a page-builder array row with the same
+  // title satisfies this without the block being in the insert menu at all.
+  const menu = studio.getByRole("menu");
   for (const fixture of blockFixtures) {
     await expect(
-      studio
+      menu
         .getByRole("menuitem", { name: fixture.title, exact: true })
-        .or(studio.getByRole("button", { name: fixture.title, exact: true })),
+        .or(menu.getByRole("button", { name: fixture.title, exact: true })),
       `insert menu is missing "${fixture.title}"`
     ).toBeVisible();
   }
@@ -110,6 +113,11 @@ for (const fixture of blockFixtures) {
       thumbnail.status(),
       `no insert-menu thumbnail for ${fixture.type}`
     ).toBe(200);
+    // A dev server's SPA fallback answers a missing asset with 200 index.html.
+    expect(
+      thumbnail.headers()["content-type"],
+      `thumbnail for ${fixture.type} is not an image`
+    ).toContain("image/");
 
     test.skip(
       Boolean(fixture.requiresImage) && !assets.imageId,
@@ -207,6 +215,7 @@ test.describe("markdown", () => {
   test("no component leaks as a raw tag", () => {
     // The serializers emit structured Markdown, never JSX — a `<Capitalised`
     // in the output means a component reached the string.
+    expect(markdown.length, "no markdown was serialized").toBeGreaterThan(0);
     expect(markdown).not.toMatch(/<[A-Z][A-Za-z]*/);
   });
 });
