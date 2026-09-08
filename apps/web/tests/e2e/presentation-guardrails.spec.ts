@@ -147,12 +147,18 @@ test("seo: overrides reach the metadata, noindex hides the page from the sitemap
     "content",
     seoPage.seoDescription
   );
-  // A skip, not a silent `if`: without a second asset the og:image half of the
-  // ticket proves nothing, and that should show in the report.
-  test.skip(!asset, "dataset has no image asset besides the settings og:image");
-  await expect(
-    publicTab.locator('meta[property="og:image"]').first()
-  ).toHaveAttribute("content", new RegExp(`^${asset?.url}`));
+  // Annotated rather than skipped: `test.skip` here would abandon the robots
+  // and sitemap assertions below, which have nothing to do with the image.
+  if (asset) {
+    await expect(
+      publicTab.locator('meta[property="og:image"]').first()
+    ).toHaveAttribute("content", new RegExp(`^${asset.url}`));
+  } else {
+    test.info().annotations.push({
+      type: "skipped",
+      description: "no image asset besides the settings og:image",
+    });
+  }
 
   await expect(publicTab.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
