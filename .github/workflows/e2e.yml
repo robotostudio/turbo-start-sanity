@@ -165,6 +165,10 @@ jobs:
           NEXT_PUBLIC_SANITY_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
           NEXT_PUBLIC_SANITY_API_VERSION: ${{ secrets.NEXT_PUBLIC_SANITY_API_VERSION }}
           NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL: ${{ github.event.deployment_status.target_url }}
+          # `@workspace/env/client` validates at import time and the specs reach
+          # it through `@/utils`, so the suite cannot even be collected without
+          # this. The Studio runs inside the runner, hence localhost.
+          NEXT_PUBLIC_SANITY_STUDIO_URL: http://localhost:3333
           SANITY_STUDIO_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
           SANITY_STUDIO_DATASET: ${{ secrets.NEXT_PUBLIC_SANITY_DATASET }}
           SANITY_E2E_SESSION_TOKEN: ${{ secrets.SANITY_E2E_SESSION_TOKEN }}
