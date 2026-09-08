@@ -254,7 +254,7 @@ test("publish release: fresh visitors see the new heading, an open tab updates l
   await fresh.context().close();
 
   await expect
-    .poll(async () => (await request.get(`${pageDoc.slug}.md`)).text(), {
+    .poll(soft(async () => (await request.get(`${pageDoc.slug}.md`)).text()), {
       timeout: SYNC_TIMEOUT,
     })
     .toContain(pageDoc.releaseHeading);
