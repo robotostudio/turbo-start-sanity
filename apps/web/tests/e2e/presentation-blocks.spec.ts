@@ -4,6 +4,7 @@ import {
   expect,
   fillStable,
   LIVE_TIMEOUT,
+  PUBLISHED,
   prefix,
   runId,
   STUDIO_URL,
@@ -41,10 +42,14 @@ let markdown = "";
 test.describe.configure({ mode: "serial" });
 
 test.beforeAll(async () => {
-  assets = await client.fetch<BlockAssets>(`{
-    "imageId": *[_type == "sanity.imageAsset" && !(_id in path("drafts.**"))] | order(_id asc) [0]._id,
-    "muxAssetId": *[_type == "mux.videoAsset" && !(_id in path("drafts.**")) && status != "errored" && defined(playbackId) && data.playback_ids[0].policy == "public"] | order(_id asc) [0]._id
-  }`);
+  assets = await client.fetch<BlockAssets>(
+    `{
+    "imageId": *[_type == "sanity.imageAsset"] | order(_id asc) [0]._id,
+    "muxAssetId": *[_type == "mux.videoAsset" && status != "errored" && defined(playbackId) && data.playback_ids[0].policy == "public"] | order(_id asc) [0]._id
+  }`,
+    {},
+    PUBLISHED
+  );
 
   await client.createOrReplace({
     _id: `drafts.${pageDoc.id}`,

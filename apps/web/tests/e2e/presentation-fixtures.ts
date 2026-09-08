@@ -48,6 +48,9 @@ export const client = createClient({
   perspective: "raw",
 });
 
+/** For reads that must not see drafts or versions. `client` is `raw`. */
+export const PUBLISHED = { perspective: "published" } as const;
+
 // Two PRs can run at once against the same dataset, so every id and slug a
 // run creates carries its own prefix and cleanup only ever touches that prefix.
 // The exception is presentation-singletons.spec.ts, which edits the real

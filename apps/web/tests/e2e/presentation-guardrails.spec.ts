@@ -5,6 +5,7 @@ import {
   fillStable,
   html,
   LIVE_TIMEOUT,
+  PUBLISHED,
   prefix,
   runId,
   STUDIO_URL,
@@ -39,9 +40,6 @@ const seoPage = {
 };
 // Its own id: presentation.spec.ts owns `${prefix}author`.
 const authorId = `${prefix}seo-author`;
-// The shared client is `perspective: "raw"`; these counts must not see
-// drafts or release versions.
-const PUBLISHED = { perspective: "published" } as const;
 const BLOG_CATEGORY = "aeo";
 // `BLOG_LIST_PAGE_SIZE` is not exported; page 2 starts where page 1 ends.
 const BLOG_LIST_PAGE_SIZE = getBlogPaginationRange(2).start;
