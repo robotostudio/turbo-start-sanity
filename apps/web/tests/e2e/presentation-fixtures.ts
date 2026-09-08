@@ -175,6 +175,16 @@ export const test = base.extend<
     async ({}, use) => {
       // Own prefix (a re-run of the same run id) plus whatever a run that died
       // mid-way left behind more than an hour ago. Concurrent runs keep theirs.
+      // A checkout that never created this dataset otherwise fails deep in a
+      // spec, on a missing singleton, which points at the wrong thing.
+      const seeded = await client
+        .fetch<number>(`count(*[_id in ["navbar", "footer", "settings"]])`)
+        .catch(() => 0);
+      if (seeded === 0) {
+        throw new Error(
+          `Sanity dataset "${dataset}" is missing or empty. Create it once from your content dataset: cd apps/studio && npx sanity dataset copy <source> ${dataset}`
+        );
+      }
       await client.delete({
         query: `*[${inPrefix} || ${isStale}]`,
         params: { prefix },

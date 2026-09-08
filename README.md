@@ -202,10 +202,18 @@ Editor-role token, though `SANITY_API_WRITE_TOKEN` works locally. The Releases
 test needs `NEXT_PUBLIC_SANITY_API_VERSION` unset or `>= 2025-02-19`, and skips
 itself with that message otherwise.
 
-It runs against its own dataset (`e2e` by default, override with
-`SANITY_E2E_DATASET`), never production: the singleton test publishes into the
-real `navbar`, `footer` and `settings`, which cannot carry a prefix. Everything
-else is prefixed `e2e-<runId>-` and deleted afterwards. Still one run at a time
+It runs against its own dataset, never production. Create it once from the
+dataset that holds your content:
+
+```sh
+cd apps/studio
+npx sanity dataset copy production e2e
+```
+
+Override the name with `SANITY_E2E_DATASET`. A separate dataset is required
+because the singleton test publishes into the real `navbar`, `footer` and
+`settings`, which cannot carry a prefix. Everything else is prefixed
+`e2e-<runId>-` and deleted afterwards. Still one run at a time
 per dataset — the singletons are shared. CI builds and serves both halves inside
 the runner and runs the same specs on every PR.
 
