@@ -2,7 +2,7 @@
  * Slug validation — single source of truth for all URL path validation.
  */
 
-import type { ValidationContext } from "sanity";
+import { getPublishedId, type ValidationContext } from "sanity";
 import slugify from "slugify";
 
 import { API_VERSION } from "@/utils/constant";
@@ -230,9 +230,9 @@ export function createSlugErrorValidator(
 }
 
 /**
- * Reject a slug already taken by another document. The document's own draft and
- * published ids are excluded so re-saving an unchanged document doesn't flag
- * itself.
+ * Reject a slug already taken by another document. Excludes every id this
+ * document can be stored under so it never flags itself: in a release `_id` is
+ * `versions.<releaseId>.<publishedId>`, matching neither the draft nor published id.
  */
 export function createSlugUniqueValidator(): (
   slug: { current?: string } | undefined,
@@ -243,12 +243,13 @@ export function createSlugUniqueValidator(): (
     if (!(current && context.getClient)) {
       return true;
     }
-    const id = (context.document?._id ?? "").replace(/^drafts\./, "");
+    const self = context.document?._id ?? "";
+    const id = getPublishedId(self);
     const taken = await context
       .getClient({ apiVersion: API_VERSION })
       .fetch<number>(
-        `count(*[!(_id in [$draft, $published]) && slug.current == $slug])`,
-        { draft: `drafts.${id}`, published: id, slug: current }
+        `count(*[!(_id in [$self, $draft, $published]) && slug.current == $slug])`,
+        { self, draft: `drafts.${id}`, published: id, slug: current }
       );
     return taken > 0
       ? `“${current}” is already used by another document. URLs must be unique.`
