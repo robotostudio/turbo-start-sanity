@@ -20,11 +20,11 @@ import {
 } from "./presentation-fixtures";
 
 /**
- * navbar, footer and settings are singletons rendered by the root
- * layout, so an edit reaches every route through the layout's cache tags, not
- * a page's. These documents are shared with real editors and cannot be
- * deleted, so the suite snapshots them (draft included) and writes the
- * snapshot back in `afterAll`.
+ * navbar, footer and settings are singletons rendered by the root layout, so an
+ * edit reaches every route through the layout's cache tags, not a page's. They
+ * cannot carry a run prefix and cannot be deleted, so the suite snapshots them
+ * (draft included) and writes the snapshot back in `afterAll` — otherwise the
+ * next run starts on the last one's content.
  */
 
 // Presentation gives the preview 75% of the window and the desktop nav is
@@ -46,7 +46,7 @@ const pageDoc = {
 };
 const ROUTES = ["/", "/blog", pageDoc.slug];
 
-// `runId` is digits only, so these are safe inside a RegExp unescaped.
+// `runId` is digits, hyphens and the job name — regex-safe unescaped below.
 const linkName = `E2E ${runId}`;
 const footerSubtitle = `E2E footer ${runId}`;
 const siteTitle = `E2E site ${runId}`;
@@ -75,6 +75,9 @@ const writeSnapshot = () =>
     json: JSON.stringify([...before]),
   });
 
+/** Text only this suite writes into the singletons. */
+const E2E_CONTENT = /E2E (\d{6,}|footer|site)/;
+
 const restore = (entries: Snapshot) => {
   let tx = client.transaction();
   for (const [id, doc] of entries) {
@@ -84,20 +87,22 @@ const restore = (entries: Snapshot) => {
 };
 
 test.beforeAll(async () => {
-  // A snapshot that outlived its run means that run died before restoring.
-  // Put the singletons back before anything reads them, including the guard
-  // below — which would otherwise refuse to start over pollution this run can
-  // undo itself.
+  const ids = SINGLETONS.flatMap((id) => [id, `drafts.${id}`]);
+  // A snapshot that outlived its run means that run died before restoring. It
+  // has no age bound, so replay it only over pollution this suite recognises as
+  // its own; over clean singletons it is obsolete — drop it, restore nothing.
   const rescue = await client.fetch<{ json: string } | null>(
     "*[_id == $id][0]{json}",
     { id: SINGLETON_SNAPSHOT_ID }
   );
   if (rescue) {
-    await restore(JSON.parse(rescue.json) as Snapshot);
+    const live: SanityDoc[] = await client.fetch("*[_id in $ids]", { ids });
+    if (E2E_CONTENT.test(JSON.stringify(live))) {
+      await restore(JSON.parse(rescue.json) as Snapshot);
+    }
     await client.delete(SINGLETON_SNAPSHOT_ID);
   }
 
-  const ids = SINGLETONS.flatMap((id) => [id, `drafts.${id}`]);
   const docs: SanityDoc[] = await client.fetch("*[_id in $ids]", { ids });
   // Never absorb a previous run's leftovers as the baseline: snapshotting
   // polluted singletons would write E2E content back as the original and make
@@ -105,7 +110,7 @@ test.beforeAll(async () => {
   expect(
     JSON.stringify(docs),
     "singletons still carry E2E content from an earlier run — restore them before running this spec"
-  ).not.toMatch(/E2E (\d{6,}|footer|site)/);
+  ).not.toMatch(E2E_CONTENT);
   for (const id of ids) {
     before.set(id, docs.find((doc) => doc._id === id) ?? null);
   }
@@ -142,6 +147,10 @@ test.afterAll(async ({ browser }) => {
   );
   try {
     await restore([...before]);
+    // Dropped as soon as the dataset is back, before the cache polls, so a
+    // slow invalidation cannot strand it. A restore that never lands throws
+    // first and keeps it.
+    await client.delete(SINGLETON_SNAPSHOT_ID);
     for (const tab of tabs) {
       await expect
         .poll(html(tab.request, new URL(tab.url()).pathname), {
@@ -149,10 +158,6 @@ test.afterAll(async ({ browser }) => {
         })
         .not.toContain(runId);
     }
-    // Only now: while this document exists, the next run restores from it
-    // instead of snapshotting the polluted singletons. A restore that never
-    // lands leaves it in place on purpose.
-    await client.delete(SINGLETON_SNAPSHOT_ID);
   } finally {
     await visitor.close();
   }
