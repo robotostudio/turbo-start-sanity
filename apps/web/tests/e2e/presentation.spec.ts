@@ -102,6 +102,16 @@ test("new page: draft renders in Presentation, 404s publicly", async ({
   expect(await status(request, pageDoc.slug)()).toBe(404);
   // The Markdown route shares the fetch path, so it must 404 too.
   expect(await status(request, `${pageDoc.slug}.md`)()).toBe(404);
+
+  // The draft branch: the Studio's context carries the draft-mode cookie its
+  // preview iframe set, which no anonymous assertion above can reach.
+  const draftMd = await studio.request.get(`${pageDoc.slug}.md`);
+  expect(draftMd.status(), "the Markdown route 404s in a draft session").toBe(
+    200
+  );
+  expect(await draftMd.text()).toContain(edited);
+  // Draft Markdown must never be stored by a shared cache.
+  expect(draftMd.headers()["cache-control"]).toContain("no-store");
 });
 
 test("publish: public page goes live, updates live, keeps new drafts private", async ({
@@ -143,6 +153,12 @@ test("publish: public page goes live, updates live, keeps new drafts private", a
   await expect
     .poll(status(request, `${pageDoc.slug}.md`), { timeout: SYNC_TIMEOUT })
     .toBe(200);
+  // The other half of content negotiation: the header, not the `.md` suffix.
+  const negotiated = await request.get(pageDoc.slug, {
+    headers: { accept: "text/markdown" },
+  });
+  expect(negotiated.status()).toBe(200);
+  expect(negotiated.headers()["content-type"]).toContain("text/markdown");
 
   const visitor = await browser.newContext();
   const publicTab = await visitor.newPage();
