@@ -11,8 +11,10 @@ const isCI = !!process.env.CI;
 
 // Never the live site's dataset: this suite publishes into the real
 // navbar/footer/settings. Set before the webServers spawn so they all agree.
+// `||`, not `??`: .env.example ships the key blank, and dotenv reads that as
+// an empty string.
 process.env.NEXT_PUBLIC_SANITY_DATASET =
-  process.env.SANITY_E2E_DATASET ?? "e2e";
+  process.env.SANITY_E2E_DATASET || "e2e";
 process.env.SANITY_STUDIO_DATASET = process.env.NEXT_PUBLIC_SANITY_DATASET;
 
 /**
