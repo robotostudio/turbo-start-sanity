@@ -38,6 +38,7 @@ pnpm type                      # Generate types from schema.json (root via turbo
 # Tests
 pnpm test             # Vitest unit tests (currently only @workspace/sanity-blocks)
 pnpm test:e2e         # Playwright smoke tests (apps/web, needs a running/deployed site)
+pnpm --filter web test:e2e:presentation  # Studio → website loop (Presentation drafts, publish, live update, no leaks); starts Studio on 3333 + `next build && next start` on 3000
 ```
 
 Note: `pnpm test` at the root is `turbo run test`, which today only reaches
