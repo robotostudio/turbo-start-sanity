@@ -179,18 +179,19 @@ export const test = base.extend<
   e2eDataset: [
     // biome-ignore lint/correctness/noEmptyPattern: Playwright fixture signature
     async ({}, use) => {
-      // Own prefix (a re-run of the same run id) plus whatever a run that died
-      // mid-way left behind more than an hour ago. Concurrent runs keep theirs.
-      // A checkout that never created this dataset otherwise fails deep in a
-      // spec, on a missing singleton, which points at the wrong thing.
+      // All three, not merely one: presentation-singletons.spec.ts needs every
+      // singleton published, and a half-seeded dataset otherwise fails deep in
+      // that spec on whichever one is missing.
       const seeded = await client.fetch<number>(
         `count(*[_id in ["navbar", "footer", "settings"]])`
       );
-      if (seeded === 0) {
+      if (seeded < 3) {
         throw new Error(
-          `Sanity dataset "${dataset}" is missing or empty. Create it once from your content dataset: cd apps/studio && npx sanity dataset copy <source> ${dataset}`
+          `Sanity dataset "${dataset}" has no published navbar/footer/settings. Seed it from your content dataset: cd apps/studio && npx sanity dataset copy <source> ${dataset}`
         );
       }
+      // Own prefix (a re-run of the same run id) plus whatever a run that died
+      // mid-way left behind more than an hour ago. Concurrent runs keep theirs.
       await client.delete({
         query: `*[${inPrefix} || ${isStale}]`,
         params: { prefix },
