@@ -88,6 +88,14 @@ export default defineConfig({
       timeout: 120_000,
     },
     {
+      // Next adds a `drain` listener per concurrent write to a response's Gzip
+      // stream, and this suite holds many tabs open, so Node's 10-listener
+      // warning fires on hundreds of separate streams. Every one reports 11,
+      // never more — nothing accumulates. Suppressed for this server only.
+      env: {
+        NODE_OPTIONS:
+          `${process.env.NODE_OPTIONS ?? ""} --disable-warning=MaxListenersExceededWarning`.trim(),
+      },
       // Never reuse: a `next dev` already on 3000 would serve drafts to the
       // anonymous checks. Playwright fails fast on the busy port.
       command: "pnpm --filter web build && pnpm --filter web start",
