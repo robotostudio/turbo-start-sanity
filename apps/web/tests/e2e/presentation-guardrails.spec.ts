@@ -38,6 +38,9 @@ const seoPage = {
 };
 // Its own id: presentation.spec.ts owns `${prefix}author`.
 const authorId = `${prefix}seo-author`;
+// The shared client is `perspective: "raw"`; these counts must not see
+// drafts or release versions.
+const PUBLISHED = { perspective: "published" } as const;
 const BLOG_CATEGORY = "aeo";
 // `BLOG_LIST_PAGE_SIZE` is not exported; page 2 starts where page 1 ends.
 const BLOG_LIST_PAGE_SIZE = getBlogPaginationRange(2).start;
@@ -102,11 +105,14 @@ test("seo: overrides reach the metadata, noindex hides the page from the sitemap
   // the same URL shape, so it would satisfy the assertion without `seoImage`
   // being read at all.
   const fallback = await client.fetch<string | null>(
-    `*[_type == "settings"][0].ogImage.asset._ref`
+    `*[_type == "settings"][0].ogImage.asset._ref`,
+    {},
+    PUBLISHED
   );
   const asset = await client.fetch<{ _id: string; url: string } | null>(
-    `*[_type == "sanity.imageAsset" && !(_id in path("drafts.**")) && _id != $fallback][0]{_id, url}`,
-    { fallback: fallback ?? "" }
+    `*[_type == "sanity.imageAsset" && _id != $fallback][0]{_id, url}`,
+    { fallback: fallback ?? "" },
+    PUBLISHED
   );
   await client.createOrReplace({
     _id: seoPage.id,
@@ -210,7 +216,9 @@ test("blog index: drafts filter by category and paginate in Presentation only", 
   request,
 }) => {
   const published = await client.fetch<number>(
-    `count(*[_type == "blog" && !(_id in path("drafts.**")) && !(_id in path("versions.**")) && defined(slug.current) && seoHideFromLists != true && featured != true])`
+    `count(*[_type == "blog" && defined(slug.current) && seoHideFromLists != true && featured != true])`,
+    {},
+    PUBLISHED
   );
   // Land the total one item past the current last page, so the drafts must
   // add a page: a pagination control that ignored them would keep the old
@@ -262,16 +270,24 @@ test("blog index: drafts filter by category and paginate in Presentation only", 
     name: "Blog pagination",
   });
   await expect(pagination).toBeVisible({ timeout: LIVE_TIMEOUT });
-  await expect(
-    // The number is the visible text, but `aria-label` sets the accessible
-    // name (blog-pagination.tsx). The last page is always rendered, however
-    // the window around the current page truncates.
-    pagination.getByRole("link", {
-      name: `Go to page ${expectedPages}`,
-      exact: true,
-    }),
-    `drafts did not add page ${expectedPages} to the listing`
-  ).toBeVisible({ timeout: LIVE_TIMEOUT });
+  // `aria-label` sets the accessible name (blog-pagination.tsx), and the window
+  // around the current page truncates — only the last page is always rendered,
+  // so assert on that one. It may exceed `expectedPages` if other drafts exist.
+  const pageLinks = pagination.getByRole("link", { name: /^Go to page \d+$/ });
+  // Polled, not read once: the drafts reach the listing over the live channel
+  // after the first render, so a single read catches the pre-draft page count.
+  await expect
+    .poll(
+      soft(async () => {
+        const label = await pageLinks.last().getAttribute("aria-label");
+        return Number(label?.replace(/\D+/g, ""));
+      }),
+      {
+        message: `drafts did not push the listing past ${basePages} pages`,
+        timeout: LIVE_TIMEOUT,
+      }
+    )
+    .toBeGreaterThanOrEqual(expectedPages);
 
   for (const path of [categoryPath, "/blog"]) {
     const response = await request.get(path);
