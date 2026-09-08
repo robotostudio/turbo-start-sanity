@@ -3,9 +3,11 @@ import type { BrowserContext, FrameLocator, Page } from "@playwright/test";
 import {
   client,
   expect,
+  expectStamped,
   fillStable,
   html,
   LIVE_TIMEOUT,
+  openListening,
   prefix,
   runId,
   SINGLETON_SNAPSHOT_ID,
@@ -13,6 +15,7 @@ import {
   SYNC_TIMEOUT,
   settle,
   soft,
+  stamp,
   test,
 } from "./presentation-fixtures";
 
@@ -171,30 +174,11 @@ const mainNav = (scope: Page | FrameLocator) =>
   scope.getByRole("navigation", { name: "Main" });
 
 // A live update must land without a navigation; a reload would wipe the stamp.
-const stamp = (page: Page) =>
-  page.evaluate(() => {
-    (window as { __e2e?: boolean }).__e2e = true;
-  });
-const expectStamped = async (page: Page) =>
-  expect(
-    await page.evaluate(() => (window as { __e2e?: boolean }).__e2e),
-    "page navigated instead of updating live"
-  ).toBe(true);
 
 // A public route's cache is only invalidated while a SanityLive tab is open
 // on it, so every route under test gets a visitor before the publish.
 const visit = async (context: BrowserContext, path: string) => {
-  const tab = await context.newPage();
-  // `goto` resolves on load, but <SanityLive>'s EventSource only opens after
-  // hydration. Publishing before it is listening means no revalidation ever
-  // reaches this tab, which looks exactly like a broken cache.
-  const live = tab
-    .waitForRequest((request) => request.url().includes("/data/live/events/"), {
-      timeout: 15_000,
-    })
-    .catch(() => null);
-  await tab.goto(path);
-  await live;
+  const tab = await openListening(context, path);
   await stamp(tab);
   return tab;
 };

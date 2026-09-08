@@ -1,9 +1,8 @@
-import type { Page } from "@playwright/test";
-
 import {
   client,
   deleteOwn,
   expect,
+  expectStamped,
   fillStable,
   html,
   LIVE_TIMEOUT,
@@ -13,6 +12,7 @@ import {
   SYNC_TIMEOUT,
   settle,
   soft,
+  stamp,
   status,
   test,
 } from "./presentation-fixtures";
@@ -30,17 +30,7 @@ const postDoc = {
 };
 const authorId = `${prefix}author`;
 
-type Stampable = Pick<Page, "evaluate"> | null;
 // A live update must land without a navigation; a reload would wipe the stamp.
-const stamp = (target: Stampable) =>
-  target?.evaluate(() => {
-    (window as { __e2e?: boolean }).__e2e = true;
-  });
-const expectStamped = async (target: Stampable) =>
-  expect(
-    await target?.evaluate(() => (window as { __e2e?: boolean }).__e2e),
-    "page navigated instead of updating live"
-  ).toBe(true);
 
 test.describe.configure({ mode: "serial" });
 

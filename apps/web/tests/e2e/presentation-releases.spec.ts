@@ -1,9 +1,8 @@
-import type { Page } from "@playwright/test";
-
 import {
   client,
   deleteRelease,
   expect,
+  expectStamped,
   fillStable,
   prefix,
   type ReleaseRef,
@@ -12,6 +11,7 @@ import {
   STUDIO_URL,
   SYNC_TIMEOUT,
   soft,
+  stamp,
   status,
   test,
 } from "./presentation-fixtures";
@@ -51,17 +51,7 @@ const findRelease = () =>
     { title: releaseTitle }
   );
 
-type Stampable = Pick<Page, "evaluate"> | null;
 // A live update must land without a navigation; a reload would wipe the stamp.
-const stamp = (target: Stampable) =>
-  target?.evaluate(() => {
-    (window as { __e2e?: boolean }).__e2e = true;
-  });
-const expectStamped = async (target: Stampable) =>
-  expect(
-    await target?.evaluate(() => (window as { __e2e?: boolean }).__e2e),
-    "page navigated instead of updating live"
-  ).toBe(true);
 
 // See the file header: below 2025-02-19 the app cannot serve a release
 // perspective, so this asserts nothing and says why.

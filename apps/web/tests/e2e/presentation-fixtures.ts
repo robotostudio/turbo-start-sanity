@@ -1,8 +1,10 @@
 import {
   type APIRequestContext,
+  type BrowserContext,
   test as base,
   expect,
   type Locator,
+  type Page,
 } from "@playwright/test";
 import { createClient } from "@sanity/client";
 import { DEFAULT_SANITY_API_VERSION } from "@workspace/env/constants";
@@ -196,6 +198,37 @@ export const status =
     const [response] = await handleErrors(request.get(path));
     return response?.status() ?? 0;
   };
+
+/** A Page, or a Frame that may not exist. */
+export type Stampable = Pick<Page, "evaluate"> | null;
+
+/** Mark a tab; a reload wipes the mark, so a navigation is detectable. */
+export const stamp = (target: Stampable) =>
+  target?.evaluate(() => {
+    (window as { __e2e?: boolean }).__e2e = true;
+  });
+
+export const expectStamped = async (target: Stampable) =>
+  expect(
+    await target?.evaluate(() => (window as { __e2e?: boolean }).__e2e),
+    "page navigated instead of updating live"
+  ).toBe(true);
+
+/**
+ * A tab with <SanityLive> already subscribed. `goto` resolves before the
+ * EventSource opens, and a publish landing in that gap never reaches the tab.
+ */
+export const openListening = async (context: BrowserContext, path: string) => {
+  const tab = await context.newPage();
+  const live = tab
+    .waitForRequest((request) => request.url().includes("/data/live/events/"), {
+      timeout: 15_000,
+    })
+    .catch(() => null);
+  await tab.goto(path);
+  await live;
+  return tab;
+};
 
 export const test = base.extend<
   Record<never, never>,

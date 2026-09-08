@@ -7,6 +7,7 @@ import {
   fillStable,
   html,
   LIVE_TIMEOUT,
+  openListening,
   prefix,
   runId,
   STUDIO_URL,
@@ -44,18 +45,7 @@ const loc = (slug: string) => `${slug}</loc>`;
 const visit = async (browser: Browser, paths: string[]) => {
   const visitor = await browser.newContext();
   for (const path of paths) {
-    const tab = await visitor.newPage();
-    // Wait for <SanityLive> to open its EventSource: `goto` resolves on load,
-    // and a publish that lands before the subscription exists never reaches
-    // this tab.
-    const live = tab
-      .waitForRequest(
-        (request) => request.url().includes("/data/live/events/"),
-        { timeout: 15_000 }
-      )
-      .catch(() => null);
-    await tab.goto(path);
-    await live;
+    await openListening(visitor, path);
   }
   return visitor;
 };
