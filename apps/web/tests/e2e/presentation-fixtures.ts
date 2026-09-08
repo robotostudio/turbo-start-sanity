@@ -6,6 +6,7 @@ import {
 } from "@playwright/test";
 import { createClient } from "@sanity/client";
 import { DEFAULT_SANITY_API_VERSION } from "@workspace/env/constants";
+import { handleErrors } from "@/utils";
 
 /**
  * Shared by every spec that drives the Studio's Presentation tool against the
@@ -59,11 +60,9 @@ export const runId = process.env.GITHUB_RUN_ID
 export const prefix = `e2e-${runId}-`;
 
 /**
- * presentation-singletons.spec.ts keeps its rescue snapshot of the singletons
- * here so a run that dies mid-edit can be undone by the next one. The stale
- * sweep below must skip it, or the only thing that can restore them is swept
- * away an hour later. Never surfaces as content: every site query is
- * `_type ==` filtered (packages/sanity/src/query.ts).
+ * Where presentation-singletons.spec.ts parks its rescue copy of navbar/footer/
+ * settings, so a run that dies mid-edit can be undone by the next one. Exempt
+ * from the stale sweep below — sweeping it is deleting the only way back.
  */
 export const SINGLETON_SNAPSHOT_ID = "e2e-singleton-snapshot";
 
@@ -136,21 +135,18 @@ export const fillStable = async (field: Locator, value: string) => {
 export const soft =
   <T>(fn: () => Promise<T>) =>
   async (): Promise<T | null> => {
-    try {
-      return await fn();
-    } catch {
-      return null;
-    }
+    // Branch on the error slot, never on the value: `client.getDocument`
+    // resolves `undefined` for a document that is gone, and `?? null` would
+    // turn that success into the failure sentinel.
+    const [value, error] = await handleErrors(fn());
+    return error === undefined ? (value as T) : null;
   };
 
 /** `() => status` for `expect.poll`; `request` carries no cookies, so this is an anonymous visitor. */
 export const status =
   (request: APIRequestContext, path: string) => async () => {
-    try {
-      return (await request.get(path)).status();
-    } catch {
-      return 0;
-    }
+    const [response] = await handleErrors(request.get(path));
+    return response?.status() ?? 0;
   };
 
 export const test = base.extend<
