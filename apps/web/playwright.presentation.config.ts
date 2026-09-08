@@ -16,6 +16,24 @@ const isCI = !!process.env.CI;
 process.env.NEXT_PUBLIC_SANITY_DATASET =
   process.env.SANITY_E2E_DATASET || "e2e";
 process.env.SANITY_STUDIO_DATASET = process.env.NEXT_PUBLIC_SANITY_DATASET;
+// Without a secret the revalidate route fails closed and 401s everything, so
+// both "rejects a bad secret" tests would pass without exercising the compare.
+process.env.SANITY_REVALIDATE_SECRET ||= `e2e-${Date.now()}`;
+
+// Complex (array) perspectives need >= 2025-02-19; a lower pin silently skips
+// the Releases perspective test. Unset falls back to today's UTC date.
+if (
+  (process.env.NEXT_PUBLIC_SANITY_API_VERSION ?? "").replace(/^v/, "") <
+  "2025-02-19"
+) {
+  process.env.NEXT_PUBLIC_SANITY_API_VERSION = "";
+}
+
+if (/^prod/i.test(process.env.NEXT_PUBLIC_SANITY_DATASET)) {
+  throw new Error(
+    `This suite publishes into the real navbar/footer/settings — refusing to run against "${process.env.NEXT_PUBLIC_SANITY_DATASET}"`
+  );
+}
 
 /**
  * Studio → website loop, kept apart from `playwright.config.ts`.
@@ -63,7 +81,10 @@ export default defineConfig({
       // CI serves the `dist` the workflow builds; locally, Vite dev.
       command: isCI ? "pnpm --filter studio start" : "pnpm --filter studio dev",
       url: "http://localhost:3333",
-      reuseExistingServer: !isCI,
+      // Never reuse: a Studio already on 3333 takes its dataset from
+      // apps/studio/.env, so every Publish would land in that dataset while the
+      // site and the write client use the pinned one.
+      reuseExistingServer: false,
       timeout: 120_000,
     },
     {
