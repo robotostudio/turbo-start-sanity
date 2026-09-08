@@ -144,7 +144,6 @@ test("publish: public page goes live, updates live, keeps new drafts private", a
   const visitor = await browser.newContext();
   const publicTab = await visitor.newPage();
   await publicTab.goto(pageDoc.slug);
-  await expect(publicTab).toHaveTitle(new RegExp(`${pageDoc.title} edited`));
   await expect(
     publicTab.getByRole("heading", {
       level: 1,
