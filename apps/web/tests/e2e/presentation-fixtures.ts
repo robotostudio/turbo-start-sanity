@@ -100,8 +100,11 @@ export const deleteRelease = async ({ name, state }: ReleaseRef) => {
   await releaseClient.releases.delete({ releaseId: name });
 };
 
-// Past any live run, short of the workspace release limit.
-const RELEASE_MAX_AGE_SECONDS = 6 * 3600;
+// The same hour as the document sweep: a `versions.*` document is never older
+// than its release, so any version the sweep reaches belongs to a release
+// already deleted. A wider window strands versions an active release owns, and
+// the delete transaction fails.
+const RELEASE_MAX_AGE_SECONDS = 3600;
 
 /**
  * Covers a run killed before its own `afterAll` ran. Best effort: a failing
