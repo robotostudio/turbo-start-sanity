@@ -136,25 +136,25 @@ test.afterAll(async ({ browser }) => {
   if (before.size === 0) {
     return;
   }
-  // A visitor tab per route carries the restore into the site's cache, not
-  // just the dataset — a route with no open tab keeps serving this run's
-  // navbar to real editors.
-  // The dataset first, and before any tab is opened: `goto` throws when the
-  // site is down, which is exactly the run whose singletons need restoring.
-  await restore([...before]);
-  await client.delete(SINGLETON_SNAPSHOT_ID);
-
   const visitor = await browser.newContext();
-  const cached = ["/", "/blog"];
   try {
-    const tabs = await Promise.all(
-      cached.map(async (route) => {
+    // Tabs first: a cached route is only flushed while a SanityLive tab is
+    // listening, so restoring before they open leaves this run's navbar served
+    // to real editors. Failure-tolerant: a site that is down is exactly the run
+    // whose singletons must still be restored.
+    const opened = await Promise.all(
+      ["/", "/blog"].map(async (route) => {
         const tab = await visitor.newPage();
-        await tab.goto(route);
-        return tab;
+        return await tab.goto(route).then(
+          () => tab,
+          () => null
+        );
       })
     );
-    for (const tab of tabs) {
+    await restore([...before]);
+    await client.delete(SINGLETON_SNAPSHOT_ID);
+
+    for (const tab of opened.filter((tab) => tab !== null)) {
       await expect
         .poll(html(tab.request, new URL(tab.url()).pathname), {
           timeout: SYNC_TIMEOUT,
