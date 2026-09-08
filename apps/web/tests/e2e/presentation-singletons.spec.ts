@@ -1,7 +1,3 @@
-import { existsSync, rmSync } from "node:fs";
-import { readFile, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import path from "node:path";
 import type {
   APIRequestContext,
   BrowserContext,
@@ -16,6 +12,7 @@ import {
   LIVE_TIMEOUT,
   prefix,
   runId,
+  SINGLETON_SNAPSHOT_ID,
   STUDIO_URL,
   SYNC_TIMEOUT,
   soft,
@@ -55,6 +52,7 @@ const footerSubtitle = `E2E footer ${runId}`;
 const siteTitle = `E2E site ${runId}`;
 
 type SanityDoc = Record<string, unknown> & { _id: string; _type: string };
+type Snapshot = [string, SanityDoc | null][];
 
 // Every singleton as found before the run, published and draft; a draft that
 // did not exist is `null` and gets deleted on restore rather than written.
@@ -62,40 +60,62 @@ const before = new Map<string, SanityDoc | null>();
 
 const strip = ({ _rev, _createdAt, _updatedAt, ...doc }: SanityDoc) => doc;
 
-// A retry gets a fresh worker process, so module state is not a guard: the
-// snapshot has to outlive the process or a retry would capture this run's own
-// edits as the state to restore, and write E2E content back as the original.
-const SNAPSHOT = path.join(tmpdir(), `e2e-singletons-${runId}.json`);
+/**
+ * The snapshot lives in the dataset, not `tmpdir()`: a cancelled CI job takes
+ * its runner with it, and a local retry gets a fresh `runId` and so a filename
+ * it can never find — either way the E2E navbar stays published with nothing
+ * to restore it from. Any later run finds the document and puts the singletons
+ * back. Stored as a JSON string so the navbar's `_ref`s stay inert text rather
+ * than real references pinning pages this suite deletes.
+ */
+const writeSnapshot = () =>
+  client.createOrReplace({
+    _id: SINGLETON_SNAPSHOT_ID,
+    _type: "e2eSingletonSnapshot",
+    json: JSON.stringify([...before]),
+  });
+
+const restore = (entries: Snapshot) => {
+  let tx = client.transaction();
+  for (const [id, doc] of entries) {
+    tx = doc ? tx.createOrReplace(strip(doc)) : tx.delete(id);
+  }
+  return tx.commit();
+};
 
 test.beforeAll(async () => {
-  if (existsSync(SNAPSHOT)) {
-    for (const [id, doc] of JSON.parse(await readFile(SNAPSHOT, "utf8")) as [
-      string,
-      SanityDoc | null,
-    ][]) {
-      before.set(id, doc);
-    }
-  } else {
-    const ids = SINGLETONS.flatMap((id) => [id, `drafts.${id}`]);
-    const docs: SanityDoc[] = await client.fetch("*[_id in $ids]", { ids });
-    // Refuse to absorb a previous run's leftovers as the baseline. A killed
-    // worker (or a concurrent run) can leave E2E content published on these
-    // shared documents; snapshotting that would write it back as the original
-    // and make it permanent. Fail loudly and let a human clean up instead.
-    expect(
-      JSON.stringify(docs),
-      "singletons still carry E2E content from an earlier run — restore them before running this spec"
-    ).not.toMatch(/E2E (\d{6,}|footer|site)/);
-    for (const id of ids) {
-      before.set(id, docs.find((doc) => doc._id === id) ?? null);
-    }
-    await writeFile(SNAPSHOT, JSON.stringify([...before]));
+  // A snapshot that outlived its run means that run died before restoring.
+  // Put the singletons back before anything reads them, including the guard
+  // below — which would otherwise refuse to start over pollution this run can
+  // undo itself.
+  const rescue = await client.fetch<{ json: string } | null>(
+    "*[_id == $id][0]{json}",
+    { id: SINGLETON_SNAPSHOT_ID }
+  );
+  if (rescue) {
+    await restore(JSON.parse(rescue.json) as Snapshot);
+    await client.delete(SINGLETON_SNAPSHOT_ID);
+  }
+
+  const ids = SINGLETONS.flatMap((id) => [id, `drafts.${id}`]);
+  const docs: SanityDoc[] = await client.fetch("*[_id in $ids]", { ids });
+  // Never absorb a previous run's leftovers as the baseline: snapshotting
+  // polluted singletons would write E2E content back as the original and make
+  // it permanent. Fail before the snapshot document exists.
+  expect(
+    JSON.stringify(docs),
+    "singletons still carry E2E content from an earlier run — restore them before running this spec"
+  ).not.toMatch(/E2E (\d{6,}|footer|site)/);
+  for (const id of ids) {
+    before.set(id, docs.find((doc) => doc._id === id) ?? null);
   }
   for (const id of SINGLETONS) {
     expect(before.get(id), `${id} is not published`).toBeTruthy();
   }
-  // On both paths: a retry's fresh worker re-runs the dataset sweep, which
-  // deletes this page, and the nav link would then resolve to no href.
+  await writeSnapshot();
+
+  // A retry's fresh worker re-runs the dataset sweep, which deletes this page,
+  // and the nav link would then resolve to no href.
   await client.createOrReplace({
     _id: pageDoc.id,
     _type: "page",
@@ -121,11 +141,7 @@ test.afterAll(async ({ browser }) => {
     })
   );
   try {
-    let tx = client.transaction();
-    for (const [id, doc] of before) {
-      tx = doc ? tx.createOrReplace(strip(doc)) : tx.delete(id);
-    }
-    await tx.commit();
+    await restore([...before]);
     for (const tab of tabs) {
       await expect
         .poll(html(tab.request, new URL(tab.url()).pathname), {
@@ -133,9 +149,10 @@ test.afterAll(async ({ browser }) => {
         })
         .not.toContain(runId);
     }
-    // Only now: while this file exists, a retry restores from it instead of
-    // snapshotting the polluted singletons.
-    rmSync(SNAPSHOT, { force: true });
+    // Only now: while this document exists, the next run restores from it
+    // instead of snapshotting the polluted singletons. A restore that never
+    // lands leaves it in place on purpose.
+    await client.delete(SINGLETON_SNAPSHOT_ID);
   } finally {
     await visitor.close();
   }

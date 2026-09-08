@@ -58,14 +58,62 @@ export const runId = process.env.GITHUB_RUN_ID
   : `${Date.now()}`;
 export const prefix = `e2e-${runId}-`;
 
+/**
+ * presentation-singletons.spec.ts keeps its rescue snapshot of the singletons
+ * here so a run that dies mid-edit can be undone by the next one. The stale
+ * sweep below must skip it, or the only thing that can restore them is swept
+ * away an hour later. Never surfaces as content: every site query is
+ * `_type ==` filtered (packages/sanity/src/query.ts).
+ */
+export const SINGLETON_SNAPSHOT_ID = "e2e-singleton-snapshot";
+
 // Documents this run owns: prefixed ids, and any `redirect` the auto-redirect
 // Sanity Function created for one of its slugs.
 const inPrefix = `(string::startsWith(_id, $prefix) || string::startsWith(_id, "drafts." + $prefix) || _id match ("versions.*." + $prefix + "*") || (_type == "redirect" && (string::startsWith(source.current, "/" + $prefix) || string::startsWith(source.current, "/blog/" + $prefix))))`;
-const isStale = `((string::startsWith(_id, "e2e-") || string::startsWith(_id, "drafts.e2e-") || _id match "versions.*.e2e-*" || (_type == "redirect" && (string::startsWith(source.current, "/e2e-") || string::startsWith(source.current, "/blog/e2e-")))) && dateTime(_createdAt) < dateTime(now()) - 3600)`;
+const isStale = `(_id != "${SINGLETON_SNAPSHOT_ID}" && (string::startsWith(_id, "e2e-") || string::startsWith(_id, "drafts.e2e-") || _id match "versions.*.e2e-*" || (_type == "redirect" && (string::startsWith(source.current, "/e2e-") || string::startsWith(source.current, "/blog/e2e-")))) && dateTime(_createdAt) < dateTime(now()) - 3600)`;
 
 /** Delete every document this run created, drafts included. */
 export const deleteOwn = () =>
   client.delete({ query: `*[${inPrefix}]`, params: { prefix } });
+
+// A release is a `_.releases.*` system document — invisible to `*[...]`, so the
+// sweep above cannot reach one, and a workspace holds a limited number. The
+// app's pinned API version predates the Releases actions, hence its own client.
+export const releaseClient = client.withConfig({ apiVersion: "vX" });
+
+export type ReleaseRef = { name: string; state: string };
+
+/**
+ * `delete` rejects an active release and `archive` rejects an inactive one, so
+ * the archive is best effort and the delete is the failure worth reporting.
+ */
+export const deleteRelease = async ({ name, state }: ReleaseRef) => {
+  if (state === "active") {
+    await releaseClient.releases
+      .archive({ releaseId: name })
+      .catch(() => undefined);
+  }
+  await releaseClient.releases.delete({ releaseId: name });
+};
+
+// Past any live run, short of the workspace release limit.
+const RELEASE_MAX_AGE_SECONDS = 6 * 3600;
+
+/**
+ * Covers a run killed before its own `afterAll` ran. Best effort: a failing
+ * Releases API must not break specs that never touch one, and the next run
+ * sweeps again.
+ */
+const sweepStaleReleases = async () => {
+  try {
+    const stale = await releaseClient.fetch<ReleaseRef[]>(
+      `releases::all()[string::startsWith(metadata.title, "e2e-") && dateTime(_createdAt) < dateTime(now()) - ${RELEASE_MAX_AGE_SECONDS}]{name, state}`
+    );
+    await Promise.allSettled(stale.map((release) => deleteRelease(release)));
+  } catch {
+    return;
+  }
+};
 
 /**
  * Type into a Studio field and make sure the value stuck. A form pane
@@ -135,6 +183,7 @@ export const test = base.extend<
         query: `*[${inPrefix} || ${isStale}]`,
         params: { prefix },
       });
+      await sweepStaleReleases();
       await use(undefined);
       await deleteOwn();
     },

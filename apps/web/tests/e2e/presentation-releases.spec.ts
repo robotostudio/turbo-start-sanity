@@ -2,9 +2,12 @@ import type { Page } from "@playwright/test";
 
 import {
   client,
+  deleteRelease,
   expect,
   fillStable,
   prefix,
+  type ReleaseRef,
+  releaseClient,
   runId,
   STUDIO_URL,
   SYNC_TIMEOUT,
@@ -43,7 +46,7 @@ let releaseId: string;
 const hero = (title: string) => ({ _type: "hero", _key: "hero", title });
 
 const findRelease = () =>
-  releaseClient.fetch<{ name: string; state: string } | null>(
+  releaseClient.fetch<ReleaseRef | null>(
     "releases::all()[metadata.title == $title][0]{name, state}",
     { title: releaseTitle }
   );
@@ -59,10 +62,6 @@ const expectStamped = async (target: Stampable) =>
     await target?.evaluate(() => (window as { __e2e?: boolean }).__e2e),
     "page navigated instead of updating live"
   ).toBe(true);
-
-// The app's pinned API version predates the Releases actions, so the release
-// calls get their own client; everything else stays on the app's version.
-const releaseClient = client.withConfig({ apiVersion: "vX" });
 
 // See the file header: below 2025-02-19 the app cannot serve a release
 // perspective, so this asserts nothing and says why.
@@ -83,23 +82,22 @@ test.beforeAll(async () => {
 });
 
 // The worker teardown only knows prefixed document ids; a release the run
-// left behind (a failure before the cleanup test) is removed here.
+// left behind (a failure before the cleanup test) is removed here; a run that
+// never reaches this hook is covered by the stale sweep in the fixtures.
 test.afterAll(async () => {
-  const releases = await releaseClient.fetch<{ name: string; state: string }[]>(
+  const releases = await releaseClient.fetch<ReleaseRef[]>(
     "releases::all()[string::startsWith(metadata.title, $prefix)]{name, state}",
     { prefix: `e2e-${runId}-` }
   );
-  for (const release of releases) {
-    try {
-      if (release.state === "active") {
-        await releaseClient.releases.archive({ releaseId: release.name });
-      }
-    } finally {
-      // A release that cannot be archived must still be deleted, or it leaks
-      // into the shared dataset where no prefixed-id sweep can reach it.
-      await releaseClient.releases.delete({ releaseId: release.name });
-    }
-  }
+  // Settled, not a loop: one release that refuses to go must not take the
+  // others' deletes with it.
+  const results = await Promise.allSettled(releases.map(deleteRelease));
+  const failed = results.flatMap((result) =>
+    result.status === "rejected" ? [String(result.reason)] : []
+  );
+  expect(failed, "release cleanup failed — delete these in the Studio").toEqual(
+    []
+  );
 });
 
 test("release: created in the Studio, page version added to it", async ({
