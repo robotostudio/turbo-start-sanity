@@ -18,6 +18,9 @@ const baseURL = resolveBaseURL();
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  // Runs under playwright.presentation.config.ts — it needs a Studio and a
+  // write token this config never has.
+  testIgnore: /presentation.*\.spec\.ts$/,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
