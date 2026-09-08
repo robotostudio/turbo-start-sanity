@@ -37,11 +37,9 @@ export const test = base.extend<{ slugPages: SlugPages }>({
   // so an empty pattern is how a fixture declares it depends on nothing.
   // biome-ignore lint/correctness/noEmptyPattern: required by Playwright
   slugPages: async ({}, provide) => {
-    // `e2e-*` documents belong to the Presentation suite, which may be
-    // publishing and deleting them on the same deployment right now.
     const result = await sanityClient.fetch<SlugPages>(`{
-      "pages": *[_type == "page" && defined(slug.current) && !string::startsWith(_id, "e2e-")].slug.current,
-      "blogs": *[_type == "blog" && defined(slug.current) && !string::startsWith(_id, "e2e-")].slug.current
+      "pages": *[_type == "page" && defined(slug.current)].slug.current,
+      "blogs": *[_type == "blog" && defined(slug.current)].slug.current
     }`);
 
     await provide({
