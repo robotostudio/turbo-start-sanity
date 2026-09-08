@@ -160,6 +160,33 @@ export const html = (request: APIRequestContext, path: string) =>
     return response.text();
   });
 
+/**
+ * Bridge the gap between a publish and the surface the site reads.
+ *
+ * A publish lands in the origin API, but `defineLive` reads published content
+ * through Sanity's API CDN, which trails it — so the first live event can cache
+ * pre-publish content, which the cacheLife profile's one-year `revalidate` then
+ * pins. A deployed site recovers through the retrying invalidate-tags Function;
+ * a local or CI run has none, so emit a second event here.
+ */
+export const settle = async (id: string, expected: string) => {
+  // A GROQ fetch, not `getDocument`: the CDN caches `/query` and `/doc`
+  // separately, and `/query` is the endpoint the site reads.
+  const cdn = client.withConfig({ useCdn: true });
+  await expect
+    .poll(
+      soft(async () =>
+        JSON.stringify(await cdn.fetch("*[_id == $id][0]", { id }))
+      ),
+      {
+        timeout: SYNC_TIMEOUT,
+      }
+    )
+    .toContain(expected);
+  // Unsetting a missing field bumps `_rev` — a second event, no content change.
+  await client.patch(id).unset(["_e2eSettle"]).commit();
+};
+
 /** `() => status` for `expect.poll`; `request` carries no cookies, so this is an anonymous visitor. */
 export const status =
   (request: APIRequestContext, path: string) => async () => {

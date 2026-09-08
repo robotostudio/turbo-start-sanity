@@ -11,6 +11,7 @@ import {
   SINGLETON_SNAPSHOT_ID,
   STUDIO_URL,
   SYNC_TIMEOUT,
+  settle,
   soft,
   test,
 } from "./presentation-fixtures";
@@ -210,6 +211,7 @@ const publish = async (studio: Page, id: SingletonId, value: string) => {
       }
     )
     .toContain(value);
+  await settle(id, value);
 };
 
 test("navbar: draft link shows in Presentation on every route, not publicly", async ({

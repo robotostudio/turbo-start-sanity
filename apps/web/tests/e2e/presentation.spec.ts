@@ -11,6 +11,7 @@ import {
   runId,
   STUDIO_URL,
   SYNC_TIMEOUT,
+  settle,
   soft,
   status,
   test,
@@ -143,6 +144,8 @@ test("publish: public page goes live, updates live, keeps new drafts private", a
       }
     )
     .toBeTruthy();
+
+  await settle(pageDoc.id, pageDoc.heading);
 
   // The earlier 404 was cached; Presentation's own live event invalidates it.
   await expect
