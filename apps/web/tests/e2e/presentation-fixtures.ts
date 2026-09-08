@@ -57,7 +57,11 @@ export const runId = process.env.GITHUB_RUN_ID
       process.env.GITHUB_JOB ?? "0",
     ].join("-")
   : `${Date.now()}`;
-export const prefix = `e2e-${runId}-`;
+// The worker index, not just the run: a retry runs in a fresh worker whose
+// fixture already deleted the previous worker's documents, and reopening an id
+// Sanity now treats as deleted gives a read-only form that `fill` can never
+// satisfy.
+export const prefix = `e2e-${runId}-w${process.env.TEST_WORKER_INDEX ?? 0}-`;
 
 /**
  * Where presentation-singletons.spec.ts parks its rescue copy of navbar/footer/
