@@ -295,6 +295,17 @@ test("cleanup: deleted documents 404 publicly again", async ({
 
   await deleteOwn();
 
+  // The dataset, not just the routes: a 404 can come from a broken route as
+  // easily as from a deleted document.
+  const ids = [pageDoc.id, postDoc.id, authorId];
+  expect(
+    await client.fetch<number>(`count(*[_id in $ids || _id in $draftIds])`, {
+      ids,
+      draftIds: ids.map((id) => `drafts.${id}`),
+    }),
+    "documents survived deleteOwn"
+  ).toBe(0);
+
   await expect
     .poll(status(request, pageDoc.slug), { timeout: LIVE_TIMEOUT })
     .toBe(404);
