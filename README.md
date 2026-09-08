@@ -202,10 +202,12 @@ Editor-role token, though `SANITY_API_WRITE_TOKEN` works locally. The Releases
 test needs `NEXT_PUBLIC_SANITY_API_VERSION` unset or `>= 2025-02-19`, and skips
 itself with that message otherwise.
 
-Documents it creates are prefixed `e2e-<runId>-` and deleted afterwards. The
-singleton test is the exception: `navbar`, `footer` and `settings` cannot be
-prefixed, so it snapshots and restores them — don't run two copies against one
-dataset at once. CI runs the same specs against every PR preview.
+It runs against its own dataset (`e2e` by default, override with
+`SANITY_E2E_DATASET`), never production: the singleton test publishes into the
+real `navbar`, `footer` and `settings`, which cannot carry a prefix. Everything
+else is prefixed `e2e-<runId>-` and deleted afterwards. Still one run at a time
+per dataset — the singletons are shared. CI builds and serves both halves inside
+the runner and runs the same specs on every PR.
 
 ## Content model
 
