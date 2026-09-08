@@ -222,6 +222,7 @@ test.describe("markdown", () => {
  */
 test("insert a block from the Studio menu and watch the preview render it", async ({
   page: studio,
+  baseURL,
 }) => {
   const uiPage = {
     id: `${prefix}ui-insert`,
@@ -254,9 +255,12 @@ test("insert a block from the Studio menu and watch the preview render it", asyn
       visited.push(new URL(frame.url()).pathname);
     }
   });
+  // Origin from `baseURL`, not a hardcoded port: against a deployed preview a
+  // port check matches nothing and the assertion below passes vacuously.
+  const siteOrigin = new URL(baseURL ?? "http://localhost:3000").origin;
   studio.on("request", (request) => {
     const url = new URL(request.url());
-    if (url.port === "3000" && url.searchParams.has("_rsc")) {
+    if (url.origin === siteOrigin && url.searchParams.has("_rsc")) {
       rsc.push(url.pathname);
     }
   });

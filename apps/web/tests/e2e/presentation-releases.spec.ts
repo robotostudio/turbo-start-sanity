@@ -66,7 +66,8 @@ const expectStamped = async (target: Stampable) =>
 // See the file header: below 2025-02-19 the app cannot serve a release
 // perspective, so this asserts nothing and says why.
 const appApiVersion = process.env.NEXT_PUBLIC_SANITY_API_VERSION;
-const SUPPORTS_RELEASES = !appApiVersion || appApiVersion >= "2025-02-19";
+const SUPPORTS_RELEASES =
+  !appApiVersion || appApiVersion.replace(/^v/, "") >= "2025-02-19";
 
 test.describe.configure({ mode: "serial" });
 
