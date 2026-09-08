@@ -358,9 +358,12 @@ test("settings: site title reaches <title> on / after publish", async ({
   const frame = studio.frame({ url: (url) => url.pathname === "/" });
   expect(frame, "preview iframe is not on /").not.toBeNull();
   await expect
-    .poll(soft(() => frame?.title() ?? Promise.resolve("")), {
-      timeout: LIVE_TIMEOUT,
-    })
+    .poll(
+      soft(() => frame?.title() ?? Promise.resolve("")),
+      {
+        timeout: LIVE_TIMEOUT,
+      }
+    )
     .toContain(siteTitle);
   expect(await html(request, "/")()).not.toContain(siteTitle);
 

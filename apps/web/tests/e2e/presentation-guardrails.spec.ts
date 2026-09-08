@@ -62,9 +62,12 @@ test("validation: publish stays disabled until title and slug are filled", async
   await expect(description).toBeVisible({ timeout: 90_000 });
   await fillStable(description, "An editor forgot the title and the slug.");
   await expect
-    .poll(soft(() => client.getDocument(`drafts.${invalidPage.id}`)), {
-      timeout: SYNC_TIMEOUT,
-    })
+    .poll(
+      soft(() => client.getDocument(`drafts.${invalidPage.id}`)),
+      {
+        timeout: SYNC_TIMEOUT,
+      }
+    )
     .toBeTruthy();
 
   const publish = studio.getByTestId("action-publish");
