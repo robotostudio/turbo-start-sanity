@@ -126,7 +126,9 @@ const sweepStaleReleases = async () => {
 export const fillStable = async (field: Locator, value: string) => {
   await expect(field).toBeVisible({ timeout: 90_000 });
   await expect(async () => {
-    await field.fill(value);
+    // Bounded: an uneditable field would otherwise hold the default forever and
+    // `toPass` would report a bare timeout with no call log.
+    await field.fill(value, { timeout: 5_000 });
     await expect(field).toHaveValue(value, { timeout: 1000 });
   }).toPass({ timeout: 30_000 });
 };
@@ -181,9 +183,9 @@ export const test = base.extend<
       // mid-way left behind more than an hour ago. Concurrent runs keep theirs.
       // A checkout that never created this dataset otherwise fails deep in a
       // spec, on a missing singleton, which points at the wrong thing.
-      const seeded = await client
-        .fetch<number>(`count(*[_id in ["navbar", "footer", "settings"]])`)
-        .catch(() => 0);
+      const seeded = await client.fetch<number>(
+        `count(*[_id in ["navbar", "footer", "settings"]])`
+      );
       if (seeded === 0) {
         throw new Error(
           `Sanity dataset "${dataset}" is missing or empty. Create it once from your content dataset: cd apps/studio && npx sanity dataset copy <source> ${dataset}`
