@@ -67,6 +67,16 @@ export default defineConfig({
     // the Editor token on each API call — the report is uploaded as an
     // artifact of a public repo.
     trace: isCI ? "off" : "retain-on-failure",
+    // On in CI, unlike the trace above: a video records the viewport, never a
+    // request header, so it carries no token — and with the trace off it is
+    // the only CI artifact showing the loop run.
+    video: {
+      mode: "retain-on-failure",
+      // Labels every frame with the spec and test, and annotates actions. The
+      // failing assertion is never shown: `expect` polling draws nothing, so
+      // that stays in the error panel and the trace.
+      show: { actions: { cursor: "pointer" }, test: { level: "step" } },
+    },
     screenshot: "only-on-failure",
     navigationTimeout: 30_000,
   },
