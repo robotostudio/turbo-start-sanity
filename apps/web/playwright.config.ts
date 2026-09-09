@@ -18,6 +18,9 @@ const baseURL = resolveBaseURL();
 
 export default defineConfig({
   testDir: "./tests/e2e",
+  // Runs under playwright.presentation.config.ts — it needs a Studio and a
+  // write token this config never has.
+  testIgnore: /presentation.*\.spec\.ts$/,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -28,7 +31,9 @@ export default defineConfig({
   ],
   use: {
     baseURL,
-    trace: "on-first-retry",
+    // Never in CI: a retry's trace records every request header, including the
+    // Vercel bypass secret below, and the report is a public-repo artifact.
+    trace: process.env.CI ? "off" : "on-first-retry",
     screenshot: "only-on-failure",
     navigationTimeout: 30_000,
     ...(process.env.VERCEL_AUTOMATION_BYPASS_SECRET && {

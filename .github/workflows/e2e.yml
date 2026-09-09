@@ -94,3 +94,96 @@ jobs:
           name: playwright-report
           path: apps/web/playwright-report/
           retention-days: 14
+
+  # Studio → website loop. Both halves are built here from the PR's own source,
+  # so a schema or Studio change is what gets tested, and the site is served
+  # here rather than on the preview (see playwright.presentation.config.ts).
+  # Hands a write-capable token to PR code, hence the same `guard` gate.
+  presentation:
+    name: Playwright Presentation Tests
+    permissions:
+      contents: read
+    needs: guard
+    # One at a time repo-wide: two runs sharing a dataset would each restore the
+    # other's singleton edits as if they were the original. Its own group
+    # because the workflow-level one keys on the deployment id, so never queues.
+    concurrency:
+      group: presentation-e2e
+      # Without this only one run stays pending; a newer preview drops the rest.
+      queue: max
+      cancel-in-progress: false
+    # Both fields: Vercel has shipped the environment name on the deployment and
+    # on the status in different versions, and matching neither is a silent no-op.
+    # Both casings too: Actions has no lower(), and a gate that matches neither
+    # leaves this job a permanent green no-op.
+    if: >-
+      needs.guard.outputs.trusted == 'true' &&
+      (startsWith(github.event.deployment_status.environment, 'Preview') ||
+       startsWith(github.event.deployment_status.environment, 'preview') ||
+       startsWith(github.event.deployment.environment, 'Preview') ||
+       startsWith(github.event.deployment.environment, 'preview'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Install Playwright Chromium
+        working-directory: apps/web
+        run: node_modules/.bin/playwright install --with-deps chromium
+
+      # A production build, not `sanity dev`: Vite compiles on demand and the
+      # first Presentation load pays for it. Playwright serves this `dist`.
+      - name: Build Studio
+        run: pnpm --filter studio build
+        env:
+          SANITY_STUDIO_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+          SANITY_STUDIO_DATASET: ${{ vars.SANITY_E2E_DATASET || 'e2e' }}
+          SANITY_STUDIO_API_VERSION: ${{ secrets.NEXT_PUBLIC_SANITY_API_VERSION }}
+          SANITY_STUDIO_PRESENTATION_URL: http://localhost:3000
+
+      - name: Run Presentation tests
+        run: pnpm --filter web test:e2e:presentation
+        env:
+          CI: true
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+          # Never the production dataset: this suite publishes into the real
+          # navbar/footer/settings. The Playwright config pins it too.
+          SANITY_E2E_DATASET: ${{ vars.SANITY_E2E_DATASET || 'e2e' }}
+          NEXT_PUBLIC_SANITY_API_VERSION: ${{ secrets.NEXT_PUBLIC_SANITY_API_VERSION }}
+          NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL: http://localhost:3000
+          # `@workspace/env/client` validates at import time and the specs reach
+          # it through `@/utils`, so the suite cannot even be collected without
+          # this. Both servers run inside the runner, hence localhost.
+          NEXT_PUBLIC_SANITY_STUDIO_URL: http://localhost:3333
+          # `next.config.ts` imports `@workspace/env/server`, so the build this
+          # job's webServer runs fails fast without both tokens.
+          SANITY_API_READ_TOKEN: ${{ secrets.SANITY_API_READ_TOKEN }}
+          SANITY_API_WRITE_TOKEN: ${{ secrets.SANITY_API_WRITE_TOKEN }}
+          SANITY_STUDIO_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID }}
+          SANITY_E2E_SESSION_TOKEN: ${{ secrets.SANITY_E2E_SESSION_TOKEN }}
+          SANITY_REVALIDATE_SECRET: ${{ secrets.SANITY_REVALIDATE_SECRET }}
+          SANITY_E2E_FUNCTIONS_DEPLOYED: ${{ vars.SANITY_E2E_FUNCTIONS_DEPLOYED }}
+
+      - name: Upload report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: playwright-report-presentation
+          path: apps/web/playwright-report/
+          retention-days: 14

@@ -22,7 +22,7 @@ export async function revalidateSyncTags(unsafeTags: unknown) {
   }
 
   for (const tag of tags) {
-    revalidateTag(tag, "max");
+    revalidateTag(tag, { expire: 0 });
   }
   return "refresh" as const;
 }

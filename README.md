@@ -179,7 +179,43 @@ pnpm type             # Run Sanity type generation tasks
 
 pnpm test             # Vitest unit tests (packages/sanity-blocks)
 pnpm test:e2e         # Playwright smoke tests against a running or deployed site
+pnpm --filter web test:e2e:presentation   # Studio → website loop, see Tests
 ```
+
+## Tests
+
+`pnpm --filter web test:e2e:presentation` drives a real Studio against a
+production build of the site. Run it before a demo. It covers:
+
+| Area | Checks |
+| --- | --- |
+| Pages | Draft renders in Presentation, 404s publicly, publishes, deletes |
+| Live updates | An open tab updates without a reload |
+| Releases | A release previews and publishes |
+| Singletons | Navbar, footer and settings reach every route |
+| Slugs | Nested pages, rename, unpublish, sitemap |
+| Blocks | Every page-builder block renders and serializes to Markdown |
+| Guardrails | Validation, SEO/noindex, the revalidate webhook |
+
+It needs ports 3000 and 3333 free, and `SANITY_E2E_SESSION_TOKEN` — an
+Editor-role token, though `SANITY_API_WRITE_TOKEN` works locally. The Releases
+test needs `NEXT_PUBLIC_SANITY_API_VERSION` unset or `>= 2025-02-19`, and skips
+itself with that message otherwise.
+
+It runs against its own dataset, never production. Create it once from the
+dataset that holds your content:
+
+```sh
+cd apps/studio
+npx sanity dataset copy production e2e
+```
+
+Override the name with `SANITY_E2E_DATASET`. A separate dataset is required
+because the singleton test publishes into the real `navbar`, `footer` and
+`settings`, which cannot carry a prefix. Everything else is prefixed
+`e2e-<runId>-` and deleted afterwards. Still one run at a time
+per dataset — the singletons are shared. CI builds and serves both halves inside
+the runner and runs the same specs on every PR.
 
 ## Content model
 
@@ -439,8 +475,8 @@ The repository currently ships with:
 
 - `.github/workflows/ci.yml`: lint, format check, type check, and unit tests on
   push/PR to `main`
-- `.github/workflows/e2e.yml`: Playwright smoke tests on successful deployment
-  status events
+- `.github/workflows/e2e.yml`: Playwright smoke and Presentation tests on
+  successful deployment status events
 - `.github/workflows/deploy-sanity.yml`: manual Studio deploy workflow
 - `.github/workflows/sanity-template.yml`: Sanity template validation on `main`
 

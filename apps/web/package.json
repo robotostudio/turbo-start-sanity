@@ -12,7 +12,8 @@
     "format:check": "biome format .",
     "check-types": "tsc --noEmit",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:presentation": "playwright test --config playwright.presentation.config.ts"
   },
   "dependencies": {
     "@sanity/client": "catalog:",
