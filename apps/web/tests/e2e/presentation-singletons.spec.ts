@@ -183,8 +183,27 @@ const visit = async (context: BrowserContext, path: string) => {
   return tab;
 };
 
+/**
+ * The Studio form's value is browser state — `fillStable` asserts the input,
+ * not a committed mutation. The preview and Publish both read the dataset, so
+ * assert the edit landed there first; otherwise both act on the pre-edit draft.
+ */
+const draftHas = (id: SingletonId, value: string) =>
+  expect
+    .poll(
+      soft(
+        async () =>
+          JSON.stringify(await client.getDocument(`drafts.${id}`)) ?? ""
+      ),
+      { timeout: SYNC_TIMEOUT }
+    )
+    .toContain(value);
+
 /** Publish through the Studio and wait for the dataset to carry `value`. */
 const publish = async (studio: Page, id: SingletonId, value: string) => {
+  // Publishing before the draft lands ships the pre-edit document, and the
+  // poll below then times out on content that was never published.
+  await draftHas(id, value);
   await studio.getByTestId("action-publish").click();
   await expect
     .poll(
@@ -309,6 +328,7 @@ test("footer: draft subtitle shows in Presentation only, publish puts it on ever
   const subtitle = studio.getByTestId("field-subtitle").getByRole("textbox");
   await expect(subtitle).toBeVisible({ timeout: LIVE_TIMEOUT });
   await fillStable(subtitle, footerSubtitle);
+  await draftHas("footer", footerSubtitle);
   await expect(
     preview(studio).getByRole("contentinfo").getByText(footerSubtitle)
   ).toBeVisible({ timeout: LIVE_TIMEOUT });
@@ -339,6 +359,7 @@ test("settings: site title reaches <title> on / after publish", async ({
   const title = studio.getByTestId("field-siteTitle").getByRole("textbox");
   await expect(title).toBeVisible({ timeout: LIVE_TIMEOUT });
   await fillStable(title, siteTitle);
+  await draftHas("settings", siteTitle);
   // Metadata is fetched without stega, so the draft title reads clean.
   const frame = studio.frame({ url: (url) => url.pathname === "/" });
   expect(frame, "preview iframe is not on /").not.toBeNull();
