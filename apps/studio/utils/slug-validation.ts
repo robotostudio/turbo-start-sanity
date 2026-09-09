@@ -230,9 +230,10 @@ export function createSlugErrorValidator(
 }
 
 /**
- * Reject a slug already taken by another document. Excludes every id this
- * document can be stored under so it never flags itself: in a release `_id` is
- * `versions.<releaseId>.<publishedId>`, matching neither the draft nor published id.
+ * Reject a slug already taken by another document. Excludes its own draft,
+ * published and release copies so it never flags itself — the releases by
+ * predicate, not id: a release copy collides from the draft's point of view too,
+ * and a document can sit in more than one release.
  */
 export function createSlugUniqueValidator(): (
   slug: { current?: string } | undefined,
@@ -243,13 +244,12 @@ export function createSlugUniqueValidator(): (
     if (!(current && context.getClient)) {
       return true;
     }
-    const self = context.document?._id ?? "";
-    const id = getPublishedId(self);
+    const id = getPublishedId(context.document?._id ?? "");
     const taken = await context
       .getClient({ apiVersion: API_VERSION })
       .fetch<number>(
-        `count(*[!(_id in [$self, $draft, $published]) && slug.current == $slug])`,
-        { self, draft: `drafts.${id}`, published: id, slug: current }
+        `count(*[!(_id in [$draft, $published]) && !sanity::versionOf($published) && slug.current == $slug])`,
+        { draft: `drafts.${id}`, published: id, slug: current }
       );
     return taken > 0
       ? `“${current}” is already used by another document. URLs must be unique.`
