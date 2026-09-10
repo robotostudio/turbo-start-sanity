@@ -37,7 +37,10 @@ function FeatureCardItem({ card }: Readonly<{ card: FeatureCard }>) {
       {/* Dissolved on lg so heading and body land in the shared subgrid rows. */}
       <div className="flex min-w-0 flex-col gap-2 lg:contents">
         {title ? (
-          <h3 className="text-balance break-words font-medium text-xl leading-8 lg:row-start-2 lg:mb-2 lg:min-w-0">
+          <h3
+            className="text-balance break-words font-medium text-xl leading-8 lg:row-start-2 lg:mb-2 lg:min-w-0"
+            data-inline-edit
+          >
             {title}
           </h3>
         ) : null}

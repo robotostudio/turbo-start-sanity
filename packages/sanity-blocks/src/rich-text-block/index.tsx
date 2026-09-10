@@ -18,7 +18,11 @@ export function RichTextBlock({
       <div className="container">
         <div className="flex flex-col items-start gap-6">
           <BlockEyebrow eyebrow={eyebrow} />
-          {title && <h2 className="max-w-2xl block-title">{title}</h2>}
+          {title && (
+            <h2 className="max-w-2xl block-title" data-inline-edit>
+              {title}
+            </h2>
+          )}
         </div>
         {richText && (
           <div className="mt-8 max-w-3xl">

@@ -175,7 +175,10 @@ function ShowcaseHeader({
   return (
     <div className="mx-auto flex max-w-4xl flex-col items-center gap-4 text-center">
       {title ? (
-        <h2 className="block-title text-balance lg:text-[64px] lg:leading-[1.1]">
+        <h2
+          className="block-title text-balance lg:text-[64px] lg:leading-[1.1]"
+          data-inline-edit
+        >
           {title}
         </h2>
       ) : null}
