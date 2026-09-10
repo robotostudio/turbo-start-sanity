@@ -165,11 +165,10 @@ All frontend types derive from generated Sanity types. `apps/web/src/types.ts` e
 `<VisualEditing components={...} />` through `visual-editing-layer.tsx` (its own
 client component, because a function cannot cross the server/client boundary).
 It returns `InlineText` when `isInlineEditable` in `inline-text.tsx` allows it:
-the element holds a single text node, sits outside any link or button (with
-the overlay toggled off, a click to move the caret would follow the link), and
-either
+the element holds a single text node, sits outside any link, button, summary
+or label (the click capture would swallow their handlers), and either
 
-- **Plain strings**: carries the bare `data-inline-edit` flag over a `string` field. Not `text`, which can hold several lines while Enter saves. `BlockEyebrow`, `BlockHeader`'s title and each block's own plain-string titles, subtitles, captions and testimonial author lines carry it. Opt-in, because the resolver also sees every nav link, button label and badge
+- **Plain strings**: carries the bare `data-inline-edit` flag over a `string` field. Never flag a multi-line `text` field: nothing at runtime can tell the two apart, Enter saves, and a paste collapses newlines. `BlockEyebrow`, `BlockHeader`'s title and each block's own plain-string titles, subtitles, captions and testimonial author lines carry it. Opt-in, because the resolver also sees every nav link, button label and badge
 - **Rich text**: has a Portable Text span path (`…children[_key=="s"].text`). The words in a one-span paragraph, or in the bold/italic run inside one, can be typed over. Plain runs in a paragraph that also has marks, and marks, links and new paragraphs themselves, stay in the Studio form
 
 `inline-text.tsx` makes the element `contentEditable="plaintext-only"` on
@@ -178,7 +177,9 @@ node's own `id` and `path`. Sanity ships nothing official for inline typing;
 this is custom on that documented API. The rules that keep typing and page
 updates from trampling each other (strip stega first, save only on blur, put
 typed text back over a render, rewrite React's text node in place, restore on
-cancel, empty or a rejected patch, end without saving if React restructures the
+cancel, empty or a locally rejected patch (the Studio's own write is
+fire-and-forget, so a server rejection is not reported back), end without
+saving if React restructures the
 text mid-edit, clean up if the element is removed) live as comments in
 `inline-text.tsx`. No real click on an editable element reaches the overlay: a
 click opening the field makes the Studio focus its input, which ends an edit
