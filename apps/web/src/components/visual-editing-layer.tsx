@@ -5,11 +5,15 @@ import { VisualEditing } from "next-sanity/visual-editing";
 import { overlayComponents } from "@/components/overlay-components";
 
 /**
- * `<VisualEditing>` with this app's overlay components. Its own client
- * component because the resolver is a function, which React refuses to pass
- * from the server layout ("Functions cannot be passed directly to Client
- * Components"). Rendered only in draft mode, so visitors never mount it.
+ * A client component because React won't pass the resolver function from the
+ * server layout ("Functions cannot be passed directly to Client Components").
+ * Inline editing only on drafts: saves always write `drafts.<id>`, which a
+ * published or release preview never shows.
  */
-export function VisualEditingLayer() {
-  return <VisualEditing components={overlayComponents} />;
+export function VisualEditingLayer({
+  inlineEditing,
+}: Readonly<{ inlineEditing: boolean }>) {
+  return (
+    <VisualEditing components={inlineEditing ? overlayComponents : undefined} />
+  );
 }

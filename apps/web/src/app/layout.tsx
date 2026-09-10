@@ -102,13 +102,14 @@ export default async function RootLayout({
  */
 async function LivePreviewLayer() {
   const { isEnabled: isDraftMode } = await draftMode();
+  const { perspective } = await getDynamicFetchOptions();
   return (
     <>
       <SanityLive action={revalidateSyncTags} includeDrafts={isDraftMode} />
       {isDraftMode && (
         <>
           <PreviewBar />
-          <VisualEditingLayer />
+          <VisualEditingLayer inlineEditing={perspective === "drafts"} />
         </>
       )}
     </>
