@@ -178,12 +178,14 @@ node's own `id` and `path`. Sanity ships nothing official for inline typing;
 this is custom on that documented API. The rules that keep typing and page
 updates from trampling each other (strip stega first, save only on blur, put
 typed text back over a render, rewrite React's text node in place, restore on
-cancel, empty or a failed save, end without saving if React restructures the
-text mid-edit) live in the `startEditing` docblock. Saving is last-write-wins,
-as in the Studio form. Never under a release: `useDocuments` always writes to
-`drafts.<id>`, so the edit would land outside the version on screen. Text from
-the published document stays editable, because a page with no draft renders
-from it and the first save creates the draft.
+cancel, empty or a rejected patch, end without saving if React restructures the
+text mid-edit, clean up if the element is removed) live as comments in
+`inline-text.tsx`. Saving is last-write-wins, as in the Studio form. Inline
+editing is on only when the preview's perspective is drafts: `LivePreviewLayer`
+passes that to `VisualEditingLayer`, because saves always write `drafts.<id>`,
+which a published or release preview never shows. In a drafts preview, text
+from the published document stays editable, because a page with no draft
+renders from it and the first save creates the draft.
 
 Visitors never mount any of it: `VisualEditingLayer` renders only in draft
 mode, and the `data-inline-edit` attribute is inert outside Presentation.
