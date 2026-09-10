@@ -337,12 +337,15 @@ export const InlineText: OverlayComponent = ({ element, node }) => {
     }
     const target = element;
     let pendingClick: ReturnType<typeof setTimeout> | undefined;
+    const cancelPending = () => {
+      clearTimeout(pendingClick);
+      pendingClick = undefined;
+    };
 
     // A synthetic click passes the capture below and reaches the overlay,
     // which opens this field in the Studio.
     const openInStudio = () => {
-      clearTimeout(pendingClick);
-      pendingClick = undefined;
+      cancelPending();
       target.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     };
 
@@ -355,7 +358,7 @@ export const InlineText: OverlayComponent = ({ element, node }) => {
     };
 
     const onDoubleClick = (event: Event) => {
-      clearTimeout(pendingClick);
+      cancelPending();
       // The overlay remounts this on every hover, so a session may be running.
       if (target.isContentEditable) {
         return;
@@ -388,7 +391,7 @@ export const InlineText: OverlayComponent = ({ element, node }) => {
         return;
       }
       event.stopPropagation();
-      clearTimeout(pendingClick);
+      cancelPending();
       if (!target.isContentEditable) {
         pendingClick = setTimeout(openInStudio, DOUBLE_CLICK_MS);
       }
@@ -404,7 +407,7 @@ export const InlineText: OverlayComponent = ({ element, node }) => {
       signal,
     });
     return () => {
-      clearTimeout(pendingClick);
+      cancelPending();
       listeners.abort();
     };
   }, [element, id, path, getDocument]);
