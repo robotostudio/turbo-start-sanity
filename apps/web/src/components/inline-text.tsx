@@ -13,8 +13,9 @@ const logger = new Logger("inline-text");
 
 const EDIT_ATTR = "data-inline-edit";
 
-/** Longest gap between the two clicks of a double-click. */
-const DOUBLE_CLICK_MS = 300;
+/** The macOS, Windows and Chrome default; a slower system setting replays the
+ * first click early, ending the edit unsaved. The next double-click then works. */
+const DOUBLE_CLICK_MS = 500;
 
 /** A Portable Text span's text: its own plain string, so its words are typeable. */
 const SPAN_TEXT = /\.children\[_key=="[^"]+"\]\.text$/;
@@ -339,8 +340,19 @@ export const InlineText: OverlayComponent = ({ element, node }) => {
 
     // A synthetic click passes the capture below and reaches the overlay,
     // which opens this field in the Studio.
-    const openInStudio = () =>
+    const openInStudio = () => {
+      clearTimeout(pendingClick);
+      pendingClick = undefined;
       target.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    };
+
+    // The overlay ignores clicks on an unhovered element, so replay before its
+    // own mouseleave handler runs.
+    const onLeaveCapture = (event: MouseEvent) => {
+      if (event.target === target && pendingClick !== undefined) {
+        openInStudio();
+      }
+    };
 
     const onDoubleClick = (event: Event) => {
       clearTimeout(pendingClick);
@@ -385,11 +397,12 @@ export const InlineText: OverlayComponent = ({ element, node }) => {
     const listeners = new AbortController();
     const { signal } = listeners;
     target.addEventListener("dblclick", onDoubleClick, { signal });
-    target.ownerDocument.defaultView?.addEventListener(
-      "click",
-      onClickCapture,
-      { capture: true, signal }
-    );
+    const view = target.ownerDocument.defaultView;
+    view?.addEventListener("click", onClickCapture, { capture: true, signal });
+    view?.addEventListener("mouseleave", onLeaveCapture, {
+      capture: true,
+      signal,
+    });
     return () => {
       clearTimeout(pendingClick);
       listeners.abort();
