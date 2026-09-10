@@ -30,6 +30,13 @@ export default defineConfig({
         replacement: path.resolve(__dirname, "../logger/src/index.ts"),
       },
       {
+        find: "@robotostudio/sanity-plugin-lucide-icon-picker",
+        replacement: path.resolve(
+          __dirname,
+          "src/internal/testing/lucide-icon-picker.mock.ts"
+        ),
+      },
+      {
         find: "lucide-react/dynamic",
         replacement: path.resolve(
           __dirname,

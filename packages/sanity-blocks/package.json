@@ -22,6 +22,7 @@
     "@mux/mux-player-react": "^3.13.2",
     "@mux/mux-video-react": "^0.31.2",
     "@portabletext/markdown": "^2.0.0",
+    "@robotostudio/sanity-plugin-lucide-icon-picker": "^1.0.2",
     "@sanity/client": "catalog:",
     "@sanity/icons": "^5.2.1",
     "@workspace/env": "workspace:*",
