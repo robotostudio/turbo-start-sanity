@@ -13,8 +13,8 @@ const logger = new Logger("inline-text");
 
 const EDIT_ATTR = "data-inline-edit";
 
-/** How long the Studio can take to open the field and focus its input. */
-const RECLAIM_MS = 5000;
+/** Longest gap between the two clicks of a double-click. */
+const DOUBLE_CLICK_MS = 300;
 
 /** A Portable Text span's text: its own plain string, so its words are typeable. */
 const SPAN_TEXT = /\.children\[_key=="[^"]+"\]\.text$/;
@@ -73,7 +73,8 @@ function placeCaret(element: HTMLElement, offset: number) {
  */
 function startEditing(
   element: HTMLElement,
-  save: (text: string) => Promise<unknown>
+  save: (text: string) => Promise<unknown>,
+  onEnter: () => void
 ) {
   const own = element.firstChild;
   if (!(own instanceof Text)) {
@@ -105,32 +106,7 @@ function startEditing(
   let staleUndo = false;
   let cancelled = false;
   let aborted = false;
-  let reclaimed = false;
-  const startedAt = Date.now();
   const listeners = new AbortController();
-
-  // The Studio focuses its input once the field's pane opens, even mid-typing.
-  // Refocus after the blur finishes dispatching, or it is ignored.
-  const reclaimFocus = () => {
-    if (
-      reclaimed ||
-      Date.now() - startedAt > RECLAIM_MS ||
-      element.ownerDocument.hasFocus()
-    ) {
-      return false;
-    }
-    reclaimed = true;
-    setTimeout(() => {
-      element.ownerDocument.defaultView?.focus();
-      element.focus();
-      if (element.ownerDocument.hasFocus()) {
-        placeCaret(element, caret);
-      } else {
-        finish();
-      }
-    });
-    return true;
-  };
 
   // The browser can swap React's node, as a paste over a selection does.
   const keepOwnNode = () => {
@@ -252,6 +228,7 @@ function startEditing(
     if (event.key === "Enter") {
       event.preventDefault();
       element.blur();
+      onEnter();
       return;
     }
     if (event.key === "Escape") {
@@ -297,12 +274,6 @@ function startEditing(
   };
 
   const onBlur = () => {
-    if (!reclaimFocus()) {
-      finish();
-    }
-  };
-
-  const finish = () => {
     end();
     // A removed element (block deleted, field cleared elsewhere) never saves.
     if (aborted || !element.isConnected) {
@@ -364,34 +335,50 @@ export const InlineText: OverlayComponent = ({ element, node }) => {
       return;
     }
     const target = element;
+    let pendingClick: ReturnType<typeof setTimeout> | undefined;
+
+    // A synthetic click passes the capture below and reaches the overlay,
+    // which opens this field in the Studio.
+    const openInStudio = () =>
+      target.dispatchEvent(new MouseEvent("click", { bubbles: true }));
 
     const onDoubleClick = (event: Event) => {
+      clearTimeout(pendingClick);
       // The overlay remounts this on every hover, so a session may be running.
       if (target.isContentEditable) {
         return;
       }
       event.preventDefault();
 
-      startEditing(target, (text) =>
-        // In the chain, because `getDocument` can throw for an untracked id.
-        Promise.resolve()
-          .then(() => getDocument(id).patch([at(path, set(text))]))
-          .catch((error: unknown) => {
-            logger.error(`patch failed for ${path}`, error);
-            throw error;
-          })
+      startEditing(
+        target,
+        (text) =>
+          // In the chain, because `getDocument` can throw for an untracked id.
+          Promise.resolve()
+            .then(() => getDocument(id).patch([at(path, set(text))]))
+            .catch((error: unknown) => {
+              logger.error(`patch failed for ${path}`, error);
+              throw error;
+            }),
+        openInStudio
       );
     };
 
-    // Each click the overlay sees opens this field in the Studio, which takes
-    // focus. Hide the double-click's second click and caret clicks mid-edit.
+    // The Studio focuses its input when a click opens the field, which ends
+    // an edit mid-word. So no real click reaches the overlay: a single click
+    // is replayed once it is clearly not a double-click, and a double-click
+    // opens the field after Enter instead.
     const onClickCapture = (event: MouseEvent) => {
       if (
-        (event.detail > 1 || target.isContentEditable) &&
-        event.target instanceof Node &&
-        target.contains(event.target)
+        !event.isTrusted ||
+        !(event.target instanceof Node && target.contains(event.target))
       ) {
-        event.stopPropagation();
+        return;
+      }
+      event.stopPropagation();
+      clearTimeout(pendingClick);
+      if (!target.isContentEditable) {
+        pendingClick = setTimeout(openInStudio, DOUBLE_CLICK_MS);
       }
     };
 
@@ -403,7 +390,10 @@ export const InlineText: OverlayComponent = ({ element, node }) => {
       onClickCapture,
       { capture: true, signal }
     );
-    return () => listeners.abort();
+    return () => {
+      clearTimeout(pendingClick);
+      listeners.abort();
+    };
   }, [element, id, path, getDocument]);
 
   return null;
