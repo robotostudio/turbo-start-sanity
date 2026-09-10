@@ -101,8 +101,8 @@ function startEditing(
   let typing = false;
   let composing = false;
   let missedRender = false;
-  // Text and caret as the IME started, to rebuild from after a missed render.
-  let composeFrom = { text: typed, at: caret };
+  // Text and selection as the IME started, to rebuild from after a missed render.
+  let composeFrom = { text: typed, start: caret, end: caret };
   // Set once a paste or re-home replaces nodes the undo history points at.
   let staleUndo = false;
   let cancelled = false;
@@ -200,12 +200,12 @@ function startEditing(
 
   const onCompositionStart = () => {
     composing = true;
-    // A composition over a selection replaces it; `caret` is the selection end.
+    // `caret` is the selection end; a composition replaces the selection.
     const selected = element.ownerDocument.getSelection()?.toString() ?? "";
-    const start = Math.max(0, caret - selected.length);
     composeFrom = {
-      text: typed.slice(0, start) + typed.slice(caret),
-      at: start,
+      text: typed,
+      start: Math.max(0, caret - selected.length),
+      end: caret,
     };
   };
   const onCompositionEnd = (event: CompositionEvent) => {
@@ -214,9 +214,15 @@ function startEditing(
       return;
     }
     missedRender = false;
-    const { text, at } = composeFrom;
-    typed = text.slice(0, at) + event.data + text.slice(at);
-    caret = at + event.data.length;
+    const { text, start, end } = composeFrom;
+    // Empty data is a cancelled composition, which browsers undo in full.
+    if (!event.data) {
+      typed = text;
+      caret = end;
+    } else {
+      typed = text.slice(0, start) + event.data + text.slice(end);
+      caret = start + event.data.length;
+    }
     restoreTyped();
   };
 
