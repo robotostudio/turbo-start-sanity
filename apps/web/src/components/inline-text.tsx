@@ -84,7 +84,7 @@ function startEditing(
   // Rewrite React's node in place: Portable Text spans are nodes React keeps
   // and later updates or removes.
   const show = (text: string) => {
-    own.data = text;
+    own.textContent = text;
     if (!ownIsOnlyChild()) {
       element.replaceChildren(own);
     }
@@ -99,6 +99,8 @@ function startEditing(
   let typing = false;
   let composing = false;
   let missedRender = false;
+  // Text and caret as the IME started, to rebuild from after a missed render.
+  let composeFrom = { text: typed, at: caret };
   // Set once a paste or re-home replaces nodes the undo history points at.
   let staleUndo = false;
   let cancelled = false;
@@ -107,8 +109,8 @@ function startEditing(
   const startedAt = Date.now();
   const listeners = new AbortController();
 
-  // The Studio focuses its input once the field's pane opens, even mid-typing;
-  // take focus back once.
+  // The Studio focuses its input once the field's pane opens, even mid-typing.
+  // Refocus after the blur finishes dispatching, or it is ignored.
   const reclaimFocus = () => {
     if (
       reclaimed ||
@@ -118,9 +120,16 @@ function startEditing(
       return false;
     }
     reclaimed = true;
-    element.focus();
-    placeCaret(element, caret);
-    return element.ownerDocument.hasFocus();
+    setTimeout(() => {
+      element.ownerDocument.defaultView?.focus();
+      element.focus();
+      if (element.ownerDocument.hasFocus()) {
+        placeCaret(element, caret);
+      } else {
+        finish();
+      }
+    });
+    return true;
   };
 
   // The browser can swap React's node, as a paste over a selection does.
@@ -194,7 +203,7 @@ function startEditing(
   const onInput = () => {
     typing = false;
     edited = true;
-    // Keep the text from before a mid-composition render until it's restored.
+    // After a mid-composition render the DOM is stale; compositionend rebuilds.
     if (missedRender) {
       return;
     }
@@ -214,13 +223,24 @@ function startEditing(
 
   const onCompositionStart = () => {
     composing = true;
+    // A composition over a selection replaces it; `caret` is the selection end.
+    const selected = element.ownerDocument.getSelection()?.toString() ?? "";
+    const start = Math.max(0, caret - selected.length);
+    composeFrom = {
+      text: typed.slice(0, start) + typed.slice(caret),
+      at: start,
+    };
   };
-  const onCompositionEnd = () => {
+  const onCompositionEnd = (event: CompositionEvent) => {
     composing = false;
-    if (missedRender) {
-      missedRender = false;
-      restoreTyped();
+    if (!missedRender) {
+      return;
     }
+    missedRender = false;
+    const { text, at } = composeFrom;
+    typed = text.slice(0, at) + event.data + text.slice(at);
+    caret = at + event.data.length;
+    restoreTyped();
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
@@ -242,6 +262,11 @@ function startEditing(
   };
 
   const onPaste = (event: ClipboardEvent) => {
+    const text = event.clipboardData?.getData("text/plain") ?? "";
+    // A one-line paste goes through the browser, so undo still covers it.
+    if (!/[\r\n\t]/.test(text)) {
+      return;
+    }
     event.preventDefault();
     const selection = element.ownerDocument.getSelection();
     if (!selection?.rangeCount) {
@@ -249,7 +274,7 @@ function startEditing(
     }
     // Newlines to spaces: `textContent` drops line breaks and glues the words.
     const pasted = element.ownerDocument.createTextNode(
-      (event.clipboardData?.getData("text/plain") ?? "").replace(/\s+/g, " ")
+      text.replace(/\s+/g, " ")
     );
     const range = selection.getRangeAt(0);
     range.deleteContents();
@@ -272,9 +297,12 @@ function startEditing(
   };
 
   const onBlur = () => {
-    if (reclaimFocus()) {
-      return;
+    if (!reclaimFocus()) {
+      finish();
     }
+  };
+
+  const finish = () => {
     end();
     // A removed element (block deleted, field cleared elsewhere) never saves.
     if (aborted || !element.isConnected) {
@@ -291,7 +319,7 @@ function startEditing(
     // A rejected patch puts the rendered text back, unless React re-rendered.
     save(text).catch(() => {
       if (element.contains(own) && own.data === text) {
-        own.data = rendered;
+        own.textContent = rendered;
       }
     });
   };
