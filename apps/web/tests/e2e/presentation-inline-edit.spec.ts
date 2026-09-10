@@ -95,8 +95,8 @@ test("double-click types into a heading and Enter saves it once", async ({
 
   await armInlineEdit(heading);
   await studio.keyboard.type(" one");
-  // The Studio focuses its input once the field's pane loads; typing must stay
-  // on the page through that.
+  // A click that reached the Studio would open the field and take focus. Give
+  // its pane time to have done so.
   await studio.waitForTimeout(5000);
   await studio.keyboard.type(" two");
   await expect(heading).toHaveAttribute("contenteditable", "plaintext-only");
@@ -106,6 +106,12 @@ test("double-click types into a heading and Enter saves it once", async ({
   await studio.keyboard.press("Enter");
   await expect.poll(soft(heroTitle), { timeout: SYNC_TIMEOUT }).toBe(saved);
   await expect(heading).not.toHaveAttribute("contenteditable");
+  // Enter is what opens the field in the Studio.
+  await expect(
+    studio
+      .getByTestId('field-pageBuilder[_key=="hero"].title')
+      .getByRole("textbox")
+  ).toHaveValue(saved, { timeout: LIVE_TIMEOUT });
 });
 
 test("Escape cancels without saving", async ({ page: studio }) => {
