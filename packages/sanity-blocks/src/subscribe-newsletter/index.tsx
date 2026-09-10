@@ -84,12 +84,14 @@ function TestimonialPanel({
             )}
             <div className="flex flex-col text-base leading-6">
               {authorName && (
-                <span className="font-medium text-foreground">
+                <span className="font-medium text-foreground" data-inline-edit>
                   {authorName}
                 </span>
               )}
               {authorRole && (
-                <span className="text-muted-foreground">{authorRole}</span>
+                <span className="text-muted-foreground" data-inline-edit>
+                  {authorRole}
+                </span>
               )}
             </div>
           </div>
@@ -131,7 +133,10 @@ export function SubscribeNewsletter({
           <div className="flex max-w-3xl flex-col items-start gap-8 pb-12">
             <div className="flex flex-col items-start gap-5">
               {title && (
-                <h2 className="max-w-none text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] sm:text-5xl">
+                <h2
+                  className="max-w-none text-balance font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] sm:text-5xl"
+                  data-inline-edit
+                >
                   {title}
                 </h2>
               )}

@@ -42,7 +42,10 @@ export function VideoFeature({
           <figure className="grid gap-3">
             <MuxVideo options={video} title={title} video={video?.asset} />
             {caption && (
-              <figcaption className="text-muted-foreground text-sm">
+              <figcaption
+                className="text-muted-foreground text-sm"
+                data-inline-edit
+              >
                 {caption}
               </figcaption>
             )}

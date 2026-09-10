@@ -203,12 +203,18 @@ function FaqHeader({
       {(title || subtitle) && (
         <div className="flex flex-col gap-5">
           {title && (
-            <h2 className="font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] md:text-5xl">
+            <h2
+              className="font-normal text-4xl text-foreground leading-tight tracking-[-0.24px] md:text-5xl"
+              data-inline-edit
+            >
               {title}
             </h2>
           )}
           {subtitle && (
-            <p className="body-text max-w-xl text-muted-foreground">
+            <p
+              className="body-text max-w-xl text-muted-foreground"
+              data-inline-edit
+            >
               {subtitle}
             </p>
           )}
@@ -224,7 +230,9 @@ function FaqContactLink({ link }: Readonly<{ link: FaqLink }>) {
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
       {link.title && (
-        <p className="text-base text-muted-foreground">{link.title}</p>
+        <p className="text-base text-muted-foreground" data-inline-edit>
+          {link.title}
+        </p>
       )}
       <Link
         aria-label={link.description ?? link.title ?? "Learn more"}

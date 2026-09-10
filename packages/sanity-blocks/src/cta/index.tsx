@@ -58,7 +58,10 @@ export function CTABlock({
           <div className="flex max-w-[690px] flex-col items-start gap-6 lg:min-w-0">
             <BlockEyebrow eyebrow={eyebrow} />
             <div className="flex flex-col items-start gap-4">
-              <h2 className="font-normal text-3xl text-foreground leading-tight tracking-[-0.24px] md:text-4xl lg:text-5xl">
+              <h2
+                className="font-normal text-3xl text-foreground leading-tight tracking-[-0.24px] md:text-4xl lg:text-5xl"
+                data-inline-edit
+              >
                 {title}
               </h2>
               <RichText
@@ -73,7 +76,10 @@ export function CTABlock({
             // shrinks and wraps, so the card never overflows its dotted frame.
             <div className="bleed-x flex flex-col items-start gap-2 lg:mx-0 lg:w-[557px] lg:shrink-0">
               {usedByTeams?.title && (
-                <p className="px-4 font-light font-mono text-sm text-zinc-600 uppercase leading-6 tracking-[0.24px] lg:px-0 dark:text-zinc-300">
+                <p
+                  className="px-4 font-light font-mono text-sm text-zinc-600 uppercase leading-6 tracking-[0.24px] lg:px-0 dark:text-zinc-300"
+                  data-inline-edit
+                >
                   {usedByTeams.title}
                 </p>
               )}

@@ -8,7 +8,6 @@ import {
 } from "@workspace/sanity/live";
 import { Geist, Geist_Mono } from "next/font/google";
 import { draftMode } from "next/headers";
-import { VisualEditing } from "next-sanity/visual-editing";
 import { Suspense } from "react";
 import { preconnect, prefetchDNS } from "react-dom";
 
@@ -20,6 +19,7 @@ import { PreviewBar } from "@/components/preview-bar";
 import { Providers } from "@/components/providers";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { StickyFooter } from "@/components/sticky-footer";
+import { VisualEditingLayer } from "@/components/visual-editing-layer";
 import { getGithubStars } from "@/lib/github-stars";
 import { getNavigationData } from "@/lib/navigation";
 
@@ -102,13 +102,14 @@ export default async function RootLayout({
  */
 async function LivePreviewLayer() {
   const { isEnabled: isDraftMode } = await draftMode();
+  const { perspective } = await getDynamicFetchOptions();
   return (
     <>
       <SanityLive action={revalidateSyncTags} includeDrafts={isDraftMode} />
       {isDraftMode && (
         <>
           <PreviewBar />
-          <VisualEditing />
+          <VisualEditingLayer inlineEditing={perspective === "drafts"} />
         </>
       )}
     </>

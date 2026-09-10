@@ -21,7 +21,11 @@ export function BlockHeader({
     <div className="flex flex-col items-start gap-6">
       <BlockEyebrow eyebrow={eyebrow} />
       <div className="flex flex-col items-start gap-5">
-        {title ? <h2 className="max-w-2xl block-title">{title}</h2> : null}
+        {title ? (
+          <h2 className="max-w-2xl block-title" data-inline-edit>
+            {title}
+          </h2>
+        ) : null}
         {children}
       </div>
     </div>

@@ -1,6 +1,29 @@
 import { HeroBlock } from "@workspace/sanity-blocks/hero/index";
 import { renderToStaticMarkup } from "react-dom/server";
 
+// The flag arms plain-string typing, honoured only where the element's one
+// child is that text. Portable Text is armed by span path, so the intro stays
+// unflagged: a whole paragraph is not one string.
+test("HeroBlock flags its heading and badge, and nothing else, for inline edits", () => {
+  const html = renderToStaticMarkup(
+    <HeroBlock
+      badge="New"
+      richText={[
+        {
+          _type: "block",
+          _key: "block-1",
+          children: [{ _type: "span", text: "Intro copy." }],
+        },
+      ]}
+      title="Type here"
+    />
+  );
+
+  expect(html).toMatch(/<h1[^>]*data-inline-edit[^>]*>Type here<\/h1>/);
+  expect(html).toMatch(/<span[^>]*data-inline-edit[^>]*>New<\/span>/);
+  expect(html.match(/data-inline-edit/g)).toHaveLength(2);
+});
+
 test("HeroBlock renders the title and button content", () => {
   const html = renderToStaticMarkup(
     <HeroBlock
