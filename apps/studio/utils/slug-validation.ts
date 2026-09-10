@@ -2,7 +2,7 @@
  * Slug validation — single source of truth for all URL path validation.
  */
 
-import type { ValidationContext } from "sanity";
+import { getPublishedId, type ValidationContext } from "sanity";
 import slugify from "slugify";
 
 import { API_VERSION } from "@/utils/constant";
@@ -230,9 +230,10 @@ export function createSlugErrorValidator(
 }
 
 /**
- * Reject a slug already taken by another document. The document's own draft and
- * published ids are excluded so re-saving an unchanged document doesn't flag
- * itself.
+ * Reject a slug already taken by another document. Excludes its own draft,
+ * published and release copies so it never flags itself — the releases by
+ * predicate, not id: a release copy collides from the draft's point of view too,
+ * and a document can sit in more than one release.
  */
 export function createSlugUniqueValidator(): (
   slug: { current?: string } | undefined,
@@ -243,11 +244,11 @@ export function createSlugUniqueValidator(): (
     if (!(current && context.getClient)) {
       return true;
     }
-    const id = (context.document?._id ?? "").replace(/^drafts\./, "");
+    const id = getPublishedId(context.document?._id ?? "");
     const taken = await context
       .getClient({ apiVersion: API_VERSION })
       .fetch<number>(
-        `count(*[!(_id in [$draft, $published]) && slug.current == $slug])`,
+        `count(*[!(_id in [$draft, $published]) && !sanity::versionOf($published) && slug.current == $slug])`,
         { draft: `drafts.${id}`, published: id, slug: current }
       );
     return taken > 0
