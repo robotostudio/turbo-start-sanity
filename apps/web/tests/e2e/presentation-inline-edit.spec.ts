@@ -34,17 +34,19 @@ const boldSpan = () =>
     { id: draftId }
   );
 
-// The overlay arms the editor only while hovered, so a double-click can land
-// before it is armed.
+// A double-click before the text cursor marks the element armed opens the
+// field through stock click-to-edit instead.
 const armInlineEdit = async (target: Locator) => {
-  await expect(async () => {
-    await target.hover();
-    await target.dblclick();
-    await expect(target).toHaveAttribute("contenteditable", "plaintext-only", {
-      timeout: 1000,
-    });
-  }).toPass({ timeout: 30_000 });
+  await target.hover();
+  await expect(target).toHaveCSS("cursor", "text", { timeout: 30_000 });
+  await target.dblclick();
+  await expect(target).toHaveAttribute("contenteditable", "plaintext-only");
 };
+
+const studioTitleField = (studio: Page) =>
+  studio
+    .getByTestId('field-pageBuilder[_key=="hero"].title')
+    .getByRole("textbox");
 
 // Without a field open in the Studio, so the double-click is what opens it.
 const openPreview = async (studio: Page) => {
@@ -102,16 +104,17 @@ test("double-click types into a heading and Enter saves it once", async ({
   await expect(heading).toHaveAttribute("contenteditable", "plaintext-only");
   // Keystrokes that reached the Studio form would have autosaved by now.
   expect(await heroTitle()).toBe(doc.heading);
+  // The field must not be open yet, or the assertion after Enter proves nothing.
+  await expect(studioTitleField(studio)).toHaveCount(0);
 
+  // Enter must open the field wherever the pointer is.
+  await studio.mouse.move(0, 0);
   await studio.keyboard.press("Enter");
   await expect.poll(soft(heroTitle), { timeout: SYNC_TIMEOUT }).toBe(saved);
   await expect(heading).not.toHaveAttribute("contenteditable");
-  // Enter is what opens the field in the Studio.
-  await expect(
-    studio
-      .getByTestId('field-pageBuilder[_key=="hero"].title')
-      .getByRole("textbox")
-  ).toHaveValue(saved, { timeout: LIVE_TIMEOUT });
+  await expect(studioTitleField(studio)).toHaveValue(saved, {
+    timeout: LIVE_TIMEOUT,
+  });
 });
 
 test("Escape cancels without saving", async ({ page: studio }) => {
@@ -119,14 +122,19 @@ test("Escape cancels without saving", async ({ page: studio }) => {
   const heading = preview.getByRole("heading", { level: 1, name: saved });
   await expect(heading).toBeVisible({ timeout: LIVE_TIMEOUT });
 
+  const revBefore = await client.fetch<string>("*[_id == $id][0]._rev", {
+    id: draftId,
+  });
   await armInlineEdit(heading);
   await studio.keyboard.type(" discarded");
   await studio.keyboard.press("Escape");
   await expect(heading).not.toHaveAttribute("contenteditable");
   await expect(heading).not.toContainText("discarded");
-  // Long enough for a stray save to land before asserting there was none.
+  // Long enough for a stray write to land before asserting there was none.
   await studio.waitForTimeout(2000);
-  expect(await heroTitle()).toBe(saved);
+  expect(
+    await client.fetch<string>("*[_id == $id][0]._rev", { id: draftId })
+  ).toBe(revBefore);
 });
 
 test("rich text: edits a bold run's words and keeps it bold", async ({
