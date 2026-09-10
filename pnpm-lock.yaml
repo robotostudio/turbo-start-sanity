@@ -183,6 +183,9 @@ importers:
       '@sanity/client':
         specifier: 'catalog:'
         version: 7.26.2
+      '@sanity/mutate':
+        specifier: ^0.18.1
+        version: 0.18.1(xstate@5.32.5)
       '@sanity/visual-editing':
         specifier: ^6.1.1
         version: 6.1.1(@sanity/client@7.26.2)(@types/react@19.2.18)(next@16.3.3(@babel/core@7.29.7(supports-color@8.1.1))(@playwright/test@1.62.1)(@types/node@24.13.3)(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(styled-components@6.5.3(css-to-react-native@3.2.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(typescript@5.9.3)
