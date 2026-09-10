@@ -21,23 +21,20 @@ const DOUBLE_CLICK_MS = 500;
 const SPAN_TEXT = /\.children\[_key=="[^"]+"\]\.text$/;
 
 /**
- * Opt-in: a flagged `string` element (not `text`, which can hold several
- * lines), or a Portable Text span whose element holds only its text. Never
- * inside a link or button, where a caret click could follow the link.
+ * Opt-in: a flagged element, or a Portable Text span whose element holds only
+ * its text. Never inside a click target, whose handler the click capture would
+ * swallow. Only flag `string` fields: a multi-line `text` field looks the same.
  */
-export function isInlineEditable(
-  element: Element,
-  path: string,
-  type?: string
-) {
+export function isInlineEditable(element: Element, path: string) {
   const onlyText =
     element.childNodes.length === 1 && element.firstChild instanceof Text;
-  if (!onlyText || element.closest("a, button")) {
+  if (
+    !onlyText ||
+    element.closest("a, button, summary, label, [role=button]")
+  ) {
     return false;
   }
-  return element.hasAttribute(EDIT_ATTR)
-    ? type === "string"
-    : SPAN_TEXT.test(path);
+  return element.hasAttribute(EDIT_ATTR) || SPAN_TEXT.test(path);
 }
 
 function caretOffset(element: HTMLElement): number | null {
@@ -140,7 +137,8 @@ function startEditing(
     rendered = now;
     if (!edited) {
       typed = stegaClean(now);
-      show(typed);
+      // Rewriting the node collapses a live range to offset 0.
+      restoreTyped();
       return;
     }
     // Rewriting mid-composition breaks the IME; restore once it ends.
@@ -294,7 +292,7 @@ function startEditing(
       return;
     }
     show(text);
-    // A rejected patch puts the rendered text back, unless React re-rendered.
+    // Only a local failure rejects; the Studio's own write is fire-and-forget.
     save(text).catch(() => {
       if (element.contains(own) && own.data === text) {
         own.textContent = rendered;
@@ -349,16 +347,24 @@ export const InlineText: OverlayComponent = ({ element, node }) => {
     };
 
     // A synthetic click passes the capture below and reaches the overlay,
-    // which opens this field in the Studio.
+    // which opens this field in the Studio. The overlay only honours a click
+    // on its hovered element, so hover it for the duration of the click.
     const openInStudio = () => {
       cancelPending();
-      target.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      for (const type of ["mouseenter", "click", "mouseleave"]) {
+        target.dispatchEvent(
+          new MouseEvent(type, { bubbles: type === "click" })
+        );
+      }
     };
 
-    // The overlay ignores clicks on an unhovered element, so replay before its
-    // own mouseleave handler runs.
+    // The overlay unmounts this component on leave, taking the timer with it.
     const onLeaveCapture = (event: MouseEvent) => {
-      if (event.target === target && pendingClick !== undefined) {
+      if (
+        event.isTrusted &&
+        event.target === target &&
+        pendingClick !== undefined
+      ) {
         openInStudio();
       }
     };
@@ -406,6 +412,10 @@ export const InlineText: OverlayComponent = ({ element, node }) => {
     const listeners = new AbortController();
     const { signal } = listeners;
     target.addEventListener("dblclick", onDoubleClick, { signal });
+    // Before the overlay's schema handshake mounts this, a double-click falls
+    // through to stock click-to-edit; the text cursor marks it armed.
+    const cursor = target.style.cursor;
+    target.style.cursor = "text";
     const view = target.ownerDocument.defaultView;
     view?.addEventListener("click", onClickCapture, { capture: true, signal });
     view?.addEventListener("mouseleave", onLeaveCapture, {
@@ -415,6 +425,7 @@ export const InlineText: OverlayComponent = ({ element, node }) => {
     return () => {
       cancelPending();
       listeners.abort();
+      target.style.cursor = cursor;
     };
   }, [element, id, path, getDocument]);
 

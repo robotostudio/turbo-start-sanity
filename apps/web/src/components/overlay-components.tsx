@@ -7,5 +7,4 @@ import { InlineText, isInlineEditable } from "@/components/inline-text";
 export const overlayComponents: OverlayComponentResolver = ({
   element,
   node,
-  type,
-}) => (isInlineEditable(element, node.path, type) ? InlineText : undefined);
+}) => (isInlineEditable(element, node.path) ? InlineText : undefined);
