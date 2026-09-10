@@ -155,9 +155,38 @@ All frontend types derive from generated Sanity types. `apps/web/src/types.ts` e
 ### Visual Editing & Live Preview
 
 - Sanity Presentation Tool configured in `sanity.config.ts` with `presentationTool`
-- Next.js uses `VisualEditing` from `next-sanity/visual-editing` in layout (draft mode only)
+- Next.js renders `VisualEditingLayer` (`VisualEditing` from `next-sanity/visual-editing` plus this app's overlay components) in layout (draft mode only)
 - `createDataAttribute` used throughout page builder for click-to-edit in Presentation
 - `SanityLive` component enables automatic content revalidation
+
+#### Double-click to type (custom Presentation overlay)
+
+`apps/web/src/components/overlay-components.tsx` is the resolver handed to
+`<VisualEditing components={...} />` through `visual-editing-layer.tsx` (its own
+client component, because a function cannot cross the server/client boundary).
+It returns `InlineText` when `isInlineEditable` in `inline-text.tsx` allows it:
+the element holds a single text node, sits outside any link or button (with
+the overlay toggled off, a click to move the caret would follow the link), and
+either
+
+- **Plain strings**: carries the bare `data-inline-edit` flag over a `string` field. Not `text`, which can hold several lines while Enter saves. `BlockEyebrow`, `BlockHeader`'s title and each block's own plain-string titles, subtitles, captions and testimonial author lines carry it. Opt-in, because the resolver also sees every nav link, button label and badge
+- **Rich text**: has a Portable Text span path (`…children[_key=="s"].text`). The words in a one-span paragraph, or in the bold/italic run inside one, can be typed over. Plain runs in a paragraph that also has marks, and marks, links and new paragraphs themselves, stay in the Studio form
+
+`inline-text.tsx` makes the element `contentEditable="plaintext-only"` on
+double-click and saves once on blur through `useDocuments()`, to the overlay
+node's own `id` and `path`. Sanity ships nothing official for inline typing;
+this is custom on that documented API. The rules that keep typing and page
+updates from trampling each other (strip stega first, save only on blur, put
+typed text back over a render, rewrite React's text node in place, restore on
+cancel, empty or a failed save, end without saving if React restructures the
+text mid-edit) live in the `startEditing` docblock. Saving is last-write-wins,
+as in the Studio form. Never under a release: `useDocuments` always writes to
+`drafts.<id>`, so the edit would land outside the version on screen. Text from
+the published document stays editable, because a page with no draft renders
+from it and the first save creates the draft.
+
+Visitors never mount any of it: `VisualEditingLayer` renders only in draft
+mode, and the `data-inline-edit` attribute is inert outside Presentation.
 
 ## Conventions
 
