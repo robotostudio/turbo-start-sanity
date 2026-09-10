@@ -180,7 +180,11 @@ updates from trampling each other (strip stega first, save only on blur, put
 typed text back over a render, rewrite React's text node in place, restore on
 cancel, empty or a rejected patch, end without saving if React restructures the
 text mid-edit, clean up if the element is removed) live as comments in
-`inline-text.tsx`. Saving is last-write-wins, as in the Studio form. Inline
+`inline-text.tsx`. No real click on an editable element reaches the overlay: a
+click opening the field makes the Studio focus its input, which ends an edit
+mid-word. A single click is replayed after the double-click window, and Enter
+opens the field with the saved value. Saving is last-write-wins, as in the
+Studio form. Inline
 editing is on only when the preview's perspective is drafts: `LivePreviewLayer`
 passes that to `VisualEditingLayer`, because saves always write `drafts.<id>`,
 which a published or release preview never shows. In a drafts preview, text
