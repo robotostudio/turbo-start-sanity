@@ -1,7 +1,10 @@
 import type { ButtonProps } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import { SanityButtons } from "@workspace/sanity-blocks/internal/sanity-buttons";
 import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
-import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
+import {
+  resolveAssetId,
+  SanityImage,
+} from "@workspace/sanity-blocks/internal/sanity-image";
 
 export interface HeroSplitProps {
   buttons?: ButtonProps[] | null;
@@ -42,7 +45,7 @@ export function HeroSplit({
           )}
           <SanityButtons buttons={buttons} className="pt-3" />
         </div>
-        {image?.id && (
+        {resolveAssetId(image) && image && (
           <div className="relative aspect-video overflow-hidden bg-muted outline-1 -outline-offset-1 outline-black/5 dark:outline-white/10">
             <SanityImage
               className="absolute inset-0 size-full object-cover"

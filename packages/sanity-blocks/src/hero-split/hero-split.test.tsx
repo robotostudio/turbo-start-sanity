@@ -45,6 +45,14 @@ test("HeroSplit uses an h2 when it is not the first block", () => {
   expect(html).not.toMatch(/<h1/);
 });
 
+test("HeroSplit drops the image column for a malformed asset id", () => {
+  const html = renderToStaticMarkup(
+    <HeroSplit image={{ id: "not-an-asset" }} title="Build pages faster" />
+  );
+
+  expect(html).not.toMatch(/aspect-video/);
+});
+
 test("HeroSplit keeps the copy when no image is set", () => {
   const html = renderToStaticMarkup(<HeroSplit title="Build pages faster" />);
 
