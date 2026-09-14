@@ -5,6 +5,7 @@ import { ctaToMarkdown } from "../cta/markdown";
 import { faqAccordionToMarkdown } from "../faq-accordion/markdown";
 import { featureCardsIconToMarkdown } from "../feature-cards-icon/markdown";
 import { heroToMarkdown } from "../hero/markdown";
+import { heroSplitToMarkdown } from "../hero-split/markdown";
 import { logoCloudToMarkdown } from "../logo-cloud/markdown";
 import { richTextBlockToMarkdown } from "../rich-text-block/markdown";
 import { showcaseGridToMarkdown } from "../showcase-grid/markdown";
@@ -23,6 +24,8 @@ function blockToMarkdown(
   switch (block?._type) {
     case "hero":
       return heroToMarkdown(block, options);
+    case "heroSplit":
+      return heroSplitToMarkdown(block, options);
     case "cta":
       return ctaToMarkdown(block, options);
     case "richTextBlock":

@@ -2,6 +2,7 @@ import { ctaGroqProjection } from "@workspace/sanity-blocks/cta/cta.groq";
 import { faqAccordionGroqProjection } from "@workspace/sanity-blocks/faq-accordion/faq-accordion.groq";
 import { featureCardsIconGroqProjection } from "@workspace/sanity-blocks/feature-cards-icon/feature-cards-icon.groq";
 import { heroGroqProjection } from "@workspace/sanity-blocks/hero/hero.groq";
+import { heroSplitGroqProjection } from "@workspace/sanity-blocks/hero-split/hero-split.groq";
 import { logoCloudGroqProjection } from "@workspace/sanity-blocks/logo-cloud/logo-cloud.groq";
 import { richTextBlockGroqProjection } from "@workspace/sanity-blocks/rich-text-block/rich-text-block.groq";
 import { showcaseGridGroqProjection } from "@workspace/sanity-blocks/showcase-grid/showcase-grid.groq";
@@ -131,6 +132,7 @@ const pageBuilderFragment = /* groq */ `
     _type,
     ${ctaGroqProjection},
     ${heroGroqProjection},
+    ${heroSplitGroqProjection},
     ${faqAccordionGroqProjection},
     ${featureCardsIconGroqProjection},
     ${subscribeNewsletterGroqProjection},

@@ -6,6 +6,7 @@ import { CTABlock } from "@workspace/sanity-blocks/cta/index";
 import { FaqAccordion } from "@workspace/sanity-blocks/faq-accordion/index";
 import { FeatureCardsWithIcon } from "@workspace/sanity-blocks/feature-cards-icon/index";
 import { HeroBlock } from "@workspace/sanity-blocks/hero/index";
+import { HeroSplit } from "@workspace/sanity-blocks/hero-split/index";
 import { LogoCloud } from "@workspace/sanity-blocks/logo-cloud/index";
 import { RichTextBlock } from "@workspace/sanity-blocks/rich-text-block/index";
 import { ShowcaseGrid } from "@workspace/sanity-blocks/showcase-grid/index";
@@ -49,6 +50,13 @@ function renderBlockComponent(
         <HeroBlock
           {...(block as PagebuilderType<"hero">)}
           dataSanity={dataSanity}
+          isFirst={isFirst}
+        />
+      );
+    case "heroSplit":
+      return (
+        <HeroSplit
+          {...(block as PagebuilderType<"heroSplit">)}
           isFirst={isFirst}
         />
       );

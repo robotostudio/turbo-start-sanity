@@ -43,6 +43,12 @@ export const blockFixtures: BlockFixture[] = [
     block: () => ({ title: heading("hero") }),
   },
   {
+    type: "heroSplit",
+    title: "Hero Split",
+    heading: heading("heroSplit"),
+    block: () => ({ title: heading("heroSplit") }),
+  },
+  {
     type: "cta",
     title: "Cta",
     heading: heading("cta"),
