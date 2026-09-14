@@ -106,6 +106,7 @@ export interface MarkdownBlock {
   items?: MarkdownShowcaseItem[] | null;
   badge?: string | null;
   subtitle?: string | null;
+  image?: MarkdownImage | null;
   richText?: PortableTextValue;
   subTitle?: PortableTextValue;
   helperText?: PortableTextValue;

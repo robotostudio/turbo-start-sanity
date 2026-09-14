@@ -13,6 +13,7 @@ export const Check = IconStub("check");
 export const ChevronDown = IconStub("chevron-down");
 export const ChevronDownIcon = IconStub("chevron-down-icon");
 export const ChevronRight = IconStub("chevron-right");
+export const Columns2 = IconStub("columns-2");
 export const Copy = IconStub("copy");
 export const Facebook = IconStub("facebook");
 export const Github = IconStub("github");
