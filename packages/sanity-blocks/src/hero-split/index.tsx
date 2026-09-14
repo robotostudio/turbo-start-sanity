@@ -18,17 +18,19 @@ export function HeroSplit({
   subtitle,
   title,
 }: Readonly<HeroSplitProps>) {
+  const Heading = isFirst ? "h1" : "h2";
+
   return (
     <section className="block-section" id="hero-split">
       <div className="container grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
         <div className="grid gap-5">
           {title && (
-            <h1
+            <Heading
               className="max-w-[24ch] text-balance font-normal text-4xl text-foreground tracking-tight md:text-5xl lg:text-6xl"
               data-inline-edit
             >
               {title}
-            </h1>
+            </Heading>
           )}
           {subtitle && (
             <p

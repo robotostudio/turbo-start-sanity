@@ -7,6 +7,7 @@ test("HeroSplit renders the heading, subtitle and image", () => {
   const html = renderToStaticMarkup(
     <HeroSplit
       image={{ id: IMAGE_ID, alt: "A desk" }}
+      isFirst
       subtitle="Change pages without a deploy."
       title="Build pages faster"
     />
@@ -35,6 +36,13 @@ test("HeroSplit renders its buttons as links", () => {
 
   expect(html).toMatch(/href="\/start"[^>]*>Get started/);
   expect(html).toMatch(/href="\/docs"[^>]*>Read the docs/);
+});
+
+test("HeroSplit uses an h2 when it is not the first block", () => {
+  const html = renderToStaticMarkup(<HeroSplit title="Build pages faster" />);
+
+  expect(html).toMatch(/<h2[^>]*>Build pages faster<\/h2>/);
+  expect(html).not.toMatch(/<h1/);
 });
 
 test("HeroSplit keeps the copy when no image is set", () => {
