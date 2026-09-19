@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "turbo-start-sanity-kb": {
+      "type": "http",
+      "url": "${SANITY_CONTEXT_ENDPOINT}",
+      "headers": {
+        "Authorization": "Bearer ${SANITY_CONTEXT_TOKEN}"
+      }
+    }
+  }
+}
