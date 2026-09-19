@@ -10,13 +10,18 @@ import {
 
 import { client } from "./client";
 
+// Placeholder tokens (not `sk…`) would 401 every request, so treat them as unset.
+const readToken = env.SANITY_API_READ_TOKEN.startsWith("sk")
+  ? env.SANITY_API_READ_TOKEN
+  : false;
+
 /** Learn more: https://github.com/sanity-io/next-sanity?tab=readme-ov-file#1-configure-definelive */
 const { sanityFetch: liveFetch, SanityLive } = defineLive({
   client,
   // Required for showing draft content when the Sanity Presentation Tool is used, or to enable the Vercel Toolbar Edit Mode
-  serverToken: env.SANITY_API_READ_TOKEN,
+  serverToken: readToken,
   // Required for stand-alone live previews, the token is only shared to the browser if it's a valid Next.js Draft Mode session
-  browserToken: env.SANITY_API_READ_TOKEN,
+  browserToken: readToken,
   strict: true,
 });
 
@@ -76,7 +81,8 @@ const DRAFTS_FETCH_OPTIONS: DynamicFetchOptions = {
  * only: anywhere the URL is publicly reachable this would hand unpublished
  * content to anyone who can load the page.
  */
-export const DRAFTS_WITHOUT_SESSION = process.env.NODE_ENV === "development";
+export const DRAFTS_WITHOUT_SESSION =
+  process.env.NODE_ENV === "development" && readToken !== false;
 
 /**
  * Resolves perspective/stega outside any `'use cache'` boundary (reads
