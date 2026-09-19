@@ -16,6 +16,7 @@
     "test:e2e:presentation": "playwright test --config playwright.presentation.config.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.127.0",
     "@sanity/client": "catalog:",
     "@sanity/mutate": "^0.18.1",
     "@sanity/visual-editing": "^6.1.1",

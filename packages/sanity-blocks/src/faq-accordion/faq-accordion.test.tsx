@@ -99,3 +99,21 @@ test("FaqAccordion renders with no categories", () => {
 
   expect(html).toMatch(/No items yet/);
 });
+
+test("FaqAccordion ends with an ask-your-own-question row", () => {
+  const html = renderToStaticMarkup(
+    <FaqAccordion
+      categories={[
+        {
+          _key: "cat-1",
+          title: "General",
+          faqs: [{ _id: "faq-1", title: "How do I import schemas?" }],
+        },
+      ]}
+    />
+  );
+
+  expect(html).toMatch(/Can&#x27;t find it\? Type your own question here…/);
+  expect(html).toMatch(/aria-label="Ask"/);
+  expect(html).not.toMatch(/Clear question/);
+});

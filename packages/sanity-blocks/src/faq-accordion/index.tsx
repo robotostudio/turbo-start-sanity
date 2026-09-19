@@ -7,7 +7,22 @@ import { useDisclosureAnimation } from "@workspace/sanity-blocks/internal/use-di
 import { cn } from "@workspace/tailwind-config/utils";
 import { ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
-import { type MouseEvent as ReactMouseEvent, useState } from "react";
+import {
+  type ChangeEvent,
+  type MouseEvent as ReactMouseEvent,
+  type ReactNode,
+  type SubmitEvent,
+  useId,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
+
+const ASK_ENDPOINT = "/api/ask";
+const ASK_MIN_LENGTH = 3;
+const ASK_MAX_LENGTH = 500;
+const ASK_EMPTY_ANSWER = "Sorry, I couldn't find an answer to that.";
+const ASK_FALLBACK_ERROR = "Sorry, something went wrong. Please try again.";
 
 export interface FaqItem {
   _key?: string | null;
@@ -47,16 +62,18 @@ const DISCLOSURE_BASE_CLASS =
 const DISCLOSURE_ANIMATION_CLASS =
   "fade-in slide-in-from-bottom-2 animate-in fill-mode-both animation-duration-300 ease-out motion-reduce:animate-none";
 
-function FaqDisclosure({
+function Disclosure({
   animationDelay,
-  faq,
+  children,
   isOpen,
   onToggle,
+  title,
 }: Readonly<{
   animationDelay: string;
-  faq: FaqItem;
+  children?: ReactNode;
   isOpen: boolean;
   onToggle: () => void;
+  title: ReactNode;
 }>) {
   const { detailsRef, contentRef } = useDisclosureAnimation(isOpen);
   const [initialOpen] = useState(isOpen);
@@ -86,7 +103,7 @@ function FaqDisclosure({
         onClick={handleSummaryClick}
       >
         <h3 className="font-medium text-foreground text-lg leading-6">
-          {faq.title}
+          {title}
         </h3>
         <Plus
           className={cn(
@@ -95,14 +112,218 @@ function FaqDisclosure({
           )}
         />
       </summary>
-      {faq.richText?.length ? (
+      {children ? (
         <div className="overflow-hidden" ref={contentRef}>
-          <div className="min-h-0 pb-4 text-muted-foreground">
-            <RichText className="body-text" richText={faq.richText} />
-          </div>
+          <div className="min-h-0 pb-4 text-muted-foreground">{children}</div>
         </div>
       ) : null}
     </details>
+  );
+}
+
+function FaqDisclosure({
+  faq,
+  ...props
+}: Readonly<{
+  animationDelay: string;
+  faq: FaqItem;
+  isOpen: boolean;
+  onToggle: () => void;
+}>) {
+  return (
+    <Disclosure {...props} title={faq.title}>
+      {faq.richText?.length ? (
+        <RichText className="body-text" richText={faq.richText} />
+      ) : null}
+    </Disclosure>
+  );
+}
+
+async function readErrorMessage(response: Response) {
+  if (response.headers.get("content-type")?.includes("application/json")) {
+    const body = (await response.json()) as { error?: unknown };
+    return typeof body.error === "string" ? body.error : ASK_FALLBACK_ERROR;
+  }
+  return (await response.text()) || ASK_FALLBACK_ERROR;
+}
+
+async function readTextStream(
+  response: Response,
+  onChunk: (chunk: string) => void
+) {
+  if (!response.body) {
+    onChunk(await response.text());
+    return;
+  }
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) return;
+    onChunk(decoder.decode(value, { stream: true }));
+  }
+}
+
+function askButtonLabel(showsAsk: boolean, expanded: boolean) {
+  if (showsAsk) return "Ask";
+  return expanded ? "Hide answer" : "Show answer";
+}
+
+function AskAnswer({
+  answer,
+  error,
+  isAsking,
+}: Readonly<{ answer: string; error: string; isAsking: boolean }>) {
+  if (error) return <p>{error}</p>;
+  if (isAsking && !answer) {
+    return <p className="animate-pulse">Looking that up…</p>;
+  }
+  return (
+    <p className="whitespace-pre-wrap">
+      {answer || (isAsking ? "" : ASK_EMPTY_ANSWER)}
+    </p>
+  );
+}
+
+function AskItem({ animationDelay }: Readonly<{ animationDelay: string }>) {
+  const answerId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const [question, setQuestion] = useState("");
+  const [asked, setAsked] = useState("");
+  const [answer, setAnswer] = useState("");
+  const [error, setError] = useState("");
+  const [open, setOpen] = useState(false);
+  const [isAsking, startAsking] = useTransition();
+
+  const trimmed = question.trim();
+  const hasAnswer = asked !== "";
+  const expanded = open && hasAnswer;
+  const isNewQuestion =
+    trimmed !== asked &&
+    trimmed.length >= ASK_MIN_LENGTH &&
+    trimmed.length <= ASK_MAX_LENGTH;
+
+  const ask = async (text: string, controller: AbortController) => {
+    try {
+      const response = await fetch(ASK_ENDPOINT, {
+        body: JSON.stringify({ question: text }),
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        setError(await readErrorMessage(response));
+        return;
+      }
+      await readTextStream(response, (chunk) => {
+        if (!controller.signal.aborted) {
+          setAnswer((current) => current + chunk);
+        }
+      });
+    } catch {
+      if (!controller.signal.aborted) setError(ASK_FALLBACK_ERROR);
+    }
+  };
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
+    setQuestion(event.target.value);
+
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (isAsking) return;
+    if (!isNewQuestion) {
+      if (hasAnswer) setOpen((current) => !current);
+      return;
+    }
+    const controller = new AbortController();
+    abortRef.current = controller;
+    // Reset outside the transition so streamed chunks append to "".
+    setAnswer("");
+    setError("");
+    setAsked(trimmed);
+    setOpen(true);
+    startAsking(() => ask(trimmed, controller));
+  };
+
+  const handleClear = () => {
+    abortRef.current?.abort();
+    setQuestion("");
+    setAsked("");
+    setAnswer("");
+    setError("");
+    setOpen(false);
+    inputRef.current?.focus();
+  };
+
+  return (
+    <div
+      className={cn(
+        "border border-border bg-background px-4 transition-colors duration-150 has-[input:focus-visible]:[outline:2px_dotted_var(--foreground)] has-[input:focus-visible]:[outline-offset:-2px] motion-reduce:transition-none",
+        DISCLOSURE_ANIMATION_CLASS,
+        expanded
+          ? "border-transparent bg-zinc-100 dark:bg-zinc-900"
+          : "hover-surface"
+      )}
+      style={{ animationDelay }}
+    >
+      <form className="flex items-center gap-2.5 py-4" onSubmit={handleSubmit}>
+        <input
+          aria-label="Ask your own question"
+          autoComplete="off"
+          className="min-w-0 flex-1 bg-transparent font-medium text-foreground text-lg leading-6 outline-none placeholder:font-normal placeholder:text-muted-foreground"
+          enterKeyHint="send"
+          maxLength={ASK_MAX_LENGTH}
+          name="question"
+          onChange={handleChange}
+          placeholder="Can't find it? Type your own question here…"
+          ref={inputRef}
+          value={question}
+        />
+        {question || hasAnswer ? (
+          <button
+            className="focus-ring -my-2 shrink-0 rounded-none px-2 py-2 font-mono text-muted-foreground text-sm uppercase leading-5 tracking-[0.28px] transition-colors duration-150 hover:text-foreground"
+            onClick={handleClear}
+            type="button"
+          >
+            Clear
+          </button>
+        ) : null}
+        <button
+          aria-controls={answerId}
+          aria-expanded={expanded}
+          aria-label={askButtonLabel(isNewQuestion || !hasAnswer, expanded)}
+          className="focus-ring -my-2 -mr-2 shrink-0 rounded-none p-2 disabled:cursor-default disabled:opacity-40"
+          disabled={isAsking || !(isNewQuestion || hasAnswer)}
+          type="submit"
+        >
+          <Plus
+            className={cn(
+              "pointer-events-none size-5 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none dark:text-accent-green",
+              expanded && "rotate-45"
+            )}
+          />
+        </button>
+      </form>
+      <div
+        aria-busy={isAsking}
+        aria-live="polite"
+        className={cn(
+          "grid transition-[grid-template-rows] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none",
+          expanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        )}
+        id={answerId}
+        inert={!expanded}
+      >
+        <div className="overflow-hidden">
+          {hasAnswer ? (
+            <div className="body-text pb-4 text-muted-foreground">
+              <AskAnswer answer={answer} error={error} isAsking={isAsking} />
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -301,7 +522,12 @@ export function FaqAccordion({
             )}
 
             <div className="flex flex-col gap-6">
-              <FaqList faqs={activeFaqs} key={accordionKey} />
+              <div className="grid content-start gap-4">
+                <FaqList faqs={activeFaqs} key={accordionKey} />
+                <AskItem
+                  animationDelay={`${Math.min(activeFaqs.length, 8) * 45}ms`}
+                />
+              </div>
               {link && <FaqContactLink link={link} />}
             </div>
           </div>
