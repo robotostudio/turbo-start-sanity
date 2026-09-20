@@ -13,6 +13,10 @@ const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
 // https://www.sanity.io/docs/help/studio-host-user-applications
 const appId = process.env.SANITY_STUDIO_APP_ID || undefined;
 
+// Schema extraction bundles with rolldown, which cannot interop lexorank's
+// CommonJS build (reached via @sanity/orderable-document-list).
+const isSchemaExtraction = process.env.SANITY_SCHEMA_EXTRACT === "1";
+
 if (!projectId) {
   logger.warn(
     "Missing or invalid SANITY_STUDIO_PROJECT_ID - some features may not work"
@@ -34,7 +38,7 @@ export default defineCliConfig({
     autoUpdates: false,
   },
   schemaExtraction: {
-    enabled: true,
+    enabled: false,
     enforceRequiredFields: true,
   },
   typegen: {
@@ -49,6 +53,14 @@ export default defineCliConfig({
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "."),
+        ...(isSchemaExtraction
+          ? {
+              lexorank: path.resolve(
+                __dirname,
+                "scripts/lexorank-extract-stub.ts"
+              ),
+            }
+          : {}),
       },
     },
   },
