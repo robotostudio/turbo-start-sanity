@@ -40,6 +40,7 @@
   "devDependencies": {
     "@playwright/test": "^1.62.1",
     "@sanity/codegen": "^8.0.0",
+    "@tailwindcss/postcss": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

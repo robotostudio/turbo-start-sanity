@@ -247,6 +247,9 @@ importers:
       '@sanity/codegen':
         specifier: ^8.0.0
         version: 8.0.0(react@19.2.8)(supports-color@8.1.1)
+      '@tailwindcss/postcss':
+        specifier: 'catalog:'
+        version: 4.3.3
       '@types/node':
         specifier: 'catalog:'
         version: 24.13.3
@@ -10437,7 +10440,7 @@ snapshots:
       '@alloc/quick-lru': 5.2.0
       '@tailwindcss/node': 4.3.3
       '@tailwindcss/oxide': 4.3.3
-      postcss: 8.5.26
+      postcss: 8.5.28
       tailwindcss: 4.3.3
 
   '@tailwindcss/typography@0.5.20(tailwindcss@4.3.3)':
