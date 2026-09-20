@@ -55,7 +55,7 @@ packages/
   env/           — @workspace/env — Zod-validated env vars via @t3-oss/env-nextjs
   sanity/        — @workspace/sanity — Shared Sanity client, GROQ queries, live preview, image utils
   sanity-blocks/ — @workspace/sanity-blocks — Block schemas, GROQ projections, React block components, Markdown serializers, Vitest suite
-  ui/            — @workspace/ui — Shared UI components (Radix + CVA + Tailwind, shadcn-style)
+  ui/            — @workspace/ui — Shared UI components (Base UI + CVA + Tailwind, shadcn-style)
   tailwind-config/   — @workspace/tailwind-config — Shared Tailwind v4 theme + `cn` utility
   logger/        — @workspace/logger — Structured logger class with context prefixes
   typescript-config/ — Shared TS configs
@@ -216,7 +216,7 @@ mode, and the `data-inline-edit` attribute is inert outside Presentation.
 - Prefer `grid` over `flex` unless two sibling elements
 - Use `SanityImage` component for Sanity images (from `sanity-image` library)
 - Use `SanityButtons` resolver for button arrays
-- Shared UI components in `@workspace/ui` (Radix + CVA pattern)
+- Shared UI components in `@workspace/ui` (Base UI + CVA pattern)
 
 ### Formatting (Biome)
 
