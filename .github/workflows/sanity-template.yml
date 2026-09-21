@@ -15,4 +15,4 @@ jobs:
         with:
           persist-credentials: false
       - name: Validate Sanity Template
-        uses: sanity-io/template-validator@579a9fcc32543d373eb4c8e0d0c2a4c32b413ef6 # v3.1.0
+        uses: sanity-io/template-validator@f86b443bd88342f796e9718cedd8025591e464c1 # v3.1.1
