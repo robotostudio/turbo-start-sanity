@@ -30,7 +30,13 @@ export default defineMigration({
           if (!value || value.mediaType) continue;
           patches.push(
             at(
-              `pageBuilder[_key=="${block._key}"].video.${variant}.mediaType`,
+              [
+                "pageBuilder",
+                { _key: block._key },
+                "video",
+                variant,
+                "mediaType",
+              ],
               set(value.mux?.asset?._ref ? "mux" : "sanity")
             )
           );
