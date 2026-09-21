@@ -12,6 +12,8 @@ const REQUESTS_PER_MINUTE = 5;
 const WINDOW_MS = 60_000;
 const ERROR_MESSAGE = "Sorry, something went wrong. Please try again.";
 const CUT_OFF_NOTE = "\n\n(The answer was cut off. Please try again.)";
+const UNAVAILABLE_MESSAGE =
+  "The assistant is temporarily unavailable. Please try again later.";
 
 // Per server instance only; use a Vercel Firewall rule for a global limit.
 const recentRequests = new Map<string, number[]>();
@@ -50,6 +52,16 @@ async function readQuestion(req: NextRequest): Promise<string> {
   }
 }
 
+// AI Gateway answers 402 once the key's spending limit is reached.
+function isBudgetExhausted(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "statusCode" in error &&
+    error.statusCode === 402
+  );
+}
+
 async function streamAnswer(
   config: AskConfig,
   question: string,
@@ -63,6 +75,7 @@ async function streamAnswer(
       headers: { Authorization: `Bearer ${config.token}` },
     },
   });
+  let streamError: unknown;
   try {
     const result = streamText({
       model: "anthropic/claude-opus-5",
@@ -73,8 +86,13 @@ async function streamAnswer(
       stopWhen: isStepCount(MAX_STEPS),
       prompt: question,
       abortSignal: signal,
+      onError: ({ error }) => {
+        streamError = error;
+      },
     });
     for await (const text of result.textStream) onText(text);
+    // The stream ends quietly on error; rethrow so the caller sees the cause.
+    if (streamError) throw streamError;
 
     const finishReason = await result.finishReason;
     if (finishReason === "content-filter") {
@@ -126,7 +144,11 @@ export async function POST(req: NextRequest) {
         controller.enqueue(encoder.encode(text));
       };
       // A partial answer gets a cut-off note, never a glued-on error.
-      const endEarly = () => send(sentText ? CUT_OFF_NOTE : ERROR_MESSAGE);
+      const endEarly = (error?: unknown) => {
+        if (sentText) send(CUT_OFF_NOTE);
+        else if (isBudgetExhausted(error)) send(UNAVAILABLE_MESSAGE);
+        else send(ERROR_MESSAGE);
+      };
       try {
         const finished = await streamAnswer(
           { endpoint, token },
@@ -138,7 +160,7 @@ export async function POST(req: NextRequest) {
       } catch (error) {
         if (!req.signal.aborted) {
           logger.error("Ask request failed", error);
-          endEarly();
+          endEarly(error);
         }
       } finally {
         if (!req.signal.aborted) controller.close();
