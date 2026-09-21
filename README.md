@@ -125,7 +125,7 @@ Notes:
 - Video is hosted on **Mux**, not stored in Sanity. There is no env var for it:
   the first time an editor uploads a video, the Studio asks for a Mux Access
   Token ID and Secret Key, and stores both in the dataset as `secrets.mux`.
-  Give that token only the Mux Video read and write scopes — on a public dataset it is readable by anyone who can
+  Give that token Mux Video read and write plus Mux Data read, as the plugin's README requires — on a public dataset it is readable by anyone who can
   query the dataset. Nothing else in the template needs a Mux account until
   then.
 - Local development defaults are `http://localhost:3000` for the web app and
