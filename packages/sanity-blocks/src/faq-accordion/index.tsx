@@ -271,9 +271,23 @@ function AskButton({
   );
 }
 
+// A click on the row's padding focuses the input, as a click on the input would.
+function focusInputFromPadding(
+  event: ReactMouseEvent<HTMLDivElement>,
+  form: HTMLFormElement | null,
+  input: HTMLInputElement | null
+) {
+  const onPadding =
+    event.target === event.currentTarget || event.target === form;
+  if (!(onPadding && input)) return;
+  event.preventDefault();
+  input.focus();
+}
+
 function AskItem({ animationDelay }: Readonly<{ animationDelay: string }>) {
   const answerId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   // Stops the request, and the billed stream behind it, when the row unmounts.
   useEffect(() => () => abortRef.current?.abort(), []);
@@ -346,17 +360,25 @@ function AskItem({ animationDelay }: Readonly<{ animationDelay: string }>) {
   };
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: pointer shortcut; the input is already tabbable
     <div
       className={cn(
-        "border border-border bg-background px-4 transition-colors duration-150 has-[input:focus-visible]:[outline:2px_dotted_var(--foreground)] has-[input:focus-visible]:[outline-offset:-2px] motion-reduce:transition-none",
+        "cursor-text border border-border bg-background px-4 transition-colors duration-150 has-[input:focus-visible]:[outline:2px_dotted_var(--foreground)] has-[input:focus-visible]:[outline-offset:-2px] motion-reduce:transition-none",
         DISCLOSURE_ANIMATION_CLASS,
         expanded
           ? "border-transparent bg-zinc-100 dark:bg-zinc-900"
           : "hover-surface"
       )}
+      onMouseDown={(event) =>
+        focusInputFromPadding(event, formRef.current, inputRef.current)
+      }
       style={{ animationDelay }}
     >
-      <form className="flex items-center py-4" onSubmit={handleSubmit}>
+      <form
+        className="flex items-center py-4"
+        onSubmit={handleSubmit}
+        ref={formRef}
+      >
         <input
           aria-label="Ask your own question"
           autoComplete="off"
