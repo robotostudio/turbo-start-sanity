@@ -233,6 +233,44 @@ function AskAnswer({
   );
 }
 
+// The toggle shows or hides the answer; otherwise it sends a new question.
+function AskButton({
+  answerId,
+  disabled,
+  expanded,
+  isToggle,
+}: Readonly<{
+  answerId: string;
+  disabled: boolean;
+  expanded: boolean;
+  isToggle: boolean;
+}>) {
+  const iconClass =
+    "pointer-events-none size-5 text-foreground dark:text-accent-green";
+  return (
+    <button
+      aria-controls={isToggle ? answerId : undefined}
+      aria-expanded={isToggle ? expanded : undefined}
+      aria-label={askButtonLabel(!isToggle, expanded)}
+      className="focus-ring -my-2 -mr-2 shrink-0 rounded-none p-2 disabled:cursor-default disabled:opacity-40"
+      disabled={disabled}
+      type="submit"
+    >
+      {isToggle ? (
+        <Plus
+          className={cn(
+            iconClass,
+            "transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none",
+            expanded && "rotate-45"
+          )}
+        />
+      ) : (
+        <ArrowRight className={iconClass} />
+      )}
+    </button>
+  );
+}
+
 function AskItem({ animationDelay }: Readonly<{ animationDelay: string }>) {
   const answerId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -253,6 +291,7 @@ function AskItem({ animationDelay }: Readonly<{ animationDelay: string }>) {
     trimmed !== asked &&
     trimmed.length >= ASK_MIN_LENGTH &&
     trimmed.length <= ASK_MAX_LENGTH;
+  const isToggle = hasAnswer && !isNewQuestion;
 
   const ask = async (text: string, controller: AbortController) => {
     try {
@@ -346,26 +385,13 @@ function AskItem({ animationDelay }: Readonly<{ animationDelay: string }>) {
           </>
         ) : null}
 
-        {trimmed ? (
-          <button
-            aria-controls={answerId}
-            aria-expanded={expanded}
-            aria-label={askButtonLabel(isNewQuestion || !hasAnswer, expanded)}
-            className="focus-ring -my-2 -mr-2 shrink-0 rounded-none p-2 disabled:cursor-default disabled:opacity-40"
+        {trimmed || hasAnswer ? (
+          <AskButton
+            answerId={answerId}
             disabled={isAsking || !(isNewQuestion || hasAnswer)}
-            type="submit"
-          >
-            {isNewQuestion ? (
-              <ArrowRight className="pointer-events-none size-5 text-foreground dark:text-accent-green" />
-            ) : (
-              <Plus
-                className={cn(
-                  "pointer-events-none size-5 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none dark:text-accent-green",
-                  expanded && "rotate-45"
-                )}
-              />
-            )}
-          </button>
+            expanded={expanded}
+            isToggle={isToggle}
+          />
         ) : null}
       </form>
       <div
