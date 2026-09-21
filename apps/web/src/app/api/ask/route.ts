@@ -10,6 +10,8 @@ const MAX_CONTINUATIONS = 3;
 const MCP_SERVER_NAME = "sanity-kb";
 const REQUESTS_PER_MINUTE = 5;
 const WINDOW_MS = 60_000;
+const ERROR_MESSAGE = "Sorry, something went wrong. Please try again.";
+const CUT_OFF_NOTE = "\n\n(The answer was cut off. Please try again.)";
 
 // Per server instance only; use a Vercel Firewall rule for a global limit.
 const recentRequests = new Map<string, number[]>();
@@ -54,7 +56,7 @@ async function streamAnswer(
   question: string,
   signal: AbortSignal,
   onText: (text: string) => void
-) {
+): Promise<boolean> {
   const client = new Anthropic({ apiKey: config.apiKey });
   const messages: Anthropic.Beta.BetaMessageParam[] = [
     { role: "user", content: question },
@@ -85,13 +87,20 @@ async function streamAnswer(
     stream.on("text", onText);
     const message = await stream.finalMessage();
 
+    if (message.stop_reason === "pause_turn") {
+      messages.push({ role: "assistant", content: message.content });
+      continue;
+    }
     if (message.stop_reason === "refusal") {
       onText("Sorry, I can't answer that.");
-      return;
+      return true;
     }
-    if (message.stop_reason !== "pause_turn") return;
-    messages.push({ role: "assistant", content: message.content });
+    return (
+      message.stop_reason === "end_turn" ||
+      message.stop_reason === "stop_sequence"
+    );
   }
+  return false;
 }
 
 export async function POST(req: NextRequest) {
@@ -105,7 +114,7 @@ export async function POST(req: NextRequest) {
   }
 
   const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
+    req.headers.get("x-forwarded-for")?.split(",").at(-1)?.trim() || "local";
   if (isRateLimited(ip)) {
     return Response.json(
       {
@@ -127,20 +136,26 @@ export async function POST(req: NextRequest) {
   const encoder = new TextEncoder();
   const body = new ReadableStream<Uint8Array>({
     async start(controller) {
+      let sentText = false;
       const send = (text: string) => {
-        if (!req.signal.aborted) controller.enqueue(encoder.encode(text));
+        if (req.signal.aborted || !text) return;
+        sentText = true;
+        controller.enqueue(encoder.encode(text));
       };
+      // A partial answer gets a cut-off note, never a glued-on error.
+      const endEarly = () => send(sentText ? CUT_OFF_NOTE : ERROR_MESSAGE);
       try {
-        await streamAnswer(
+        const finished = await streamAnswer(
           { apiKey, endpoint, token },
           question,
           req.signal,
           send
         );
+        if (!finished) endEarly();
       } catch (error) {
         if (!req.signal.aborted) {
           logger.error("Ask request failed", error);
-          send("Sorry, something went wrong. Please try again.");
+          endEarly();
         }
       } finally {
         if (!req.signal.aborted) controller.close();

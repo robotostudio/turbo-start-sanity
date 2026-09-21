@@ -183,6 +183,7 @@ function ArrowGlyph() {
   const [frame, setFrame] = useState(0);
   // Steps the 3x3 glyph through its four frames.
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const timer = window.setInterval(
       () => setFrame((current) => (current + 1) % ARROW_FRAMES.length),
       FRAME_MS
@@ -195,7 +196,7 @@ function ArrowGlyph() {
       {dots.map((on, index) => (
         <span
           className={cn(
-            "size-[3px] rounded-full bg-current transition-opacity duration-200",
+            "size-[3px] rounded-full bg-current transition-opacity duration-200 motion-reduce:transition-none",
             on ? "opacity-100" : "opacity-20"
           )}
           key={index}
@@ -209,7 +210,9 @@ function Thinking() {
   return (
     <span className="inline-flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
       <ArrowGlyph />
-      <span className="animate-pulse">Thinking...</span>
+      <span className="animate-pulse motion-reduce:animate-none">
+        Thinking...
+      </span>
     </span>
   );
 }
@@ -234,6 +237,8 @@ function AskItem({ animationDelay }: Readonly<{ animationDelay: string }>) {
   const answerId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  // Stops the request, and the billed stream behind it, when the row unmounts.
+  useEffect(() => () => abortRef.current?.abort(), []);
   const [question, setQuestion] = useState("");
   const [asked, setAsked] = useState("");
   const [answer, setAnswer] = useState("");

@@ -115,5 +115,5 @@ test("FaqAccordion ends with an ask-your-own-question row", () => {
 
   expect(html).toMatch(/Can&#x27;t find it\? Type your own question here…/);
   expect(html).toMatch(/aria-label="Ask"/);
-  expect(html).not.toMatch(/Clear question/);
+  expect(html).not.toMatch(/>\s*Clear\s*</);
 });
