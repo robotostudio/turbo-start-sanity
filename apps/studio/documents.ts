@@ -28,9 +28,10 @@ export const mainDocuments = defineDocuments([
     params: ({ params }) => ({ slug: `/blog/${params.slug}` }),
   },
   {
-    // `:path*` matches any depth, including the root — reached only when no
-    // route above it matched.
-    route: "/:path*",
+    // Matches any depth, reached only when no route above it matched. The
+    // wildcard hands `params` an array of segments rather than a string, so
+    // the pathname is read off the context instead.
+    route: "/*pathSegments",
     resolve: ({ path }) => ({
       filter: `_type == "page" && slug.current == $slug`,
       params: { slug: toSlug(path) },
