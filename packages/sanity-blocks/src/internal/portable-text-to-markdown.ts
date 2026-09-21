@@ -6,10 +6,7 @@
  * Sanity-specific shapes; each is explained at its definition below.
  */
 
-import {
-  DefaultNormalRenderer,
-  portableTextToMarkdown as officialPortableTextToMarkdown,
-} from "@portabletext/markdown";
+import { portableTextToMarkdown as officialPortableTextToMarkdown } from "@portabletext/markdown";
 
 export interface PortableTextSpan {
   _type?: string;
@@ -112,18 +109,6 @@ export function escapeMarkdown(text: string): string {
   return text.replace(/([\\`*_[\]<>~|#])/g, String.raw`\$1`);
 }
 
-// Inline code span: fence with one more backtick than the longest inner run,
-// padded when the content borders a backtick (CommonMark §6.1).
-function wrapInlineCode(text: string): string {
-  const longestRun = (text.match(/`+/g) ?? []).reduce(
-    (max, run) => Math.max(max, run.length),
-    0
-  );
-  const fence = "`".repeat(longestRun + 1);
-  const body = text.startsWith("`") || text.endsWith("`") ? ` ${text} ` : text;
-  return `${fence}${body}${fence}`;
-}
-
 type AnyBlock = { _type: string; [key: string]: unknown };
 
 // Fenced code block: open with a backtick run at least one longer than the
@@ -202,22 +187,6 @@ export function portableTextToMarkdown(
   }
 
   return officialPortableTextToMarkdown(blocks as AnyBlock[], {
-    // Escape block-leading Markdown markers in plain paragraphs so a normal
-    // paragraph whose text starts with `- x`, `1. x`, `> x`, `# x`, or `---`
-    // is emitted verbatim instead of being re-parsed as a list / blockquote /
-    // heading / thematic break. The official lib's DefaultNormalRenderer just
-    // returns `children`, so we wrap it and apply the escaping after.
-    // List items produced by real `listItem` blocks are NOT touched here —
-    // they go through the lib's list renderer, not through `block.normal`.
-    block: {
-      normal: (opts) =>
-        DefaultNormalRenderer(opts)
-          .replace(/^([-+*]) /gm, String.raw`\$1 `)
-          .replace(/^(\d+)([.)]) /gm, String.raw`$1\$2 `)
-          .replace(/^(>) /gm, String.raw`\$1 `)
-          .replace(/^(#{1,6}) /gm, String.raw`\$1 `)
-          .replace(/^([-*_]{3,})$/gm, String.raw`\$1`),
-    },
     marks: {
       // Sanity schema convention: links use `customLink`, not the standard `link`.
       customLink: ({ value, children }) => {
@@ -227,8 +196,6 @@ export function portableTextToMarkdown(
         }
         return `[${children}](${formatUrl(absolutizeUrl(href, options.baseUrl))})`;
       },
-      // Use CommonMark-compliant fencing (handles embedded backticks).
-      code: ({ children }) => wrapInlineCode(children),
       // Underline has no Markdown equivalent — emit plain text, not `<u>`.
       underline: ({ children }) => children,
     },

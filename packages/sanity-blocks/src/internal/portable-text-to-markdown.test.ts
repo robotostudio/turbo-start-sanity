@@ -239,8 +239,9 @@ test("wraps link URLs containing parens or spaces in angle brackets", () => {
 });
 
 test("passes span text through without escaping Markdown metacharacters", () => {
-  // The official library does not escape raw body text — callers that need
-  // escaped plain-string output should use `escapeMarkdown` directly.
+  // The library escapes only what CommonMark would reparse: intraword `_` is
+  // not emphasis and `]` not followed by `(`/`[` is not a link, so both stay
+  // literal. Plain-string fields outside portable text use `escapeMarkdown`.
   const md = portableTextToMarkdown([
     {
       _type: "block",
