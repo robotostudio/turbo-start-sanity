@@ -5,7 +5,7 @@ import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text"
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
 import { useDisclosureAnimation } from "@workspace/sanity-blocks/internal/use-disclosure-animation";
 import { cn } from "@workspace/tailwind-config/utils";
-import { ArrowUpRight, Plus } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
 import {
   type ChangeEvent,
@@ -346,21 +346,27 @@ function AskItem({ animationDelay }: Readonly<{ animationDelay: string }>) {
           </>
         ) : null}
 
-        <button
-          aria-controls={answerId}
-          aria-expanded={expanded}
-          aria-label={askButtonLabel(isNewQuestion || !hasAnswer, expanded)}
-          className="focus-ring -my-2 -mr-2 shrink-0 rounded-none p-2 disabled:cursor-default disabled:opacity-40"
-          disabled={isAsking || !(isNewQuestion || hasAnswer)}
-          type="submit"
-        >
-          <Plus
-            className={cn(
-              "pointer-events-none size-5 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none dark:text-accent-green",
-              expanded && "rotate-45"
+        {trimmed ? (
+          <button
+            aria-controls={answerId}
+            aria-expanded={expanded}
+            aria-label={askButtonLabel(isNewQuestion || !hasAnswer, expanded)}
+            className="focus-ring -my-2 -mr-2 shrink-0 rounded-none p-2 disabled:cursor-default disabled:opacity-40"
+            disabled={isAsking || !(isNewQuestion || hasAnswer)}
+            type="submit"
+          >
+            {isNewQuestion ? (
+              <ArrowRight className="pointer-events-none size-5 text-foreground dark:text-accent-green" />
+            ) : (
+              <Plus
+                className={cn(
+                  "pointer-events-none size-5 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none dark:text-accent-green",
+                  expanded && "rotate-45"
+                )}
+              />
             )}
-          />
-        </button>
+          </button>
+        ) : null}
       </form>
       <div
         aria-busy={isAsking}
