@@ -65,7 +65,7 @@ async function streamAnswer(
   });
   try {
     const result = streamText({
-      model: "anthropic/claude-haiku-4.5",
+      model: "anthropic/claude-opus-5",
       maxOutputTokens: 8000,
       reasoning: "low",
       instructions: SYSTEM_PROMPT,
