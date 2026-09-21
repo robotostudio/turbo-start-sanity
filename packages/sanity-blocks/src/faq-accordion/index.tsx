@@ -12,6 +12,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
   type SubmitEvent,
+  useEffect,
   useId,
   useRef,
   useState,
@@ -169,6 +170,50 @@ function askButtonLabel(showsAsk: boolean, expanded: boolean) {
   return expanded ? "Hide answer" : "Show answer";
 }
 
+const ARROW_FRAMES = [
+  [0, 1, 0, 0, 1, 1, 0, 1, 0],
+  [0, 0, 0, 1, 1, 1, 0, 1, 0],
+  [0, 1, 0, 1, 1, 0, 0, 1, 0],
+  [0, 1, 0, 1, 1, 1, 0, 0, 0],
+] as const;
+
+const FRAME_MS = 320;
+
+function ArrowGlyph() {
+  const [frame, setFrame] = useState(0);
+  // Steps the 3x3 glyph through its four frames.
+  useEffect(() => {
+    const timer = window.setInterval(
+      () => setFrame((current) => (current + 1) % ARROW_FRAMES.length),
+      FRAME_MS
+    );
+    return () => window.clearInterval(timer);
+  }, []);
+  const dots = ARROW_FRAMES[frame] ?? ARROW_FRAMES[0];
+  return (
+    <span aria-hidden="true" className="grid grid-cols-3 gap-[2px]">
+      {dots.map((on, index) => (
+        <span
+          className={cn(
+            "size-[3px] rounded-full bg-current transition-opacity duration-200",
+            on ? "opacity-100" : "opacity-20"
+          )}
+          key={index}
+        />
+      ))}
+    </span>
+  );
+}
+
+function Thinking() {
+  return (
+    <span className="inline-flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
+      <ArrowGlyph />
+      <span className="animate-pulse">Thinking...</span>
+    </span>
+  );
+}
+
 function AskAnswer({
   answer,
   error,
@@ -176,7 +221,7 @@ function AskAnswer({
 }: Readonly<{ answer: string; error: string; isAsking: boolean }>) {
   if (error) return <p>{error}</p>;
   if (isAsking && !answer) {
-    return <p className="animate-pulse">Looking that up…</p>;
+    return <Thinking />;
   }
   return (
     <p className="whitespace-pre-wrap">
@@ -267,7 +312,7 @@ function AskItem({ animationDelay }: Readonly<{ animationDelay: string }>) {
       )}
       style={{ animationDelay }}
     >
-      <form className="flex items-center gap-2.5 py-4" onSubmit={handleSubmit}>
+      <form className="flex items-center py-4" onSubmit={handleSubmit}>
         <input
           aria-label="Ask your own question"
           autoComplete="off"
@@ -281,14 +326,21 @@ function AskItem({ animationDelay }: Readonly<{ animationDelay: string }>) {
           value={question}
         />
         {question || hasAnswer ? (
-          <button
-            className="focus-ring -my-2 shrink-0 rounded-none px-2 py-2 font-mono text-muted-foreground text-sm uppercase leading-5 tracking-[0.28px] transition-colors duration-150 hover:text-foreground"
-            onClick={handleClear}
-            type="button"
-          >
-            Clear
-          </button>
+          <>
+            <button
+              className="focus-ring -my-2 shrink-0 rounded-none px-2 py-2 text-muted-foreground text-base leading-5 tracking-[0.28px] transition-colors duration-150 hover:text-foreground"
+              onClick={handleClear}
+              type="button"
+            >
+              Clear
+            </button>
+            <span
+              aria-hidden="true"
+              className="mx-1.5 h-5 w-px shrink-0 bg-muted-foreground/50"
+            />
+          </>
         ) : null}
+
         <button
           aria-controls={answerId}
           aria-expanded={expanded}
