@@ -19,9 +19,9 @@
     "sanity": "catalog:"
   },
   "dependencies": {
-    "@mux/mux-player-react": "^3.13.2",
-    "@mux/mux-video-react": "^0.31.2",
-    "@portabletext/markdown": "^2.0.0",
+    "@mux/mux-player-react": "^3.13.3",
+    "@mux/mux-video-react": "^0.31.3",
+    "@portabletext/markdown": "^2.1.0",
     "@sanity/client": "catalog:",
     "@sanity/icons": "^5.2.1",
     "@workspace/env": "workspace:*",
@@ -32,7 +32,7 @@
     "next-sanity": "13.3.3",
     "next-themes": "catalog:",
     "sanity": "catalog:",
-    "sanity-image": "^1.1.0",
+    "sanity-image": "^1.2.0",
     "schema-dts": "^2.0.0",
     "slugify": "^1.6.9"
   },
@@ -40,7 +40,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@vitejs/plugin-react": "^6.1.0",
+    "@vitejs/plugin-react": "^6.1.1",
     "@workspace/typescript-config": "workspace:*",
     "next": "16.3.3",
     "typescript": "catalog:",
