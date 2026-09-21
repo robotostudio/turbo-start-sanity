@@ -382,7 +382,7 @@ function AskItem({ animationDelay }: Readonly<{ animationDelay: string }>) {
         <input
           aria-label="Ask your own question"
           autoComplete="off"
-          className="min-w-0 flex-1 bg-transparent font-medium text-foreground text-lg leading-6 outline-none placeholder:font-normal placeholder:text-muted-foreground"
+          className="w-0 min-w-0 flex-1 bg-transparent font-medium text-foreground text-lg leading-6 outline-none placeholder:font-normal placeholder:text-muted-foreground"
           enterKeyHint="send"
           maxLength={ASK_MAX_LENGTH}
           name="question"
@@ -478,7 +478,7 @@ function CategoryTabs({
   onSelect: (index: number) => void;
 }>) {
   return (
-    <div className="flex h-full flex-col gap-6">
+    <div className="flex h-full min-w-0 flex-col gap-6">
       <ul className="grid gap-1">
         {categories.map((category, index) => {
           const isActive = index === activeIndex;
@@ -620,7 +620,7 @@ export function FaqAccordion({
         <div className="mt-12 flex flex-col gap-6 lg:mt-16">
           <div
             className={cn(
-              "grid items-stretch gap-10 lg:gap-16",
+              "grid grid-cols-1 items-stretch gap-10 lg:gap-16",
               hasCategories && "lg:grid-cols-[minmax(0,12rem)_1fr]"
             )}
           >
@@ -632,7 +632,7 @@ export function FaqAccordion({
               />
             )}
 
-            <div className="flex flex-col gap-6">
+            <div className="flex min-w-0 flex-col gap-6">
               <div className="grid content-start gap-4">
                 <FaqList faqs={activeFaqs} key={accordionKey} />
                 <AskItem
