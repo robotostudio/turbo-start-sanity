@@ -24,20 +24,21 @@ export async function generateMetadata(): Promise<Metadata> {
   return seoFromDocument(homePageData, { slug: "/" });
 }
 
-// The published page is the static shell; draftMode() is read behind Suspense.
-export default function Page() {
-  return (
-    <Suspense fallback={<CachedHome perspective="published" stega={false} />}>
-      <HomeContent />
-    </Suspense>
-  );
+export default async function Page() {
+  const { isEnabled: isDraftMode } = await draftMode();
+
+  if (isDraftMode || DRAFTS_WITHOUT_SESSION) {
+    return (
+      <Suspense fallback={null}>
+        <HomeContent />
+      </Suspense>
+    );
+  }
+
+  return <CachedHome perspective="published" stega={false} />;
 }
 
 async function HomeContent() {
-  const { isEnabled: isDraftMode } = await draftMode();
-  if (!(isDraftMode || DRAFTS_WITHOUT_SESSION)) {
-    return <CachedHome perspective="published" stega={false} />;
-  }
   const { perspective, stega } = await resolvePageFetchOptions();
   return <CachedHome perspective={perspective} stega={stega} />;
 }
