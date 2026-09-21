@@ -3,7 +3,7 @@ import {
   at,
   defineMigration,
   type MigrationContext,
-  set,
+  setIfMissing,
 } from "sanity/migrate";
 
 const VARIANTS = ["light", "dark"] as const;
@@ -72,7 +72,7 @@ export default defineMigration({
         const ref = value?.mux?.asset?._ref;
         return at(
           ["pageBuilder", { _key: block._key }, "video", variant, "mediaType"],
-          set(ref && playable.has(ref) ? "mux" : "sanity")
+          setIfMissing(ref && playable.has(ref) ? "mux" : "sanity")
         );
       });
     },
