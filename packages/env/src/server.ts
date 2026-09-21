@@ -15,8 +15,7 @@ const env = createEnv({
     // Shared secret for the `/api/revalidate-sync-tags` webhook. Optional so
     // existing deployments still boot; the webhook fails closed when unset.
     SANITY_REVALIDATE_SECRET: z.string().min(1).optional(),
-    // FAQ ask box; `/api/ask` returns 503 until all three are set.
-    ANTHROPIC_API_KEY: z.string().min(1).optional(),
+    // FAQ ask box; `/api/ask` returns 503 until both are set.
     SANITY_CONTEXT_ENDPOINT: z.url().optional(),
     SANITY_CONTEXT_TOKEN: z.string().min(1).optional(),
   },

@@ -1,13 +1,13 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { createMCPClient } from "@ai-sdk/mcp";
 import { env } from "@workspace/env/server";
 import { Logger } from "@workspace/logger";
+import { isStepCount, streamText } from "ai";
 import type { NextRequest } from "next/server";
 
 const logger = new Logger("AskRoute");
 
 const MAX_QUESTION_LENGTH = 500;
-const MAX_CONTINUATIONS = 3;
-const MCP_SERVER_NAME = "sanity-kb";
+const MAX_STEPS = 10;
 const REQUESTS_PER_MINUTE = 5;
 const WINDOW_MS = 60_000;
 const ERROR_MESSAGE = "Sorry, something went wrong. Please try again.";
@@ -23,7 +23,6 @@ Reply with the answer only; don't announce or describe the tool calls.
 Keep answers short: a few sentences, in plain text with no Markdown.`;
 
 interface AskConfig {
-  apiKey: string;
   endpoint: string;
   token: string;
 }
@@ -57,57 +56,41 @@ async function streamAnswer(
   signal: AbortSignal,
   onText: (text: string) => void
 ): Promise<boolean> {
-  const client = new Anthropic({ apiKey: config.apiKey });
-  const messages: Anthropic.Beta.BetaMessageParam[] = [
-    { role: "user", content: question },
-  ];
+  const mcpClient = await createMCPClient({
+    transport: {
+      type: "http",
+      url: config.endpoint,
+      headers: { Authorization: `Bearer ${config.token}` },
+    },
+  });
+  try {
+    const result = streamText({
+      model: "anthropic/claude-haiku-4.5",
+      maxOutputTokens: 8000,
+      reasoning: "low",
+      instructions: SYSTEM_PROMPT,
+      tools: await mcpClient.tools(),
+      stopWhen: isStepCount(MAX_STEPS),
+      prompt: question,
+      abortSignal: signal,
+    });
+    for await (const text of result.textStream) onText(text);
 
-  for (let turn = 0; turn <= MAX_CONTINUATIONS; turn++) {
-    const stream = client.beta.messages.stream(
-      {
-        model: "claude-opus-5",
-        max_tokens: 8000,
-        betas: ["mcp-client-2025-11-20", "server-side-fallback-2026-07-01"],
-        fallbacks: "default",
-        output_config: { effort: "low" },
-        system: SYSTEM_PROMPT,
-        mcp_servers: [
-          {
-            type: "url",
-            url: config.endpoint,
-            name: MCP_SERVER_NAME,
-            authorization_token: config.token,
-          },
-        ],
-        tools: [{ type: "mcp_toolset", mcp_server_name: MCP_SERVER_NAME }],
-        messages,
-      },
-      { signal }
-    );
-    stream.on("text", onText);
-    const message = await stream.finalMessage();
-
-    if (message.stop_reason === "pause_turn") {
-      messages.push({ role: "assistant", content: message.content });
-      continue;
-    }
-    if (message.stop_reason === "refusal") {
+    const finishReason = await result.finishReason;
+    if (finishReason === "content-filter") {
       onText("Sorry, I can't answer that.");
       return true;
     }
-    return (
-      message.stop_reason === "end_turn" ||
-      message.stop_reason === "stop_sequence"
-    );
+    return finishReason === "stop";
+  } finally {
+    await mcpClient.close();
   }
-  return false;
 }
 
 export async function POST(req: NextRequest) {
-  const apiKey = env.ANTHROPIC_API_KEY;
   const endpoint = env.SANITY_CONTEXT_ENDPOINT;
   const token = env.SANITY_CONTEXT_TOKEN;
-  if (!(apiKey && endpoint && token)) {
+  if (!(endpoint && token)) {
     return new Response("Asking isn't set up on this site yet.", {
       status: 503,
     });
@@ -146,7 +129,7 @@ export async function POST(req: NextRequest) {
       const endEarly = () => send(sentText ? CUT_OFF_NOTE : ERROR_MESSAGE);
       try {
         const finished = await streamAnswer(
-          { apiKey, endpoint, token },
+          { endpoint, token },
           question,
           req.signal,
           send

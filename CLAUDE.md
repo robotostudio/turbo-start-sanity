@@ -135,7 +135,7 @@ Canonical source of truth is `apps/web/.env.example` and `apps/studio/.env.examp
 **`apps/web`** (validated by `@workspace/env`):
 
 - Required: `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET`, `NEXT_PUBLIC_SANITY_STUDIO_URL`, `SANITY_API_READ_TOKEN`, `SANITY_API_WRITE_TOKEN`
-- Optional: `NEXT_PUBLIC_SANITY_API_VERSION` (blank or unset falls back to `DEFAULT_SANITY_API_VERSION` from `@workspace/env/constants`, which uses the current UTC date at runtime), `SANITY_REVALIDATE_SECRET` (shared secret for the `/api/revalidate-sync-tags` webhook; the route fails closed when unset), and `ANTHROPIC_API_KEY`, `SANITY_CONTEXT_ENDPOINT`, `SANITY_CONTEXT_TOKEN` for the FAQ block's ask row (`/api/ask` returns 503 until all three are set)
+- Optional: `NEXT_PUBLIC_SANITY_API_VERSION` (blank or unset falls back to `DEFAULT_SANITY_API_VERSION` from `@workspace/env/constants`, which uses the current UTC date at runtime), `SANITY_REVALIDATE_SECRET` (shared secret for the `/api/revalidate-sync-tags` webhook; the route fails closed when unset), and `SANITY_CONTEXT_ENDPOINT`, `SANITY_CONTEXT_TOKEN` for the FAQ block's ask row (`/api/ask` returns 503 until both are set). The ask row calls Claude through Vercel AI Gateway, which authenticates with `AI_GATEWAY_API_KEY` or, on Vercel and after `vercel env pull`, the project's `VERCEL_OIDC_TOKEN`
 - `NEXT_PUBLIC_VERCEL_ENV`, `NEXT_PUBLIC_VERCEL_URL`, `NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL` are also validated but default to localhost, so they need no local value
 
 Caveat: `SANITY_API_WRITE_TOKEN` is currently required by `packages/env/src/server.ts` even though no runtime code reads it. `apps/web/next.config.ts` imports `@workspace/env/server`, so `next dev` and `next build` both fail fast if it is unset.
