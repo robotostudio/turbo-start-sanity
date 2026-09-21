@@ -9,6 +9,7 @@ import { media } from "sanity-plugin-media";
 import { muxInput } from "sanity-plugin-mux-input";
 
 import { Logo } from "@/components/logo";
+import { mainDocuments } from "@/documents";
 import { locations } from "@/location";
 import { presentationUrl } from "@/plugins/presentation-url";
 import { schemaTypes, singletonTypes } from "@/schemaTypes/index";
@@ -41,6 +42,7 @@ export default defineConfig({
     presentationTool({
       resolve: {
         locations,
+        mainDocuments,
       },
       previewUrl: {
         origin: getPresentationUrl(),
