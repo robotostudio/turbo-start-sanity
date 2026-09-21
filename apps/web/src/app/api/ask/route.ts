@@ -91,10 +91,15 @@ async function streamAnswer(
       },
     });
     for await (const text of result.textStream) onText(text);
-    // The stream ends quietly on error; rethrow so the caller sees the cause.
-    if (streamError) throw streamError;
 
-    const finishReason = await result.finishReason;
+    // The stream ends quietly on error; rethrow so the caller sees the cause.
+    let finishReason: Awaited<typeof result.finishReason>;
+    try {
+      finishReason = await result.finishReason;
+    } catch (error) {
+      throw streamError ?? error;
+    }
+    if (streamError) throw streamError;
     if (finishReason === "content-filter") {
       onText("Sorry, I can't answer that.");
       return true;
