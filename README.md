@@ -31,13 +31,13 @@ apps/
   studio/   Sanity Studio
   web/      Next.js frontend
 packages/
-  env/
-  logger/
-  sanity/
-  sanity-blocks/
-  tailwind-config/
-  typescript-config/
-  ui/
+  env/                 Env validation
+  logger/              Logging
+  sanity/              Sanity client and queries
+  sanity-blocks/       Shared page-builder block schemas
+  tailwind-config/     Styling
+  typescript-config/   TypeScript config
+  ui/                  UI
 ```
 
 ## Requirements
