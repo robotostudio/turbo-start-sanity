@@ -3,15 +3,17 @@ import test from "node:test";
 import { mainDocuments } from "./documents.ts";
 
 const cases = [
-  ["/", {}, '_type == "homePage" && _id == "homePage"', undefined],
-  ["/blog", {}, '_type == "blogIndex"', undefined],
+  ["/", "/", {}, '_type == "homePage" && _id == "homePage"', undefined],
+  ["/blog", "/blog", {}, '_type == "blogIndex"', undefined],
   [
+    "/blog/:slug",
     "/blog/new-post",
     { slug: "new-post" },
     '_type == "blog" && slug.current == $slug',
     { slug: "/blog/new-post" },
   ],
   [
+    "/*pathSegments",
     "/new-page",
     { pathSegments: ["new-page"] },
     '_type == "page" && slug.current == $slug',
@@ -19,15 +21,13 @@ const cases = [
   ],
 ];
 
-for (const [index, [path, params, filter, expectedParams]] of cases.entries()) {
+for (const [route, path, params, filter, expectedParams] of cases) {
   test(`${path}: an explicitly selected document bypasses main-document resolution`, () => {
-    const resolver = mainDocuments[index];
+    const resolver = mainDocuments.find((entry) => entry.route === route);
+    assert.ok(resolver);
+    assert.equal(typeof resolver.resolve, "function");
     const context = { origin: "http://localhost:3000", path, params };
-    const resolve = () =>
-      resolver.resolve?.(context) ??
-      (resolver.filter
-        ? { filter: resolver.filter, params: resolver.params?.(context) }
-        : undefined);
+    const resolve = () => resolver.resolve(context);
 
     globalThis.window = {
       location: { pathname: "/presentation/page/new-document" },
