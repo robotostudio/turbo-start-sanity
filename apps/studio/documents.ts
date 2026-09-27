@@ -13,28 +13,39 @@ import { defineDocuments } from "sanity/presentation";
 // trailing slash the route matcher allows through.
 const toSlug = (path: string) => path.replace(/\/+$/, "") || "/";
 
+const resolveMainDocument = (
+  filter: string,
+  params?: Record<string, string>
+) =>
+  /\/presentation\/[^/]+\/[^/]+(?:\/|$)/.test(window.location.pathname)
+    ? undefined
+    : { filter, params };
+
 export const mainDocuments = defineDocuments([
   {
     route: "/",
-    filter: `_type == "homePage" && _id == "homePage"`,
+    resolve: () =>
+      resolveMainDocument(`_type == "homePage" && _id == "homePage"`),
   },
   {
     route: "/blog",
-    filter: `_type == "blogIndex"`,
+    resolve: () => resolveMainDocument(`_type == "blogIndex"`),
   },
   {
     route: "/blog/:slug",
-    filter: `_type == "blog" && slug.current == $slug`,
-    params: ({ params }) => ({ slug: `/blog/${params.slug}` }),
+    resolve: ({ params }) =>
+      resolveMainDocument(`_type == "blog" && slug.current == $slug`, {
+        slug: `/blog/${params.slug}`,
+      }),
   },
   {
     // Matches any depth, reached only when no route above it matched. The
     // wildcard hands `params` an array of segments rather than a string, so
     // the pathname is read off the context instead.
     route: "/*pathSegments",
-    resolve: ({ path }) => ({
-      filter: `_type == "page" && slug.current == $slug`,
-      params: { slug: toSlug(path) },
-    }),
+    resolve: ({ path }) =>
+      resolveMainDocument(`_type == "page" && slug.current == $slug`, {
+        slug: toSlug(path),
+      }),
   },
 ]);
