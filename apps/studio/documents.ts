@@ -13,28 +13,61 @@ import { defineDocuments } from "sanity/presentation";
 // trailing slash the route matcher allows through.
 const toSlug = (path: string) => path.replace(/\/+$/, "") || "/";
 
+// A new page opened by id (`/presentation/page/<id>?preview=`) matches no slug,
+// so Sanity clears the id and shows "Missing a main document". Resolvers can't
+// see the selection, so only the id + preview path Presentation opened on skip
+// resolution, until the preview moves; ids it pins later still resolve, so the
+// panel keeps following the preview.
+// ponytail: assumes the default tool name `presentation`; no upstream hook —
+// drop once Sanity's `useMainDocument` stops clearing the id.
+let openedOn: { id: string; path: string } | undefined | null = null;
+
+const selectedId = () =>
+  /^\/presentation\/(?!intent\/)[^/]+\/([^/]+)/.exec(
+    window.location.pathname
+  )?.[1];
+
+const resolveMainDocument = (
+  path: string,
+  filter: string,
+  params?: Record<string, string>
+) => {
+  const id = selectedId();
+  if (openedOn === null) {
+    openedOn = id ? { id, path } : undefined;
+  }
+  if (openedOn && openedOn.id === id && openedOn.path === path) {
+    return undefined;
+  }
+  openedOn = undefined;
+  return { filter, params };
+};
+
 export const mainDocuments = defineDocuments([
   {
     route: "/",
-    filter: `_type == "homePage" && _id == "homePage"`,
+    resolve: ({ path }) =>
+      resolveMainDocument(path, `_type == "homePage" && _id == "homePage"`),
   },
   {
     route: "/blog",
-    filter: `_type == "blogIndex"`,
+    resolve: ({ path }) => resolveMainDocument(path, `_type == "blogIndex"`),
   },
   {
     route: "/blog/:slug",
-    filter: `_type == "blog" && slug.current == $slug`,
-    params: ({ params }) => ({ slug: `/blog/${params.slug}` }),
+    resolve: ({ params, path }) =>
+      resolveMainDocument(path, `_type == "blog" && slug.current == $slug`, {
+        slug: `/blog/${params.slug}`,
+      }),
   },
   {
     // Matches any depth, reached only when no route above it matched. The
     // wildcard hands `params` an array of segments rather than a string, so
     // the pathname is read off the context instead.
     route: "/*pathSegments",
-    resolve: ({ path }) => ({
-      filter: `_type == "page" && slug.current == $slug`,
-      params: { slug: toSlug(path) },
-    }),
+    resolve: ({ path }) =>
+      resolveMainDocument(path, `_type == "page" && slug.current == $slug`, {
+        slug: toSlug(path),
+      }),
   },
 ]);
