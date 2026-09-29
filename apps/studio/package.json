@@ -8,7 +8,6 @@
     "dev": "sanity dev",
     "start": "sanity start",
     "build": "sanity build",
-    "test": "node --experimental-strip-types --test *.test.mjs",
     "deploy": "sanity deploy",
     "lint": "biome lint .",
     "format": "biome format --write .",
