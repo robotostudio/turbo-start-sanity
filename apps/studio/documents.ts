@@ -23,8 +23,8 @@ const toSlug = (path: string) => path.replace(/\/+$/, "") || "/";
 let openedOn: { id: string; path: string } | undefined | null = null;
 
 const selectedId = () =>
-  window.location.pathname.match(
-    /^\/presentation\/(?!intent\/)[^/]+\/([^/]+)/
+  /^\/presentation\/(?!intent\/)[^/]+\/([^/]+)/.exec(
+    window.location.pathname
   )?.[1];
 
 const resolveMainDocument = (
