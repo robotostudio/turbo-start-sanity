@@ -1,4 +1,3 @@
-import type { SanityDocument } from "sanity";
 import {
   at,
   defineMigration,
@@ -50,7 +49,7 @@ export default defineMigration({
   title: "Backfill hero mediaType",
   documentTypes: ["page", "homePage", "blogIndex"],
   migrate: {
-    async document(doc: SanityDocument, context: MigrationContext) {
+    async document(doc, context) {
       const blocks = (doc as { pageBuilder?: Block[] }).pageBuilder ?? [];
       const missing = blocks
         .filter((block) => block._type === "hero")
