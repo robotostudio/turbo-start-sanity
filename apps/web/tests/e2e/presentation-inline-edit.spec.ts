@@ -40,7 +40,7 @@ const armInlineEdit = async (target: Locator) => {
   // Hover is one mousemove; the overlay misses it before its handshake or after a re-render.
   await expect(async () => {
     await target.page().mouse.move(0, 0);
-    await target.hover();
+    await target.hover({ timeout: 2000 });
     await expect(target).toHaveCSS("cursor", "text", { timeout: 2000 });
   }).toPass({ timeout: 30_000 });
   await target.dblclick();
