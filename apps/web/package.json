@@ -32,7 +32,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "fuse.js": "^7.5.0",
     "lucide-react": "catalog:",
-    "next": "16.3.3",
+    "next": "16.3.6",
     "next-sanity": "13.3.4",
     "next-themes": "catalog:",
     "react": "catalog:",
