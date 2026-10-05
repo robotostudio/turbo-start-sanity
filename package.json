@@ -43,7 +43,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.14",
     "@workspace/typescript-config": "workspace:*",
-    "turbo": "^2.11.3",
+    "turbo": "^2.11.5",
     "typescript": "catalog:"
   },
   "packageManager": "pnpm@11.24.0",
