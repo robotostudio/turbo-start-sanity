@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
   cacheLife: { default: sanity },
   experimental: {
     inlineCss: true,
+    turbopackRustReactCompiler: true,
   },
   logging: {
     fetches: {},
