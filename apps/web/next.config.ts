@@ -11,7 +11,6 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@workspace/ui", "@workspace/sanity-blocks"],
   reactCompiler: true,
   cacheComponents: true,
-  partialPrefetching: true,
   cacheLife: { default: sanity },
   experimental: {
     inlineCss: true,
