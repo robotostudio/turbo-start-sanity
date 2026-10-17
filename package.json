@@ -41,9 +41,9 @@
     "test:e2e": "turbo run test:e2e"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.14",
+    "@biomejs/biome": "2.5.15",
     "@workspace/typescript-config": "workspace:*",
-    "turbo": "^2.11.5",
+    "turbo": "^2.11.7",
     "typescript": "catalog:"
   },
   "packageManager": "pnpm@11.24.0",
