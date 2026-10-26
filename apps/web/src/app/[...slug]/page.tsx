@@ -24,6 +24,10 @@ import { PageBuilder } from "@/components/pagebuilder";
 import { seoFromDocument } from "@/lib/seo";
 import { PLACEHOLDER_SLUG } from "@/utils";
 
+// Keep: under Partial Prefetching the layout navbar reads usePathname()
+// outside Suspense, which makes runtime renders of this route 500.
+export const instant = false;
+
 const logger = new Logger("PageSlug");
 
 type SlugParams = { slug: string[] };

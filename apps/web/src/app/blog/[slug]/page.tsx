@@ -27,6 +27,10 @@ import { ArticleJsonLd } from "@/components/json-ld";
 import { seoFromDocument } from "@/lib/seo";
 import { formatDate, getBaseUrl, PLACEHOLDER_SLUG } from "@/utils";
 
+// Keep: under Partial Prefetching the layout navbar reads usePathname()
+// outside Suspense, which makes runtime renders of this route 500.
+export const instant = false;
+
 const logger = new Logger("BlogSlug");
 
 type BlogParams = { slug: string };
