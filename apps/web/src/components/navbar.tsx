@@ -10,10 +10,9 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@workspace/ui/components/navigation-menu";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 
+import { NavLink } from "@/components/elements/nav-link";
 import { GithubStars } from "@/components/github-stars";
 import { Logo } from "@/components/logo";
 import { MobileMenu } from "@/components/mobile-menu";
@@ -206,12 +205,6 @@ export function Navbar({
   const { siteTitle, logos } = settingsData || {};
   const headerRef = useRef<HTMLElement>(null);
   useNavContrast(headerRef);
-  // Nothing in the bar marks where you are: the active item is styled no
-  // differently from the rest, so `aria-current` is the only signal a screen
-  // reader can get. Purely semantic — it paints nothing.
-  const pathname = usePathname();
-  const currentPage = (href?: string | null) =>
-    href && href === pathname ? ("page" as const) : undefined;
 
   return (
     <header
@@ -252,10 +245,9 @@ export function Navbar({
                           {column.links?.map((link: ColumnLink) => (
                             <li key={link._key}>
                               <NavigationMenuLink
-                                aria-current={currentPage(link.href)}
                                 className="hover-surface group flex flex-col gap-0.5 rounded-none px-3 py-2.5 focus-ring-inset"
                                 closeOnClick
-                                render={<Link href={link.href ?? "#"} />}
+                                render={<NavLink href={link.href ?? "#"} />}
                               >
                                 <span className="font-light font-mono text-foreground text-sm uppercase tracking-normal">
                                   {link.name}
@@ -280,10 +272,9 @@ export function Navbar({
                   return (
                     <NavigationMenuItem key={column._key}>
                       <NavigationMenuLink
-                        aria-current={currentPage(column.href)}
                         data-nav-adaptive=""
                         className={cn("flex items-center", NAV_LINK_CLASS)}
-                        render={<Link href={column.href} />}
+                        render={<NavLink href={column.href} />}
                       >
                         {column.name}
                       </NavigationMenuLink>

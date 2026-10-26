@@ -13,7 +13,6 @@ import {
 } from "@workspace/sanity-blocks/internal/use-copy";
 import { cn } from "@workspace/tailwind-config/utils";
 import { Check, Loader2, X } from "lucide-react";
-import { usePathname } from "next/navigation";
 import { useCallback } from "react";
 
 const LABELS: Record<CopyStatus, string> = {
@@ -40,14 +39,13 @@ function markdownPath(pathname: string): string {
 export function CopyMarkdownButton({
   className,
 }: Readonly<{ className?: string }>) {
-  const pathname = usePathname();
   const getMarkdown = useCallback(async () => {
-    const response = await fetch(markdownPath(pathname));
+    const response = await fetch(markdownPath(window.location.pathname));
     if (!response.ok) {
       throw new Error("Failed to fetch markdown");
     }
     return await response.text();
-  }, [pathname]);
+  }, []);
   const { status, copy } = useCopyToClipboard(getMarkdown);
 
   return (
