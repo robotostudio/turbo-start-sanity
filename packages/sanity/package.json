@@ -22,7 +22,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@workspace/typescript-config": "workspace:*",
-    "next": "16.4.0",
+    "next": "16.4.3",
     "sanity": "catalog:",
     "typescript": "catalog:"
   },

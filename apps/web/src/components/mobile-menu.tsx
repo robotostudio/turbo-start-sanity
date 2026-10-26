@@ -22,11 +22,11 @@ import {
 import { Button } from "@workspace/ui/components/button";
 import { useMediaQuery } from "@workspace/ui/hooks/use-media-query";
 import { Menu, X } from "lucide-react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import { MenuLink } from "@/components/elements/menu-link";
+import { NavLink } from "@/components/elements/nav-link";
 import { Logo } from "@/components/logo";
 import type { ColumnLink, NavigationData } from "@/types";
 
@@ -50,7 +50,6 @@ export function MobileMenu({
   settingsData,
 }: Readonly<NavigationData>) {
   const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname();
   const isTablet = useMediaQuery(TABLET_QUERY);
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const liveSide = isTablet ? "right" : "bottom";
@@ -80,11 +79,6 @@ export function MobileMenu({
     setIsOpen(false);
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: pathname is the route-change trigger, not a value the effect body reads.
-  useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
-
   const { columns, buttons } = navbarData || {};
   const { siteTitle, logos } = settingsData || {};
 
@@ -94,6 +88,9 @@ export function MobileMenu({
       open={isOpen}
       swipeDirection={side === "right" ? "right" : "down"}
     >
+      <Suspense fallback={null}>
+        <CloseOnNavigate onNavigate={closeMenu} />
+      </Suspense>
       <DrawerTrigger
         render={
           <Button
@@ -154,17 +151,14 @@ export function MobileMenu({
                         return null;
                       }
                       return (
-                        <Link
-                          aria-current={
-                            column.href === pathname ? "page" : undefined
-                          }
+                        <NavLink
                           className="hover-surface focus-ring-inset -mx-3 flex items-center rounded-none px-3 py-3 font-light font-mono text-foreground text-sm uppercase tracking-normal"
                           href={column.href}
                           key={column._key}
                           onClick={closeMenu}
                         >
                           {column.name}
-                        </Link>
+                        </NavLink>
                       );
                     }
 
@@ -218,4 +212,13 @@ export function MobileMenu({
       </DrawerPortal>
     </Drawer>
   );
+}
+
+function CloseOnNavigate({ onNavigate }: Readonly<{ onNavigate: () => void }>) {
+  const pathname = usePathname();
+  // biome-ignore lint/correctness/useExhaustiveDependencies: pathname is the route-change trigger, not a value the effect body reads.
+  useEffect(() => {
+    onNavigate();
+  }, [pathname]);
+  return null;
 }

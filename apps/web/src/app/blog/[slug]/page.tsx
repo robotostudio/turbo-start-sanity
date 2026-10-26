@@ -27,6 +27,10 @@ import { ArticleJsonLd } from "@/components/json-ld";
 import { seoFromDocument } from "@/lib/seo";
 import { formatDate, getBaseUrl, PLACEHOLDER_SLUG } from "@/utils";
 
+// Keep: this route awaits params outside Suspense on purpose, which Partial
+// Prefetching rejects at runtime with a 500 unless the route may block.
+export const instant = false;
+
 const logger = new Logger("BlogSlug");
 
 type BlogParams = { slug: string };

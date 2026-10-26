@@ -24,6 +24,10 @@ import { PageBuilder } from "@/components/pagebuilder";
 import { seoFromDocument } from "@/lib/seo";
 import { PLACEHOLDER_SLUG } from "@/utils";
 
+// Keep: this route awaits params outside Suspense on purpose, which Partial
+// Prefetching rejects at runtime with a 500 unless the route may block.
+export const instant = false;
+
 const logger = new Logger("PageSlug");
 
 type SlugParams = { slug: string[] };

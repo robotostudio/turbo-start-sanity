@@ -90,7 +90,9 @@ test("new page: draft renders in Presentation, 404s publicly", async ({
   ).toBeVisible({ timeout: LIVE_TIMEOUT });
   await expectStamped(frame);
 
-  expect(await status(request, pageDoc.slug)()).toBe(404);
+  await expect
+    .poll(status(request, pageDoc.slug), { timeout: SYNC_TIMEOUT })
+    .toBe(404);
   // The Markdown route shares the fetch path, so it must 404 too.
   expect(await status(request, `${pageDoc.slug}.md`)()).toBe(404);
 
@@ -243,7 +245,9 @@ test("blog: draft post shows in Presentation only, publish lists it", async ({
   const blogIndex = await request.get("/blog");
   expect(blogIndex.status()).toBe(200);
   expect(await blogIndex.text()).not.toContain(postDoc.title);
-  expect(await status(request, postDoc.slug)()).toBe(404);
+  await expect
+    .poll(status(request, postDoc.slug), { timeout: SYNC_TIMEOUT })
+    .toBe(404);
 
   // A visitor on /blog keeps SanityLive listening, which is what invalidates
   // the cached index once the post is published.
