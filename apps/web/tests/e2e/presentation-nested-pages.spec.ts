@@ -301,7 +301,9 @@ test("cleanup: deleted pages 404 and leave the sitemap", async ({
   await expect
     .poll(status(request, child.renamed), { timeout: SYNC_TIMEOUT })
     .toBe(404);
-  expect(await status(request, parent.slug)()).toBe(404);
+  await expect
+    .poll(status(request, parent.slug), { timeout: SYNC_TIMEOUT })
+    .toBe(404);
   await expect
     .poll(sitemap, { timeout: SYNC_TIMEOUT })
     .not.toContain(loc(child.renamed));
