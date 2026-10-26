@@ -68,6 +68,7 @@ function SanityButton({
     >
       <Link
         href={safeHref}
+        prefetch
         rel={openInNewTab ? "noopener noreferrer" : undefined}
         target={openInNewTab ? "_blank" : "_self"}
       >

@@ -267,6 +267,7 @@ function Footer({ data, settingsData }: Readonly<FooterProps>) {
                           <Link
                             className="link-underline after:-bottom-0.5! rounded-sm focus-ring after:transition-none! outline-accent-green-foreground!"
                             href={link.href ?? "#"}
+                            prefetch
                             rel={
                               link.openInNewTab
                                 ? "noopener noreferrer"
