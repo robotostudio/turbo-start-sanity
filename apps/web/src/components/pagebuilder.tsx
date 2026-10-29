@@ -8,6 +8,7 @@ import { FeatureCardsWithIcon } from "@workspace/sanity-blocks/feature-cards-ico
 import { HeroBlock } from "@workspace/sanity-blocks/hero/index";
 import { HeroSplit } from "@workspace/sanity-blocks/hero-split/index";
 import { LogoCloud } from "@workspace/sanity-blocks/logo-cloud/index";
+import { PricingPlans } from "@workspace/sanity-blocks/pricing-plans/index";
 import { RichTextBlock } from "@workspace/sanity-blocks/rich-text-block/index";
 import { ShowcaseGrid } from "@workspace/sanity-blocks/showcase-grid/index";
 import { SocialGrid } from "@workspace/sanity-blocks/social-grid/index";
@@ -74,6 +75,8 @@ function renderBlockComponent(
       );
     case "logoCloud":
       return <LogoCloud {...(block as PagebuilderType<"logoCloud">)} />;
+    case "pricingPlans":
+      return <PricingPlans {...(block as PagebuilderType<"pricingPlans">)} />;
     case "socialGrid":
       return <SocialGrid {...(block as PagebuilderType<"socialGrid">)} />;
     case "showcaseGrid":

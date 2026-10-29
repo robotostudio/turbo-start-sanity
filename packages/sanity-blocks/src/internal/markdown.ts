@@ -22,6 +22,15 @@ export interface MarkdownButton {
   href?: string | null;
 }
 
+export interface MarkdownPricingPlan {
+  _key?: string | null;
+  name?: string | null;
+  description?: string | null;
+  price?: string | null;
+  priceSuffix?: string | null;
+  features?: string[] | null;
+}
+
 export interface MarkdownCard {
   _key?: string | null;
   title?: string | null;
@@ -112,6 +121,7 @@ export interface MarkdownBlock {
   helperText?: PortableTextValue;
   buttons?: MarkdownButton[] | null;
   cards?: MarkdownCard[] | null;
+  plans?: MarkdownPricingPlan[] | null;
   categories?: MarkdownFaqCategory[] | null;
   link?: MarkdownLink | null;
   logos?: MarkdownLogo[] | null;

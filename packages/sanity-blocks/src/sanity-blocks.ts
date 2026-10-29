@@ -4,6 +4,7 @@ import { featureCardsIconSchema } from "./feature-cards-icon/feature-cards-icon.
 import { heroSchema } from "./hero/hero.schema";
 import { heroSplitSchema } from "./hero-split/hero-split.schema";
 import { logoCloudSchema } from "./logo-cloud/logo-cloud.schema";
+import { pricingPlansSchema } from "./pricing-plans/pricing-plans.schema";
 import { richTextBlockSchema } from "./rich-text-block/rich-text-block.schema";
 import { showcaseGridSchema } from "./showcase-grid/showcase-grid.schema";
 import { socialGridSchema } from "./social-grid/social-grid.schema";
@@ -16,6 +17,7 @@ export { featureCardsIconSchema } from "./feature-cards-icon/feature-cards-icon.
 export { heroSchema } from "./hero/hero.schema";
 export { heroSplitSchema } from "./hero-split/hero-split.schema";
 export { logoCloudSchema } from "./logo-cloud/logo-cloud.schema";
+export { pricingPlansSchema } from "./pricing-plans/pricing-plans.schema";
 export { richTextBlockSchema } from "./rich-text-block/rich-text-block.schema";
 export { showcaseGridSchema } from "./showcase-grid/showcase-grid.schema";
 export { socialGridSchema } from "./social-grid/social-grid.schema";
@@ -29,6 +31,7 @@ export const blockSchemas = [
   featureCardsIconSchema,
   faqAccordionSchema,
   logoCloudSchema,
+  pricingPlansSchema,
   socialGridSchema,
   showcaseGridSchema,
   richTextBlockSchema,

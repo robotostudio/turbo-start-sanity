@@ -7,6 +7,7 @@ import { featureCardsIconToMarkdown } from "../feature-cards-icon/markdown";
 import { heroToMarkdown } from "../hero/markdown";
 import { heroSplitToMarkdown } from "../hero-split/markdown";
 import { logoCloudToMarkdown } from "../logo-cloud/markdown";
+import { pricingPlansToMarkdown } from "../pricing-plans/markdown";
 import { richTextBlockToMarkdown } from "../rich-text-block/markdown";
 import { showcaseGridToMarkdown } from "../showcase-grid/markdown";
 import { socialGridToMarkdown } from "../social-grid/markdown";
@@ -34,6 +35,8 @@ function blockToMarkdown(
       return featureCardsIconToMarkdown(block, options);
     case "logoCloud":
       return logoCloudToMarkdown(block, options);
+    case "pricingPlans":
+      return pricingPlansToMarkdown(block, options);
     case "socialGrid":
       return socialGridToMarkdown(block, options);
     case "showcaseGrid":
