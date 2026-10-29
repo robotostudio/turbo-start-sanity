@@ -244,7 +244,7 @@ test("blog index: drafts filter by category and paginate in Presentation only", 
     _type: "author",
     name: `E2E author ${runId}`,
   });
-  for (const [i, post] of posts.entries()) {
+  for (const post of posts) {
     tx.create({
       _id: `drafts.${post.id}`,
       _type: "blog",
@@ -252,10 +252,9 @@ test("blog index: drafts filter by category and paginate in Presentation only", 
       slug: { _type: "slug", current: post.slug },
       authors: [{ _type: "reference", _key: "author", _ref: authorId }],
       category: BLOG_CATEGORY,
+      // The list is newest first, ties broken by `_createdAt`, so today's
+      // date puts these posts on page 1.
       publishedAt: new Date().toISOString().slice(0, 10),
-      // The list is `order(orderRank asc)` and a missing rank sorts last;
-      // these sort before anything the Studio generates, onto page 1.
-      orderRank: `0|${String(i + 1).padStart(6, "0")}:`,
     });
   }
   await tx.commit();

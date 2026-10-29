@@ -224,10 +224,9 @@ test("blog: draft post shows in Presentation only, publish lists it", async ({
       slug: { _type: "slug", current: postDoc.slug },
       authors: [{ _type: "reference", _key: "author", _ref: authorId }],
       category: "sanity",
+      // The list is newest first, ties broken by `_createdAt`, so today's
+      // date puts this post at the top of page 1.
       publishedAt: new Date().toISOString().slice(0, 10),
-      // The list is `order(orderRank asc)` and a missing rank sorts last, onto
-      // page 2; this rank sorts before anything the Studio generates.
-      orderRank: "0|000000:",
     })
     .commit();
 

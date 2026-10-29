@@ -28,7 +28,6 @@
     "@sanity/client": "catalog:",
     "@sanity/functions": "^1.10.1",
     "@sanity/icons": "^5.2.1",
-    "@sanity/orderable-document-list": "^2.0.28",
     "@sanity/ui": "^4.0.6",
     "@sanity/vision": "^6.19.0",
     "@workspace/env": "workspace:*",

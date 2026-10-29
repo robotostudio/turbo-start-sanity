@@ -83,8 +83,8 @@ type BlogIndexQuery = {
 /**
  * One page of the blog index, matching what `/blog?page=…&category=…` renders,
  * off the same cached fetch as the HTML route. Featured posts lead page 1
- * (the query keeps them out of the list; an active category drops them) and
- * flatten with the grid into one `orderRank`-sorted list.
+ * (the query keeps them out of the list; an active category drops them),
+ * followed by the grid, both newest first.
  */
 async function buildBlogIndexPageMarkdown(
   query: BlogIndexQuery,
