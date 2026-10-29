@@ -310,7 +310,7 @@ export const querySitemapData = defineQuery(`{
   },
   "blogPages": *[_type == "blog" && defined(slug.current) && seoNoIndex != true] | order(coalesce(publishedAt, _createdAt) desc, _createdAt desc){
     "slug": slug.current,
-    "lastModified": _updatedAt,
+    "lastModified": coalesce(updatedAt, _updatedAt),
     title
   }
 }`);
