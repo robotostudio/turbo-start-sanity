@@ -153,10 +153,10 @@ async function getDraftBlogPage({
 }
 
 function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
-  const { title, richText, publishedAt, _updatedAt } = data ?? {};
+  const { title, richText, publishedAt, updatedAt, _updatedAt } = data ?? {};
   const author = data?.authors;
   const publishedDate = formatDate(publishedAt);
-  const updatedDate = formatDate(_updatedAt);
+  const updatedDate = formatDate(updatedAt ?? _updatedAt);
   const shareUrl = data?.slug ? `${getBaseUrl()}${data.slug}` : undefined;
 
   return (

@@ -108,7 +108,7 @@ export function ArticleJsonLd({
       article.publishedAt || article._createdAt || new Date().toISOString()
     ).toISOString(),
     dateModified: new Date(
-      article._updatedAt || new Date().toISOString()
+      article.updatedAt || article._updatedAt || new Date().toISOString()
     ).toISOString(),
     url: articleUrl,
     mainEntityOfPage: {

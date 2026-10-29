@@ -1,4 +1,3 @@
-import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 import {
   BookMarked,
   Cog,
@@ -13,10 +12,7 @@ import {
   TrendingUpDown,
   User,
 } from "lucide-react";
-import type {
-  StructureBuilder,
-  StructureResolverContext,
-} from "sanity/structure";
+import type { StructureBuilder } from "sanity/structure";
 
 import { createSlugBasedStructure } from "@/components/nested-pages-structure";
 import type { SchemaType, SingletonType } from "@/schemaTypes/index";
@@ -58,15 +54,9 @@ type CreateIndexList = {
   S: StructureBuilder;
   list: Base;
   index: Base<SingletonType>;
-  context: StructureResolverContext;
 };
 
-const createIndexListWithOrderableItems = ({
-  S,
-  index,
-  list,
-  context,
-}: CreateIndexList) => {
+const createIndexListWithDatedItems = ({ S, index, list }: CreateIndexList) => {
   const indexTitle = index.title ?? getTitleCase(index.type);
   const listTitle = list.title ?? getTitleCase(list.type);
   return S.listItem()
@@ -85,32 +75,29 @@ const createIndexListWithOrderableItems = ({
                 .schemaType(index.type)
                 .documentId(index.type)
             ),
-          orderableDocumentListDeskItem({
-            type: list.type,
-            S,
-            context,
-            icon: list.icon ?? File,
-            title: `${listTitle}`,
-          }),
+          S.listItem()
+            .title(listTitle)
+            .icon(list.icon ?? File)
+            .child(
+              S.documentTypeList(list.type)
+                .title(listTitle)
+                .defaultOrdering([{ field: "publishedAt", direction: "desc" }])
+            ),
         ])
     );
 };
 
-export const structure = (
-  S: StructureBuilder,
-  context: StructureResolverContext
-) =>
+export const structure = (S: StructureBuilder) =>
   S.list()
     .title("Content")
     .items([
       createSingleTon({ S, type: "homePage", icon: House }),
       S.divider(),
       createSlugBasedStructure(S, "page"),
-      createIndexListWithOrderableItems({
+      createIndexListWithDatedItems({
         S,
         index: { type: "blogIndex", icon: BookMarked },
         list: { type: "blog", title: "Blogs", icon: FileText },
-        context,
       }),
       createList({
         S,

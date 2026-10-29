@@ -1,7 +1,3 @@
-import {
-  orderRankField,
-  orderRankOrdering,
-} from "@sanity/orderable-document-list";
 import { BLOG_CATEGORY_OPTIONS } from "@workspace/sanity-blocks/internal/blog-categories";
 import { FileText } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
@@ -19,9 +15,24 @@ export const blog = defineType({
     "A blog post that will be published on the website. Add a title, description, author, and content to create a new article for readers.",
   icon: FileText,
   groups: GROUPS,
-  orderings: [orderRankOrdering],
+  orderings: [
+    {
+      title: "Published date, newest first",
+      name: "publishedAtDesc",
+      by: [{ field: "publishedAt", direction: "desc" }],
+    },
+    {
+      title: "Published date, oldest first",
+      name: "publishedAtAsc",
+      by: [{ field: "publishedAt", direction: "asc" }],
+    },
+    {
+      title: "Last updated, newest first",
+      name: "updatedAtDesc",
+      by: [{ field: "updatedAt", direction: "desc" }],
+    },
+  ],
   fields: [
-    orderRankField({ type: "blog" }),
     defineField({
       name: "title",
       type: "string",
@@ -91,6 +102,18 @@ export const blog = defineType({
         "The date when your blog post will appear to have been published",
       initialValue: () => new Date().toISOString().split("T")[0],
       group: GROUP.MAIN_CONTENT,
+    }),
+    defineField({
+      name: "updatedAt",
+      type: "date",
+      title: "Updated At",
+      description:
+        "Set this when you make a meaningful change to the post, such as new information or a rewrite. Readers see it as the “Last updated” date. Leave it empty to use the date of the last edit.",
+      group: GROUP.MAIN_CONTENT,
+      validation: (Rule) =>
+        Rule.min(Rule.valueOfField("publishedAt")).error(
+          "The updated date can't be earlier than the published date"
+        ),
     }),
     defineField({
       name: "featured",

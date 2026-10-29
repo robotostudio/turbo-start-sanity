@@ -49,10 +49,7 @@ export type MarkdownDocument = Partial<
 >;
 
 export type MarkdownBlogListItem = Partial<
-  Pick<
-    NonNullable<QueryAllBlogDataForSearchResult[number]>,
-    "title" | "slug" | "orderRank"
-  >
+  Pick<NonNullable<QueryAllBlogDataForSearchResult[number]>, "title" | "slug">
 >;
 
 function pageBuilderMarkdown(doc: MarkdownDocument): string {
@@ -104,8 +101,7 @@ export function blogIndexToMarkdown(
   doc: MarkdownDocument,
   posts: MarkdownBlogListItem[]
 ): string {
-  const list = [...posts]
-    .sort((a, b) => (a.orderRank ?? "").localeCompare(b.orderRank ?? ""))
+  const list = posts
     .map((post) => {
       const title = post.title?.trim();
       const slug = post.slug?.trim();

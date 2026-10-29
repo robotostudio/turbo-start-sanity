@@ -101,7 +101,6 @@ const blogCardFragment = /* groq */ `
   title,
   description,
   "slug":slug.current,
-  orderRank,
   category,
   ${imageFragment},
   publishedAt,
@@ -196,12 +195,12 @@ export const queryBlogIndexPage = defineQuery(`
     ${pageBuilderFragment},
     "slug": slug.current,
     "featuredBlogs": select(
-      $category == "" => *[_type == "blog" && featured == true && defined(slug.current) && (seoHideFromLists != true)] | order(orderRank asc){
+      $category == "" => *[_type == "blog" && featured == true && defined(slug.current) && (seoHideFromLists != true)] | order(coalesce(publishedAt, _createdAt) desc, _createdAt desc){
         ${blogCardFragment}
       },
       []
     ),
-    "blogs": *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true) && ($category == "" || category == $category) && ($category != "" || featured != true)] | order(orderRank asc) [$start...$end]{
+    "blogs": *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true) && ($category == "" || category == $category) && ($category != "" || featured != true)] | order(coalesce(publishedAt, _createdAt) desc, _createdAt desc) [$start...$end]{
       ${blogCardFragment}
     },
     "total": count(*[_type == "blog" && defined(slug.current) && (seoHideFromLists != true) && ($category == "" || category == $category) && ($category != "" || featured != true)])
@@ -209,7 +208,7 @@ export const queryBlogIndexPage = defineQuery(`
 `);
 
 export const queryAllBlogDataForSearch = defineQuery(`
-  *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true)]{
+  *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true)] | order(coalesce(publishedAt, _createdAt) desc, _createdAt desc) {
     ${blogCardFragment}
   }
 `);
@@ -309,9 +308,9 @@ export const querySitemapData = defineQuery(`{
     "slug": slug.current,
     "lastModified": _updatedAt
   },
-  "blogPages": *[_type == "blog" && defined(slug.current) && seoNoIndex != true] | order(orderRank asc){
+  "blogPages": *[_type == "blog" && defined(slug.current) && seoNoIndex != true] | order(coalesce(publishedAt, _createdAt) desc, _createdAt desc){
     "slug": slug.current,
-    "lastModified": _updatedAt,
+    "lastModified": coalesce(updatedAt, _updatedAt),
     title
   }
 }`);
