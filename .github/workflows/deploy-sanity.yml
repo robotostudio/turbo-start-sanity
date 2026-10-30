@@ -1,6 +1,18 @@
 name: Deploy Sanity Studio
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/studio/**"
+      - "packages/sanity/**"
+      - "packages/sanity-blocks/**"
+      - "packages/env/**"
+      - "packages/logger/**"
+      - "packages/ui/**"
+      - "packages/tailwind-config/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/deploy-sanity.yml"
   workflow_dispatch:
     inputs:
       presentation_url:
@@ -10,6 +22,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: deploy-sanity-studio
+  cancel-in-progress: false
 
 jobs:
   deploy:
