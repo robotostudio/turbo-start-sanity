@@ -1,5 +1,12 @@
 import { Button } from "@workspace/ui/components/button";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+import { FALLBACK_SITE_CONFIG, NOT_FOUND_TITLE } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: `${NOT_FOUND_TITLE} / ${FALLBACK_SITE_CONFIG.title}`,
+};
 
 export default function NotFound() {
   return (

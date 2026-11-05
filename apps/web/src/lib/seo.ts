@@ -29,7 +29,9 @@ type PageSeoData = Metadata & {
   pageType?: Extract<Metadata["openGraph"], { type: string }>["type"];
 };
 
-const FALLBACK_SITE_CONFIG: SiteConfig = {
+export const NOT_FOUND_TITLE = "Page not found";
+
+export const FALLBACK_SITE_CONFIG: SiteConfig = {
   title: "Turbo Start Sanity",
   description: "Turbo Start Sanity",
   twitterHandle: "@studioroboto",
@@ -103,6 +105,14 @@ export function seoFromDocument(
   doc: SeoSourceDocument | null | undefined,
   { slug, pageType }: { slug: string; pageType?: PageSeoData["pageType"] }
 ): Promise<Metadata> {
+  if (!doc) {
+    return getSEOMetadata({
+      title: NOT_FOUND_TITLE,
+      seoNoIndex: true,
+      slug,
+      pageType,
+    });
+  }
   return getSEOMetadata({
     title: doc?.seoTitle || doc?.title || undefined,
     description: doc?.seoDescription || doc?.description || undefined,

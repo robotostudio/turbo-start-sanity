@@ -6,6 +6,7 @@ import {
   getDynamicFetchOptions,
   SanityLive,
 } from "@workspace/sanity/live";
+import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { draftMode } from "next/headers";
 import { Suspense } from "react";
@@ -22,6 +23,12 @@ import { StickyFooter } from "@/components/sticky-footer";
 import { VisualEditingLayer } from "@/components/visual-editing-layer";
 import { getGithubStars } from "@/lib/github-stars";
 import { getNavigationData } from "@/lib/navigation";
+import { FALLBACK_SITE_CONFIG } from "@/lib/seo";
+
+export const metadata: Metadata = {
+  title: FALLBACK_SITE_CONFIG.title,
+  description: FALLBACK_SITE_CONFIG.description,
+};
 
 const fontSans = Geist({
   subsets: ["latin"],
