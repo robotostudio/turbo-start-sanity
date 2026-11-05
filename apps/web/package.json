@@ -32,7 +32,7 @@
     "ai": "^7.0.143",
     "fuse.js": "^7.5.0",
     "lucide-react": "catalog:",
-    "next": "16.4.3",
+    "next": "16.4.5",
     "next-sanity": "13.3.4",
     "next-themes": "catalog:",
     "react": "catalog:",
