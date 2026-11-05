@@ -6,7 +6,6 @@ import {
   getDynamicFetchOptions,
   SanityLive,
 } from "@workspace/sanity/live";
-import { Geist, Geist_Mono } from "next/font/google";
 import { draftMode } from "next/headers";
 import { Suspense } from "react";
 import { preconnect, prefetchDNS } from "react-dom";
@@ -20,18 +19,9 @@ import { Providers } from "@/components/providers";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { StickyFooter } from "@/components/sticky-footer";
 import { VisualEditingLayer } from "@/components/visual-editing-layer";
+import { fontMono, fontSans } from "@/lib/fonts";
 import { getGithubStars } from "@/lib/github-stars";
 import { getNavigationData } from "@/lib/navigation";
-
-const fontSans = Geist({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
-
-const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-});
 
 export default async function RootLayout({
   children,

@@ -2,14 +2,21 @@
 
 import "@workspace/ui/globals.css";
 
+import { Providers } from "@/components/providers";
+import { fontMono, fontSans } from "@/lib/fonts";
+
 import ErrorPage from "./error";
 
 export default function GlobalError({ retry }: { retry: () => void }) {
   return (
-    <html lang="en">
-      <body className="bg-background font-sans antialiased">
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${fontSans.variable} ${fontMono.variable} bg-background font-sans antialiased`}
+      >
         <title>Something went wrong</title>
-        <ErrorPage retry={retry} />
+        <Providers>
+          <ErrorPage retry={retry} />
+        </Providers>
       </body>
     </html>
   );
