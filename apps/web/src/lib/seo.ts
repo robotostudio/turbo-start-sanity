@@ -30,7 +30,7 @@ type PageSeoData = Metadata & {
   pageType?: Extract<Metadata["openGraph"], { type: string }>["type"];
 };
 
-export const NOT_FOUND_TITLE = "Page not found";
+const NOT_FOUND_TITLE = "Page not found";
 
 export const FALLBACK_SITE_CONFIG: SiteConfig = {
   title: "Turbo Start Sanity",
@@ -64,8 +64,9 @@ function withSiteTitle(pageTitle: string, siteTitle: string): string {
 }
 
 export async function getNotFoundMetadata(): Promise<Metadata> {
-  const { title: siteTitle } = await resolveSiteConfig("published");
-  return { title: withSiteTitle(NOT_FOUND_TITLE, siteTitle) };
+  const { title: siteTitle, description } =
+    await resolveSiteConfig("published");
+  return { title: withSiteTitle(NOT_FOUND_TITLE, siteTitle), description };
 }
 
 function buildPageUrl({
@@ -127,12 +128,12 @@ export function seoFromDocument(
     });
   }
   return getSEOMetadata({
-    title: doc?.seoTitle || doc?.title || undefined,
-    description: doc?.seoDescription || doc?.description || undefined,
-    ogTitle: doc?.ogTitle,
-    ogDescription: doc?.ogDescription,
-    ogImage: doc?.ogImage,
-    seoNoIndex: doc?.seoNoIndex ?? false,
+    title: doc.seoTitle || doc.title || undefined,
+    description: doc.seoDescription || doc.description || undefined,
+    ogTitle: doc.ogTitle,
+    ogDescription: doc.ogDescription,
+    ogImage: doc.ogImage,
+    seoNoIndex: doc.seoNoIndex ?? false,
     slug,
     pageType,
   });

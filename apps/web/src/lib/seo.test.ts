@@ -12,7 +12,7 @@ const sanityFetchMetadata = vi.fn();
 
 vi.mock("@workspace/sanity/live", () => ({
   getDynamicFetchOptions: async () => ({
-    perspective: "published",
+    perspective: "drafts",
     stega: false,
   }),
   sanityFetchMetadata: (...args: unknown[]) => sanityFetchMetadata(...args),
@@ -62,11 +62,14 @@ describe("getNotFoundMetadata", () => {
   });
 
   it("suffixes the not-found title with the site title from published Settings", async () => {
-    sanityFetchMetadata.mockResolvedValue({ data: { siteTitle: "Acme" } });
+    sanityFetchMetadata.mockResolvedValue({
+      data: { siteTitle: "Acme", siteDescription: "Acme builds rockets" },
+    });
 
     const metadata = await getNotFoundMetadata();
 
     expect(metadata.title).toBe("Page not found / Acme");
+    expect(metadata.description).toBe("Acme builds rockets");
     expect(sanityFetchMetadata).toHaveBeenCalledWith(
       expect.objectContaining({ perspective: "published" })
     );
