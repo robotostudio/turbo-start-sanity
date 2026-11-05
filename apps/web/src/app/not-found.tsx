@@ -2,11 +2,11 @@ import { Button } from "@workspace/ui/components/button";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { FALLBACK_SITE_CONFIG, NOT_FOUND_TITLE } from "@/lib/seo";
+import { getNotFoundMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: `${NOT_FOUND_TITLE} / ${FALLBACK_SITE_CONFIG.title}`,
-};
+export function generateMetadata(): Promise<Metadata> {
+  return getNotFoundMetadata();
+}
 
 export default function NotFound() {
   return (

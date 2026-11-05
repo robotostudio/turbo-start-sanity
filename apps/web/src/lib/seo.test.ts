@@ -18,7 +18,7 @@ vi.mock("@workspace/sanity/live", () => ({
   sanityFetchMetadata: (...args: unknown[]) => sanityFetchMetadata(...args),
 }));
 
-const { seoFromDocument } = await import("./seo");
+const { getNotFoundMetadata, seoFromDocument } = await import("./seo");
 
 describe("seoFromDocument", () => {
   beforeEach(() => {
@@ -46,5 +46,37 @@ describe("seoFromDocument", () => {
     expect(metadata.title).toBe("About / Turbo Start Sanity");
     expect(metadata.robots).toBe("index, follow");
     expect(metadata.alternates?.canonical).toBe("http://localhost:3000/about");
+  });
+
+  it("keeps a homepage with no document titled by the site and indexable", async () => {
+    const metadata = await seoFromDocument({}, { slug: "/" });
+
+    expect(metadata.title).toBe("Turbo Start Sanity");
+    expect(metadata.robots).toBe("index, follow");
+  });
+});
+
+describe("getNotFoundMetadata", () => {
+  beforeEach(() => {
+    sanityFetchMetadata.mockReset();
+  });
+
+  it("suffixes the not-found title with the site title from published Settings", async () => {
+    sanityFetchMetadata.mockResolvedValue({ data: { siteTitle: "Acme" } });
+
+    const metadata = await getNotFoundMetadata();
+
+    expect(metadata.title).toBe("Page not found / Acme");
+    expect(sanityFetchMetadata).toHaveBeenCalledWith(
+      expect.objectContaining({ perspective: "published" })
+    );
+  });
+
+  it("falls back to the template name when Settings has no site title", async () => {
+    sanityFetchMetadata.mockResolvedValue({ data: null });
+
+    const metadata = await getNotFoundMetadata();
+
+    expect(metadata.title).toBe("Page not found / Turbo Start Sanity");
   });
 });
