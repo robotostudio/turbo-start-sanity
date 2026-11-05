@@ -1,4 +1,5 @@
 import {
+  type DynamicFetchOptions,
   getDynamicFetchOptions,
   sanityFetchMetadata,
 } from "@workspace/sanity/live";
@@ -29,18 +30,21 @@ type PageSeoData = Metadata & {
   pageType?: Extract<Metadata["openGraph"], { type: string }>["type"];
 };
 
-const FALLBACK_SITE_CONFIG: SiteConfig = {
+const NOT_FOUND_TITLE = "Page not found";
+
+export const FALLBACK_SITE_CONFIG: SiteConfig = {
   title: "Turbo Start Sanity",
   description: "Turbo Start Sanity",
   twitterHandle: "@studioroboto",
   keywords: ["roboto", "studio", "demo", "sanity", "next", "react", "template"],
 };
 
-async function resolveSiteConfig(): Promise<SiteConfig> {
-  const { perspective } = await getDynamicFetchOptions();
+async function resolveSiteConfig(
+  perspective?: DynamicFetchOptions["perspective"]
+): Promise<SiteConfig> {
   const { data: settings } = await sanityFetchMetadata({
     query: queryGlobalSeoSettings,
-    perspective,
+    perspective: perspective ?? (await getDynamicFetchOptions()).perspective,
   });
   const twitter = settings?.socialLinks?.twitter?.split("/").findLast(Boolean);
   return {
@@ -51,6 +55,18 @@ async function resolveSiteConfig(): Promise<SiteConfig> {
     favicon: settings?.favicon ?? null,
     ogImage: settings?.ogImage ?? null,
   };
+}
+
+function withSiteTitle(pageTitle: string, siteTitle: string): string {
+  return pageTitle.includes(siteTitle)
+    ? pageTitle
+    : `${pageTitle} / ${siteTitle}`;
+}
+
+export async function getNotFoundMetadata(): Promise<Metadata> {
+  const { title: siteTitle, description } =
+    await resolveSiteConfig("published");
+  return { title: withSiteTitle(NOT_FOUND_TITLE, siteTitle), description };
 }
 
 function buildPageUrl({
@@ -103,13 +119,21 @@ export function seoFromDocument(
   doc: SeoSourceDocument | null | undefined,
   { slug, pageType }: { slug: string; pageType?: PageSeoData["pageType"] }
 ): Promise<Metadata> {
+  if (!doc) {
+    return getSEOMetadata({
+      title: NOT_FOUND_TITLE,
+      seoNoIndex: true,
+      slug,
+      pageType,
+    });
+  }
   return getSEOMetadata({
-    title: doc?.seoTitle || doc?.title || undefined,
-    description: doc?.seoDescription || doc?.description || undefined,
-    ogTitle: doc?.ogTitle,
-    ogDescription: doc?.ogDescription,
-    ogImage: doc?.ogImage,
-    seoNoIndex: doc?.seoNoIndex ?? false,
+    title: doc.seoTitle || doc.title || undefined,
+    description: doc.seoDescription || doc.description || undefined,
+    ogTitle: doc.ogTitle,
+    ogDescription: doc.ogDescription,
+    ogImage: doc.ogImage,
+    seoNoIndex: doc.seoNoIndex ?? false,
     slug,
     pageType,
   });
@@ -162,9 +186,7 @@ export async function getSEOMetadata(
   // "Page / Site" tab titles, unless the title already carries the site name —
   // the homepage, and any `seoTitle` override written as a complete meta title
   // ("Careers — Acme"), which must not come out as "Careers — Acme / Acme".
-  const fullTitle = defaultTitle.includes(siteConfig.title)
-    ? defaultTitle
-    : `${defaultTitle} / ${siteConfig.title}`;
+  const fullTitle = withSiteTitle(defaultTitle, siteConfig.title);
 
   // SVG first so browsers that support it take it. Each slot falls back
   // separately: an SVG-only setting must still emit the ICO for Safari.
