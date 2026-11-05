@@ -1,5 +1,12 @@
 import { Button } from "@workspace/ui/components/button";
+import type { Metadata } from "next";
 import Link from "next/link";
+
+import { getNotFoundMetadata } from "@/lib/seo";
+
+export function generateMetadata(): Promise<Metadata> {
+  return getNotFoundMetadata();
+}
 
 export default function NotFound() {
   return (

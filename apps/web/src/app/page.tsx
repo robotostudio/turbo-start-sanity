@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
     query: queryHomePageData,
     perspective,
   });
-  return seoFromDocument(homePageData, { slug: "/" });
+  return seoFromDocument(homePageData ?? {}, { slug: "/" });
 }
 
 export default async function Page() {
