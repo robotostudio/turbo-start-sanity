@@ -41,7 +41,7 @@
     "react-is": "catalog:",
     "sanity": "catalog:",
     "sanity-plugin-asset-source-unsplash": "^7.0.29",
-    "sanity-plugin-media": "^6.3.5",
+    "sanity-plugin-media": "^6.6.1",
     "sanity-plugin-mux-input": "^5.2.0",
     "slugify": "^1.6.9",
     "styled-components": "^6.6.0"
