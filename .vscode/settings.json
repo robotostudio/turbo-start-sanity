@@ -35,7 +35,8 @@
   "[graphql]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "js/ts.experimental.useTsgo": true,
+  "js/ts.tsdk.path": "./node_modules/typescript",
   "emmet.showExpandedAbbreviation": "never",
   "cSpell.words": [
     "GROQ",
