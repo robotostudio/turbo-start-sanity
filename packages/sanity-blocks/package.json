@@ -19,9 +19,9 @@
     "sanity": "catalog:"
   },
   "dependencies": {
-    "@mux/mux-player-react": "^3.14.0",
-    "@mux/mux-video-react": "^0.31.5",
-    "@portabletext/markdown": "^2.5.1",
+    "@mux/mux-player-react": "^3.14.1",
+    "@mux/mux-video-react": "^0.31.6",
+    "@portabletext/markdown": "^2.9.1",
     "@sanity/client": "catalog:",
     "@sanity/icons": "^5.2.1",
     "@workspace/env": "workspace:*",
