@@ -38,9 +38,9 @@ import type { QueryHomePageDataResult } from "@workspace/sanity/types";
 
 Image handling is split across two packages:
 
-| Need | Where |
-| --- | --- |
-| A CDN URL with transforms, e.g. `urlFor(img).width(800).url()` | `@workspace/sanity/client` (here) |
+| Need                                                                        | Where                                                             |
+| --------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| A CDN URL with transforms, e.g. `urlFor(img).width(800).url()`              | `@workspace/sanity/client` (here)                                 |
 | Rendering an image — responsive srcset, LQIP, hotspot/crop, SVG passthrough | `SanityImage` in `@workspace/sanity-blocks/internal/sanity-image` |
 
 `SanityImage` also exports `resolveAssetId` (validates the asset ref and strips
