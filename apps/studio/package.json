@@ -24,12 +24,12 @@
   ],
   "dependencies": {
     "@robotostudio/sanity-plugin-lucide-icon-picker": "^1.0.2",
-    "@sanity/assist": "^6.2.5",
+    "@sanity/assist": "^6.2.6",
     "@sanity/client": "catalog:",
-    "@sanity/functions": "^1.10.1",
+    "@sanity/functions": "^1.11.0",
     "@sanity/icons": "^5.2.1",
     "@sanity/ui": "^4.0.6",
-    "@sanity/vision": "^6.19.0",
+    "@sanity/vision": "^6.22.0",
     "@workspace/env": "workspace:*",
     "@workspace/logger": "workspace:*",
     "@workspace/sanity-blocks": "workspace:*",
@@ -40,9 +40,9 @@
     "react-dom": "catalog:",
     "react-is": "catalog:",
     "sanity": "catalog:",
-    "sanity-plugin-asset-source-unsplash": "^7.0.29",
+    "sanity-plugin-asset-source-unsplash": "^7.0.30",
     "sanity-plugin-media": "^6.6.1",
-    "sanity-plugin-mux-input": "^5.2.0",
+    "sanity-plugin-mux-input": "^5.2.1",
     "slugify": "^1.6.9",
     "styled-components": "^6.6.0"
   },
@@ -50,6 +50,6 @@
     "@sanity/blueprints": "^0.24.0",
     "@types/react": "catalog:",
     "typescript": "catalog:",
-    "vite": "^8.3.4"
+    "vite": "^8.3.5"
   }
 }
