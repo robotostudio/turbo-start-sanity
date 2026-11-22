@@ -21,7 +21,7 @@
   "dependencies": {
     "@mux/mux-player-react": "^3.14.1",
     "@mux/mux-video-react": "^0.31.6",
-    "@portabletext/markdown": "^2.9.2",
+    "@portabletext/markdown": "^2.9.4",
     "@sanity/client": "catalog:",
     "@sanity/icons": "^5.2.1",
     "@workspace/env": "workspace:*",
@@ -40,7 +40,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
-    "@vitejs/plugin-react": "^6.2.1",
+    "@vitejs/plugin-react": "^6.3.0",
     "@workspace/typescript-config": "workspace:*",
     "next": "16.4.5",
     "typescript": "catalog:",
