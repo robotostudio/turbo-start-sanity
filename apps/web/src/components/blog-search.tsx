@@ -28,7 +28,9 @@ export function SearchInput({
           className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground"
         />
 
+        {/* biome-ignore lint/a11y/noAutofocus: the input remounts after a search, so this keeps keyboard focus in the box */}
         <Input
+          autoFocus={defaultValue !== ""}
           className="peer h-auto rounded-none border-border bg-transparent py-1.5 pr-10 pl-9.5 text-sm shadow-none"
           defaultValue={defaultValue}
           enterKeyHint="search"
