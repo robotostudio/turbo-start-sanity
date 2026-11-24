@@ -17,7 +17,7 @@
     "test:e2e:presentation": "playwright test --config playwright.presentation.config.ts"
   },
   "dependencies": {
-    "@ai-sdk/mcp": "^2.0.78",
+    "@ai-sdk/mcp": "^2.0.99",
     "@sanity/client": "catalog:",
     "@sanity/mutate": "^0.18.2",
     "@sanity/visual-editing": "^6.1.2",
@@ -28,7 +28,7 @@
     "@workspace/sanity-blocks": "workspace:*",
     "@workspace/tailwind-config": "workspace:*",
     "@workspace/ui": "workspace:*",
-    "ai": "^7.0.143",
+    "ai": "^7.0.173",
     "fuse.js": "^7.5.0",
     "lucide-react": "catalog:",
     "next": "16.4.5",
@@ -39,8 +39,8 @@
     "schema-dts": "^2.1.0"
   },
   "devDependencies": {
-    "@playwright/test": "^1.64.1",
-    "@sanity/codegen": "^8.2.0",
+    "@playwright/test": "^1.65.1",
+    "@sanity/codegen": "^8.3.1",
     "@tailwindcss/postcss": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
