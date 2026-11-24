@@ -16,10 +16,14 @@ async function fetchSearchableBlogs(
 
 export async function searchBlogs(
   query: string,
+  category: string,
   perspective: DynamicFetchOptions["perspective"]
 ) {
   const blogs = await fetchSearchableBlogs(perspective);
-  const fuse = new Fuse(blogs, {
+  const blogsInCategory = category
+    ? blogs.filter((blog) => blog.category === category)
+    : blogs;
+  const fuse = new Fuse(blogsInCategory, {
     keys: ["title", "description", "slug", "authors.name"],
     threshold: 0.3,
   });

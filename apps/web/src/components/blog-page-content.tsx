@@ -35,7 +35,7 @@ export function BlogPageContent({
   const { title, description } = indexPageData;
 
   const showFeatured =
-    paginationMetadata.currentPage === 1 && featuredBlogs.length > 0;
+    paginationMetadata.currentPage === 1 && activeCategory === "";
 
   return (
     <main className="bg-background">
@@ -48,13 +48,15 @@ export function BlogPageContent({
             <BlogCategoryFilter activeCategory={activeCategory} />
           }
           featured={
-            showFeatured
+            featuredBlogs.length > 0
               ? featuredBlogs.map((blog) => (
                   <FeaturedBlogCard blog={blog} key={blog._id} />
                 ))
               : null
           }
+          activeCategory={activeCategory}
           searchQuery={searchQuery}
+          showFeatured={showFeatured}
           searchResults={searchResults}
           list={
             <>

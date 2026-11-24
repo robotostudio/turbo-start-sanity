@@ -12,6 +12,7 @@ import {
   parseBlogPageParam,
 } from "@/lib/blog-index";
 import { searchBlogs } from "@/lib/blog-search";
+import { parseBlogSearchParam } from "@/lib/blog-search-query";
 import { seoFromDocument } from "@/lib/seo";
 import type { Blog } from "@/types";
 import { calculateBlogPaginationMetadata } from "@/utils";
@@ -95,15 +96,29 @@ async function BlogIndexShell() {
   }
 
   return (
-    <BlogIndexBody
-      activeCategory=""
-      currentPage={1}
-      data={data}
-      searchQuery=""
-      searchResults={[]}
-    />
+    <div>
+      <script dangerouslySetInnerHTML={{ __html: HIDE_SHELL_FEATURED }} />
+      <BlogIndexBody
+        activeCategory=""
+        currentPage={1}
+        data={data}
+        featuredBlogs={data.featuredBlogs}
+        searchQuery=""
+        searchResults={[]}
+      />
+    </div>
   );
 }
+
+// The shell is prebuilt for /blog, so it can't know the URL. This runs before
+// first paint and hides its featured posts on category, search and page URLs.
+const HIDE_SHELL_FEATURED = `(function () {
+  var params = new URLSearchParams(location.search);
+  var page = params.get("page");
+  if (params.get("category") || params.get("q") || (page && page !== "1")) {
+    document.currentScript.parentElement.dataset.hideFeatured = "";
+  }
+})();`;
 
 async function BlogIndexView({ searchParams }: BlogPageProps) {
   const [{ page, category, q }, { perspective, stega }] = await Promise.all([
@@ -115,17 +130,17 @@ async function BlogIndexView({ searchParams }: BlogPageProps) {
     notFound();
   }
   const activeCategory = category ?? "";
-  const firstQuery = Array.isArray(q) ? q[0] : q;
-  const searchQuery = firstQuery?.trim() ?? "";
+  const searchQuery = parseBlogSearchParam(q);
 
-  const [data, searchResults] = await Promise.all([
+  const [data, allPostsPage, searchResults] = await Promise.all([
     fetchBlogIndexPage({
       currentPage,
       category: activeCategory,
       perspective,
       stega,
     }),
-    searchQuery ? searchBlogs(searchQuery, perspective) : [],
+    fetchBlogIndexPage({ currentPage: 1, category: "", perspective, stega }),
+    searchQuery ? searchBlogs(searchQuery, activeCategory, perspective) : [],
   ]);
   if (!data) {
     notFound();
@@ -146,6 +161,7 @@ async function BlogIndexView({ searchParams }: BlogPageProps) {
       activeCategory={activeCategory}
       currentPage={currentPage}
       data={data}
+      featuredBlogs={allPostsPage?.featuredBlogs ?? []}
       searchQuery={searchQuery}
       searchResults={searchResults}
     />
@@ -156,12 +172,14 @@ function BlogIndexBody({
   data,
   activeCategory,
   currentPage,
+  featuredBlogs,
   searchQuery,
   searchResults,
 }: Readonly<{
   data: BlogIndexPageData;
   activeCategory: string;
   currentPage: number;
+  featuredBlogs: Blog[];
   searchQuery: string;
   searchResults: Blog[];
 }>) {
@@ -176,7 +194,7 @@ function BlogIndexBody({
       <BlogPageContent
         activeCategory={activeCategory}
         blogs={data.blogs}
-        featuredBlogs={data.featuredBlogs}
+        featuredBlogs={featuredBlogs}
         indexPageData={data}
         paginationMetadata={paginationMetadata}
         searchQuery={searchQuery}

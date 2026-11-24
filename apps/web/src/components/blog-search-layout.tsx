@@ -6,21 +6,26 @@ import { BlogSearchResults } from "@/components/blog-search-results";
 import type { Blog } from "@/types";
 
 type BlogSearchLayoutProps = {
+  activeCategory: string;
   categoryFilter: ReactNode;
   featured: ReactNode;
   list: ReactNode;
   searchQuery: string;
   searchResults: Blog[];
+  showFeatured: boolean;
 };
 
 export function BlogSearchLayout({
+  activeCategory,
   categoryFilter,
   featured,
   list,
   searchQuery,
   searchResults,
+  showFeatured,
 }: Readonly<BlogSearchLayoutProps>) {
   const hasQuery = searchQuery.length > 0;
+  const featuredOpen = showFeatured && !hasQuery;
   const isDeadEnd = hasQuery && searchResults.length === 0;
   const plural = searchResults.length === 1 ? "" : "s";
   let searchStatus = "";
@@ -36,15 +41,15 @@ export function BlogSearchLayout({
         <section
           aria-label="Featured posts"
           className={cn(
-            "grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none",
-            hasQuery
-              ? "grid-rows-[0fr] opacity-0"
-              : "grid-rows-[1fr] opacity-100"
+            "grid transition-[grid-template-rows,opacity] duration-300 ease-out in-data-hide-featured:hidden motion-reduce:transition-none",
+            featuredOpen
+              ? "grid-rows-[1fr] opacity-100"
+              : "grid-rows-[0fr] opacity-0"
           )}
-          inert={hasQuery}
+          inert={!featuredOpen}
         >
-          <div className="min-h-0 overflow-hidden">
-            <div className="grid gap-8 pt-10">{featured}</div>
+          <div className="-mx-1 min-h-0 overflow-hidden">
+            <div className="grid gap-8 px-1 pt-10 pb-1">{featured}</div>
           </div>
         </section>
       ) : null}
@@ -53,10 +58,10 @@ export function BlogSearchLayout({
         <aside className="h-max bg-grid-dots p-4 text-zinc-800 lg:sticky lg:top-24 lg:self-start dark:text-zinc-50">
           <div className="flex flex-col gap-6 bg-background p-4">
             <SearchInput
+              category={activeCategory}
               className="max-w-none"
-              defaultValue={searchQuery}
-              key={searchQuery}
               placeholder="Search…"
+              query={searchQuery}
             />
             {categoryFilter}
           </div>
@@ -71,6 +76,11 @@ export function BlogSearchLayout({
           <output className="sr-only">{searchStatus}</output>
           {hasQuery ? (
             <BlogSearchResults
+              clearHref={
+                activeCategory
+                  ? `/blog?category=${encodeURIComponent(activeCategory)}`
+                  : "/blog"
+              }
               results={searchResults}
               searchQuery={searchQuery}
             />

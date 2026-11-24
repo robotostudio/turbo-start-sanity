@@ -1,4 +1,3 @@
-import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -6,7 +5,7 @@ import { BlogList } from "@/components/blog-list";
 import type { Blog } from "@/types";
 
 type BlogSearchResultsProps = Readonly<{
-  className?: string;
+  clearHref: string;
   results: Blog[];
   searchQuery: string;
 }>;
@@ -47,7 +46,10 @@ function StateFrame({ children }: Readonly<{ children: ReactNode }>) {
 const ACTION_CLASS =
   "focus-ring inline-flex min-h-11 w-max shrink-0 items-center rounded-none border border-foreground px-3 font-mono text-foreground text-sm uppercase tracking-wide transition-colors hover:bg-foreground hover:text-background";
 
-function EmptySearchState({ query }: Readonly<{ query: string }>) {
+function EmptySearchState({
+  query,
+  clearHref,
+}: Readonly<{ query: string; clearHref: string }>) {
   return (
     <>
       <div className="grid gap-6">
@@ -57,7 +59,7 @@ function EmptySearchState({ query }: Readonly<{ query: string }>) {
           adjusting your search terms.
         </p>
       </div>
-      <Link className={ACTION_CLASS} href="/blog">
+      <Link className={ACTION_CLASS} href={clearHref}>
         Clear search
       </Link>
     </>
@@ -65,22 +67,22 @@ function EmptySearchState({ query }: Readonly<{ query: string }>) {
 }
 
 export function BlogSearchResults({
-  className,
+  clearHref,
   results,
   searchQuery,
 }: BlogSearchResultsProps) {
   if (results.length === 0) {
     return (
-      <section className={cn("min-h-full", className)}>
+      <section className="min-h-full">
         <StateFrame>
-          <EmptySearchState query={searchQuery} />
+          <EmptySearchState clearHref={clearHref} query={searchQuery} />
         </StateFrame>
       </section>
     );
   }
 
   return (
-    <section className={cn("mt-8 grid gap-6", className)}>
+    <section className="mt-8 grid gap-6">
       <SearchResultsHeader count={results.length} query={searchQuery} />
       <BlogList blogs={results} />
     </section>
