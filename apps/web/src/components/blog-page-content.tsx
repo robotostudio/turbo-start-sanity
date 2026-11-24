@@ -53,7 +53,7 @@ export function BlogPageContent({
                   <FeaturedBlogCard
                     blog={blog}
                     key={blog._id}
-                    withImage={showFeatured}
+                    withImage={showFeatured && searchQuery === ""}
                   />
                 ))
               : null
