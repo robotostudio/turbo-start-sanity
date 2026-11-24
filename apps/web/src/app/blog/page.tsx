@@ -111,12 +111,13 @@ async function BlogIndexShell() {
 }
 
 // The shell is prebuilt for /blog, so it can't know the URL. This runs before
-// first paint and hides its featured posts on category, search and page URLs.
+// first paint and hides its featured posts and list on category, search and
+// page URLs until the real page arrives.
 const HIDE_SHELL_FEATURED = `(function () {
   var params = new URLSearchParams(location.search);
   var page = params.get("page");
   if (params.get("category") || params.get("q") || (page && page !== "1")) {
-    document.currentScript.parentElement.dataset.hideFeatured = "";
+    document.currentScript.parentElement.dataset.filtered = "";
   }
 })();`;
 

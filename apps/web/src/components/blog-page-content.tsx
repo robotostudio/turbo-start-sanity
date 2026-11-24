@@ -50,11 +50,7 @@ export function BlogPageContent({
           featured={
             featuredBlogs.length > 0
               ? featuredBlogs.map((blog) => (
-                  <FeaturedBlogCard
-                    blog={blog}
-                    key={blog._id}
-                    withImage={showFeatured && searchQuery === ""}
-                  />
+                  <FeaturedBlogCard blog={blog} key={blog._id} />
                 ))
               : null
           }

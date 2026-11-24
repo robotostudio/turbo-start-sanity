@@ -44,7 +44,7 @@ export function BlogSearchLayout({
         <section
           aria-label="Featured posts"
           className={cn(
-            "grid transition-[grid-template-rows,opacity] duration-300 ease-out in-data-hide-featured:hidden motion-reduce:transition-none",
+            "grid transition-[grid-template-rows,opacity] duration-300 ease-out in-data-filtered:hidden motion-reduce:transition-none",
             featuredOpen
               ? "grid-rows-[1fr] opacity-100"
               : "grid-rows-[0fr] opacity-0"
@@ -72,7 +72,7 @@ export function BlogSearchLayout({
 
         <div
           className={cn(
-            "grid text-foreground",
+            "grid text-foreground in-data-filtered:invisible",
             isDeadEnd ? "lg:h-0 lg:min-h-full" : "content-start"
           )}
         >
