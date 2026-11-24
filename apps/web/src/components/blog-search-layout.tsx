@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import { SearchInput } from "@/components/blog-search";
 import { BlogSearchResults } from "@/components/blog-search-results";
+import { getBlogCategoryLabel } from "@/lib/blog-categories";
 import type { Blog } from "@/types";
 
 type BlogSearchLayoutProps = {
@@ -27,12 +28,14 @@ export function BlogSearchLayout({
   const hasQuery = searchQuery.length > 0;
   const featuredOpen = showFeatured && !hasQuery;
   const isDeadEnd = hasQuery && searchResults.length === 0;
+  const categoryLabel = getBlogCategoryLabel(activeCategory);
+  const inCategory = categoryLabel ? ` in ${categoryLabel}` : "";
   const plural = searchResults.length === 1 ? "" : "s";
   let searchStatus = "";
   if (isDeadEnd) {
-    searchStatus = `No articles found for ${searchQuery}`;
+    searchStatus = `No articles found for ${searchQuery}${inCategory}`;
   } else if (hasQuery) {
-    searchStatus = `${searchResults.length} article${plural} found for ${searchQuery}`;
+    searchStatus = `${searchResults.length} article${plural} found for ${searchQuery}${inCategory}`;
   }
 
   return (
@@ -76,6 +79,7 @@ export function BlogSearchLayout({
           <output className="sr-only">{searchStatus}</output>
           {hasQuery ? (
             <BlogSearchResults
+              categoryLabel={categoryLabel}
               clearHref={
                 activeCategory
                   ? `/blog?category=${encodeURIComponent(activeCategory)}`

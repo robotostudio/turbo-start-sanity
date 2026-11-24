@@ -5,6 +5,7 @@ import { BlogList } from "@/components/blog-list";
 import type { Blog } from "@/types";
 
 type BlogSearchResultsProps = Readonly<{
+  categoryLabel: string | null;
   clearHref: string;
   results: Blog[];
   searchQuery: string;
@@ -16,15 +17,18 @@ function Term({ children }: Readonly<{ children: string }>) {
 
 function SearchResultsHeader({
   query,
+  categoryLabel,
   count,
 }: Readonly<{
   query: string;
+  categoryLabel: string | null;
   count: number;
 }>) {
   return (
     <div className="grid gap-1">
       <h2 className="text-balance font-normal text-2xl tracking-tight">
         Search results for <Term>{query}</Term>
+        {categoryLabel ? ` in ${categoryLabel}` : null}
       </h2>
       <p className="text-muted-foreground text-sm tabular-nums">
         {count === 0
@@ -48,15 +52,25 @@ const ACTION_CLASS =
 
 function EmptySearchState({
   query,
+  categoryLabel,
   clearHref,
-}: Readonly<{ query: string; clearHref: string }>) {
+}: Readonly<{
+  query: string;
+  categoryLabel: string | null;
+  clearHref: string;
+}>) {
   return (
     <>
       <div className="grid gap-6">
-        <SearchResultsHeader count={0} query={query} />
+        <SearchResultsHeader
+          categoryLabel={categoryLabel}
+          count={0}
+          query={query}
+        />
         <p className="max-w-[70ch] text-pretty text-foreground">
-          We couldn&rsquo;t find any articles matching <Term>{query}</Term>. Try
-          adjusting your search terms.
+          We couldn&rsquo;t find any articles matching <Term>{query}</Term>
+          {categoryLabel ? ` in ${categoryLabel}` : null}. Try adjusting your
+          search terms.
         </p>
       </div>
       <Link className={ACTION_CLASS} href={clearHref}>
@@ -67,6 +81,7 @@ function EmptySearchState({
 }
 
 export function BlogSearchResults({
+  categoryLabel,
   clearHref,
   results,
   searchQuery,
@@ -75,7 +90,11 @@ export function BlogSearchResults({
     return (
       <section className="min-h-full">
         <StateFrame>
-          <EmptySearchState clearHref={clearHref} query={searchQuery} />
+          <EmptySearchState
+            categoryLabel={categoryLabel}
+            clearHref={clearHref}
+            query={searchQuery}
+          />
         </StateFrame>
       </section>
     );
@@ -83,7 +102,11 @@ export function BlogSearchResults({
 
   return (
     <section className="mt-8 grid gap-6">
-      <SearchResultsHeader count={results.length} query={searchQuery} />
+      <SearchResultsHeader
+        categoryLabel={categoryLabel}
+        count={results.length}
+        query={searchQuery}
+      />
       <BlogList blogs={results} />
     </section>
   );

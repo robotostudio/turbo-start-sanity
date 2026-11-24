@@ -121,7 +121,10 @@ function BlogMeta({
   );
 }
 
-export function FeaturedBlogCard({ blog }: BlogCardProps) {
+export function FeaturedBlogCard({
+  blog,
+  withImage,
+}: Readonly<BlogCardProps & { withImage: boolean }>) {
   const { title, publishedAt, slug, description, image, authors, category } =
     blog ?? {};
 
@@ -144,7 +147,7 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
         </div>
       </div>
       <div className="relative order-first min-h-60 overflow-hidden border-border border-b lg:order-last lg:min-h-full lg:border-b-0 lg:border-s">
-        <BlogImage image={image} title={title} />
+        {withImage ? <BlogImage image={image} title={title} /> : null}
       </div>
     </article>
   );
