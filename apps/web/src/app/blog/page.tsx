@@ -20,7 +20,7 @@ type BlogPageProps = Readonly<{
   searchParams: Promise<{
     page?: string;
     category?: string;
-    q?: string;
+    q?: string | string[];
   }>;
 }>;
 
@@ -115,7 +115,8 @@ async function BlogIndexView({ searchParams }: BlogPageProps) {
     notFound();
   }
   const activeCategory = category ?? "";
-  const searchQuery = q?.trim() ?? "";
+  const firstQuery = Array.isArray(q) ? q[0] : q;
+  const searchQuery = firstQuery?.trim() ?? "";
 
   const [data, searchResults] = await Promise.all([
     fetchBlogIndexPage({
