@@ -1,11 +1,11 @@
 import { cn } from "@workspace/tailwind-config/utils";
 import { Input } from "@workspace/ui/components/input";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import Form from "next/form";
 import Link from "next/link";
 
 const CLEAR_CLASS =
-  "focus-ring -translate-y-1/2 absolute top-1/2 right-2 rounded-sm px-1 py-0.5 text-muted-foreground text-xs transition-colors hover:text-foreground peer-placeholder-shown:hidden";
+  "focus-ring -translate-y-1/2 absolute top-1/2 right-2 rounded-sm p-1 text-muted-foreground transition-colors hover:text-foreground peer-placeholder-shown:hidden";
 
 export function SearchInput({
   className,
@@ -29,7 +29,7 @@ export function SearchInput({
         />
 
         <Input
-          className="peer h-auto rounded-none border-border bg-transparent py-1.5 pr-16 pl-9.5 text-sm shadow-none"
+          className="peer h-auto rounded-none border-border bg-transparent py-1.5 pr-10 pl-9.5 text-sm shadow-none"
           defaultValue={defaultValue}
           enterKeyHint="search"
           id="blog-search-input"
@@ -38,12 +38,16 @@ export function SearchInput({
         />
 
         {defaultValue ? (
-          <Link className={CLEAR_CLASS} href="/blog">
-            Clear
+          <Link aria-label="Clear search" className={CLEAR_CLASS} href="/blog">
+            <X className="size-4" />
           </Link>
         ) : (
-          <button className={CLEAR_CLASS} type="reset">
-            Clear
+          <button
+            aria-label="Clear search"
+            className={CLEAR_CLASS}
+            type="reset"
+          >
+            <X className="size-4" />
           </button>
         )}
       </div>
