@@ -37,6 +37,7 @@ export function SearchInput({
   const [lastQuery, setLastQuery] = useState(query);
   const [isSearching, startSearch] = useTransition();
 
+  // useState ignores new props after mount, so copy a new URL q into the box.
   if (query !== lastQuery) {
     setLastQuery(query);
     setValue(query);
