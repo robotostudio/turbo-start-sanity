@@ -17,7 +17,15 @@ export function proxy(request: NextRequest): NextResponse {
     return NextResponse.next();
   }
 
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
+
+  const searchQuery = searchParams.get("q");
+  if (pathname === "/blog" && searchQuery?.trim() === "") {
+    const url = request.nextUrl.clone();
+    url.searchParams.delete("q");
+    return NextResponse.redirect(url);
+  }
+
   const hasMdSuffix = pathname.endsWith(".md");
   const wantsMarkdown =
     hasMdSuffix || prefersMarkdown(request.headers.get("accept") ?? "");

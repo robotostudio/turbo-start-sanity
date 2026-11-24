@@ -17,6 +17,8 @@ type BlogPageContentProps = {
   featuredBlogs: Blog[];
   paginationMetadata: PaginationMetadata;
   activeCategory: string;
+  searchQuery: string;
+  searchResults: Blog[];
   children?: ReactNode;
 };
 
@@ -26,6 +28,8 @@ export function BlogPageContent({
   featuredBlogs,
   paginationMetadata,
   activeCategory,
+  searchQuery,
+  searchResults,
   children,
 }: BlogPageContentProps) {
   const { title, description } = indexPageData;
@@ -50,6 +54,8 @@ export function BlogPageContent({
                 ))
               : null
           }
+          searchQuery={searchQuery}
+          searchResults={searchResults}
           list={
             <>
               <BlogList blogs={blogs} />

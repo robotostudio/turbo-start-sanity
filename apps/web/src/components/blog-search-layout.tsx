@@ -1,51 +1,51 @@
-"use client";
-
 import { cn } from "@workspace/tailwind-config/utils";
 import type { ReactNode } from "react";
 
 import { SearchInput } from "@/components/blog-search";
 import { BlogSearchResults } from "@/components/blog-search-results";
-import { useBlogSearch } from "@/hooks/use-blog-search";
+import type { Blog } from "@/types";
 
 type BlogSearchLayoutProps = {
   categoryFilter: ReactNode;
   featured: ReactNode;
   list: ReactNode;
+  searchQuery: string;
+  searchResults: Blog[];
 };
 
 export function BlogSearchLayout({
   categoryFilter,
   featured,
   list,
+  searchQuery,
+  searchResults,
 }: Readonly<BlogSearchLayoutProps>) {
-  const { searchQuery, setSearchQuery, results, isSearching, hasQuery, error } =
-    useBlogSearch();
-
-  const isDeadEnd =
-    hasQuery && !isSearching && (Boolean(error) || results.length === 0);
-
-  const searchStatus = (() => {
-    if (!hasQuery) {
-      return "";
-    }
-    if (isSearching) {
-      return "Searching…";
-    }
-    if (error) {
-      return "Search failed";
-    }
-    if (results.length === 0) {
-      return `No articles found for ${searchQuery}`;
-    }
-    const plural = results.length === 1 ? "" : "s";
-    return `${results.length} article${plural} found for ${searchQuery}`;
-  })();
+  const hasQuery = searchQuery.length > 0;
+  const isDeadEnd = hasQuery && searchResults.length === 0;
+  const plural = searchResults.length === 1 ? "" : "s";
+  let searchStatus = "";
+  if (isDeadEnd) {
+    searchStatus = `No articles found for ${searchQuery}`;
+  } else if (hasQuery) {
+    searchStatus = `${searchResults.length} article${plural} found for ${searchQuery}`;
+  }
 
   return (
     <>
-      {featured && !hasQuery ? (
-        <section aria-label="Featured posts" className="mt-10 grid gap-8">
-          {featured}
+      {featured ? (
+        <section
+          aria-label="Featured posts"
+          className={cn(
+            "grid transition-[grid-template-rows,opacity] duration-300 ease-out motion-reduce:transition-none",
+            hasQuery
+              ? "grid-rows-[0fr] opacity-0"
+              : "grid-rows-[1fr] opacity-100"
+          )}
+          inert={hasQuery}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <div className="grid gap-8 pt-10">{featured}</div>
+          </div>
         </section>
       ) : null}
 
@@ -54,10 +54,9 @@ export function BlogSearchLayout({
           <div className="flex flex-col gap-6 bg-background p-4">
             <SearchInput
               className="max-w-none"
-              onChange={setSearchQuery}
-              onClear={() => setSearchQuery("")}
+              defaultValue={searchQuery}
+              key={searchQuery}
               placeholder="Search…"
-              value={searchQuery}
             />
             {categoryFilter}
           </div>
@@ -72,11 +71,7 @@ export function BlogSearchLayout({
           <output className="sr-only">{searchStatus}</output>
           {hasQuery ? (
             <BlogSearchResults
-              error={error}
-              hasQuery={hasQuery}
-              isSearching={isSearching}
-              onClear={() => setSearchQuery("")}
-              results={results}
+              results={searchResults}
               searchQuery={searchQuery}
             />
           ) : (

@@ -11,20 +11,23 @@ import {
   fetchBlogIndexPage,
   parseBlogPageParam,
 } from "@/lib/blog-index";
+import { searchBlogs } from "@/lib/blog-search";
 import { seoFromDocument } from "@/lib/seo";
+import type { Blog } from "@/types";
 import { calculateBlogPaginationMetadata } from "@/utils";
 
 type BlogPageProps = Readonly<{
   searchParams: Promise<{
     page?: string;
     category?: string;
+    q?: string;
   }>;
 }>;
 
 export async function generateMetadata({
   searchParams,
 }: BlogPageProps): Promise<Metadata> {
-  const [{ page, category }, { perspective }] = await Promise.all([
+  const [{ page, category, q }, { perspective }] = await Promise.all([
     searchParams,
     getDynamicFetchOptions(),
   ]);
@@ -56,7 +59,11 @@ export async function generateMetadata({
     notFound();
   }
 
-  return seoFromDocument(data, { slug: "/blog" });
+  const metadata = await seoFromDocument(data, { slug: "/blog" });
+  if (q && metadata.robots === "index, follow") {
+    metadata.robots = "noindex, follow";
+  }
+  return metadata;
 }
 
 export default function BlogIndexPage({ searchParams }: BlogPageProps) {
@@ -87,11 +94,19 @@ async function BlogIndexShell() {
     return null;
   }
 
-  return <BlogIndexBody activeCategory="" currentPage={1} data={data} />;
+  return (
+    <BlogIndexBody
+      activeCategory=""
+      currentPage={1}
+      data={data}
+      searchQuery=""
+      searchResults={[]}
+    />
+  );
 }
 
 async function BlogIndexView({ searchParams }: BlogPageProps) {
-  const [{ page, category }, { perspective, stega }] = await Promise.all([
+  const [{ page, category, q }, { perspective, stega }] = await Promise.all([
     searchParams,
     getDynamicFetchOptions(),
   ]);
@@ -100,13 +115,17 @@ async function BlogIndexView({ searchParams }: BlogPageProps) {
     notFound();
   }
   const activeCategory = category ?? "";
+  const searchQuery = q?.trim() ?? "";
 
-  const data = await fetchBlogIndexPage({
-    currentPage,
-    category: activeCategory,
-    perspective,
-    stega,
-  });
+  const [data, searchResults] = await Promise.all([
+    fetchBlogIndexPage({
+      currentPage,
+      category: activeCategory,
+      perspective,
+      stega,
+    }),
+    searchQuery ? searchBlogs(searchQuery, perspective) : [],
+  ]);
   if (!data) {
     notFound();
   }
@@ -126,6 +145,8 @@ async function BlogIndexView({ searchParams }: BlogPageProps) {
       activeCategory={activeCategory}
       currentPage={currentPage}
       data={data}
+      searchQuery={searchQuery}
+      searchResults={searchResults}
     />
   );
 }
@@ -134,10 +155,14 @@ function BlogIndexBody({
   data,
   activeCategory,
   currentPage,
+  searchQuery,
+  searchResults,
 }: Readonly<{
   data: BlogIndexPageData;
   activeCategory: string;
   currentPage: number;
+  searchQuery: string;
+  searchResults: Blog[];
 }>) {
   const paginationMetadata = calculateBlogPaginationMetadata(
     data.total,
@@ -153,6 +178,8 @@ function BlogIndexBody({
         featuredBlogs={data.featuredBlogs}
         indexPageData={data}
         paginationMetadata={paginationMetadata}
+        searchQuery={searchQuery}
+        searchResults={searchResults}
       >
         {data.pageBuilder && data.pageBuilder.length > 0 ? (
           <div className="pb-16">

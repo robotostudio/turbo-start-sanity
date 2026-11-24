@@ -1,55 +1,52 @@
-"use client";
-
 import { cn } from "@workspace/tailwind-config/utils";
 import { Input } from "@workspace/ui/components/input";
-import { Search, X } from "lucide-react";
+import { Search } from "lucide-react";
+import Form from "next/form";
+import Link from "next/link";
+
+const CLEAR_CLASS =
+  "focus-ring -translate-y-1/2 absolute top-1/2 right-2 rounded-sm px-1 py-0.5 text-muted-foreground text-xs transition-colors hover:text-foreground peer-placeholder-shown:hidden";
 
 export function SearchInput({
   className,
   placeholder,
-  value,
-  onChange,
-  onClear,
+  defaultValue,
 }: {
   className?: string;
   placeholder: string;
-  value: string;
-  onChange: (value: string) => void;
-  onClear: () => void;
+  defaultValue: string;
 }) {
   return (
-    <div className={cn("w-full max-w-sm", className)}>
+    <Form action="/blog" className={cn("w-full max-w-sm", className)}>
+      <label className="sr-only" htmlFor="blog-search-input">
+        {placeholder}
+      </label>
+
       <div className="relative">
-        <label className="sr-only" htmlFor="blog-search-input">
-          {placeholder}
-        </label>
+        <Search
+          aria-hidden="true"
+          className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground"
+        />
 
-        <div className="relative">
-          <Search
-            aria-hidden="true"
-            className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground"
-          />
+        <Input
+          className="peer h-auto rounded-none border-border bg-transparent py-1.5 pr-16 pl-9.5 text-sm shadow-none"
+          defaultValue={defaultValue}
+          enterKeyHint="search"
+          id="blog-search-input"
+          name="q"
+          placeholder={placeholder}
+        />
 
-          <Input
-            className="h-auto rounded-none border-border bg-transparent py-1.5 pr-10 pl-9.5 text-sm shadow-none"
-            id="blog-search-input"
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={placeholder}
-            value={value}
-          />
-
-          {value && (
-            <button
-              aria-label="Clear search"
-              className="focus-ring -translate-y-1/2 absolute top-1/2 right-2 rounded-sm p-1 text-muted-foreground transition-colors hover:text-foreground"
-              onClick={onClear}
-              type="button"
-            >
-              <X className="size-4" />
-            </button>
-          )}
-        </div>
+        {defaultValue ? (
+          <Link className={CLEAR_CLASS} href="/blog">
+            Clear
+          </Link>
+        ) : (
+          <button className={CLEAR_CLASS} type="reset">
+            Clear
+          </button>
+        )}
       </div>
-    </div>
+    </Form>
   );
 }
