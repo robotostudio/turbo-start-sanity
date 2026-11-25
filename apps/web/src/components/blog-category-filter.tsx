@@ -10,7 +10,12 @@ import { BLOG_CATEGORIES } from "@/lib/blog-categories";
 export function BlogCategoryFilter({
   activeCategory,
   className,
-}: Readonly<{ activeCategory: string; className?: string }>) {
+  searchQuery,
+}: Readonly<{
+  activeCategory: string;
+  className?: string;
+  searchQuery: string;
+}>) {
   const router = useRouter();
   const [shownCategory, setShownCategory] = useOptimistic(activeCategory);
 
@@ -21,7 +26,15 @@ export function BlogCategoryFilter({
     >
       {BLOG_CATEGORIES.map(({ label, value }) => {
         const isActive = shownCategory === value;
-        const href = value ? `/blog?category=${value}` : "/blog";
+        const params = new URLSearchParams();
+        if (value) {
+          params.set("category", value);
+        }
+        if (searchQuery) {
+          params.set("q", searchQuery);
+        }
+        const search = params.toString();
+        const href = search ? `/blog?${search}` : "/blog";
 
         return (
           <Link
@@ -36,17 +49,9 @@ export function BlogCategoryFilter({
             key={value || "all"}
             onNavigate={(event) => {
               event.preventDefault();
-              const params = new URLSearchParams(window.location.search);
-              params.delete("page");
-              if (value) {
-                params.set("category", value);
-              } else {
-                params.delete("category");
-              }
-              const search = params.toString();
               startTransition(() => {
                 setShownCategory(value);
-                router.push(search ? `/blog?${search}` : "/blog");
+                router.push(href);
               });
             }}
           >

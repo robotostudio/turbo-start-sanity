@@ -45,7 +45,10 @@ export function BlogPageContent({
 
         <BlogSearchLayout
           categoryFilter={
-            <BlogCategoryFilter activeCategory={activeCategory} />
+            <BlogCategoryFilter
+              activeCategory={activeCategory}
+              searchQuery={searchQuery}
+            />
           }
           featured={
             featuredBlogs.length > 0
