@@ -7,6 +7,18 @@ import { startTransition, useOptimistic } from "react";
 
 import { BLOG_CATEGORIES } from "@/lib/blog-categories";
 
+function categoryHref(category: string, query: string | null) {
+  const params = new URLSearchParams();
+  if (category) {
+    params.set("category", category);
+  }
+  if (query) {
+    params.set("q", query);
+  }
+  const search = params.toString();
+  return search ? `/blog?${search}` : "/blog";
+}
+
 export function BlogCategoryFilter({
   activeCategory,
   className,
@@ -26,15 +38,7 @@ export function BlogCategoryFilter({
     >
       {BLOG_CATEGORIES.map(({ label, value }) => {
         const isActive = shownCategory === value;
-        const params = new URLSearchParams();
-        if (value) {
-          params.set("category", value);
-        }
-        if (searchQuery) {
-          params.set("q", searchQuery);
-        }
-        const search = params.toString();
-        const href = search ? `/blog?${search}` : "/blog";
+        const href = categoryHref(value, searchQuery);
 
         return (
           <Link
@@ -49,17 +53,12 @@ export function BlogCategoryFilter({
             key={value || "all"}
             onNavigate={(event) => {
               event.preventDefault();
-              const current = new URLSearchParams(window.location.search);
-              current.delete("page");
-              if (value) {
-                current.set("category", value);
-              } else {
-                current.delete("category");
-              }
-              const currentSearch = current.toString();
+              const query = new URLSearchParams(window.location.search).get(
+                "q"
+              );
               startTransition(() => {
                 setShownCategory(value);
-                router.push(currentSearch ? `/blog?${currentSearch}` : "/blog");
+                router.push(categoryHref(value, query));
               });
             }}
           >
