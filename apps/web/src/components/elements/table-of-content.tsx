@@ -75,13 +75,11 @@ function useActiveHeading(slugKey: string): string | null {
         document.documentElement.scrollHeight - 2;
       const current = atBottom
         ? elements.at(-1)
-        : elements
-            .filter(
-              (element) =>
-                element.getBoundingClientRect().top <=
-                READING_LINE + READING_LINE_SLACK
-            )
-            .at(-1);
+        : elements.findLast(
+            (element) =>
+              element.getBoundingClientRect().top <=
+              READING_LINE + READING_LINE_SLACK
+          );
       setActiveSlug(current?.id ?? null);
     };
 

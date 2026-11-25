@@ -46,8 +46,9 @@ function getFlatHeadings(richText: SanityRichTextProps): FlatHeading[] {
       continue;
     }
 
+    const key = block._key || headingTextToSlug(text) || `heading-${index}`;
     headings.push({
-      id: `toc-${block._key || headingTextToSlug(text) || `heading-${index}`}`,
+      id: `toc-${key}`,
       slug: headingChildrenToSlug(children),
       text,
       level,
