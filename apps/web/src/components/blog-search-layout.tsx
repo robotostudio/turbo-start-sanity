@@ -1,51 +1,59 @@
-"use client";
-
 import { cn } from "@workspace/tailwind-config/utils";
 import type { ReactNode } from "react";
 
 import { SearchInput } from "@/components/blog-search";
 import { BlogSearchResults } from "@/components/blog-search-results";
-import { useBlogSearch } from "@/hooks/use-blog-search";
+import { getBlogCategoryLabel } from "@/lib/blog-categories";
+import type { Blog } from "@/types";
 
 type BlogSearchLayoutProps = {
+  activeCategory: string;
   categoryFilter: ReactNode;
   featured: ReactNode;
   list: ReactNode;
+  searchQuery: string;
+  searchResults: Blog[];
+  showFeatured: boolean;
 };
 
 export function BlogSearchLayout({
+  activeCategory,
   categoryFilter,
   featured,
   list,
+  searchQuery,
+  searchResults,
+  showFeatured,
 }: Readonly<BlogSearchLayoutProps>) {
-  const { searchQuery, setSearchQuery, results, isSearching, hasQuery, error } =
-    useBlogSearch();
-
-  const isDeadEnd =
-    hasQuery && !isSearching && (Boolean(error) || results.length === 0);
-
-  const searchStatus = (() => {
-    if (!hasQuery) {
-      return "";
-    }
-    if (isSearching) {
-      return "Searching…";
-    }
-    if (error) {
-      return "Search failed";
-    }
-    if (results.length === 0) {
-      return `No articles found for ${searchQuery}`;
-    }
-    const plural = results.length === 1 ? "" : "s";
-    return `${results.length} article${plural} found for ${searchQuery}`;
-  })();
+  const hasQuery = searchQuery.length > 0;
+  const featuredOpen = showFeatured && !hasQuery;
+  const isDeadEnd = hasQuery && searchResults.length === 0;
+  const categoryLabel = getBlogCategoryLabel(activeCategory);
+  const inCategory = categoryLabel ? ` in ${categoryLabel}` : "";
+  const plural = searchResults.length === 1 ? "" : "s";
+  let searchStatus = "";
+  if (isDeadEnd) {
+    searchStatus = `No articles found for ${searchQuery}${inCategory}`;
+  } else if (hasQuery) {
+    searchStatus = `${searchResults.length} article${plural} found for ${searchQuery}${inCategory}`;
+  }
 
   return (
     <>
-      {featured && !hasQuery ? (
-        <section aria-label="Featured posts" className="mt-10 grid gap-8">
-          {featured}
+      {featured ? (
+        <section
+          aria-label="Featured posts"
+          className={cn(
+            "grid transition-[grid-template-rows,opacity] duration-300 ease-out in-data-filtered:hidden motion-reduce:transition-none",
+            featuredOpen
+              ? "grid-rows-[1fr] opacity-100"
+              : "grid-rows-[0fr] opacity-0"
+          )}
+          inert={!featuredOpen}
+        >
+          <div className="-mx-1 min-h-0 overflow-hidden">
+            <div className="grid gap-8 px-1 pt-10 pb-1">{featured}</div>
+          </div>
         </section>
       ) : null}
 
@@ -53,11 +61,10 @@ export function BlogSearchLayout({
         <aside className="h-max bg-grid-dots p-4 text-zinc-800 lg:sticky lg:top-24 lg:self-start dark:text-zinc-50">
           <div className="flex flex-col gap-6 bg-background p-4">
             <SearchInput
+              category={activeCategory}
               className="max-w-none"
-              onChange={setSearchQuery}
-              onClear={() => setSearchQuery("")}
               placeholder="Search…"
-              value={searchQuery}
+              query={searchQuery}
             />
             {categoryFilter}
           </div>
@@ -65,18 +72,20 @@ export function BlogSearchLayout({
 
         <div
           className={cn(
-            "grid text-foreground",
+            "grid text-foreground in-data-filtered:invisible",
             isDeadEnd ? "lg:h-0 lg:min-h-full" : "content-start"
           )}
         >
           <output className="sr-only">{searchStatus}</output>
           {hasQuery ? (
             <BlogSearchResults
-              error={error}
-              hasQuery={hasQuery}
-              isSearching={isSearching}
-              onClear={() => setSearchQuery("")}
-              results={results}
+              categoryLabel={categoryLabel}
+              clearHref={
+                activeCategory
+                  ? `/blog?category=${encodeURIComponent(activeCategory)}`
+                  : "/blog"
+              }
+              results={searchResults}
               searchQuery={searchQuery}
             />
           ) : (

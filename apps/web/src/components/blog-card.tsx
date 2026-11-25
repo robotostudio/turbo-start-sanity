@@ -126,7 +126,7 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
     blog ?? {};
 
   return (
-    <article className="hover-surface group focus-ring-within relative grid grid-cols-1 border border-border lg:grid-cols-2">
+    <article className="hover-surface group focus-ring-within relative grid grid-cols-1 border border-border transition-colors hover:border-transparent lg:grid-cols-2">
       <div className="flex flex-col justify-between gap-10 p-6 sm:p-8">
         <BlockEyebrow eyebrow="Featured" />
         <div className="grid gap-4">
@@ -158,7 +158,7 @@ export function BlogCard({ blog }: BlogCardProps) {
   const { title, publishedAt, slug, description, authors, category } = blog;
 
   return (
-    <article className="hover-surface group focus-ring-within relative flex flex-col gap-4 border border-border p-6">
+    <article className="hover-surface group focus-ring-within relative flex flex-col gap-4 border border-border p-6 transition-colors hover:border-transparent">
       <BlogMeta category={category} publishedAt={publishedAt} />
       <div className="flex flex-col gap-3">
         <h3 className="font-normal text-2xl text-zinc-900 leading-8.5 dark:text-zinc-50">

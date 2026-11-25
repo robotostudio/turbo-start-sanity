@@ -11,20 +11,24 @@ import {
   fetchBlogIndexPage,
   parseBlogPageParam,
 } from "@/lib/blog-index";
+import { searchBlogs } from "@/lib/blog-search";
+import { parseBlogSearchParam } from "@/lib/blog-search-query";
 import { seoFromDocument } from "@/lib/seo";
+import type { Blog } from "@/types";
 import { calculateBlogPaginationMetadata } from "@/utils";
 
 type BlogPageProps = Readonly<{
   searchParams: Promise<{
     page?: string;
     category?: string;
+    q?: string | string[];
   }>;
 }>;
 
 export async function generateMetadata({
   searchParams,
 }: BlogPageProps): Promise<Metadata> {
-  const [{ page, category }, { perspective }] = await Promise.all([
+  const [{ page, category, q }, { perspective }] = await Promise.all([
     searchParams,
     getDynamicFetchOptions(),
   ]);
@@ -56,7 +60,11 @@ export async function generateMetadata({
     notFound();
   }
 
-  return seoFromDocument(data, { slug: "/blog" });
+  const metadata = await seoFromDocument(data, { slug: "/blog" });
+  if (q && metadata.robots === "index, follow") {
+    metadata.robots = "noindex, follow";
+  }
+  return metadata;
 }
 
 export default function BlogIndexPage({ searchParams }: BlogPageProps) {
@@ -87,11 +95,34 @@ async function BlogIndexShell() {
     return null;
   }
 
-  return <BlogIndexBody activeCategory="" currentPage={1} data={data} />;
+  return (
+    <div>
+      <script dangerouslySetInnerHTML={{ __html: HIDE_SHELL_FEATURED }} />
+      <BlogIndexBody
+        activeCategory=""
+        currentPage={1}
+        data={data}
+        featuredBlogs={data.featuredBlogs}
+        searchQuery=""
+        searchResults={[]}
+      />
+    </div>
+  );
 }
 
+// The shell is prebuilt for /blog, so it can't know the URL. This runs before
+// first paint and hides its featured posts and list on category, search and
+// page URLs until the real page arrives.
+const HIDE_SHELL_FEATURED = `(function () {
+  var params = new URLSearchParams(location.search);
+  var page = params.get("page");
+  if (params.get("category") || params.get("q") || (page && page !== "1")) {
+    document.currentScript.parentElement.dataset.filtered = "";
+  }
+})();`;
+
 async function BlogIndexView({ searchParams }: BlogPageProps) {
-  const [{ page, category }, { perspective, stega }] = await Promise.all([
+  const [{ page, category, q }, { perspective, stega }] = await Promise.all([
     searchParams,
     getDynamicFetchOptions(),
   ]);
@@ -100,13 +131,18 @@ async function BlogIndexView({ searchParams }: BlogPageProps) {
     notFound();
   }
   const activeCategory = category ?? "";
+  const searchQuery = parseBlogSearchParam(q);
 
-  const data = await fetchBlogIndexPage({
-    currentPage,
-    category: activeCategory,
-    perspective,
-    stega,
-  });
+  const [data, allPostsPage, searchResults] = await Promise.all([
+    fetchBlogIndexPage({
+      currentPage,
+      category: activeCategory,
+      perspective,
+      stega,
+    }),
+    fetchBlogIndexPage({ currentPage: 1, category: "", perspective, stega }),
+    searchQuery ? searchBlogs(searchQuery, activeCategory, perspective) : [],
+  ]);
   if (!data) {
     notFound();
   }
@@ -126,6 +162,9 @@ async function BlogIndexView({ searchParams }: BlogPageProps) {
       activeCategory={activeCategory}
       currentPage={currentPage}
       data={data}
+      featuredBlogs={allPostsPage?.featuredBlogs ?? []}
+      searchQuery={searchQuery}
+      searchResults={searchResults}
     />
   );
 }
@@ -134,10 +173,16 @@ function BlogIndexBody({
   data,
   activeCategory,
   currentPage,
+  featuredBlogs,
+  searchQuery,
+  searchResults,
 }: Readonly<{
   data: BlogIndexPageData;
   activeCategory: string;
   currentPage: number;
+  featuredBlogs: Blog[];
+  searchQuery: string;
+  searchResults: Blog[];
 }>) {
   const paginationMetadata = calculateBlogPaginationMetadata(
     data.total,
@@ -150,9 +195,11 @@ function BlogIndexBody({
       <BlogPageContent
         activeCategory={activeCategory}
         blogs={data.blogs}
-        featuredBlogs={data.featuredBlogs}
+        featuredBlogs={featuredBlogs}
         indexPageData={data}
         paginationMetadata={paginationMetadata}
+        searchQuery={searchQuery}
+        searchResults={searchResults}
       >
         {data.pageBuilder && data.pageBuilder.length > 0 ? (
           <div className="pb-16">
