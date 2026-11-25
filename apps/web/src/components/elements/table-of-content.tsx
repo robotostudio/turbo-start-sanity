@@ -7,6 +7,7 @@ import {
   RedditIcon,
   XIcon,
 } from "@workspace/sanity-blocks/internal/icons";
+import type { TocHeading } from "@workspace/sanity-blocks/internal/table-of-contents";
 import {
   COPY_STATUS_CLASS,
   SWAP_HIDDEN,
@@ -19,8 +20,6 @@ import {
 import { cn } from "@workspace/tailwind-config/utils";
 import { Check, ChevronDown } from "lucide-react";
 import { type FC, type MouseEvent, useEffect, useRef, useState } from "react";
-
-import type { TocHeading } from "@/lib/table-of-contents";
 
 type TableOfContentProps = {
   headings: TocHeading[];
@@ -47,8 +46,9 @@ const READING_LINE = 96;
 // comparison misses by a fraction and credits the heading above.
 const READING_LINE_SLACK = 2;
 
-// Close animation duration plus a settle frame — scrolling waits this long.
-const DISCLOSURE_CLOSE_MS = 320;
+// Close animation duration plus the frames the page takes to settle around it —
+// scrolling waits this long.
+const DISCLOSURE_CLOSE_MS = 400;
 
 const SCROLL_SETTLE_MS = 150;
 
@@ -111,6 +111,7 @@ function useActiveHeading(headings: TocHeading[]) {
     };
 
     const observer = new IntersectionObserver(scheduleUpdate, {
+      root: document,
       rootMargin: `-${READING_LINE}px 0px 0px 0px`,
     });
     for (const element of elements) {

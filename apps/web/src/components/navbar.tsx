@@ -161,6 +161,7 @@ function useNavContrast(headerRef: React.RefObject<HTMLElement | null>) {
       behindBar.clear();
       const below = window.innerHeight - BAR_MIDDLE - 1;
       intersections = new IntersectionObserver(onIntersect, {
+        root: document,
         rootMargin: `-${BAR_MIDDLE}px 0px -${below}px 0px`,
       });
       observeSections();

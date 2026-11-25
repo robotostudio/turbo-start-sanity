@@ -1,9 +1,4 @@
-import {
-  headingChildrenToSlug,
-  headingTextToSlug,
-} from "@workspace/sanity-blocks/internal/heading-slug";
-
-import type { SanityRichTextProps } from "@/types";
+import { headingChildrenToSlug, headingTextToSlug } from "./heading-slug";
 
 const HEADING_LEVELS: Record<string, number> = {
   h2: 2,
@@ -20,9 +15,18 @@ export type TocHeading = {
   children: TocHeading[];
 };
 
+export type TocBlock = {
+  _type: string;
+  _key?: string | null;
+  style?: string | null;
+  children?: readonly { _type: string; text?: string | null }[] | null;
+};
+
 type FlatHeading = Omit<TocHeading, "children"> & { level: number };
 
-function getFlatHeadings(richText: SanityRichTextProps): FlatHeading[] {
+function getFlatHeadings(
+  richText: readonly TocBlock[] | null | undefined
+): FlatHeading[] {
   const headings: FlatHeading[] = [];
 
   for (const [index, block] of (richText ?? []).entries()) {
@@ -59,7 +63,7 @@ function getFlatHeadings(richText: SanityRichTextProps): FlatHeading[] {
 }
 
 export function getTableOfContents(
-  richText: SanityRichTextProps
+  richText: readonly TocBlock[] | null | undefined
 ): TocHeading[] {
   const headings: TocHeading[] = [];
   const parents: { level: number; heading: TocHeading }[] = [];

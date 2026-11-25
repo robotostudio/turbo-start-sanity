@@ -14,6 +14,7 @@ import {
   type RichTextValue,
 } from "@workspace/sanity-blocks/internal/rich-text";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
+import { getTableOfContents } from "@workspace/sanity-blocks/internal/table-of-contents";
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
@@ -25,7 +26,6 @@ import {
 } from "@/components/elements/table-of-content";
 import { ArticleJsonLd } from "@/components/json-ld";
 import { seoFromDocument } from "@/lib/seo";
-import { getTableOfContents } from "@/lib/table-of-contents";
 import { formatDate, getBaseUrl, PLACEHOLDER_SLUG } from "@/utils";
 
 // Keep: this route awaits params outside Suspense on purpose, which Partial
