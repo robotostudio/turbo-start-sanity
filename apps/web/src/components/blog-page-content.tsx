@@ -66,8 +66,6 @@ export function BlogPageContent({
                   category={activeCategory}
                   className="mt-12"
                   currentPage={paginationMetadata.currentPage}
-                  hasNextPage={paginationMetadata.hasNextPage}
-                  hasPreviousPage={paginationMetadata.hasPreviousPage}
                   totalPages={paginationMetadata.totalPages}
                 />
               )}

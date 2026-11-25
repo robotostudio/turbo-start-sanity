@@ -36,9 +36,17 @@ export function BlogCategoryFilter({
             key={value || "all"}
             onNavigate={(event) => {
               event.preventDefault();
+              const params = new URLSearchParams(window.location.search);
+              params.delete("page");
+              if (value) {
+                params.set("category", value);
+              } else {
+                params.delete("category");
+              }
+              const search = params.toString();
               startTransition(() => {
                 setShownCategory(value);
-                router.push(href);
+                router.push(search ? `/blog?${search}` : "/blog");
               });
             }}
           >
