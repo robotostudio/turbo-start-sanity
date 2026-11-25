@@ -79,8 +79,6 @@ export type PaginationMetadata = {
   totalPages: number;
   totalItems: number;
   itemsPerPage: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
 };
 
 /**
@@ -93,15 +91,11 @@ export function calculateBlogPaginationMetadata(
   currentPage: number
 ): PaginationMetadata {
   const totalPages = Math.max(1, Math.ceil(totalItems / BLOG_LIST_PAGE_SIZE));
-  const hasNextPage = currentPage < totalPages;
-  const hasPreviousPage = currentPage > 1;
 
   return {
     currentPage,
     totalPages,
     totalItems,
     itemsPerPage: BLOG_LIST_PAGE_SIZE,
-    hasNextPage,
-    hasPreviousPage,
   };
 }
