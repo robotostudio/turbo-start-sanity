@@ -1,5 +1,5 @@
 import { env } from "@workspace/env/server";
-import { cacheTag } from "next/cache";
+import { cacheLife, cacheTag } from "next/cache";
 import { cookies, draftMode } from "next/headers";
 import type { QueryParams, StegaCleaned } from "next-sanity";
 import {
@@ -26,6 +26,8 @@ const { sanityFetch: liveFetch, SanityLive } = defineLive({
 });
 
 export { SanityLive };
+
+const EMPTY_RESULT_REVALIDATE_SECONDS = 10;
 
 type LiveFetchOptions<Q extends string> = Parameters<typeof liveFetch<Q>>[0];
 type LiveFetchResult<Q extends string> = Awaited<
@@ -55,6 +57,9 @@ export const sanityFetch = async <const Q extends string>(
   const result = await liveFetch(options);
   if (result.tags.length > 0) {
     cacheTag(...result.tags);
+  }
+  if (result.data === null || result.data === undefined) {
+    cacheLife({ revalidate: EMPTY_RESULT_REVALIDATE_SECONDS });
   }
   return result as Omit<LiveFetchResult<Q>, "data"> & {
     data: StegaCleaned<LiveFetchResult<Q>["data"]>;
