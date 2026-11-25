@@ -156,7 +156,7 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
       <a
         aria-current={isActive ? "location" : undefined}
         className={cn(
-          "block rounded-none px-2 py-1.5 text-base leading-6 outline-none tracking-[0.01em] transition-colors focus-visible:[outline:2px_dotted_currentColor] focus-visible:[outline-offset:-3px]",
+          "block rounded-none px-2 py-1.5 text-base leading-6 outline-none tracking-[0.01em] focus-visible:[outline:2px_dotted_currentColor] focus-visible:[outline-offset:-3px]",
           isActive
             ? "bg-accent-green font-medium text-accent-green-foreground"
             : "text-muted-foreground hover:text-foreground"
