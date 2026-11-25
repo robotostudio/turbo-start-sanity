@@ -442,7 +442,7 @@ export function MobileTableOfContent({
   return (
     <details
       className={cn(
-        "group disclosure bleed-x sticky top-0 z-30 bg-grid-dots p-2.5 text-zinc-800 lg:hidden dark:text-zinc-50",
+        "group disclosure bleed-x sticky top-0 z-30 border-border border-b bg-background p-2.5 text-zinc-800 lg:hidden dark:text-zinc-50",
         className
       )}
     >
