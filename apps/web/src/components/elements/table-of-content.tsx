@@ -339,7 +339,7 @@ export function TableOfContent({
   className,
   shareTitle,
   shareUrl,
-}: TableOfContentProps) {
+}: Readonly<TableOfContentProps>) {
   const activeSlug = useActiveHeading(getSlugs(headings).join("|"));
 
   if (headings.length === 0) {
@@ -383,7 +383,7 @@ export function MobileTableOfContent({
   className,
   shareTitle,
   shareUrl,
-}: TableOfContentProps) {
+}: Readonly<TableOfContentProps>) {
   const activeSlug = useActiveHeading(getSlugs(headings).join("|"));
 
   if (headings.length === 0) {
