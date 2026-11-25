@@ -80,6 +80,7 @@ export function BlogSearchLayout({
           {hasQuery ? (
             <BlogSearchResults
               categoryLabel={categoryLabel}
+              key={searchQuery}
               clearHref={
                 activeCategory
                   ? `/blog?category=${encodeURIComponent(activeCategory)}`

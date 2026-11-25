@@ -96,8 +96,12 @@ async function BlogIndexShell() {
   }
 
   return (
-    <div>
-      <script dangerouslySetInnerHTML={{ __html: HIDE_SHELL_FEATURED }} />
+    <div data-blog-shell="">
+      <div
+        dangerouslySetInnerHTML={{
+          __html: `<script>${HIDE_SHELL_FEATURED}</script>`,
+        }}
+      />
       <BlogIndexBody
         activeCategory=""
         currentPage={1}
@@ -117,7 +121,7 @@ const HIDE_SHELL_FEATURED = `(function () {
   var params = new URLSearchParams(location.search);
   var page = params.get("page");
   if (params.get("category") || params.get("q") || (page && page !== "1")) {
-    document.currentScript.parentElement.dataset.filtered = "";
+    document.currentScript.closest("[data-blog-shell]").dataset.filtered = "";
   }
 })();`;
 

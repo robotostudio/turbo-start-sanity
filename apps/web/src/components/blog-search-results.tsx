@@ -1,3 +1,4 @@
+import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -47,6 +48,9 @@ function StateFrame({ children }: Readonly<{ children: ReactNode }>) {
   );
 }
 
+const FADE_IN =
+  "animate-in fill-mode-both fade-in slide-in-from-bottom-2 animation-duration-300 ease-out motion-reduce:animate-none";
+
 const ACTION_CLASS =
   "focus-ring inline-flex min-h-11 w-max shrink-0 items-center rounded-none border border-foreground px-3 font-mono text-foreground text-sm uppercase tracking-wide transition-colors hover:bg-foreground hover:text-background";
 
@@ -88,7 +92,7 @@ export function BlogSearchResults({
 }: BlogSearchResultsProps) {
   if (results.length === 0) {
     return (
-      <section className="min-h-full">
+      <section className={cn("min-h-full", FADE_IN)}>
         <StateFrame>
           <EmptySearchState
             categoryLabel={categoryLabel}
@@ -101,7 +105,7 @@ export function BlogSearchResults({
   }
 
   return (
-    <section className="mt-8 grid gap-6">
+    <section className={cn("mt-8 grid gap-6", FADE_IN)}>
       <SearchResultsHeader
         categoryLabel={categoryLabel}
         count={results.length}
