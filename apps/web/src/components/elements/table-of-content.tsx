@@ -83,17 +83,24 @@ function useActiveHeading(slugKey: string): string | null {
       setActiveSlug(current?.id ?? null);
     };
 
-    const observer = new IntersectionObserver(updateActiveHeading, {
+    let frame = 0;
+    const scheduleUpdate = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(updateActiveHeading);
+    };
+
+    const observer = new IntersectionObserver(scheduleUpdate, {
       rootMargin: `-${READING_LINE}px 0px 0px 0px`,
     });
     for (const element of elements) {
       observer.observe(element);
     }
     const settled = "onscrollend" in window ? "scrollend" : "scroll";
-    window.addEventListener(settled, updateActiveHeading, { passive: true });
+    window.addEventListener(settled, scheduleUpdate, { passive: true });
     return () => {
       observer.disconnect();
-      window.removeEventListener(settled, updateActiveHeading);
+      cancelAnimationFrame(frame);
+      window.removeEventListener(settled, scheduleUpdate);
     };
   }, [slugKey]);
 
