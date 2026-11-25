@@ -10,18 +10,6 @@ import { MAX_SEARCH_LENGTH } from "@/lib/blog-search-query";
 
 const SEARCH_DELAY_MS = 500;
 
-function searchHref(query: string, category: string) {
-  const params = new URLSearchParams();
-  if (category) {
-    params.set("category", category);
-  }
-  if (query) {
-    params.set("q", query);
-  }
-  const search = params.toString();
-  return search ? `/blog?${search}` : "/blog";
-}
-
 export function SearchInput({
   className,
   placeholder,
@@ -49,21 +37,26 @@ export function SearchInput({
   const search = (text: string) => {
     window.clearTimeout(searchTimer.current);
     const next = text.trim();
-    const current = new URLSearchParams(window.location.search).get("q") ?? "";
-    if (next === current) {
+    if (next === syncedQuery) {
       return;
     }
     setSyncedQuery(next);
-    startSearch(() =>
-      router.push(searchHref(next, category), { scroll: false })
-    );
+    const params = new URLSearchParams(window.location.search);
+    params.delete("page");
+    if (next) {
+      params.set("q", next);
+    } else {
+      params.delete("q");
+    }
+    const href = params.toString() ? `/blog?${params}` : "/blog";
+    startSearch(() => router.push(href, { scroll: false }));
   };
 
   const handleChange = (text: string) => {
     setValue(text);
     window.clearTimeout(searchTimer.current);
     searchTimer.current = window.setTimeout(() => {
-      if (inputRef.current?.isConnected) {
+      if (inputRef.current?.value === text) {
         search(text);
       }
     }, SEARCH_DELAY_MS);
