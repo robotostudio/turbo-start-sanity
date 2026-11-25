@@ -131,6 +131,12 @@ function useActiveHeading(headings: TocHeading[]) {
   const showClicked = (slug: string) => {
     clickedSlug.current = slug;
     setActiveSlug(slug);
+    const clickedAtY = window.scrollY;
+    window.setTimeout(() => {
+      if (window.scrollY === clickedAtY && clickedSlug.current === slug) {
+        clickedSlug.current = null;
+      }
+    }, SCROLL_SETTLE_MS);
   };
 
   return { activeSlug, showClicked };
@@ -441,7 +447,16 @@ export function MobileTableOfContent({
       )}
     >
       <summary className="focus-ring-inset flex cursor-pointer list-none items-center justify-between gap-2 bg-background px-4 py-3 text-foreground text-lg [&::-webkit-details-marker]:hidden">
-        <span className="truncate">{activeText ?? "On this page"}</span>
+        <span className="truncate">
+          {activeText ? (
+            <>
+              <span className="sr-only">On this page: </span>
+              {activeText}
+            </>
+          ) : (
+            "On this page"
+          )}
+        </span>
         <ChevronDown
           aria-hidden="true"
           className="size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
