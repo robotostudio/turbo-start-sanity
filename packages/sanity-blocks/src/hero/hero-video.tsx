@@ -2,10 +2,11 @@
 
 import type { SanityImageData } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
-import dynamic from "next/dynamic";
+import { useMediaQuery } from "@workspace/ui/hooks/use-media-query";
 import { stegaClean } from "next-sanity";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { lazy, use, useState } from "react";
+import { browser } from "react-dom";
 
 import { type MuxVideoData, muxMp4Url, muxPlaybackId } from "../internal/mux";
 import { isMuxPath, mediaTypeOf } from "./media-type";
@@ -16,11 +17,12 @@ export { isMuxPath, mediaTypeOf } from "./media-type";
 /**
  * Loaded on demand: a static import would ship hls.js and mux-embed
  * (194 KB gzip, measured) to every route through the client-side page builder,
- * video or no video. Nothing renders before mount, so skipping SSR costs no
- * markup. It also means a hero set to `sanity` never pays for the player —
- * which is what makes the two delivery paths comparable on the same site.
+ * video or no video. `lazy` fetches it the first time `MuxBackground` renders,
+ * and `HeroVideo` only renders in the browser, so the server never imports it.
+ * It also means a hero set to `sanity` never pays for the player — which is
+ * what makes the two delivery paths comparable on the same site.
  */
-const MuxVideo = dynamic(() => import("@mux/mux-video-react"), { ssr: false });
+const MuxVideo = lazy(() => import("@mux/mux-video-react"));
 
 export interface HeroVideoVariant {
   /** Which path renders. Absent on anything authored before the toggle. */
@@ -93,7 +95,7 @@ export function rungFor(width: number, connection?: Connection): DeliveryRung {
  * Read once, at mount. Deliberately not reactive: `key` is the source URL, so
  * re-picking on a resize would remount the element and re-download the clip —
  * worse than leaving an already-buffered loop alone. Safe to call during render
- * because `HeroVideo` renders nothing until it has mounted.
+ * because `HeroVideo` only renders in the browser.
  */
 function deliveryRung(): DeliveryRung {
   const { connection } = navigator as Navigator & { connection?: Connection };
@@ -114,22 +116,6 @@ function pickSources(variant: HeroVideoVariant | null, rung: DeliveryRung) {
     hevc: stegaClean(variant?.hevc) ?? undefined,
     webm: stegaClean(webm) ?? undefined,
   };
-}
-
-/** Tracks the reduced-motion preference, including changes made after load. */
-function usePrefersReducedMotion(): boolean {
-  const [prefersReduced, setPrefersReduced] = useState(true);
-
-  useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReduced(query.matches);
-    const onChange = (event: MediaQueryListEvent) =>
-      setPrefersReduced(event.matches);
-    query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
-  }, []);
-
-  return prefersReduced;
 }
 
 type BackgroundProps = Readonly<{
@@ -274,14 +260,14 @@ export function HeroVideo({
   className,
   video,
 }: Readonly<{ className?: string; video?: HeroVideoData | null }>) {
+  use(browser());
   const { resolvedTheme } = useTheme();
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const [mounted, setMounted] = useState(false);
+  const prefersReducedMotion = useMediaQuery(
+    "(prefers-reduced-motion: reduce)"
+  );
   // The clip that decoded a frame, not a boolean: a theme toggle mounts a
   // fresh element, so readiness expires with the source it was earned for.
   const [readyKey, setReadyKey] = useState<string | null>(null);
-
-  useEffect(() => setMounted(true), []);
 
   // Dark falls back to the light variant so a single upload still works.
   const variant =
@@ -290,7 +276,7 @@ export function HeroVideo({
       : video?.light;
   const sourceKey = sourceKeyOf(variant);
 
-  if (!(mounted && variant && hasSource(variant)) || prefersReducedMotion) {
+  if (prefersReducedMotion || !(variant && hasSource(variant))) {
     return null;
   }
 

@@ -25,6 +25,7 @@ import {
 } from "@/components/elements/table-of-content";
 import { ArticleJsonLd } from "@/components/json-ld";
 import { seoFromDocument } from "@/lib/seo";
+import { getTableOfContents } from "@/lib/table-of-contents";
 import { formatDate, getBaseUrl, PLACEHOLDER_SLUG } from "@/utils";
 
 // Keep: this route awaits params outside Suspense on purpose, which Partial
@@ -158,6 +159,7 @@ function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
   const publishedDate = formatDate(publishedAt);
   const updatedDate = formatDate(updatedAt ?? _updatedAt);
   const shareUrl = data?.slug ? `${getBaseUrl()}${data.slug}` : undefined;
+  const tocHeadings = getTableOfContents(richText);
 
   return (
     <main className="bg-background">
@@ -217,7 +219,7 @@ function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
           <article className="min-w-0">
             <MobileTableOfContent
               className="mb-12"
-              richText={richText ?? []}
+              headings={tocHeadings}
               shareTitle={title}
               shareUrl={shareUrl}
             />
@@ -230,7 +232,7 @@ function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
           <div className="hidden lg:block">
             <div className="sticky top-24">
               <TableOfContent
-                richText={richText ?? []}
+                headings={tocHeadings}
                 shareTitle={title}
                 shareUrl={shareUrl}
               />

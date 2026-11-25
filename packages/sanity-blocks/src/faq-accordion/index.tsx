@@ -3,7 +3,6 @@
 import { BlockEyebrow } from "@workspace/sanity-blocks/internal/block-eyebrow";
 import type { RichTextValue } from "@workspace/sanity-blocks/internal/rich-text";
 import { RichText } from "@workspace/sanity-blocks/internal/rich-text";
-import { useDisclosureAnimation } from "@workspace/sanity-blocks/internal/use-disclosure-animation";
 import { cn } from "@workspace/tailwind-config/utils";
 import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
 import Link from "next/link";
@@ -66,57 +65,36 @@ const DISCLOSURE_ANIMATION_CLASS =
 function Disclosure({
   animationDelay,
   children,
-  isOpen,
-  onToggle,
+  defaultOpen,
+  name,
   title,
 }: Readonly<{
   animationDelay: string;
   children?: ReactNode;
-  isOpen: boolean;
-  onToggle: () => void;
+  defaultOpen: boolean;
+  name: string;
   title: ReactNode;
 }>) {
-  const { detailsRef, contentRef } = useDisclosureAnimation(isOpen);
-  const [initialOpen] = useState(isOpen);
-
-  const handleSummaryClick = (event: ReactMouseEvent<HTMLElement>) => {
-    event.preventDefault();
-    onToggle();
-  };
-
   return (
     <details
       className={cn(
         DISCLOSURE_BASE_CLASS,
         DISCLOSURE_ANIMATION_CLASS,
         // Open item is a settled surface: no hover wash, by design.
-        isOpen
-          ? "border-transparent bg-zinc-100 dark:bg-zinc-900"
-          : "hover-surface"
+        "disclosure not-open:hover-surface open:border-transparent open:bg-zinc-100 dark:open:bg-zinc-900"
       )}
-      open={initialOpen}
-      ref={detailsRef}
+      name={name}
+      open={defaultOpen}
       style={{ animationDelay }}
     >
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: summary is natively interactive */}
-      <summary
-        className="flex cursor-pointer list-none items-center justify-between gap-2.5 py-4 outline-none [&::-webkit-details-marker]:hidden"
-        onClick={handleSummaryClick}
-      >
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-2.5 py-4 outline-none [&::-webkit-details-marker]:hidden">
         <h3 className="font-medium text-foreground text-lg leading-6">
           {title}
         </h3>
-        <Plus
-          className={cn(
-            "pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none dark:text-accent-green",
-            isOpen && "rotate-45"
-          )}
-        />
+        <Plus className="pointer-events-none size-5 shrink-0 text-foreground transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] group-open:rotate-45 motion-reduce:transition-none dark:text-accent-green" />
       </summary>
       {children ? (
-        <div className="overflow-hidden" ref={contentRef}>
-          <div className="min-h-0 pb-4 text-muted-foreground">{children}</div>
-        </div>
+        <div className="pb-4 text-muted-foreground">{children}</div>
       ) : null}
     </details>
   );
@@ -127,9 +105,9 @@ function FaqDisclosure({
   ...props
 }: Readonly<{
   animationDelay: string;
+  defaultOpen: boolean;
   faq: FaqItem;
-  isOpen: boolean;
-  onToggle: () => void;
+  name: string;
 }>) {
   return (
     <Disclosure {...props} title={faq.title}>
@@ -170,36 +148,35 @@ function askButtonLabel(showsAsk: boolean, expanded: boolean) {
   return expanded ? "Hide answer" : "Show answer";
 }
 
-const ARROW_FRAMES = [
-  [0, 1, 0, 0, 1, 1, 0, 1, 0],
-  [0, 0, 0, 1, 1, 1, 0, 1, 0],
-  [0, 1, 0, 1, 1, 0, 0, 1, 0],
-  [0, 1, 0, 1, 1, 1, 0, 0, 0],
-] as const;
+type ArrowDot = { on: boolean; blinkDelay?: string };
 
-const FRAME_MS = 320;
+const ARROW_DOTS: ArrowDot[] = [
+  { on: false },
+  { on: true, blinkDelay: "-960ms" },
+  { on: false },
+  { on: false, blinkDelay: "0ms" },
+  { on: true },
+  { on: true, blinkDelay: "-640ms" },
+  { on: false },
+  { on: true, blinkDelay: "-320ms" },
+  { on: false },
+];
 
 function ArrowGlyph() {
-  const [frame, setFrame] = useState(0);
-  // Steps the 3x3 glyph through its four frames.
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const timer = window.setInterval(
-      () => setFrame((current) => (current + 1) % ARROW_FRAMES.length),
-      FRAME_MS
-    );
-    return () => window.clearInterval(timer);
-  }, []);
-  const dots = ARROW_FRAMES[frame] ?? ARROW_FRAMES[0];
   return (
     <span aria-hidden="true" className="grid grid-cols-3 gap-[2px]">
-      {dots.map((on, index) => (
+      {ARROW_DOTS.map((dot, index) => (
         <span
           className={cn(
-            "size-[3px] rounded-full bg-current transition-opacity duration-200 motion-reduce:transition-none",
-            on ? "opacity-100" : "opacity-20"
+            "size-[3px] rounded-full bg-current",
+            dot.on ? "opacity-100" : "opacity-20",
+            dot.blinkDelay &&
+              "animate-[arrow-dot_1280ms_linear_infinite] motion-reduce:animate-none"
           )}
           key={index}
+          style={
+            dot.blinkDelay ? { animationDelay: dot.blinkDelay } : undefined
+          }
         />
       ))}
     </span>
@@ -439,13 +416,8 @@ function AskItem({ animationDelay }: Readonly<{ animationDelay: string }>) {
 }
 
 function FaqList({ faqs }: Readonly<{ faqs: FaqItem[] }>) {
+  const name = useId();
   const defaultFaq = faqs.find((faq) => faq?.title);
-  const defaultOpenId = defaultFaq
-    ? (defaultFaq._key ?? defaultFaq._id)
-    : undefined;
-  // Exclusive-open lives in state (not the details `name` attribute) so the
-  // sibling that closes animates instead of snapping shut.
-  const [openId, setOpenId] = useState(defaultOpenId);
 
   return (
     <div className="grid content-start gap-4">
@@ -455,12 +427,10 @@ function FaqList({ faqs }: Readonly<{ faqs: FaqItem[] }>) {
         return (
           <FaqDisclosure
             animationDelay={`${Math.min(index, 8) * 45}ms`}
+            defaultOpen={faq === defaultFaq}
             faq={faq}
-            isOpen={itemId === openId}
             key={`faq-${itemId}`}
-            onToggle={() =>
-              setOpenId((current) => (current === itemId ? undefined : itemId))
-            }
+            name={name}
           />
         );
       })}

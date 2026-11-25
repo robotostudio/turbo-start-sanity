@@ -97,25 +97,7 @@ function ProgressiveBlur() {
   );
 }
 
-type MarkedSection = { rect: DOMRect; value: string };
-
-// Contrast of the last marked section covering both the bar and this item's
-// centre. Last wins, so a section stacked over another takes precedence.
-function contrastUnder(
-  itemRect: DOMRect,
-  marked: MarkedSection[],
-  barBottom: number
-) {
-  const itemX = itemRect.left + itemRect.width / 2;
-  let value = "";
-  for (const { rect, value: markedValue } of marked) {
-    const covered = Math.min(rect.bottom, barBottom) - Math.max(rect.top, 0);
-    if (covered >= barBottom * 0.6 && rect.left < itemX && rect.right > itemX) {
-      value = markedValue;
-    }
-  }
-  return value;
-}
+const BAR_MIDDLE = 32;
 
 // Stamps the section's contrast on a link, or clears it when no section covers
 // it. Compared first so an unchanged value never touches the DOM.
@@ -131,67 +113,67 @@ function applyContrast(el: HTMLElement, value: string) {
 }
 
 // Section-aware contrast: sections that read dark or bright regardless of
-// theme carry data-nav-contrast="dark|light". While one covers most of the
-// bar, its value is stamped on each link so they can invert instantly.
+// theme carry data-nav-contrast="dark|light". While one sits behind the middle
+// of the bar, its value is stamped on each link so they can invert instantly.
 function useNavContrast(headerRef: React.RefObject<HTMLElement | null>) {
   useEffect(() => {
     const header = headerRef.current;
     if (!header) {
       return;
     }
-    let frame = 0;
-    // Cached and refreshed only when the DOM actually changes (route
-    // transitions, streamed content) — scrolling never re-queries.
-    let markedEls: HTMLElement[] = [];
-    let adaptiveEls: HTMLElement[] = [];
-    const refresh = () => {
-      markedEls = [
-        ...document.querySelectorAll<HTMLElement>("[data-nav-contrast]"),
-      ];
-      adaptiveEls = [
-        ...header.querySelectorAll<HTMLElement>("[data-nav-adaptive]"),
-      ];
-    };
-    const measure = (el: HTMLElement): MarkedSection => ({
-      rect: el.getBoundingClientRect(),
-      value: el.dataset.navContrast ?? "",
-    });
-    let needsRefresh = false;
-    const update = () => {
-      frame = 0;
-      if (needsRefresh) {
-        needsRefresh = false;
-        refresh();
-      }
-      if (markedEls.length === 0 && adaptiveEls.length === 0) {
-        return;
-      }
-      const barBottom = header.getBoundingClientRect().bottom;
-      const marked = markedEls.map(measure);
-      for (const el of adaptiveEls) {
-        const rect = el.getBoundingClientRect();
-        applyContrast(el, contrastUnder(rect, marked, barBottom));
+    const behindBar = new Map<HTMLElement, DOMRect>();
+
+    const paint = () => {
+      const items = header.querySelectorAll<HTMLElement>("[data-nav-adaptive]");
+      for (const item of items) {
+        const rect = item.getBoundingClientRect();
+        const middle = rect.left + rect.width / 2;
+        let value = "";
+        for (const [section, sectionRect] of behindBar) {
+          if (sectionRect.left < middle && sectionRect.right > middle) {
+            value = section.dataset.navContrast ?? "";
+          }
+        }
+        applyContrast(item, value);
       }
     };
-    const schedule = () => {
-      if (!frame) {
-        frame = requestAnimationFrame(update);
+
+    const onIntersect = (entries: IntersectionObserverEntry[]) => {
+      for (const entry of entries) {
+        const section = entry.target as HTMLElement;
+        if (entry.isIntersecting) {
+          behindBar.set(section, entry.boundingClientRect);
+        } else {
+          behindBar.delete(section);
+        }
+      }
+      paint();
+    };
+
+    let intersections: IntersectionObserver;
+    const observeSections = () => {
+      for (const section of document.querySelectorAll("[data-nav-contrast]")) {
+        intersections.observe(section);
       }
     };
-    const observer = new MutationObserver(() => {
-      needsRefresh = true;
-      schedule();
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-    refresh();
-    update();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
+    const watchBarMiddle = () => {
+      intersections?.disconnect();
+      behindBar.clear();
+      const below = window.innerHeight - BAR_MIDDLE - 1;
+      intersections = new IntersectionObserver(onIntersect, {
+        rootMargin: `-${BAR_MIDDLE}px 0px -${below}px 0px`,
+      });
+      observeSections();
+    };
+
+    watchBarMiddle();
+    const mutations = new MutationObserver(observeSections);
+    mutations.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener("resize", watchBarMiddle);
     return () => {
-      observer.disconnect();
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
+      intersections.disconnect();
+      mutations.disconnect();
+      window.removeEventListener("resize", watchBarMiddle);
     };
   }, [headerRef]);
 }
