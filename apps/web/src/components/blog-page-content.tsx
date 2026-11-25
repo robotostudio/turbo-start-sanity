@@ -45,7 +45,10 @@ export function BlogPageContent({
 
         <BlogSearchLayout
           categoryFilter={
-            <BlogCategoryFilter activeCategory={activeCategory} />
+            <BlogCategoryFilter
+              activeCategory={activeCategory}
+              searchQuery={searchQuery}
+            />
           }
           featured={
             featuredBlogs.length > 0
@@ -66,8 +69,6 @@ export function BlogPageContent({
                   category={activeCategory}
                   className="mt-12"
                   currentPage={paginationMetadata.currentPage}
-                  hasNextPage={paginationMetadata.hasNextPage}
-                  hasPreviousPage={paginationMetadata.hasPreviousPage}
                   totalPages={paginationMetadata.totalPages}
                 />
               )}

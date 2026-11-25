@@ -7,10 +7,27 @@ import { startTransition, useOptimistic } from "react";
 
 import { BLOG_CATEGORIES } from "@/lib/blog-categories";
 
+function categoryHref(category: string, query: string | null) {
+  const params = new URLSearchParams();
+  if (category) {
+    params.set("category", category);
+  }
+  if (query) {
+    params.set("q", query);
+  }
+  const search = params.toString();
+  return search ? `/blog?${search}` : "/blog";
+}
+
 export function BlogCategoryFilter({
   activeCategory,
   className,
-}: Readonly<{ activeCategory: string; className?: string }>) {
+  searchQuery,
+}: Readonly<{
+  activeCategory: string;
+  className?: string;
+  searchQuery: string;
+}>) {
   const router = useRouter();
   const [shownCategory, setShownCategory] = useOptimistic(activeCategory);
 
@@ -21,7 +38,7 @@ export function BlogCategoryFilter({
     >
       {BLOG_CATEGORIES.map(({ label, value }) => {
         const isActive = shownCategory === value;
-        const href = value ? `/blog?category=${value}` : "/blog";
+        const href = categoryHref(value, searchQuery);
 
         return (
           <Link
@@ -36,9 +53,12 @@ export function BlogCategoryFilter({
             key={value || "all"}
             onNavigate={(event) => {
               event.preventDefault();
+              const query = new URLSearchParams(window.location.search).get(
+                "q"
+              );
               startTransition(() => {
                 setShownCategory(value);
-                router.push(href);
+                router.push(categoryHref(value, query));
               });
             }}
           >

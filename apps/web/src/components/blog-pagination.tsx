@@ -1,11 +1,13 @@
+"use client";
+
 import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { startTransition, useOptimistic } from "react";
 
 export type PaginationProps = {
   currentPage: number;
   totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
   basePath?: string;
 };
 
@@ -58,13 +60,15 @@ const navLabelBase = "font-light text-base leading-5 transition-colors";
 export function BlogPagination({
   currentPage,
   totalPages,
-  hasNextPage,
-  hasPreviousPage,
   basePath = "/blog",
   className,
   category,
 }: BlogPaginationProps) {
-  const paginationItems = generatePaginationItems(currentPage, totalPages);
+  const router = useRouter();
+  const [shownPage, setShownPage] = useOptimistic(currentPage);
+  const paginationItems = generatePaginationItems(shownPage, totalPages);
+  const hasPreviousPage = shownPage > 1;
+  const hasNextPage = shownPage < totalPages;
 
   const getPageUrl = (page: number): string => {
     const params = new URLSearchParams();
@@ -78,6 +82,15 @@ export function BlogPagination({
     return query ? `${basePath}?${query}` : basePath;
   };
 
+  const goToPage =
+    (page: number) => (event: { preventDefault: () => void }) => {
+      event.preventDefault();
+      startTransition(() => {
+        setShownPage(page);
+        router.push(getPageUrl(page), { scroll: false });
+      });
+    };
+
   return (
     <nav
       aria-label="Blog pagination"
@@ -85,12 +98,13 @@ export function BlogPagination({
     >
       {hasPreviousPage ? (
         <Link
-          aria-label={`Previous page, page ${currentPage - 1}`}
+          aria-label={`Previous page, page ${shownPage - 1}`}
           className={cn(
             navLabelBase,
             "focus-ring rounded-none text-zinc-400 hover:text-foreground"
           )}
-          href={getPageUrl(currentPage - 1)}
+          href={getPageUrl(shownPage - 1)}
+          onNavigate={goToPage(shownPage - 1)}
         >
           Previous
         </Link>
@@ -109,7 +123,7 @@ export function BlogPagination({
           );
         }
 
-        if (item === currentPage) {
+        if (item === shownPage) {
           return (
             <span
               aria-current="page"
@@ -127,6 +141,7 @@ export function BlogPagination({
             className="focus-ring rounded-none px-0.5 font-light font-mono text-base text-zinc-400 leading-5 transition-colors hover:text-foreground"
             href={getPageUrl(item)}
             key={item}
+            onNavigate={goToPage(item)}
           >
             {item}
           </Link>
@@ -135,12 +150,13 @@ export function BlogPagination({
 
       {hasNextPage ? (
         <Link
-          aria-label={`Next page, page ${currentPage + 1}`}
+          aria-label={`Next page, page ${shownPage + 1}`}
           className={cn(
             navLabelBase,
             "focus-ring rounded-none text-zinc-400 hover:text-foreground"
           )}
-          href={getPageUrl(currentPage + 1)}
+          href={getPageUrl(shownPage + 1)}
+          onNavigate={goToPage(shownPage + 1)}
         >
           Next
         </Link>

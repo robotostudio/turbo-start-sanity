@@ -16,6 +16,7 @@ function ScrollToTopInner() {
   // to clear the flag; a pathname-only key would strand the next navigation.
   const routeKey = `${pathname}?${searchParams.toString()}`;
   const lastRouteKey = useRef(routeKey);
+  const lastPathname = useRef(pathname);
 
   useEffect(() => {
     const markPop = () => {
@@ -31,6 +32,8 @@ function ScrollToTopInner() {
 
   useEffect(() => {
     lastRouteKey.current = routeKey;
+    const pathnameChanged = lastPathname.current !== pathname;
+    lastPathname.current = pathname;
 
     if (!hasMounted.current) {
       hasMounted.current = true;
@@ -41,14 +44,16 @@ function ScrollToTopInner() {
       isPopNavigation.current = false;
       return;
     }
-    // Forward navigation: skip in-page hash jumps, otherwise reset to top.
-    if (window.location.hash) {
+    // Forward navigation: skip in-page hash jumps and query-only changes (the
+    // router handles those, and `scroll: false` keeps the page put), otherwise
+    // reset to top.
+    if (window.location.hash || !pathnameChanged) {
       return;
     }
     // Explicit "instant": hero pages set `scroll-behavior: smooth`, which the
     // two-argument form would inherit and animate.
     window.scrollTo({ top: 0, behavior: "instant" });
-  }, [routeKey]);
+  }, [routeKey, pathname]);
 
   return null;
 }
