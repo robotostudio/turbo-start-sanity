@@ -8,7 +8,7 @@ import { type FormEvent, useRef, useState, useTransition } from "react";
 
 import { MAX_SEARCH_LENGTH } from "@/lib/blog-search-query";
 
-const SEARCH_DELAY_MS = 300;
+const SEARCH_DELAY_MS = 500;
 
 function searchHref(query: string, category: string) {
   const params = new URLSearchParams();
@@ -37,16 +37,13 @@ export function SearchInput({
   const inputRef = useRef<HTMLInputElement>(null);
   const searchTimer = useRef(0);
   const [value, setValue] = useState(query);
-  const [lastQuery, setLastQuery] = useState(query);
-  const [sentQuery, setSentQuery] = useState(query);
+  const [syncedQuery, setSyncedQuery] = useState(query);
   const [isSearching, startSearch] = useTransition();
 
   // useState ignores new props after mount, so copy a new URL q into the box.
-  if (query !== lastQuery) {
-    setLastQuery(query);
-    if (query !== sentQuery && !isSearching) {
-      setValue(query);
-    }
+  if (query !== syncedQuery && !isSearching) {
+    setSyncedQuery(query);
+    setValue(query);
   }
 
   const search = (text: string) => {
@@ -56,7 +53,7 @@ export function SearchInput({
     if (next === current) {
       return;
     }
-    setSentQuery(next);
+    setSyncedQuery(next);
     startSearch(() =>
       router.push(searchHref(next, category), { scroll: false })
     );
