@@ -8,17 +8,7 @@ import { type FormEvent, useRef, useState, useTransition } from "react";
 
 import { MAX_SEARCH_LENGTH } from "@/lib/blog-search-query";
 
-function searchHref(query: string, category: string) {
-  const params = new URLSearchParams();
-  if (category) {
-    params.set("category", category);
-  }
-  if (query) {
-    params.set("q", query);
-  }
-  const search = params.toString();
-  return search ? `/blog?${search}` : "/blog";
-}
+const SEARCH_DELAY_MS = 500;
 
 export function SearchInput({
   className,
@@ -33,27 +23,54 @@ export function SearchInput({
 }) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const searchTimer = useRef(0);
   const [value, setValue] = useState(query);
-  const [lastQuery, setLastQuery] = useState(query);
+  const [syncedQuery, setSyncedQuery] = useState(query);
   const [isSearching, startSearch] = useTransition();
 
   // useState ignores new props after mount, so copy a new URL q into the box.
-  if (query !== lastQuery) {
-    setLastQuery(query);
+  if (query !== syncedQuery && !isSearching) {
+    setSyncedQuery(query);
     setValue(query);
   }
 
+  const search = (text: string) => {
+    window.clearTimeout(searchTimer.current);
+    const next = text.trim();
+    if (next === syncedQuery) {
+      return;
+    }
+    setSyncedQuery(next);
+    const params = new URLSearchParams(window.location.search);
+    params.delete("page");
+    if (next) {
+      params.set("q", next);
+    } else {
+      params.delete("q");
+    }
+    const href = params.toString() ? `/blog?${params}` : "/blog";
+    startSearch(() => router.push(href, { scroll: false }));
+  };
+
+  const handleChange = (text: string) => {
+    setValue(text);
+    window.clearTimeout(searchTimer.current);
+    searchTimer.current = window.setTimeout(() => {
+      if (inputRef.current?.value === text) {
+        search(text);
+      }
+    }, SEARCH_DELAY_MS);
+  };
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    startSearch(() => router.push(searchHref(value.trim(), category)));
+    search(value);
   };
 
   const handleClear = () => {
     setValue("");
     inputRef.current?.focus();
-    if (query) {
-      startSearch(() => router.push(searchHref("", category)));
-    }
+    search("");
   };
 
   const Icon = isSearching ? LoaderCircle : Search;
@@ -86,7 +103,7 @@ export function SearchInput({
           id="blog-search-input"
           maxLength={MAX_SEARCH_LENGTH}
           name="q"
-          onChange={(event) => setValue(event.target.value)}
+          onChange={(event) => handleChange(event.target.value)}
           placeholder={placeholder}
           ref={inputRef}
           value={value}
