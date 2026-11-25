@@ -113,9 +113,10 @@ test("HeroBlock renders one still per theme only when they differ", () => {
 });
 
 // The two delivery paths have to be selectable on the same site, or the
-// comparison pages measure nothing. `HeroVideo` mounts client-side, so the
-// server render carries the still only — which is exactly what must differ:
-// a hero served from Sanity must never reach image.mux.com for its poster.
+// comparison pages measure nothing. `HeroVideo` renders only in the browser,
+// so the server render carries the still only — which is exactly what must
+// differ: a hero served from Sanity must never reach image.mux.com for its
+// poster.
 test("a sanity-delivered hero does not borrow the Mux still", () => {
   const html = renderToStaticMarkup(
     <HeroBlock

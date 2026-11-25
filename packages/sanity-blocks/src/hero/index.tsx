@@ -9,6 +9,7 @@ import {
   SanityImage,
 } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
+import { Suspense } from "react";
 
 import { muxPlaybackId, muxThumbnailUrl } from "../internal/mux";
 import type { HeroVideoData, HeroVideoVariant } from "./hero-video";
@@ -147,7 +148,9 @@ export function HeroBlock({
   const banner = (
     <>
       <HeroPosters eager video={video} />
-      <HeroVideo className={bannerFill} video={video} />
+      <Suspense fallback={null}>
+        <HeroVideo className={bannerFill} video={video} />
+      </Suspense>
     </>
   );
 

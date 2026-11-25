@@ -1,16 +1,13 @@
 "use client";
 
 import {
-  headingChildrenToSlug,
-  headingTextToSlug,
-} from "@workspace/sanity-blocks/internal/heading-slug";
-import {
   CopyIcon,
   InstagramIcon,
   LinkedInIcon,
   RedditIcon,
   XIcon,
 } from "@workspace/sanity-blocks/internal/icons";
+import type { TocHeading } from "@workspace/sanity-blocks/internal/table-of-contents";
 import {
   COPY_STATUS_CLASS,
   SWAP_HIDDEN,
@@ -20,83 +17,26 @@ import {
   SWAP_TEXT_SHOWN,
   useCopyToClipboard,
 } from "@workspace/sanity-blocks/internal/use-copy";
-import {
-  DISCLOSURE_ANIMATION_MS,
-  useDisclosureAnimation,
-} from "@workspace/sanity-blocks/internal/use-disclosure-animation";
 import { cn } from "@workspace/tailwind-config/utils";
 import { Check, ChevronDown } from "lucide-react";
-import {
-  type FC,
-  type MouseEvent,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
-
-import type { SanityRichTextBlock, SanityRichTextProps } from "@/types";
+import { type FC, type MouseEvent, useEffect, useRef, useState } from "react";
 
 type TableOfContentProps = {
-  richText?: SanityRichTextProps;
+  headings: TocHeading[];
   className?: string;
-  maxDepth?: number;
   shareTitle?: string;
   shareUrl?: string;
 };
 
-type ProcessedHeading = {
-  readonly id: string;
-  readonly text: string;
-  readonly href: string;
-  readonly level: number;
-  readonly style: HeadingStyle;
-  readonly children: ProcessedHeading[];
-  readonly isChild: boolean;
-  readonly _key?: string;
-};
-
 type AnchorProps = {
-  readonly heading: ProcessedHeading;
+  readonly heading: TocHeading;
   readonly activeSlug: string | null;
-  readonly maxDepth?: number;
-  readonly currentDepth?: number;
+  readonly onSelect: (slug: string) => void;
+  readonly depth?: number;
   // Namespaces the anchor's own DOM id so the desktop and mobile trees can both
   // render without producing duplicate ids.
   readonly idPrefix?: string;
-  // Fires after a heading link activates, letting the mobile disclosure close.
-  readonly onNavigate?: () => void;
 };
-
-type TableOfContentState = {
-  readonly shouldShow: boolean;
-  readonly headings: ProcessedHeading[];
-  readonly error?: string;
-};
-
-type HeadingStyle = "h2" | "h3" | "h4" | "h5" | "h6";
-
-type SanityTextChild = NonNullable<SanityRichTextBlock["children"]>[number];
-
-type HeadingBlock = Extract<SanityRichTextBlock, { _type: "block" }> & {
-  style: HeadingStyle;
-  children: readonly SanityTextChild[];
-};
-
-const HEADING_STYLES: Record<HeadingStyle, string> = {
-  h2: "pl-0",
-  h3: "pl-4",
-  h4: "pl-8",
-  h5: "pl-12",
-  h6: "pl-16",
-} as const;
-
-const HEADING_LEVELS: Record<HeadingStyle, number> = {
-  h2: 2,
-  h3: 3,
-  h4: 4,
-  h5: 5,
-  h6: 6,
-} as const;
 
 // The y-offset a heading must pass to count as current. Matches the headings'
 // own scroll-margin-top (`prose-headings:scroll-m-24`), so a heading reached by
@@ -106,361 +46,113 @@ const READING_LINE = 96;
 // comparison misses by a fraction and credits the heading above.
 const READING_LINE_SLACK = 2;
 
-const DEFAULT_MAX_DEPTH = 6;
-const MIN_HEADINGS_TO_SHOW = 1;
-// Close animation duration plus a settle frame — scrolling waits this long.
-const DISCLOSURE_CLOSE_MS = DISCLOSURE_ANIMATION_MS + 20;
+// Close animation duration plus the frames the page takes to settle around it —
+// scrolling waits this long.
+const DISCLOSURE_CLOSE_MS = 400;
 
-function isValidHeadingStyle(style: unknown): style is HeadingStyle {
-  return typeof style === "string" && style in HEADING_STYLES;
+const SCROLL_SETTLE_MS = 150;
+
+function flattenHeadings(headings: TocHeading[]): TocHeading[] {
+  return headings.flatMap((heading) => [
+    heading,
+    ...flattenHeadings(heading.children),
+  ]);
 }
 
-function isValidTextChild(child: unknown): child is SanityTextChild {
-  return (
-    typeof child === "object" &&
-    child !== null &&
-    "_type" in child &&
-    child._type === "span" &&
-    "text" in child &&
-    typeof child.text === "string"
-  );
-}
-
-function hasValidTextChildren(
-  children: unknown
-): children is readonly SanityTextChild[] {
-  return (
-    Array.isArray(children) &&
-    children.length > 0 &&
-    children.every(isValidTextChild)
-  );
-}
-
-function isHeadingBlock(block: unknown): block is HeadingBlock {
-  if (
-    typeof block !== "object" ||
-    block === null ||
-    !("_type" in block) ||
-    block._type !== "block"
-  ) {
-    return false;
-  }
-
-  const candidate = block as Record<string, unknown>;
-
-  return (
-    isValidHeadingStyle(candidate.style) &&
-    hasValidTextChildren(candidate.children)
-  );
-}
-
-function extractTextFromChildren(children: readonly SanityTextChild[]): string {
-  try {
-    return children
-      .map((child) => child.text?.trim() ?? "")
-      .filter(Boolean)
-      .join(" ")
-      .trim();
-  } catch (_error) {
-    return "";
-  }
-}
-
-function generateUniqueId(text: string, index: number, _key?: string): string {
-  const baseId = _key || headingTextToSlug(text) || `heading-${index}`;
-  return `toc-${baseId}`;
-}
-
-function extractHeadingBlocks(richText: SanityRichTextProps): HeadingBlock[] {
-  if (!(richText && Array.isArray(richText))) {
-    return [];
-  }
-
-  try {
-    return richText.filter(isHeadingBlock);
-  } catch (_error) {
-    return [];
-  }
-}
-
-function createProcessedHeading(
-  block: HeadingBlock,
-  index: number
-): ProcessedHeading | null {
-  try {
-    const text = extractTextFromChildren(block.children);
-
-    if (!text) {
-      return null;
-    }
-
-    const level = HEADING_LEVELS[block.style];
-    const href = `#${headingChildrenToSlug(block.children)}`;
-    const id = generateUniqueId(text, index, block._key);
-
-    return {
-      id,
-      text,
-      href,
-      level,
-      style: block.style,
-      children: [],
-      isChild: false,
-      _key: block._key,
-    };
-  } catch (_error) {
-    return null;
-  }
-}
-
-function buildHeadingHierarchy(
-  flatHeadings: ProcessedHeading[],
-  maxDepth: number = DEFAULT_MAX_DEPTH
-): ProcessedHeading[] {
-  if (flatHeadings.length === 0) {
-    return [];
-  }
-
-  try {
-    const result: ProcessedHeading[] = [];
-    const processed = new Set<number>();
-
-    flatHeadings.forEach((heading, index) => {
-      if (processed.has(index) || heading.level > maxDepth) {
-        return;
-      }
-
-      const children = collectChildHeadings(
-        flatHeadings,
-        index,
-        processed,
-        maxDepth
-      );
-
-      result.push({
-        ...heading,
-        children,
-      });
-    });
-
-    return result;
-  } catch (_error) {
-    return flatHeadings.map((heading) => ({
-      ...heading,
-      children: [],
-    }));
-  }
-}
-
-function collectChildHeadings(
-  headings: ProcessedHeading[],
-  parentIndex: number,
-  processed: Set<number>,
-  maxDepth: number
-): ProcessedHeading[] {
-  const parentHeading = headings[parentIndex];
-
-  if (!parentHeading || parentHeading.level >= maxDepth) {
-    return [];
-  }
-
-  const children: ProcessedHeading[] = [];
-  const parentLevel = parentHeading.level;
-
-  for (let i = parentIndex + 1; i < headings.length; i++) {
-    const currentHeading = headings[i];
-
-    if (!currentHeading || currentHeading.level <= parentLevel) {
-      break;
-    }
-
-    if (processed.has(i) || currentHeading.level > maxDepth) {
-      continue;
-    }
-
-    processed.add(i);
-
-    const nestedChildren = collectChildHeadings(
-      headings,
-      i,
-      processed,
-      maxDepth
-    );
-
-    children.push({
-      ...currentHeading,
-      children: nestedChildren,
-      isChild: true,
-    });
-  }
-
-  return children;
-}
-
-function processHeadingBlocks(
-  headingBlocks: HeadingBlock[],
-  maxDepth: number = DEFAULT_MAX_DEPTH
-): ProcessedHeading[] {
-  if (!Array.isArray(headingBlocks) || headingBlocks.length === 0) {
-    return [];
-  }
-
-  try {
-    const processedHeadings = headingBlocks
-      .map(createProcessedHeading)
-      .filter((heading): heading is ProcessedHeading => heading !== null);
-
-    return buildHeadingHierarchy(processedHeadings, maxDepth);
-  } catch (_error) {
-    return [];
-  }
-}
-
-function flattenSlugs(headings: ProcessedHeading[]): string[] {
-  const result: string[] = [];
-  const walk = (items: ProcessedHeading[]) => {
-    for (const item of items) {
-      result.push(item.href.replace(/^#/, ""));
-      if (item.children.length > 0) {
-        walk(item.children);
-      }
-    }
-  };
-  walk(headings);
-  return result.filter(Boolean);
-}
-
-function useTableOfContentState(
-  richText?: SanityRichTextProps,
-  maxDepth: number = DEFAULT_MAX_DEPTH
-): TableOfContentState {
-  try {
-    if (!(richText && Array.isArray(richText)) || richText.length === 0) {
-      return {
-        shouldShow: false,
-        headings: [],
-      };
-    }
-
-    const headingBlocks = extractHeadingBlocks(richText);
-
-    if (headingBlocks.length < MIN_HEADINGS_TO_SHOW) {
-      return {
-        shouldShow: false,
-        headings: [],
-      };
-    }
-
-    const processedHeadings = processHeadingBlocks(headingBlocks, maxDepth);
-
-    return {
-      shouldShow: processedHeadings.length >= MIN_HEADINGS_TO_SHOW,
-      headings: processedHeadings,
-    };
-  } catch (error) {
-    return {
-      shouldShow: false,
-      headings: [],
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
-  }
-}
-
-function useActiveHeading(slugKey: string): string | null {
+function useActiveHeading(headings: TocHeading[]) {
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  const clickedSlug = useRef<string | null>(null);
+  const slugKey = flattenHeadings(headings)
+    .map((heading) => heading.slug)
+    .join("|");
 
   useEffect(() => {
-    const slugs = slugKey ? slugKey.split("|") : [];
-    if (slugs.length === 0) {
-      return;
-    }
-    const elements = slugs
-      .map((slug) => document.getElementById(slug))
-      .filter((element): element is HTMLElement => element !== null);
+    const elements = slugKey
+      .split("|")
+      .flatMap((slug) => document.getElementById(slug) ?? []);
     if (elements.length === 0) {
       return;
     }
 
-    // Measured once and refreshed only when layout moves, so scrolling is pure
-    // arithmetic over the cache and never forces a layout read.
-    let tops: number[] = [];
-    const measure = () => {
-      tops = elements.map(
-        (element) => element.getBoundingClientRect().top + window.scrollY
-      );
-    };
-
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      const line = window.scrollY + READING_LINE;
-      let index = -1;
-      for (const [i, top] of tops.entries()) {
-        if (top <= line + READING_LINE_SLACK) {
-          index = i;
-        }
+    const updateActiveHeading = () => {
+      if (clickedSlug.current) {
+        return;
       }
       // The last heading can't always reach the line — there isn't necessarily
       // a viewport of content beneath it.
       const atBottom =
         window.innerHeight + window.scrollY >=
         document.documentElement.scrollHeight - 2;
-      if (atBottom) {
-        index = tops.length - 1;
-      }
-      setActiveSlug(index === -1 ? null : (slugs[index] ?? null));
-    };
-    const schedule = () => {
-      if (!frame) {
-        frame = requestAnimationFrame(update);
-      }
-    };
-    const remeasure = () => {
-      measure();
-      schedule();
+      const current = atBottom
+        ? elements.at(-1)
+        : elements.findLast(
+            (element) =>
+              element.getBoundingClientRect().top <=
+              READING_LINE + READING_LINE_SLACK
+          );
+      setActiveSlug(current?.id ?? null);
     };
 
-    measure();
-    update();
-    // Fonts finishing, images settling and the mobile disclosure opening all
-    // move headings after mount; a stale cache would highlight the wrong item.
-    const observer = new ResizeObserver(remeasure);
-    observer.observe(document.body);
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", remeasure);
+    let frame = 0;
+    const scheduleUpdate = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(updateActiveHeading);
+    };
+
+    const onScrollEnd = () => {
+      clickedSlug.current = null;
+      scheduleUpdate();
+    };
+
+    let settleTimer = 0;
+    const onScroll = () => {
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(onScrollEnd, SCROLL_SETTLE_MS);
+    };
+
+    const observer = new IntersectionObserver(scheduleUpdate, {
+      root: document,
+      rootMargin: `-${READING_LINE}px 0px 0px 0px`,
+    });
+    for (const element of elements) {
+      observer.observe(element);
+    }
+    const hasScrollEnd = "onscrollend" in window;
+    const settledEvent = hasScrollEnd ? "scrollend" : "scroll";
+    const onSettled = hasScrollEnd ? onScrollEnd : onScroll;
+    window.addEventListener(settledEvent, onSettled, { passive: true });
     return () => {
       observer.disconnect();
       cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", remeasure);
+      window.clearTimeout(settleTimer);
+      window.removeEventListener(settledEvent, onSettled);
     };
   }, [slugKey]);
 
-  return activeSlug;
+  const showClicked = (slug: string) => {
+    clickedSlug.current = slug;
+    setActiveSlug(slug);
+    const clickedAtY = window.scrollY;
+    window.setTimeout(() => {
+      if (window.scrollY === clickedAtY && clickedSlug.current === slug) {
+        clickedSlug.current = null;
+      }
+    }, SCROLL_SETTLE_MS);
+  };
+
+  return { activeSlug, showClicked };
 }
 
-const TableOfContentAnchor: FC<AnchorProps> = ({
+function TableOfContentAnchor({
   heading,
   activeSlug,
-  maxDepth = DEFAULT_MAX_DEPTH,
-  currentDepth = 1,
+  onSelect,
+  depth = 1,
   idPrefix = "",
-  onNavigate,
-}) => {
-  const { href, text, children, id } = heading;
-
-  if (currentDepth > maxDepth) {
-    return null;
-  }
-
-  if (!(text?.trim() && href?.trim())) {
-    return null;
-  }
-
-  const slug = href.replace(/^#/, "");
+}: AnchorProps) {
+  const { slug, text, children, id } = heading;
+  const href = `#${slug}`;
   const isActive = activeSlug !== null && activeSlug === slug;
-  const hasChildren =
-    Array.isArray(children) && children.length > 0 && currentDepth < maxDepth;
 
   // In-page anchors are rendered as native <a>, not next/link. next/link
   // unconditionally preventDefaults hash clicks and defers the scroll to the
@@ -487,27 +179,29 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
     }
     event.preventDefault();
     window.history.pushState(null, "", href);
-    if (onNavigate) {
+    const details = event.currentTarget.closest("details");
+    if (details) {
       // Mobile: collapse the disclosure first, then scroll once its close
       // animation has settled. Scrolling immediately overshoots — the TOC
       // above the target shrinks mid-scroll, pulling the heading up and past
       // the viewport top.
-      onNavigate();
-      window.setTimeout(
-        () => target.scrollIntoView({ behavior: "smooth" }),
-        DISCLOSURE_CLOSE_MS
-      );
+      details.open = false;
+      window.setTimeout(() => {
+        onSelect(slug);
+        target.scrollIntoView({ behavior: "smooth" });
+      }, DISCLOSURE_CLOSE_MS);
       return;
     }
+    onSelect(slug);
     target.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <li className={cn(currentDepth > 1 && "ml-3")}>
+    <li className={cn(depth > 1 && "ml-3")}>
       <a
         aria-current={isActive ? "location" : undefined}
         className={cn(
-          "block rounded-none px-2 py-1.5 text-base leading-6 outline-none tracking-[0.01em] transition-colors focus-visible:[outline:2px_dotted_currentColor] focus-visible:[outline-offset:-3px]",
+          "block rounded-none px-2 py-1.5 text-base leading-6 outline-none tracking-[0.01em] focus-visible:[outline:2px_dotted_currentColor] focus-visible:[outline-offset:-3px]",
           isActive
             ? "bg-accent-green font-medium text-accent-green-foreground"
             : "text-muted-foreground hover:text-foreground"
@@ -519,24 +213,23 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
         {text}
       </a>
 
-      {hasChildren && (
+      {children.length > 0 && (
         <ul className="mt-1 flex flex-col gap-1">
-          {children.map((child, index) => (
+          {children.map((child) => (
             <TableOfContentAnchor
               activeSlug={activeSlug}
-              currentDepth={currentDepth + 1}
+              depth={depth + 1}
               heading={child}
               idPrefix={idPrefix}
-              key={child.id || `${child.text}-${index}-${currentDepth}`}
-              maxDepth={maxDepth}
-              onNavigate={onNavigate}
+              key={child.id}
+              onSelect={onSelect}
             />
           ))}
         </ul>
       )}
     </li>
   );
-};
+}
 
 type ShareTarget = {
   readonly network: string;
@@ -580,21 +273,15 @@ function ShareOptions({
   title,
   shareUrl,
 }: Readonly<{ title?: string; shareUrl?: string }>) {
-  const [url, setUrl] = useState(shareUrl ?? "");
-
-  useEffect(() => {
-    setUrl(window.location.href);
-  }, []);
-
-  const getShareUrl = useCallback(() => url || window.location.href, [url]);
+  const getShareUrl = () => shareUrl || window.location.href;
   const { status: copyStatus, copy } = useCopyToClipboard(getShareUrl);
   const copied = copyStatus === "copied";
 
-  const encodedUrl = encodeURIComponent(url);
+  const encodedUrl = encodeURIComponent(shareUrl ?? "");
   const encodedTitle = encodeURIComponent(title ?? "");
 
   const handleWebShare = async (fallbackUrl: string) => {
-    const resolvedUrl = url || window.location.href;
+    const resolvedUrl = getShareUrl();
     if (typeof navigator.share === "function") {
       try {
         await navigator.share({ title: title || undefined, url: resolvedUrl });
@@ -693,26 +380,15 @@ function ShareOptions({
   );
 }
 
-export const TableOfContent: FC<TableOfContentProps> = ({
-  richText,
+export function TableOfContent({
+  headings,
   className,
-  maxDepth = DEFAULT_MAX_DEPTH,
   shareTitle,
   shareUrl,
-}) => {
-  const { shouldShow, headings, error } = useTableOfContentState(
-    richText,
-    maxDepth
-  );
+}: Readonly<TableOfContentProps>) {
+  const { activeSlug, showClicked } = useActiveHeading(headings);
 
-  const slugKey = flattenSlugs(headings).join("|");
-  const activeSlug = useActiveHeading(slugKey);
-
-  if (error) {
-    return null;
-  }
-
-  if (!shouldShow || headings.length === 0) {
+  if (headings.length === 0) {
     return null;
   }
 
@@ -732,13 +408,12 @@ export const TableOfContent: FC<TableOfContentProps> = ({
             On this page
           </p>
           <ul className="mt-6 flex flex-col gap-2">
-            {headings.map((heading, index) => (
+            {headings.map((heading) => (
               <TableOfContentAnchor
                 activeSlug={activeSlug}
-                currentDepth={1}
                 heading={heading}
-                key={heading.id || `${heading.text}-${index}`}
-                maxDepth={maxDepth}
+                key={heading.id}
+                onSelect={showClicked}
               />
             ))}
           </ul>
@@ -748,77 +423,62 @@ export const TableOfContent: FC<TableOfContentProps> = ({
       </aside>
     </div>
   );
-};
+}
 
-export const MobileTableOfContent: FC<TableOfContentProps> = ({
-  richText,
+export function MobileTableOfContent({
+  headings,
   className,
-  maxDepth = DEFAULT_MAX_DEPTH,
   shareTitle,
   shareUrl,
-}) => {
-  const { shouldShow, headings, error } = useTableOfContentState(
-    richText,
-    maxDepth
-  );
+}: Readonly<TableOfContentProps>) {
+  const { activeSlug, showClicked } = useActiveHeading(headings);
+  const activeText = flattenHeadings(headings).find(
+    (heading) => heading.slug === activeSlug
+  )?.text;
 
-  const slugKey = flattenSlugs(headings).join("|");
-  const activeSlug = useActiveHeading(slugKey);
-  const [open, setOpen] = useState(true);
-  const { detailsRef, contentRef } = useDisclosureAnimation(open);
-
-  if (error || !shouldShow || headings.length === 0) {
+  if (headings.length === 0) {
     return null;
   }
-
-  const handleSummaryClick = (event: MouseEvent<HTMLElement>) => {
-    event.preventDefault();
-    setOpen((current) => !current);
-  };
 
   return (
     <details
       className={cn(
-        "bg-grid-dots p-2.5 text-zinc-800 lg:hidden dark:text-zinc-50",
+        "group disclosure bleed-x sticky top-0 z-30 border-border border-b bg-background p-2.5 text-zinc-800 lg:hidden dark:text-zinc-50",
         className
       )}
-      open
-      ref={detailsRef}
     >
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: summary is natively interactive */}
-      <summary
-        className="focus-ring-inset flex cursor-pointer list-none items-center justify-between gap-2 bg-background px-4 py-3 text-foreground text-lg [&::-webkit-details-marker]:hidden"
-        onClick={handleSummaryClick}
-      >
-        On this page
+      <summary className="focus-ring-inset flex cursor-pointer list-none items-center justify-between gap-2 bg-background px-4 py-3 text-foreground text-lg [&::-webkit-details-marker]:hidden">
+        <span className="truncate">
+          {activeText ? (
+            <>
+              <span className="sr-only">On this page: </span>
+              {activeText}
+            </>
+          ) : (
+            "On this page"
+          )}
+        </span>
         <ChevronDown
           aria-hidden="true"
-          className={cn(
-            "size-5 shrink-0 text-muted-foreground transition-transform",
-            open && "rotate-180"
-          )}
+          className="size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
         />
       </summary>
-      <div className="overflow-hidden" ref={contentRef}>
-        <div className="flex flex-col gap-8 bg-background px-4 pb-4">
-          <nav aria-label="On this page">
-            <ul className="flex flex-col gap-2">
-              {headings.map((heading, index) => (
-                <TableOfContentAnchor
-                  activeSlug={activeSlug}
-                  currentDepth={1}
-                  heading={heading}
-                  idPrefix="mobile-"
-                  key={heading.id || `${heading.text}-${index}`}
-                  maxDepth={maxDepth}
-                  onNavigate={() => setOpen(false)}
-                />
-              ))}
-            </ul>
-          </nav>
-          <ShareOptions shareUrl={shareUrl} title={shareTitle} />
-        </div>
+      <div className="flex max-h-[60svh] flex-col gap-8 overflow-y-auto bg-background px-4 pb-4">
+        <nav aria-label="On this page">
+          <ul className="flex flex-col gap-2">
+            {headings.map((heading) => (
+              <TableOfContentAnchor
+                activeSlug={activeSlug}
+                heading={heading}
+                idPrefix="mobile-"
+                key={heading.id}
+                onSelect={showClicked}
+              />
+            ))}
+          </ul>
+        </nav>
+        <ShareOptions shareUrl={shareUrl} title={shareTitle} />
       </div>
     </details>
   );
-};
+}

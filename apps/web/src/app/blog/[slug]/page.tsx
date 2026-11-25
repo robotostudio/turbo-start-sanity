@@ -14,6 +14,7 @@ import {
   type RichTextValue,
 } from "@workspace/sanity-blocks/internal/rich-text";
 import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
+import { getTableOfContents } from "@workspace/sanity-blocks/internal/table-of-contents";
 import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { notFound } from "next/navigation";
@@ -158,6 +159,7 @@ function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
   const publishedDate = formatDate(publishedAt);
   const updatedDate = formatDate(updatedAt ?? _updatedAt);
   const shareUrl = data?.slug ? `${getBaseUrl()}${data.slug}` : undefined;
+  const tocHeadings = getTableOfContents(richText);
 
   return (
     <main className="bg-background">
@@ -217,7 +219,7 @@ function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
           <article className="min-w-0">
             <MobileTableOfContent
               className="mb-12"
-              richText={richText ?? []}
+              headings={tocHeadings}
               shareTitle={title}
               shareUrl={shareUrl}
             />
@@ -230,7 +232,7 @@ function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
           <div className="hidden lg:block">
             <div className="sticky top-24">
               <TableOfContent
-                richText={richText ?? []}
+                headings={tocHeadings}
                 shareTitle={title}
                 shareUrl={shareUrl}
               />
