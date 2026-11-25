@@ -18,7 +18,7 @@ import {
 } from "@workspace/sanity-blocks/internal/use-copy";
 import { cn } from "@workspace/tailwind-config/utils";
 import { Check, ChevronDown } from "lucide-react";
-import { type FC, type MouseEvent, useEffect, useState } from "react";
+import { type FC, type MouseEvent, useEffect, useRef, useState } from "react";
 
 import type { TocHeading } from "@/lib/table-of-contents";
 
@@ -32,6 +32,7 @@ type TableOfContentProps = {
 type AnchorProps = {
   readonly heading: TocHeading;
   readonly activeSlug: string | null;
+  readonly onSelect: (slug: string) => void;
   readonly depth?: number;
   // Namespaces the anchor's own DOM id so the desktop and mobile trees can both
   // render without producing duplicate ids.
@@ -49,15 +50,21 @@ const READING_LINE_SLACK = 2;
 // Close animation duration plus a settle frame — scrolling waits this long.
 const DISCLOSURE_CLOSE_MS = 320;
 
-function getSlugs(headings: TocHeading[]): string[] {
+const SCROLL_SETTLE_MS = 150;
+
+function flattenHeadings(headings: TocHeading[]): TocHeading[] {
   return headings.flatMap((heading) => [
-    heading.slug,
-    ...getSlugs(heading.children),
+    heading,
+    ...flattenHeadings(heading.children),
   ]);
 }
 
-function useActiveHeading(slugKey: string): string | null {
+function useActiveHeading(headings: TocHeading[]) {
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  const clickedSlug = useRef<string | null>(null);
+  const slugKey = flattenHeadings(headings)
+    .map((heading) => heading.slug)
+    .join("|");
 
   useEffect(() => {
     const elements = slugKey
@@ -68,6 +75,9 @@ function useActiveHeading(slugKey: string): string | null {
     }
 
     const updateActiveHeading = () => {
+      if (clickedSlug.current) {
+        return;
+      }
       // The last heading can't always reach the line — there isn't necessarily
       // a viewport of content beneath it.
       const atBottom =
@@ -89,27 +99,47 @@ function useActiveHeading(slugKey: string): string | null {
       frame = requestAnimationFrame(updateActiveHeading);
     };
 
+    const onScrollEnd = () => {
+      clickedSlug.current = null;
+      scheduleUpdate();
+    };
+
+    let settleTimer = 0;
+    const onScroll = () => {
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(onScrollEnd, SCROLL_SETTLE_MS);
+    };
+
     const observer = new IntersectionObserver(scheduleUpdate, {
       rootMargin: `-${READING_LINE}px 0px 0px 0px`,
     });
     for (const element of elements) {
       observer.observe(element);
     }
-    const settled = "onscrollend" in window ? "scrollend" : "scroll";
-    window.addEventListener(settled, scheduleUpdate, { passive: true });
+    const hasScrollEnd = "onscrollend" in window;
+    const settledEvent = hasScrollEnd ? "scrollend" : "scroll";
+    const onSettled = hasScrollEnd ? onScrollEnd : onScroll;
+    window.addEventListener(settledEvent, onSettled, { passive: true });
     return () => {
       observer.disconnect();
       cancelAnimationFrame(frame);
-      window.removeEventListener(settled, scheduleUpdate);
+      window.clearTimeout(settleTimer);
+      window.removeEventListener(settledEvent, onSettled);
     };
   }, [slugKey]);
 
-  return activeSlug;
+  const showClicked = (slug: string) => {
+    clickedSlug.current = slug;
+    setActiveSlug(slug);
+  };
+
+  return { activeSlug, showClicked };
 }
 
 function TableOfContentAnchor({
   heading,
   activeSlug,
+  onSelect,
   depth = 1,
   idPrefix = "",
 }: AnchorProps) {
@@ -149,12 +179,13 @@ function TableOfContentAnchor({
       // above the target shrinks mid-scroll, pulling the heading up and past
       // the viewport top.
       details.open = false;
-      window.setTimeout(
-        () => target.scrollIntoView({ behavior: "smooth" }),
-        DISCLOSURE_CLOSE_MS
-      );
+      window.setTimeout(() => {
+        onSelect(slug);
+        target.scrollIntoView({ behavior: "smooth" });
+      }, DISCLOSURE_CLOSE_MS);
       return;
     }
+    onSelect(slug);
     target.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -184,6 +215,7 @@ function TableOfContentAnchor({
               heading={child}
               idPrefix={idPrefix}
               key={child.id}
+              onSelect={onSelect}
             />
           ))}
         </ul>
@@ -347,7 +379,7 @@ export function TableOfContent({
   shareTitle,
   shareUrl,
 }: Readonly<TableOfContentProps>) {
-  const activeSlug = useActiveHeading(getSlugs(headings).join("|"));
+  const { activeSlug, showClicked } = useActiveHeading(headings);
 
   if (headings.length === 0) {
     return null;
@@ -374,6 +406,7 @@ export function TableOfContent({
                 activeSlug={activeSlug}
                 heading={heading}
                 key={heading.id}
+                onSelect={showClicked}
               />
             ))}
           </ul>
@@ -391,7 +424,10 @@ export function MobileTableOfContent({
   shareTitle,
   shareUrl,
 }: Readonly<TableOfContentProps>) {
-  const activeSlug = useActiveHeading(getSlugs(headings).join("|"));
+  const { activeSlug, showClicked } = useActiveHeading(headings);
+  const activeText = flattenHeadings(headings).find(
+    (heading) => heading.slug === activeSlug
+  )?.text;
 
   if (headings.length === 0) {
     return null;
@@ -400,19 +436,18 @@ export function MobileTableOfContent({
   return (
     <details
       className={cn(
-        "group disclosure bg-grid-dots p-2.5 text-zinc-800 lg:hidden dark:text-zinc-50",
+        "group disclosure bleed-x sticky top-0 z-30 bg-grid-dots p-2.5 text-zinc-800 lg:hidden dark:text-zinc-50",
         className
       )}
-      open
     >
       <summary className="focus-ring-inset flex cursor-pointer list-none items-center justify-between gap-2 bg-background px-4 py-3 text-foreground text-lg [&::-webkit-details-marker]:hidden">
-        On this page
+        <span className="truncate">{activeText ?? "On this page"}</span>
         <ChevronDown
           aria-hidden="true"
           className="size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
         />
       </summary>
-      <div className="flex flex-col gap-8 bg-background px-4 pb-4">
+      <div className="flex max-h-[60svh] flex-col gap-8 overflow-y-auto bg-background px-4 pb-4">
         <nav aria-label="On this page">
           <ul className="flex flex-col gap-2">
             {headings.map((heading) => (
@@ -421,6 +456,7 @@ export function MobileTableOfContent({
                 heading={heading}
                 idPrefix="mobile-"
                 key={heading.id}
+                onSelect={showClicked}
               />
             ))}
           </ul>
