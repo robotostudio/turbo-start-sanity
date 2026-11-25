@@ -67,7 +67,7 @@ function useActiveHeading(slugKey: string): string | null {
       return;
     }
 
-    const pick = () => {
+    const updateActiveHeading = () => {
       // The last heading can't always reach the line — there isn't necessarily
       // a viewport of content beneath it.
       const atBottom =
@@ -83,29 +83,29 @@ function useActiveHeading(slugKey: string): string | null {
       setActiveSlug(current?.id ?? null);
     };
 
-    const observer = new IntersectionObserver(pick, {
+    const observer = new IntersectionObserver(updateActiveHeading, {
       rootMargin: `-${READING_LINE}px 0px 0px 0px`,
     });
     for (const element of elements) {
       observer.observe(element);
     }
     const settled = "onscrollend" in window ? "scrollend" : "scroll";
-    window.addEventListener(settled, pick, { passive: true });
+    window.addEventListener(settled, updateActiveHeading, { passive: true });
     return () => {
       observer.disconnect();
-      window.removeEventListener(settled, pick);
+      window.removeEventListener(settled, updateActiveHeading);
     };
   }, [slugKey]);
 
   return activeSlug;
 }
 
-const TableOfContentAnchor: FC<AnchorProps> = ({
+function TableOfContentAnchor({
   heading,
   activeSlug,
   depth = 1,
   idPrefix = "",
-}) => {
+}: AnchorProps) {
   const { slug, text, children, id } = heading;
   const href = `#${slug}`;
   const isActive = activeSlug !== null && activeSlug === slug;
@@ -183,7 +183,7 @@ const TableOfContentAnchor: FC<AnchorProps> = ({
       )}
     </li>
   );
-};
+}
 
 type ShareTarget = {
   readonly network: string;
@@ -334,12 +334,12 @@ function ShareOptions({
   );
 }
 
-export const TableOfContent: FC<TableOfContentProps> = ({
+export function TableOfContent({
   headings,
   className,
   shareTitle,
   shareUrl,
-}) => {
+}: TableOfContentProps) {
   const activeSlug = useActiveHeading(getSlugs(headings).join("|"));
 
   if (headings.length === 0) {
@@ -376,14 +376,14 @@ export const TableOfContent: FC<TableOfContentProps> = ({
       </aside>
     </div>
   );
-};
+}
 
-export const MobileTableOfContent: FC<TableOfContentProps> = ({
+export function MobileTableOfContent({
   headings,
   className,
   shareTitle,
   shareUrl,
-}) => {
+}: TableOfContentProps) {
   const activeSlug = useActiveHeading(getSlugs(headings).join("|"));
 
   if (headings.length === 0) {
@@ -422,4 +422,4 @@ export const MobileTableOfContent: FC<TableOfContentProps> = ({
       </div>
     </details>
   );
-};
+}
